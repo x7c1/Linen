@@ -1,19 +1,25 @@
 package x7c1.linen;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import x7c1.linen.modern.SampleImpl;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	}
 
+		TextView view = (TextView) findViewById(R.id.sample_text);
+
+		String str = new SampleImpl().getFoo(this);
+		view.setText(str);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,4 +42,5 @@ public class MainActivity extends ActionBarActivity {
 
 		return super.onOptionsItemSelected(item);
 	}
+
 }
