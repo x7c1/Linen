@@ -1,10 +1,10 @@
 import sbt.Keys._
 import sbt._
-import sbtassembly.AssemblyKeys.{assembly, assemblyJarName, assemblyOutputPath, assemblyExcludedJars}
+import sbtassembly.AssemblyKeys.{assembly, assemblyExcludedJars, assemblyJarName, assemblyOutputPath}
 
 import scala.io.Source
 
-object LinenBuild extends Build {
+object LinenBuild extends Build with LinenSettings {
 
   val linenSettings = Seq(
     scalaVersion := "2.11.6",
@@ -18,42 +18,41 @@ object LinenBuild extends Build {
   )
 
   lazy val `interfaces` = project.
-    settings(sdkClasspath).
-    settings(linenSettings:_*)
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath)
 
   lazy val `modern` = project.
-    settings(sdkClasspath).
     settings(linenSettings:_*).
-    settings(linenJarPath).
-    settings(assemblyExcludedJars in assembly := {
-      val cp = (fullClasspath in assembly).value
-
-//      cp filter {_.data.getName == "android.jar"}
-      cp filter {x => println(x); x.data.getName.contains("android")}
-    }).
+    settings(
+      unmanagedJars in Compile := androidSdkClasspath,
+      assemblyOutputPath in assembly := linenJarPath.value,
+      assemblyExcludedJars in assembly := androidJars.value
+    ).
     dependsOn(`interfaces`)
 
-  lazy val root = Project("linen", file(".")).
-    aggregate(`modern`)
+  lazy val root = Project("linen", file(".")).aggregate(`modern`)
+}
 
-  lazy val linenJarPath = assemblyOutputPath in assembly := {
-    val jar = (assemblyJarName in assembly).value
+trait LinenSettings {
+  lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
     file("starter") / "libs" / jar
   }
-
-  lazy val sdkClasspath = unmanagedJars in Compile := {
-    val sdk = {
-      val lines = Source.fromFile(file("local.properties")).getLines()
-      val regex = "^sdk.dir=(.*)".r
-      lines collectFirst { case regex(path) => file(path) } getOrElse {
-        throw new IllegalStateException("sdk.dir not found")
-      }
-    }
+  lazy val androidJars = (fullClasspath in assembly) map { path =>
+    path filter {_.data.getAbsolutePath startsWith androidSdk.getAbsolutePath}
+  }
+  lazy val androidSdkClasspath = {
     val dirs = {
       val support = "extras/android/support/v7/appcompat/libs"
       val platform = "platforms/android-23"
-      (sdk / platform) +++ (sdk / support)
+      (androidSdk / platform) +++ (androidSdk / support)
     }
     (dirs * "*.jar").classpath
+  }
+  private lazy val androidSdk = {
+    val lines = Source.fromFile(file("local.properties")).getLines()
+    val regex = "^sdk.dir=(.*)".r
+    lines collectFirst { case regex(path) => file(path) } getOrElse {
+      throw new IllegalStateException("sdk.dir not found")
+    }
   }
 }
