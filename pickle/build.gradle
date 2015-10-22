@@ -1,19 +1,15 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "x7c1.linen"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-
-        multiDexEnabled true
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -24,7 +20,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':pickle')
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:multidex:1.0.0'
 }

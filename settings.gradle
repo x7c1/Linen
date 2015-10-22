@@ -1,1 +1,1 @@
-include ':starter', ':interfaces'
+include ':starter', ':interfaces', ':pickle'
