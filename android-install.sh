@@ -9,8 +9,12 @@ message=`echo "$output" | head -1`
 echo $message
 echo "$lines" | awk '{print "[" NR - 1 "]", $0}'
 
-/bin/echo -n "input target number : "
-read number
+if test ${#lines[@]} -eq 1 ; then
+  number=0
+else
+  /bin/echo -n "input target number : "
+  read number
+fi
 
 PRE_IFS=$IFS
 IFS=$'\n'
