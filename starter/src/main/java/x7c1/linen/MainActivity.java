@@ -1,11 +1,19 @@
 package x7c1.linen;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import x7c1.linen.interfaces.ViewInspector;
+import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
 		TextView view = (TextView) findViewById(R.id.sample_text);
 
 		String str = new SampleImpl().getFoo(this);
+
+		ListView listView = (ListView) findViewById(R.id.swipe_list);
+
+		BaseAdapter adapter = new SampleAdapter(new CommentRowInspector(this));
+		listView.setAdapter(adapter);
+
 		view.setText(str);
 	}
 
