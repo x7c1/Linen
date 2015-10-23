@@ -1,5 +1,6 @@
 import sbt.Keys._
 import sbt._
+import sbt.complete.Parser
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
 
@@ -42,7 +43,10 @@ object LinenBuild extends Build with LinenSettings {
     ).
     dependsOn(`interfaces`)
 
-  lazy val root = Project("linen", file(".")).aggregate(`modern`)
+  lazy val root = Project("linen", file(".")).
+    aggregate(`modern`).
+    settings(LinenTasks.settings:_*)
+
 }
 
 trait LinenSettings {
@@ -83,4 +87,39 @@ trait LinenSettings {
       throw new IllegalStateException("sdk.dir not found")
     }
   }
+}
+
+object LinenTasks {
+  import sbt.complete.DefaultParsers._
+
+  val sample = inputKey[Unit]("sample of tab-completion")
+
+  val settings = Seq(
+    sample := {
+      val selected = parser.parsed
+
+      println("selected files")
+      selected.map(" * " + _).foreach(println)
+    }
+  )
+
+  lazy val parser: Def.Initialize[State => Parser[Seq[String]]] =
+    Def.setting { state =>
+      val items = file("starter") / "src/main/res/layout" * "*.xml"
+      val names = items.get.map(_.getName)
+      exclusiveParser(names)
+    }
+
+  def exclusiveParser(items: Seq[String]): Parser[Seq[String]] = {
+    val base = items match {
+      case Nil => failure("item not remain")
+      case _ => items.map(token(_)).reduce(_ | _)
+    }
+    val recurse = (Space ~> base) flatMap { item =>
+      val (consumed, remains) = items.partition(_ == item)
+      exclusiveParser(remains) map { input => consumed ++ input }
+    }
+    recurse ?? Nil
+  }
+
 }
