@@ -1,18 +1,13 @@
 package x7c1.linen;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import x7c1.linen.interfaces.ViewInspector;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
 
