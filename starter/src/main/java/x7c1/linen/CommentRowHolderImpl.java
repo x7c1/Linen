@@ -7,25 +7,29 @@ import x7c1.linen.interfaces.CommentRowHolder;
 
 public class CommentRowHolderImpl implements CommentRowHolder {
 
-	private View view;
+	private final View layout;
+	private final TextView name;
+	private final TextView content;
 
-	public CommentRowHolderImpl(View view) {
-		this.view = view;
+	public CommentRowHolderImpl(View layout, TextView name, TextView content) {
+		this.layout = layout;
+		this.name = name;
+		this.content = content;
 	}
 
 	@Override
-	public TextView getName() {
-		return (TextView) view.findViewById(R.id.comment_row_name);
+	public TextView name() {
+		return name;
 	}
 
 	@Override
-	public TextView getContent() {
-		return (TextView) view.findViewById(R.id.comment_row_content);
+	public TextView content() {
+		return content;
 	}
 
 	@Override
-	public View getLayout() {
-		return view;
+	public View layout() {
+		return layout;
 	}
 
 }

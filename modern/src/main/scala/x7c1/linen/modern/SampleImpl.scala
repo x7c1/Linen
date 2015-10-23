@@ -15,19 +15,19 @@ class SampleAdapter(inspector: ViewInspector[CommentRowHolder]) extends BaseAdap
     new SampleComment(n, s"name-$n", s"comment-$n")
   }
 
-  override def getItemId(i: Int): Long = sampleList(i).commentId
+  override def getItemId(i: Int) = sampleList(i).commentId
 
-  override def getCount: Int = sampleList.size
+  override def getCount = sampleList.size
 
-  override def getView(i: Int, view: View, viewGroup: ViewGroup): View = {
-    val holder = inspector.createHolder(viewGroup)
+  override def getView(i: Int, view: View, parent: ViewGroup) = {
+    val holder = inspector.createHolder(view, parent)
     val comment = sampleList(i)
-    holder.getName.setText(comment.name)
-    holder.getContent.setText(comment.content)
-    holder.getLayout
+    holder.name.setText(comment.name)
+    holder.content.setText(comment.content)
+    holder.layout
   }
 
-  override def getItem(i: Int): AnyRef = sampleList(i)
+  override def getItem(i: Int) = sampleList(i)
 }
 
 class SampleComment(
