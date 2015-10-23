@@ -17,3 +17,20 @@ allprojects {
         jcenter()
     }
 }
+
+subprojects{
+    afterEvaluate {
+        if(it.hasProperty('android')){
+            android {
+                compileSdkVersion 23
+                buildToolsVersion "21.1.2"
+
+                defaultConfig {
+                    minSdkVersion 21
+                    targetSdkVersion 23
+                    multiDexEnabled true
+                }
+            }
+        }
+    }
+}
