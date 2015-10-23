@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt._
-import sbtassembly.AssemblyKeys.{assembly, assemblyExcludedJars, assemblyJarName, assemblyOutputPath, assemblyOption}
+import sbtassembly.AssemblyKeys._
+import sbtassembly.MergeStrategy
 
 import scala.io.Source
 
@@ -14,7 +15,8 @@ object LinenBuild extends Build with LinenSettings {
     ),
     libraryDependencies ++= Seq(
       "org.scalatest" % "scalatest_2.11" % "2.2.4" % Test
-    )
+    ),
+    logLevel in assembly := Level.Error
   )
 
   lazy val `interfaces` = project.
@@ -35,7 +37,8 @@ object LinenBuild extends Build with LinenSettings {
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
-      assemblyExcludedJars in assembly := androidJars.value
+      assemblyExcludedJars in assembly := androidJars.value,
+      assemblyMergeStrategy in assembly := excludeInterfaces.value
     ).
     dependsOn(`interfaces`)
 
@@ -43,6 +46,7 @@ object LinenBuild extends Build with LinenSettings {
 }
 
 trait LinenSettings {
+
   lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
     file("starter") / "libs" / jar
   }
@@ -50,6 +54,7 @@ trait LinenSettings {
   lazy val pickleJarPath = (assemblyJarName in assembly) map { jar =>
     file("pickle") / "libs" / jar
   }
+
   lazy val androidJars = (fullClasspath in assembly) map { path =>
     path filter {_.data.getAbsolutePath startsWith androidSdk.getAbsolutePath}
   }
@@ -62,6 +67,15 @@ trait LinenSettings {
     }
     (dirs * "*.jar").classpath
   }
+
+  lazy val excludeInterfaces: Def.Initialize[String => MergeStrategy] =
+    Def.setting {
+      case path if path contains "/linen/interfaces" => MergeStrategy.discard
+      case path =>
+        val original = (assemblyMergeStrategy in assembly).value
+        original(path)
+    }
+
   private lazy val androidSdk = {
     val lines = Source.fromFile(file("local.properties")).getLines()
     val regex = "^sdk.dir=(.*)".r
