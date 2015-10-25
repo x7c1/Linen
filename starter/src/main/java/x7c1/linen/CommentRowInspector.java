@@ -1,6 +1,7 @@
 package x7c1.linen;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,44 +21,19 @@ public class CommentRowInspector implements ViewInspector<CommentRowHolder> {
 
 	@Override
 	public CommentRowHolder createHolder(View convertView, ViewGroup parent) {
-		final View layout;
-		if (convertView == null){
-			layout = layoutInflater.inflate(R.layout.comment_row, parent, false);
+		final CommentRowHolder holder;
+		if (convertView == null || convertView.getTag() == null){
+			View layout = layoutInflater.inflate(R.layout.comment_row, parent, false);
+			holder = new CommentRowHolder(
+				layout,
+				(TextView) layout.findViewById(R.id.comment_row_name),
+				(TextView) layout.findViewById(R.id.comment_row_content)
+			);
+			layout.setTag(holder);
 		} else {
-			layout = convertView;
+			holder = (CommentRowHolder) convertView.getTag();
 		}
-		return new CommentRowHolderImpl(
-			layout,
-			(TextView) layout.findViewById(R.id.comment_row_name),
-			(TextView) layout.findViewById(R.id.comment_row_content)
-		);
+		return holder;
 	}
-	private static class CommentRowHolderImpl implements CommentRowHolder {
 
-		private final View layout;
-		private final TextView name;
-		private final TextView content;
-
-		public CommentRowHolderImpl(View layout, TextView name, TextView content) {
-			this.layout = layout;
-			this.name = name;
-			this.content = content;
-		}
-
-		@Override
-		public TextView name() {
-			return name;
-		}
-
-		@Override
-		public TextView content() {
-			return content;
-		}
-
-		@Override
-		public View layout() {
-			return layout;
-		}
-
-	}
 }
