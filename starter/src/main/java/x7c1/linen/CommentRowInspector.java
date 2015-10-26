@@ -1,16 +1,15 @@
 package x7c1.linen;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import x7c1.linen.interfaces.CommentRowHolder;
 import x7c1.linen.interfaces.ViewInspector;
+import x7c1.linen.interfaces.res.CommentRowLayout;
 
-public class CommentRowInspector implements ViewInspector<CommentRowHolder> {
+public class CommentRowInspector implements ViewInspector<CommentRowLayout> {
 
 	private final LayoutInflater layoutInflater;
 
@@ -20,20 +19,24 @@ public class CommentRowInspector implements ViewInspector<CommentRowHolder> {
 	}
 
 	@Override
-	public CommentRowHolder createHolder(View convertView, ViewGroup parent) {
-		final CommentRowHolder holder;
-		if (convertView == null || convertView.getTag() == null){
-			View layout = layoutInflater.inflate(R.layout.comment_row, parent, false);
-			holder = new CommentRowHolder(
-				layout,
-				(TextView) layout.findViewById(R.id.comment_row_name),
-				(TextView) layout.findViewById(R.id.comment_row_content)
-			);
-			layout.setTag(holder);
+	public CommentRowLayout getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot) {
+		final View view;
+		final TextView name;
+		final TextView content;
+
+		if (convertView == null || convertView.getTag(R.id.comment_row_name) == null){
+			view = layoutInflater.inflate(R.layout.comment_row, parent, attachToRoot);
+			name = (TextView) view.findViewById(R.id.comment_row_name);
+			content = (TextView) view.findViewById(R.id.comment_row_content);
+
+			view.setTag(R.id.comment_row_name, name);
+			view.setTag(R.id.comment_row_content, content);
 		} else {
-			holder = (CommentRowHolder) convertView.getTag();
+			view = convertView;
+			name = (TextView) view.getTag(R.id.comment_row_name);
+			content = (TextView) view.getTag(R.id.comment_row_content);
 		}
-		return holder;
+		return new CommentRowLayout(view, name, content);
 	}
 
 }

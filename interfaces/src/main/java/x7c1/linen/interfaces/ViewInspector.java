@@ -4,5 +4,5 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public interface ViewInspector<T> {
-	T createHolder(View convertView, ViewGroup parent);
+	T getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot);
 }
