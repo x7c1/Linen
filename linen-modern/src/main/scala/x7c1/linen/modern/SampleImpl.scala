@@ -1,15 +1,13 @@
 package x7c1.linen.modern
 
-import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View.OnClickListener
 import android.view.{View, ViewGroup}
-import android.widget.{BaseAdapter, TextView, Toast}
+import android.widget.{BaseAdapter, Toast}
 import x7c1.linen.glue.res.layout.CommentRowLayout
 import x7c1.linen.glue.res.values.CommentValues
-import x7c1.linen.glue.{ValuesProvider, SampleStruct, LayoutProvider}
-import x7c1.linen.modern.decorator.{RichTextView, RichListenableView}
+import x7c1.linen.glue.{LayoutProvider, SampleStruct, ValuesProvider}
+import x7c1.wheat.modern.decorator.Imports
 
 class SampleImpl extends SampleStruct {
   override def getFoo(activity: AppCompatActivity): String = "!" + activity.toString
@@ -58,30 +56,3 @@ class SampleComment(
   val content: String
 )
 
-package decorator {
-
-  class RichListenableView[A <: View](view: A){
-
-    def context: Context = view.getContext
-
-    def onClick[B](f: A => B) = view.setOnClickListener(new OnClickListener {
-      override def onClick(view: View): Unit = f(view.asInstanceOf[A])
-    })
-  }
-  class RichTextView[A <: TextView](view: A){
-
-    def text: CharSequence = view.getText
-
-    def text_=(value: String): Unit = view.setText(value)
-  }
-}
-
-object Imports {
-  import scala.language.implicitConversions
-
-  implicit def toRichListenableView[A <: View](view: A): RichListenableView[A]
-    = new RichListenableView(view)
-
-  implicit def toRichTextView[A <: TextView](view: A): RichTextView[A]
-    = new RichTextView(view)
-}
