@@ -52,11 +52,11 @@ object LinenBuild extends Build with LinenSettings {
 trait LinenSettings {
 
   lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
-    file("starter") / "libs" / jar
+    file("starter") / "libs-generated" / jar
   }
 
   lazy val pickleJarPath = (assemblyJarName in assembly) map { jar =>
-    file("pickle") / "libs" / jar
+    file("pickle") / "libs-generated" / jar
   }
 
   lazy val androidJars = (fullClasspath in assembly) map { path =>
