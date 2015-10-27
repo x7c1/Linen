@@ -2,7 +2,7 @@ package x7c1.linen;
 
 import android.content.Context;
 
-import x7c1.linen.glue.ValuesProvider;
+import x7c1.wheat.ancient.resource.ValuesProvider;
 import x7c1.linen.glue.res.values.CommentValues;
 
 public class CommentValuesProvider implements ValuesProvider<CommentValues>{

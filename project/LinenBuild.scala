@@ -20,9 +20,14 @@ object LinenBuild extends Build with LinenSettings {
     logLevel in assembly := Level.Error
   )
 
-  lazy val `linen-glue` = project.
+  lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath)
+
+  lazy val `linen-glue` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    dependsOn(`wheat-ancient`)
 
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).

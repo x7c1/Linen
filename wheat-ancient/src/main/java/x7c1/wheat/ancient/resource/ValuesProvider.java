@@ -1,4 +1,4 @@
-package x7c1.linen.glue;
+package x7c1.wheat.ancient.resource;
 
 
 public interface ValuesProvider<T> {

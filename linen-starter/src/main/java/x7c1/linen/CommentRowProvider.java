@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import x7c1.linen.glue.LayoutProvider;
+import x7c1.wheat.ancient.resource.LayoutProvider;
 import x7c1.linen.glue.res.layout.CommentRowLayout;
 
 public class CommentRowProvider implements LayoutProvider<CommentRowLayout> {

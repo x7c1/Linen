@@ -6,7 +6,8 @@ import android.view.{View, ViewGroup}
 import android.widget.{BaseAdapter, Toast}
 import x7c1.linen.glue.res.layout.CommentRowLayout
 import x7c1.linen.glue.res.values.CommentValues
-import x7c1.linen.glue.{LayoutProvider, SampleStruct, ValuesProvider}
+import x7c1.wheat.ancient.SampleStruct
+import x7c1.wheat.ancient.resource.{LayoutProvider, ValuesProvider}
 import x7c1.wheat.modern.decorator.Imports
 
 class SampleImpl extends SampleStruct {
@@ -55,4 +56,3 @@ class SampleComment(
   val name: String,
   val content: String
 )
-
