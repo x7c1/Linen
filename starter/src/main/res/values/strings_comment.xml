@@ -1,0 +1,4 @@
+<resources>
+    <string name="comment__name_clicked">name [%s] clicked</string>
+    <string name="comment__content_clicked">content [%s] clicked</string>
+</resources>

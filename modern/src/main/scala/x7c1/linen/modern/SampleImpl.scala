@@ -7,14 +7,18 @@ import android.view.View.OnClickListener
 import android.view.{View, ViewGroup}
 import android.widget.{BaseAdapter, TextView, Toast}
 import x7c1.linen.interfaces.res.CommentRowLayout
-import x7c1.linen.interfaces.{SampleStruct, LayoutProvider}
+import x7c1.linen.interfaces.res.values.CommentValues
+import x7c1.linen.interfaces.{ValuesProvider, SampleStruct, LayoutProvider}
 import x7c1.linen.modern.decorator.{RichTextView, RichListenableView}
 
 class SampleImpl extends SampleStruct {
   override def getFoo(activity: AppCompatActivity): String = "!" + activity.toString
 }
 
-class SampleAdapter(inspector: LayoutProvider[CommentRowLayout]) extends BaseAdapter {
+class SampleAdapter(
+  layoutProvider: LayoutProvider[CommentRowLayout],
+  values: ValuesProvider[CommentValues]) extends BaseAdapter {
+
   import Imports._
 
   lazy val sampleList = (1 to 100) map { n =>
@@ -25,23 +29,24 @@ class SampleAdapter(inspector: LayoutProvider[CommentRowLayout]) extends BaseAda
   override def getCount = sampleList.size
 
   override def getView(i: Int, view: View, parent: ViewGroup) = {
-    val layout = inspector.getOrInflate(view, parent, false)
+    val layout = layoutProvider.getOrInflate(view, parent, false)
     val comment = sampleList(i)
 
     layout.name.text = comment.name
-    layout.name onClick onClickText(comment.name)
+    layout.name onClick
+      onClickText(values.get.nameClicked format comment.name)
 
     layout.content.text = comment.content
-    layout.content onClick onClickText(comment.content)
+    layout.content onClick
+      onClickText(values.get.contentClicked format comment.content)
+
     layout.view
   }
 
-  def onClickText(value: String) = (view: View) => {
-    val toast = Toast.makeText(view.context,
-      s"clicked [$value]", Toast.LENGTH_SHORT )
-
+  def onClickText(message: String) = (view: View) => {
+    val toast = Toast.makeText(view.context, message, Toast.LENGTH_SHORT )
     toast.show()
-    Log.e("SampleAdapter", s"clicked [$value]")
+    Log.e("SampleAdapter", message)
   }
   override def getItem(i: Int) = sampleList(i)
 
