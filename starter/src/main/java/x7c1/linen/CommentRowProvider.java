@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import x7c1.linen.interfaces.LayoutProvider;
-import x7c1.linen.interfaces.res.CommentRowLayout;
+import x7c1.linen.interfaces.res.layout.CommentRowLayout;
 
 public class CommentRowProvider implements LayoutProvider<CommentRowLayout> {
 

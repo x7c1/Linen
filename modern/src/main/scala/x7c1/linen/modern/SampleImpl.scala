@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.View.OnClickListener
 import android.view.{View, ViewGroup}
 import android.widget.{BaseAdapter, TextView, Toast}
-import x7c1.linen.interfaces.res.CommentRowLayout
+import x7c1.linen.interfaces.res.layout.CommentRowLayout
 import x7c1.linen.interfaces.res.values.CommentValues
 import x7c1.linen.interfaces.{ValuesProvider, SampleStruct, LayoutProvider}
 import x7c1.linen.modern.decorator.{RichTextView, RichListenableView}

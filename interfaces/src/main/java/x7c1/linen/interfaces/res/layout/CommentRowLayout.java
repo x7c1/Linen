@@ -1,4 +1,4 @@
-package x7c1.linen.interfaces.res;
+package x7c1.linen.interfaces.res.layout;
 
 import android.view.View;
 import android.widget.TextView;
