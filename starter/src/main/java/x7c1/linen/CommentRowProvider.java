@@ -6,14 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import x7c1.linen.interfaces.ViewInspector;
+import x7c1.linen.interfaces.LayoutProvider;
 import x7c1.linen.interfaces.res.CommentRowLayout;
 
-public class CommentRowInspector implements ViewInspector<CommentRowLayout> {
+public class CommentRowProvider implements LayoutProvider<CommentRowLayout> {
 
 	private final LayoutInflater layoutInflater;
 
-	public CommentRowInspector(Context context) {
+	public CommentRowProvider(Context context) {
 		this.layoutInflater = (LayoutInflater)
 				context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}

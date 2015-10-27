@@ -7,14 +7,14 @@ import android.view.View.OnClickListener
 import android.view.{View, ViewGroup}
 import android.widget.{BaseAdapter, TextView, Toast}
 import x7c1.linen.interfaces.res.CommentRowLayout
-import x7c1.linen.interfaces.{SampleStruct, ViewInspector}
+import x7c1.linen.interfaces.{SampleStruct, LayoutProvider}
 import x7c1.linen.modern.decorator.{RichTextView, RichListenableView}
 
 class SampleImpl extends SampleStruct {
   override def getFoo(activity: AppCompatActivity): String = "!" + activity.toString
 }
 
-class SampleAdapter(inspector: ViewInspector[CommentRowLayout]) extends BaseAdapter {
+class SampleAdapter(inspector: LayoutProvider[CommentRowLayout]) extends BaseAdapter {
   import Imports._
 
   lazy val sampleList = (1 to 100) map { n =>

@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
 		ListView listView = (ListView) findViewById(R.id.swipe_list);
 
-		BaseAdapter adapter = new SampleAdapter(new CommentRowInspector(this));
+		BaseAdapter adapter = new SampleAdapter(new CommentRowProvider(this));
 		listView.setAdapter(adapter);
 
 		view.setText(str);
