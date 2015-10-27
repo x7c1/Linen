@@ -1,1 +1,1 @@
-include ':starter', ':interfaces', ':pickle'
+include ':linen-starter', ':linen-glue', ':linen-pickle'

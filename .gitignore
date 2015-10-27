@@ -4,10 +4,11 @@
 /.idea/libraries
 .DS_Store
 /build
-pickle/build
 
 *.iml
 .idea
 
 target
+
 libs-generated
+linen-pickle/build

@@ -20,11 +20,11 @@ object LinenBuild extends Build with LinenSettings {
     logLevel in assembly := Level.Error
   )
 
-  lazy val `interfaces` = project.
+  lazy val `linen-glue` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath)
 
-  lazy val `pickle` = project.
+  lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
@@ -32,19 +32,19 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value
     )
 
-  lazy val `modern` = project.
+  lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value,
-      assemblyMergeStrategy in assembly := excludeInterfaces.value
+      assemblyMergeStrategy in assembly := excludeGlue.value
     ).
-    dependsOn(`interfaces`)
+    dependsOn(`linen-glue`)
 
   lazy val root = Project("linen", file(".")).
-    aggregate(`modern`).
+    aggregate(`linen-modern`).
     settings(LinenTasks.settings:_*)
 
 }
@@ -52,11 +52,11 @@ object LinenBuild extends Build with LinenSettings {
 trait LinenSettings {
 
   lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
-    file("starter") / "libs-generated" / jar
+    file("linen-starter") / "libs-generated" / jar
   }
 
   lazy val pickleJarPath = (assemblyJarName in assembly) map { jar =>
-    file("pickle") / "libs-generated" / jar
+    file("linen-pickle") / "libs-generated" / jar
   }
 
   lazy val androidJars = (fullClasspath in assembly) map { path =>
@@ -72,9 +72,9 @@ trait LinenSettings {
     (dirs * "*.jar").classpath
   }
 
-  lazy val excludeInterfaces: Def.Initialize[String => MergeStrategy] =
+  lazy val excludeGlue: Def.Initialize[String => MergeStrategy] =
     Def.setting {
-      case path if path contains "/linen/interfaces" => MergeStrategy.discard
+      case path if path startsWith "x7c1/linen/glue" => MergeStrategy.discard
       case path =>
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
@@ -105,7 +105,7 @@ object LinenTasks {
 
   lazy val parser: Def.Initialize[State => Parser[Seq[String]]] =
     Def.setting { state =>
-      val items = file("starter") / "src/main/res/layout" * "*.xml"
+      val items = file("linen-starter") / "src/main/res/layout" * "*.xml"
       val names = items.get.map(_.getName)
       exclusiveParser(names)
     }
