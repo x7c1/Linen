@@ -14,11 +14,10 @@ object LinenBuild extends Build with LinenSettings {
       "-deprecation",
       "-feature"
     ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.4" % Test
-    ),
+    libraryDependencies ++= Seq(testLibrary),
     logLevel in assembly := Level.Error
   )
+  lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -53,7 +52,10 @@ object LinenBuild extends Build with LinenSettings {
     dependsOn(`linen-glue`, `wheat-modern`)
 
   lazy val `wheat-build` = project.
-    settings(sbtPlugin := true).
+    settings(
+      sbtPlugin := true,
+      libraryDependencies ++= Seq(testLibrary)
+    ).
     settings(
       organization := "x7c1",
       name         := "wheat-build",

@@ -23,4 +23,14 @@ object WheatParser {
     }
     recurse ?? Nil
   }
+
+  def toCamelCase(x: String): Either[WheatParserError, String] = {
+    val alphabet = token('a' to 'z') | token('A' to 'Z')
+    val parser = (alphabet.+.string <~ token('_').?).+ map {
+      _.map(_.capitalize).mkString
+    }
+    parse(x, parser).left.map(WheatParserError)
+  }
 }
+
+case class WheatParserError(message: String)
