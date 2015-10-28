@@ -24,17 +24,17 @@ public class CommentRowProvider implements LayoutProvider<CommentRowLayout> {
 		final TextView name;
 		final TextView content;
 
-		if (convertView == null || convertView.getTag(R.id.comment_row_name) == null){
+		if (convertView == null || convertView.getTag(R.id.comment_row__name) == null){
 			view = layoutInflater.inflate(R.layout.comment_row, parent, attachToRoot);
-			name = (TextView) view.findViewById(R.id.comment_row_name);
-			content = (TextView) view.findViewById(R.id.comment_row_content);
+			name = (TextView) view.findViewById(R.id.comment_row__name);
+			content = (TextView) view.findViewById(R.id.comment_row__content);
 
-			view.setTag(R.id.comment_row_name, name);
-			view.setTag(R.id.comment_row_content, content);
+			view.setTag(R.id.comment_row__name, name);
+			view.setTag(R.id.comment_row__content, content);
 		} else {
 			view = convertView;
-			name = (TextView) view.getTag(R.id.comment_row_name);
-			content = (TextView) view.getTag(R.id.comment_row_content);
+			name = (TextView) view.getTag(R.id.comment_row__name);
+			content = (TextView) view.getTag(R.id.comment_row__content);
 		}
 		return new CommentRowLayout(view, name, content);
 	}
