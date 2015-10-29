@@ -23,11 +23,11 @@ object LayoutGenerator {
       println(" * " + source.file.getPath)
     }})
   }
-  val targetGluePackage = "x7c1.linen.glue.res.layout"
-  val targetAppPackage = "x7c1.linen.res.layout"
+  val glueLayoutPackage = "x7c1.linen.glue.res.layout"
+  val appLayoutPackage = "x7c1.linen.res.layout"
   val appPackage = "x7c1.linen"
 
-  def layoutDir = file("linen-starter") / "src/main/res/layout"
+  val layoutDir = file("linen-starter") / "src/main/res/layout"
 
   def layoutGenDir = file("linen-glue") / "src/main/java" / "x7c1/linen/glue/res/layout"
   def providerGenDir = file("linen-starter") / "src/main/java" / "x7c1/linen/res/layout"
@@ -35,9 +35,8 @@ object LayoutGenerator {
   def inspect(fileName: String): Either[WheatParserError, ParsedLayout] = {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
       ParsedLayout(
-        rawPrefix = prefix.rawPrefix,
-        classPrefix = prefix.classPrefix,
-        elements = createElements(fileName, prefix.keyPrefix))
+        prefix = prefix,
+        elements = createElements(fileName, prefix.ofKey))
     }
   }
 
@@ -53,19 +52,19 @@ object LayoutGenerator {
 
   def applyTemplate(layout: ParsedLayout): Seq[JavaSource] = {
     val forLayout = {
-      val parts = new LayoutPartsFactory(targetGluePackage, layout).create
+      val parts = new LayoutPartsFactory(glueLayoutPackage, layout).create
       val code = x7c1.wheat.build.txt.layout(parts).body
-      val path = layoutGenDir / s"${parts.classPrefix}Layout.java"
+      val path = layoutGenDir / s"${parts.prefix.ofClass}Layout.java"
       JavaSource(code, path)
     }
     val forLayoutProvider = {
       val factory = new LayoutProviderPartsFactory(
-        appPackage, targetAppPackage, targetGluePackage, layout
+        appPackage, appLayoutPackage, glueLayoutPackage, layout
       )
       val parts = factory.create
       val code = x7c1.wheat.build.txt.layoutProvider(parts).body
 
-      val path = providerGenDir / s"${parts.classPrefix}LayoutProvider.java"
+      val path = providerGenDir / s"${parts.prefix.ofClass}LayoutProvider.java"
       JavaSource(code, path)
     }
     Seq(forLayout, forLayoutProvider)
@@ -97,13 +96,11 @@ object LayoutGenerator {
 }
 
 case class LayoutPrefix(
-  rawPrefix: String,
-  classPrefix: String,
-  keyPrefix: String)
+  raw: String,
+  ofClass: String, ofKey: String)
 
 case class ParsedLayout(
-  rawPrefix: String,
-  classPrefix: String,
+  prefix: LayoutPrefix,
   elements: Seq[ParsedLayoutElement])
 
 case class ParsedLayoutElement(key: String, label: String, tag: String)

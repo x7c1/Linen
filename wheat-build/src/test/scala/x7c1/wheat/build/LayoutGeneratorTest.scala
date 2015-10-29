@@ -8,7 +8,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
   it can "inspect resource XML" in {
     val Right(layout) = LayoutGenerator inspect "comment_row.xml"
-    layout.classPrefix shouldBe "CommentRow"
+    layout.prefix.ofClass shouldBe "CommentRow"
 
     val elements = layout.elements
 
@@ -56,8 +56,8 @@ class LayoutNameParserTest extends FlatSpecLike with Matchers {
 
   it can "read prefix from file name" in {
     val Right(prefix) = LayoutNameParser.readPrefix("abcd_ef_ghi.xml")
-    prefix.classPrefix shouldBe "AbcdEfGhi"
-    prefix.keyPrefix shouldBe "abcd_ef_ghi__"
+    prefix.ofClass shouldBe "AbcdEfGhi"
+    prefix.ofKey shouldBe "abcd_ef_ghi__"
   }
 
   it should "fail to invalid file name" in {

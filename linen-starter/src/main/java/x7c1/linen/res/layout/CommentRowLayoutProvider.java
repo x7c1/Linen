@@ -9,12 +9,10 @@ package x7c1.linen.res.layout;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
-import x7c1.linen.R;
 import android.view.View;
 import android.widget.TextView;
-
 import x7c1.wheat.ancient.resource.LayoutProvider;
+import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.CommentRowLayout;
 
 public class CommentRowLayoutProvider implements LayoutProvider<CommentRowLayout> {
@@ -27,7 +25,11 @@ public class CommentRowLayoutProvider implements LayoutProvider<CommentRowLayout
     }
 
     @Override
-    public CommentRowLayout getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot) {
+    public CommentRowLayout getOrInflate(
+        View convertView,
+        ViewGroup parent,
+        boolean attachToRoot)
+    {
         final View view;
         final TextView name;
         final TextView content;

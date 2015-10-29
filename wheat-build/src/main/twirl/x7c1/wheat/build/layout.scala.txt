@@ -4,15 +4,15 @@
  * Do not modify this file -- YOUR CHANGES WILL BE ERASED!
  */
 
-@parts.targetPackage
+@parts.declarePackage
 
 @parts.imports
 
-public class @(parts.classPrefix)Layout {
+public class @(parts.prefix.ofClass)Layout {
 
     @parts.fields
 
-    public @(parts.classPrefix)Layout(
+    public @(parts.prefix.ofClass)Layout(
         @parts.arguments
     ){
         @parts.assignments

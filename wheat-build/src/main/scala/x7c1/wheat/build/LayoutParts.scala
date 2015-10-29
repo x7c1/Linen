@@ -1,8 +1,8 @@
 package x7c1.wheat.build
 
 case class LayoutParts(
-  targetPackage: String,
-  classPrefix: String,
+  declarePackage: String,
+  prefix: LayoutPrefix,
   imports: String,
   fields: String,
   arguments: String,
@@ -14,9 +14,12 @@ class LayoutPartsFactory (targetPackage: String, layout: ParsedLayout){
   def create: LayoutParts = {
     LayoutParts(
       s"package $targetPackage;",
-      layout.classPrefix,
-      PackageResolver.importFrom(layout),
+      layout.prefix,
+      imports,
       fields, arguments, assignments)
+  }
+  def imports = {
+    PackageResolver.imports(layout).mkString("\n")
   }
   def fields = {
     val make = (tag: String, label: String) => s"public final $tag $label;"
@@ -34,17 +37,12 @@ class LayoutPartsFactory (targetPackage: String, layout: ParsedLayout){
     val ys = make("view") +: layout.elements.map{_.label}.map(make)
     ys.mkString("\n        ")
   }
-  def toPackage(tag: String) = tag match {
-    case "View" => "android.view.View"
-    case "TextView" => "android.widget.TextView"
-  }
 }
 
 case class LayoutProviderParts(
-  targetPackage: String,
+  declarePackage: String,
   targetGluePackage: String,
-  classPrefix: String,
-  rawPrefix: String,
+  prefix: LayoutPrefix,
   imports: String,
   localVariables: String,
   assignAtFirst: String,
@@ -59,13 +57,25 @@ class LayoutProviderPartsFactory (
     LayoutProviderParts(
       s"package $targetPackage;",
       targetGluePackage,
-      layout.classPrefix,
-      layout.rawPrefix,
-      s"import $appPackage.R;\n" + PackageResolver.importFrom(layout),
+      layout.prefix,
+      imports,
       localVariables,
       assignAtFirst,
       assignCached,
       arguments )
+  }
+  def imports = {
+    val xs = Seq(
+      "import android.content.Context;",
+      "import android.view.LayoutInflater;",
+      "import android.view.ViewGroup;"
+    )
+    val ys = Seq(
+      "import x7c1.wheat.ancient.resource.LayoutProvider;",
+      s"import $appPackage.R;",
+      s"import $targetGluePackage.${layout.prefix.ofClass}Layout;"
+    )
+    (xs ++ PackageResolver.imports(layout) ++  ys).distinct.mkString("\n")
   }
   def localVariables = {
     val make = (tag: String, label: String) => s"final $tag $label;"
@@ -79,7 +89,7 @@ class LayoutProviderPartsFactory (
     val ys = layout.elements.map{ x =>
       s"view.setTag(R.id.${x.key}, ${x.label});"
     }
-    s"view = layoutInflater.inflate(R.layout.${layout.rawPrefix}, parent, attachToRoot);" +
+    s"view = layoutInflater.inflate(R.layout.${layout.prefix.raw}, parent, attachToRoot);" +
       "\n            " + xs.mkString("\n            ") +
       "\n            " + ys.mkString("\n            ")
   }
@@ -97,10 +107,9 @@ class LayoutProviderPartsFactory (
 }
 
 object PackageResolver {
-  def importFrom(layout: ParsedLayout): String = {
+  def imports(layout: ParsedLayout): Seq[String] = {
     val xs = toPackage("View") +: layout.elements.map(_.tag).map(toPackage)
-    val ys = xs.distinct.map("import " + _ + ";")
-    ys.mkString("\n")
+    xs.distinct.map("import " + _ + ";")
   }
   def toPackage(tag: String) = tag match {
     case "View" => "android.view.View"

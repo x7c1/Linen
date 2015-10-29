@@ -4,28 +4,25 @@
  * Do not modify this file -- YOUR CHANGES WILL BE ERASED!
  */
 
-@parts.targetPackage
-
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+@parts.declarePackage
 
 @parts.imports
 
-import x7c1.wheat.ancient.resource.LayoutProvider;
-import @(parts.targetGluePackage).@(parts.classPrefix)Layout;
-
-public class @(parts.classPrefix)LayoutProvider implements LayoutProvider<@(parts.classPrefix)Layout> {
+public class @(parts.prefix.ofClass)LayoutProvider implements LayoutProvider<@(parts.prefix.ofClass)Layout> {
 
     private final LayoutInflater layoutInflater;
 
-    public @(parts.classPrefix)LayoutProvider(Context context) {
+    public @(parts.prefix.ofClass)LayoutProvider(Context context) {
         this.layoutInflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @@Override
-    public @(parts.classPrefix)Layout getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot) {
+    public @(parts.prefix.ofClass)Layout getOrInflate(
+        View convertView,
+        ViewGroup parent,
+        boolean attachToRoot)
+    {
         @parts.localVariables
 
         if (convertView == null){
@@ -33,7 +30,7 @@ public class @(parts.classPrefix)LayoutProvider implements LayoutProvider<@(part
         } else {
             @parts.assignCached
         }
-        return new @(parts.classPrefix)Layout(
+        return new @(parts.prefix.ofClass)Layout(
             @parts.arguments
         );
     }
