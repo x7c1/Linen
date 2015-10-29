@@ -1,5 +1,7 @@
 package x7c1.wheat.build
 
+import java.io.PrintWriter
+
 import sbt._
 import sbt.complete.Parser
 
@@ -10,16 +12,22 @@ object LayoutGenerator {
     val selected = parser.parsed
 
     println("selected files")
+    selected.map(" * " + _).foreach(println)
 
-    val list = selected.map(inspect)
+    val layouts = selected.map(inspect)
+    val sources = layouts.map(_.right.map(applyTemplate))
 
-    val sources = list.map(_.right.map(applyTemplate))
-    sources.foreach(println)
-
+    println("generated files")
+    sources.map(_.right.foreach { source =>
+      writeSource(source)
+      println(" * " + source.file.getPath)
+    })
   }
   val targetPackage = "x7c1.linen.glue.res.layout"
 
   def layoutDir = file("linen-starter") / "src/main/res/layout"
+
+  def layoutGenDir = file("linen-glue") / "src/main/java" / "x7c1/linen/glue/res/layout"
 
   def inspect(fileName: String): Either[WheatParserError, ParsedLayout] = {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
@@ -30,9 +38,17 @@ object LayoutGenerator {
     }
   }
 
-  def applyTemplate(layout: ParsedLayout): String = {
+  def writeSource(source: JavaSource): Unit = {
+    val writer = new PrintWriter(source.file)
+    writer.write(source.code)
+    writer.close()
+  }
+
+  def applyTemplate(layout: ParsedLayout): JavaSource = {
     val parts = new LayoutPartsFactory(layout).create
-    x7c1.wheat.build.txt.layout(parts).body
+    val code = x7c1.wheat.build.txt.layout(parts).body
+    val path = layoutGenDir / s"${parts.classPrefix}Layout.java"
+    JavaSource(code, path)
   }
   def createElements(fileName: String, prefix: String) = {
     val file = layoutDir / fileName
@@ -68,6 +84,11 @@ case class ParsedLayout(
   elements: Seq[ParsedLayoutElement])
 
 case class ParsedLayoutElement(key: String, label: String, tag: String)
+
+case class JavaSource(
+  code: String,
+  file: File
+)
 
 object LayoutNameParser {
   import sbt.complete.DefaultParsers._

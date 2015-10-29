@@ -13,7 +13,7 @@ class LayoutPartsFactory (layout: ParsedLayout){
 
   def create: LayoutParts = {
     LayoutParts(
-      s"package ${layout.targetPackage}",
+      s"package ${layout.targetPackage};",
       layout.prefix, imports, fields, arguments, assignments)
   }
   def fields = {
