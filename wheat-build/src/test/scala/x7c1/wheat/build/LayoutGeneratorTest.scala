@@ -8,7 +8,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
   it can "inspect resource XML" in {
     val Right(layout) = LayoutGenerator inspect "comment_row.xml"
-    layout.prefix shouldBe "CommentRow"
+    layout.classPrefix shouldBe "CommentRow"
 
     val elements = layout.elements
 
@@ -25,7 +25,8 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
   it can "generate java source" in {
     val Right(layout) = LayoutGenerator inspect "comment_row.xml"
-    val source = LayoutGenerator.applyTemplate(layout).code
+    val sources = LayoutGenerator.applyTemplate(layout)
+    val source = sources.head.code
 
     source should include("import android.view.View;")
     source should include("import android.widget.TextView;")

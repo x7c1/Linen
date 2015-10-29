@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
+import x7c1.linen.res.layout.CommentRowLayoutProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 		ListView listView = (ListView) findViewById(R.id.swipe_list);
 
 		BaseAdapter adapter = new SampleAdapter(
-				new CommentRowProvider(this),
+				new CommentRowLayoutProvider(this),
 				new CommentValuesProvider(this)
 		);
 		listView.setAdapter(adapter);

@@ -18,37 +18,57 @@ object LayoutGenerator {
     val sources = layouts.map(_.right.map(applyTemplate))
 
     println("generated files")
-    sources.map(_.right.foreach { source =>
+    sources.map(_.right.foreach { _.foreach { source =>
       writeSource(source)
       println(" * " + source.file.getPath)
-    })
+    }})
   }
-  val targetPackage = "x7c1.linen.glue.res.layout"
+  val targetGluePackage = "x7c1.linen.glue.res.layout"
+  val targetAppPackage = "x7c1.linen.res.layout"
+  val appPackage = "x7c1.linen"
 
   def layoutDir = file("linen-starter") / "src/main/res/layout"
 
   def layoutGenDir = file("linen-glue") / "src/main/java" / "x7c1/linen/glue/res/layout"
+  def providerGenDir = file("linen-starter") / "src/main/java" / "x7c1/linen/res/layout"
 
   def inspect(fileName: String): Either[WheatParserError, ParsedLayout] = {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
       ParsedLayout(
-        targetPackage = targetPackage,
-        prefix = prefix.classPrefix,
+        rawPrefix = prefix.rawPrefix,
+        classPrefix = prefix.classPrefix,
         elements = createElements(fileName, prefix.keyPrefix))
     }
   }
 
   def writeSource(source: JavaSource): Unit = {
+    val parent = source.file.getParentFile
+    if (!parent.exists()){
+      parent.mkdirs()
+    }
     val writer = new PrintWriter(source.file)
     writer.write(source.code)
     writer.close()
   }
 
-  def applyTemplate(layout: ParsedLayout): JavaSource = {
-    val parts = new LayoutPartsFactory(layout).create
-    val code = x7c1.wheat.build.txt.layout(parts).body
-    val path = layoutGenDir / s"${parts.classPrefix}Layout.java"
-    JavaSource(code, path)
+  def applyTemplate(layout: ParsedLayout): Seq[JavaSource] = {
+    val forLayout = {
+      val parts = new LayoutPartsFactory(targetGluePackage, layout).create
+      val code = x7c1.wheat.build.txt.layout(parts).body
+      val path = layoutGenDir / s"${parts.classPrefix}Layout.java"
+      JavaSource(code, path)
+    }
+    val forLayoutProvider = {
+      val factory = new LayoutProviderPartsFactory(
+        appPackage, targetAppPackage, targetGluePackage, layout
+      )
+      val parts = factory.create
+      val code = x7c1.wheat.build.txt.layoutProvider(parts).body
+
+      val path = providerGenDir / s"${parts.classPrefix}LayoutProvider.java"
+      JavaSource(code, path)
+    }
+    Seq(forLayout, forLayoutProvider)
   }
   def createElements(fileName: String, prefix: String) = {
     val file = layoutDir / fileName
@@ -76,11 +96,14 @@ object LayoutGenerator {
     }
 }
 
-case class LayoutPrefix(classPrefix: String, keyPrefix: String)
+case class LayoutPrefix(
+  rawPrefix: String,
+  classPrefix: String,
+  keyPrefix: String)
 
 case class ParsedLayout(
-  targetPackage: String,
-  prefix: String,
+  rawPrefix: String,
+  classPrefix: String,
   elements: Seq[ParsedLayoutElement])
 
 case class ParsedLayoutElement(key: String, label: String, tag: String)
@@ -100,7 +123,7 @@ object LayoutNameParser {
   private def parserToPrefix =
     any.+.string <~ token(".xml") map {
       prefix => WheatParser.toCamelCase(prefix).right map {
-        camel => LayoutPrefix(camel, prefix + "__")
+        camel => LayoutPrefix(prefix, camel, prefix + "__")
       }
     }
 }
