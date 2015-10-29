@@ -1,3 +1,4 @@
+import play.twirl.sbt.SbtTwirl
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
@@ -60,7 +61,8 @@ object LinenBuild extends Build with LinenSettings {
       organization := "x7c1",
       name         := "wheat-build",
       version      := "0.1-SNAPSHOT"
-    )
+    ).
+    enablePlugins(SbtTwirl)
 
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).

@@ -10,16 +10,29 @@ object LayoutGenerator {
     val selected = parser.parsed
 
     println("selected files")
-    selected.map(inspect).foreach(println)
+
+    val list = selected.map(inspect)
+
+    val sources = list.map(_.right.map(applyTemplate))
+    sources.foreach(println)
+
   }
+  val targetPackage = "x7c1.linen.glue.res.layout"
+
   def layoutDir = file("linen-starter") / "src/main/res/layout"
 
   def inspect(fileName: String): Either[WheatParserError, ParsedLayout] = {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
       ParsedLayout(
+        targetPackage = targetPackage,
         prefix = prefix.camel,
         elements = createElements(fileName, prefix.key))
     }
+  }
+
+  def applyTemplate(layout: ParsedLayout): String = {
+    val parts = new LayoutPartsFactory(layout).create
+    x7c1.wheat.build.txt.layout(parts).body
   }
   def createElements(fileName: String, prefix: String) = {
     val file = layoutDir / fileName
@@ -49,7 +62,10 @@ object LayoutGenerator {
 
 case class LayoutPrefix(camel: String, key: String)
 
-case class ParsedLayout(prefix: String, elements: Seq[ParsedLayoutElement])
+case class ParsedLayout(
+  targetPackage: String,
+  prefix: String,
+  elements: Seq[ParsedLayoutElement])
 
 case class ParsedLayoutElement(key: String, label: String, tag: String)
 

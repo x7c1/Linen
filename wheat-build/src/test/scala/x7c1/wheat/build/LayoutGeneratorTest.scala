@@ -22,6 +22,17 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
     content.label shouldBe "content"
     content.tag shouldBe "TextView"
   }
+
+  it can "generate java source" in {
+    val Right(layout) = LayoutGenerator inspect "comment_row.xml"
+    val source = LayoutGenerator.applyTemplate(layout)
+
+    source should include("import android.view.View;")
+    source should include("import android.widget.TextView;")
+
+    source should include("public final TextView content;")
+    source should include("this.content = content;")
+  }
 }
 
 class WheatParserTest extends FlatSpecLike with Matchers {
