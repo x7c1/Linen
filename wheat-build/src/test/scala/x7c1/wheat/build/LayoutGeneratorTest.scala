@@ -55,8 +55,8 @@ class LayoutNameParserTest extends FlatSpecLike with Matchers {
 
   it can "read prefix from file name" in {
     val Right(prefix) = LayoutNameParser.readPrefix("abcd_ef_ghi.xml")
-    prefix.camel shouldBe "AbcdEfGhi"
-    prefix.key shouldBe "abcd_ef_ghi__"
+    prefix.classPrefix shouldBe "AbcdEfGhi"
+    prefix.keyPrefix shouldBe "abcd_ef_ghi__"
   }
 
   it should "fail to invalid file name" in {

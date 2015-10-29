@@ -25,8 +25,8 @@ object LayoutGenerator {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
       ParsedLayout(
         targetPackage = targetPackage,
-        prefix = prefix.camel,
-        elements = createElements(fileName, prefix.key))
+        prefix = prefix.classPrefix,
+        elements = createElements(fileName, prefix.keyPrefix))
     }
   }
 
@@ -60,7 +60,7 @@ object LayoutGenerator {
     }
 }
 
-case class LayoutPrefix(camel: String, key: String)
+case class LayoutPrefix(classPrefix: String, keyPrefix: String)
 
 case class ParsedLayout(
   targetPackage: String,
