@@ -1,16 +1,10 @@
 package x7c1.wheat.build
 
 import org.scalatest.{Matchers, FlatSpecLike}
-import x7c1.wheat.build.LayoutGenerator.extractId
 
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
   behavior of LayoutGenerator.getClass.getName
-
-  it can "extract id" in {
-    val id = extractId("@+id/comment_row__name")
-    id shouldBe "comment_row__name"
-  }
 
   it can "inspect resource XML" in {
     val Right(layout) = LayoutGenerator inspect "comment_row.xml"

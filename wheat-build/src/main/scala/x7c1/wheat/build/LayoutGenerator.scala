@@ -14,10 +14,6 @@ object LayoutGenerator {
   }
   def layoutDir = file("linen-starter") / "src/main/res/layout"
 
-  def targetFileNames = {
-    val finder = layoutDir * "*.xml"
-    finder.get.map(_.getName)
-  }
   def inspect(fileName: String): Either[WheatParserError, ParsedLayout] = {
     LayoutNameParser.readPrefix(fileName).right map { prefix =>
       ParsedLayout(
@@ -34,7 +30,7 @@ object LayoutGenerator {
       node -> node.attribute(namespace, "id").flatMap(_.headOption)
     } collect {
       case (node, Some(attr)) =>
-        node.label -> extractId(attr.buildString(true))
+        node.label -> attr.buildString(true).replace("@+id/", "")
     } collect {
       case (tag, id) if id startsWith prefix =>
         ParsedLayoutElement(
@@ -43,10 +39,12 @@ object LayoutGenerator {
     }
   }
 
-  def extractId(attr: String): String = attr.replace("@+id/", "")
-
   lazy val parser: Def.Initialize[State => Parser[Seq[String]]] =
-    Def.setting { state => WheatParser.exclusiveParser(targetFileNames) }
+    Def.setting { state =>
+      val finder = layoutDir * "*.xml"
+      val names = finder.get.map(_.getName)
+      WheatParser.exclusiveParser(names)
+    }
 }
 
 case class LayoutPrefix(camel: String, key: String)
