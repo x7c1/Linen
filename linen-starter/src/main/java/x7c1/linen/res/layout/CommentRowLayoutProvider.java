@@ -25,11 +25,7 @@ public class CommentRowLayoutProvider implements LayoutProvider<CommentRowLayout
     }
 
     @Override
-    public CommentRowLayout getOrInflate(
-        View convertView,
-        ViewGroup parent,
-        boolean attachToRoot)
-    {
+    public CommentRowLayout getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot){
         final View view;
         final TextView name;
         final TextView content;

@@ -1,5 +1,7 @@
 package x7c1.wheat.build
 
+import x7c1.wheat.build.PackageResolver.toPackage
+
 case class LayoutParts(
   declarePackage: String,
   prefix: LayoutPrefix,
@@ -9,39 +11,38 @@ case class LayoutParts(
   assignments: String
 )
 
-class LayoutPartsFactory (targetPackage: String, layout: ParsedLayout){
+class LayoutPartsFactory (targetPackage: String, layout: ParsedLayout) extends Indent {
 
   def create: LayoutParts = {
     LayoutParts(
       s"package $targetPackage;",
-      layout.prefix,
-      imports,
+      layout.prefix, imports,
       fields, arguments, assignments)
   }
   def imports = {
-    PackageResolver.imports(layout).mkString("\n")
+    val x0 = Seq("import android.view.View;")
+    val x1 = layout.elements.map{ x => s"import ${toPackage(x.tag)};" }
+    (x0 ++ x1).distinct mkString "\n"
   }
   def fields = {
-    val make = (tag: String, label: String) => s"public final $tag $label;"
-    val xs = make("View", "view") +: layout.elements.map {
-      x => make(x.tag, x.label)
-    }
-    xs.mkString("\n    ")
+    val x0 = Seq("public final View view;")
+    val x1 = layout.elements.map { x => s"public final ${x.tag} ${x.label};" }
+    (x0 ++ x1) mkString indent(1)
   }
   def arguments = {
-    val xs = "View view" +: layout.elements.map{x => s"${x.tag} ${x.label}"}
-    xs.mkString(",\n        ")
+    val x0 = Seq("View view")
+    val x1 = layout.elements.map{x => s"${x.tag} ${x.label}"}
+    (x0 ++ x1) mkString indent(",", 2)
   }
   def assignments = {
-    def make = (label: String) => s"this.$label = $label;"
-    val ys = make("view") +: layout.elements.map{_.label}.map(make)
-    ys.mkString("\n        ")
+    val x0 = Seq("this.view = view;")
+    val x1 = layout.elements.map{ x => s"this.${x.label} = ${x.label};"}
+    (x0 ++ x1) mkString indent(2)
   }
 }
 
 case class LayoutProviderParts(
   declarePackage: String,
-  targetGluePackage: String,
   prefix: LayoutPrefix,
   imports: String,
   localVariables: String,
@@ -51,68 +52,67 @@ case class LayoutProviderParts(
 )
 
 class LayoutProviderPartsFactory (
-  appPackage: String, targetPackage: String, targetGluePackage: String, layout: ParsedLayout)
-{
+  appPackage: String, targetPackage: String,
+  glueLayoutPackage: String, layout: ParsedLayout ) extends Indent {
+
   def create: LayoutProviderParts = {
     LayoutProviderParts(
       s"package $targetPackage;",
-      targetGluePackage,
-      layout.prefix,
-      imports,
-      localVariables,
-      assignAtFirst,
-      assignCached,
-      arguments )
+      layout.prefix, imports,
+      localVariables, assignAtFirst, assignCached, arguments
+    )
   }
   def imports = {
-    val xs = Seq(
+    val x0 = Seq(
       "import android.content.Context;",
       "import android.view.LayoutInflater;",
-      "import android.view.ViewGroup;"
+      "import android.view.ViewGroup;",
+      "import android.view.View;"
     )
-    val ys = Seq(
+    val x1 = layout.elements.map{ x =>
+      s"import ${toPackage(x.tag)};"
+    }
+    val x2 = Seq(
       "import x7c1.wheat.ancient.resource.LayoutProvider;",
       s"import $appPackage.R;",
-      s"import $targetGluePackage.${layout.prefix.ofClass}Layout;"
+      s"import $glueLayoutPackage.${layout.prefix.ofClass}Layout;"
     )
-    (xs ++ PackageResolver.imports(layout) ++  ys).distinct.mkString("\n")
+    (x0 ++ x1 ++  x2).distinct mkString "\n"
   }
   def localVariables = {
-    val make = (tag: String, label: String) => s"final $tag $label;"
-    val xs = make("View", "view") +: layout.elements.map{x => s"final ${x.tag} ${x.label};"}
-    xs.mkString("\n        ")
+    val x0 = Seq("final View view;")
+    val x1 = layout.elements.map{ x => s"final ${x.tag} ${x.label};" }
+    (x0 ++ x1) mkString indent(2)
   }
   def assignAtFirst = {
-    val xs = layout.elements.map{ x =>
+    val x0 = Seq(
+      s"view = layoutInflater.inflate(R.layout.${layout.prefix.raw}, parent, attachToRoot);"
+    )
+    val x1 = layout.elements.map{ x =>
       s"${x.label} = (${x.tag}) view.findViewById(R.id.${x.key});"
     }
-    val ys = layout.elements.map{ x =>
+    val x2 = layout.elements.map{ x =>
       s"view.setTag(R.id.${x.key}, ${x.label});"
     }
-    s"view = layoutInflater.inflate(R.layout.${layout.prefix.raw}, parent, attachToRoot);" +
-      "\n            " + xs.mkString("\n            ") +
-      "\n            " + ys.mkString("\n            ")
+    (x0 ++ x1 ++ x2) mkString indent(3)
   }
   def assignCached = {
-    val xs = layout.elements.map{ x =>
+    val x0 = Seq(
+      "view = convertView;"
+    )
+    val x1 = layout.elements.map{ x =>
       s"${x.label} = (${x.tag}) view.getTag(R.id.${x.key});"
     }
-    "view = convertView;" + "\n            " +
-      xs.mkString("\n            ")
+    (x0 ++ x1) mkString indent(3)
   }
   def arguments = {
-    val xs = "view" +: layout.elements.map{_.label}
-    xs.mkString(",\n            ")
+    val x0 = Seq("view")
+    val x1 = layout.elements.map(_.label)
+    (x0 ++ x1) mkString indent(",", 3)
   }
 }
 
-object PackageResolver {
-  def imports(layout: ParsedLayout): Seq[String] = {
-    val xs = toPackage("View") +: layout.elements.map(_.tag).map(toPackage)
-    xs.distinct.map("import " + _ + ";")
-  }
-  def toPackage(tag: String) = tag match {
-    case "View" => "android.view.View"
-    case "TextView" => "android.widget.TextView"
-  }
+trait Indent {
+  def indent(n: Int) = "\n" + ("    " * n)
+  def indent(tail: String, n: Int) = tail + "\n" + ("    " * n)
 }

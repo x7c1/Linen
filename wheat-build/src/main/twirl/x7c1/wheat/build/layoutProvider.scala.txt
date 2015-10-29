@@ -18,11 +18,7 @@ public class @(parts.prefix.ofClass)LayoutProvider implements LayoutProvider<@(p
     }
 
     @@Override
-    public @(parts.prefix.ofClass)Layout getOrInflate(
-        View convertView,
-        ViewGroup parent,
-        boolean attachToRoot)
-    {
+    public @(parts.prefix.ofClass)Layout getOrInflate(View convertView, ViewGroup parent, boolean attachToRoot){
         @parts.localVariables
 
         if (convertView == null){
