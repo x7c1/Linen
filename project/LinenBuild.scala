@@ -67,19 +67,25 @@ object LinenBuild extends Build with LinenSettings {
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
     settings(WheatTasks.settings:_*).
-    settings(WheatTasks.packages := WheatPackages(
-      starter = "x7c1.linen",
-      starterLayout = "x7c1.linen.res.layout",
-      glueLayout = "x7c1.linen.glue.res.layout"
-    )).
-    settings(WheatTasks.directories := WheatDirectories(
-      starter = file("linen-starter"),
-      glue = file("linen-glue")
-    ))
+    settings(
+      WheatTasks.packages := linenPackages,
+      WheatTasks.directories := linenDirectories
+    )
 
 }
 
 trait LinenSettings {
+
+  lazy val linenPackages = WheatPackages(
+    starter = "x7c1.linen",
+    starterLayout = "x7c1.linen.res.layout",
+    glueLayout = "x7c1.linen.glue.res.layout"
+  )
+
+  lazy val linenDirectories = WheatDirectories(
+    starter = file("linen-starter"),
+    glue = file("linen-glue")
+  )
 
   lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
     file("linen-starter") / "libs-generated" / jar
