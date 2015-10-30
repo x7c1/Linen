@@ -2,62 +2,67 @@ package x7c1.wheat.build
 
 import sbt._
 import x7c1.wheat.build.WheatParser.selectFrom
+import x7c1.wheat.build.WheatTasks.{directories, packages}
 
 object LayoutGenerator {
 
-  def task: Def.Initialize[InputTask[Unit]] = Def.inputTask {
-    val names = selectFrom(layoutDir * "*.xml").parsed
+  def task = Def inputTask {
+    val names = selectLayoutFiles.parsed
 
     println("selected files")
     names.map(" * " + _).foreach(println)
 
-    val loader = new ResourceLoader(layoutDir)
-    val layouts = names.map(loader.load)
-    val sources = layouts.map(_.right.map(applyTemplate))
-
-    println("generated files")
-    sources.map(_.right.foreach { _.foreach { source =>
+    val loader = new ResourceLoader(locations.value.layoutSrc)
+    val sources = names map loader.load map (_.right map applyTemplate.value)
+    val write = (source: JavaSource) => {
       JavaSourceWriter write source
       println(" * " + source.file.getPath)
-    }})
+    }
+    println("generated files")
+    sources map (_.right foreach (_ foreach write))
   }
 
-  val packages = new Packages(
-    app = "x7c1.linen",
-    appLayout = "x7c1.linen.res.layout",
-    glueLayout = "x7c1.linen.glue.res.layout"
+  def selectLayoutFiles = Def settingDyn {
+    val finder = locations.value.layoutSrc * "*.xml"
+    selectFrom(finder)
+  }
+
+  def locations = Def setting LayoutLocations(
+    packages = packages.value,
+    directories = directories.value
   )
 
-  val layoutDir = file("linen-starter") / "src/main/res/layout"
-  val layoutGenDir = file("linen-glue") / "src/main/java" / "x7c1/linen/glue/res/layout"
-  val providerGenDir = file("linen-starter") / "src/main/java" / "x7c1/linen/res/layout"
-
-  def applyTemplate(layout: ParsedResource): Seq[JavaSource] = {
-    val layoutSourceFactory = new JavaSourceFactory(
-      targetDir = layoutGenDir,
-      classSuffix = "Layout",
-      template = x7c1.wheat.build.txt.layout.apply,
-      partsFactory = new LayoutPartsFactory(packages)
-    )
-    val providerSourceFactory = new JavaSourceFactory(
-      targetDir = providerGenDir,
-      classSuffix = "LayoutProvider",
-      template = x7c1.wheat.build.txt.layoutProvider.apply,
-      partsFactory = new LayoutProviderPartsFactory(packages)
-    )
-    val factories = Seq(
-      layoutSourceFactory,
-      providerSourceFactory
-    )
-    factories.map(_.createFrom(layout))
+  def applyTemplate = Def setting { layout: ParsedResource =>
+    val sources = new JavaLayoutSourcesFactory(locations.value)
+    sources createFrom layout
   }
 }
 
-case class Packages(
-  app :String,
-  appLayout: String,
+case class WheatDirectories(
+  starter: File,
+  glue: File
+)
+
+case class WheatPackages(
+  starter :String,
+  starterLayout: String,
   glueLayout: String
 )
+
+case class LayoutLocations(
+  packages: WheatPackages,
+  directories: WheatDirectories){
+
+  val layoutSrc: File = {
+    directories.starter / "src/main/res/layout"
+  }
+  val layoutDst: File = {
+    directories.glue / "src/main/java" / packages.glueLayout.replace(".", "/")
+  }
+  val providerDst: File = {
+    directories.starter / "src/main/java" / packages.starterLayout.replace(".", "/")
+  }
+}
 
 case class ResourcePrefix(
   raw: String,

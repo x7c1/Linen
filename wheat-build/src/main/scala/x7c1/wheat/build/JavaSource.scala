@@ -15,8 +15,8 @@ class JavaSourceFactory [A <: ResourceParts](
   template: A => TxtFormat.Appendable,
   partsFactory: ResourcePartsFactory[A] ){
 
-  def createFrom(layout: ParsedResource): JavaSource = {
-    val parts = partsFactory.createFrom(layout)
+  def createFrom(resource: ParsedResource): JavaSource = {
+    val parts = partsFactory.createFrom(resource)
     JavaSource(
       code = template(parts).body,
       file = targetDir / s"${parts.prefix.ofClass}$classSuffix.java"

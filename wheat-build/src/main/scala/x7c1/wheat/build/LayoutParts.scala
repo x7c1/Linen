@@ -19,7 +19,7 @@ trait LayoutParts extends ResourceParts {
   def assignments: String
 }
 
-class LayoutPartsFactory (packages: Packages)
+class LayoutPartsFactory (packages: WheatPackages)
   extends ResourcePartsFactory[LayoutParts] {
 
   override def createFrom(layout: ParsedResource): LayoutParts = {
@@ -27,7 +27,7 @@ class LayoutPartsFactory (packages: Packages)
   }
 }
 
-class LayoutPartsImpl (packages: Packages, layout: ParsedResource)
+class LayoutPartsImpl (packages: WheatPackages, layout: ParsedResource)
   extends LayoutParts with Indent {
 
   override def declarePackage = s"package ${packages.glueLayout};"
@@ -66,7 +66,7 @@ trait LayoutProviderParts extends ResourceParts {
   def arguments: String
 }
 
-class LayoutProviderPartsFactory (packages: Packages)
+class LayoutProviderPartsFactory (packages: WheatPackages)
   extends ResourcePartsFactory[LayoutProviderParts] {
 
   override def createFrom(layout: ParsedResource): LayoutProviderParts = {
@@ -74,10 +74,10 @@ class LayoutProviderPartsFactory (packages: Packages)
   }
 }
 
-class LayoutProviderPartsImpl (packages: Packages, layout: ParsedResource)
+class LayoutProviderPartsImpl (packages: WheatPackages, layout: ParsedResource)
   extends LayoutProviderParts with Indent {
 
-  override def declarePackage = s"package ${packages.appLayout};"
+  override def declarePackage = s"package ${packages.starterLayout};"
 
   override def prefix = layout.prefix
 
@@ -93,7 +93,7 @@ class LayoutProviderPartsImpl (packages: Packages, layout: ParsedResource)
     }
     val x2 = Seq(
       "import x7c1.wheat.ancient.resource.LayoutProvider;",
-      s"import ${packages.app}.R;",
+      s"import ${packages.starter}.R;",
       s"import ${packages.glueLayout}.${layout.prefix.ofClass}Layout;"
     )
     (x0 ++ x1 ++  x2).distinct mkString "\n"
