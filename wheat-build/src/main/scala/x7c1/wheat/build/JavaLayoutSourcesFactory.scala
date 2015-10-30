@@ -1,7 +1,7 @@
 package x7c1.wheat.build
 
 class JavaLayoutSourcesFactory(locations: LayoutLocations){
-  def createFrom(layout: ParsedResource) = {
+  def createFrom(layout: ParsedResource): Seq[JavaSource] = {
     val layoutSourceFactory = new JavaSourceFactory(
       targetDir = locations.layoutDst,
       classSuffix = "Layout",
