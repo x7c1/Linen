@@ -4,10 +4,12 @@ import org.scalatest.{Matchers, FlatSpecLike}
 
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
+  def loader = new ResourceLoader(LayoutGenerator.layoutDir)
+
   behavior of LayoutGenerator.getClass.getName
 
   it can "inspect resource XML" in {
-    val Right(layout) = LayoutGenerator inspect "comment_row.xml"
+    val Right(layout) = loader load "comment_row.xml"
     layout.prefix.ofClass shouldBe "CommentRow"
 
     val elements = layout.elements
@@ -24,7 +26,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   }
 
   it can "generate java source" in {
-    val Right(layout) = LayoutGenerator inspect "comment_row.xml"
+    val Right(layout) = loader load "comment_row.xml"
     val sources = LayoutGenerator.applyTemplate(layout)
     val source = sources.head.code
 
@@ -51,17 +53,17 @@ class WheatParserTest extends FlatSpecLike with Matchers {
 
 }
 
-class LayoutNameParserTest extends FlatSpecLike with Matchers {
+class ResourceNameParserTest extends FlatSpecLike with Matchers {
   behavior of "LayoutNameParser"
 
   it can "read prefix from file name" in {
-    val Right(prefix) = LayoutNameParser.readPrefix("abcd_ef_ghi.xml")
+    val Right(prefix) = ResourceNameParser.readPrefix("abcd_ef_ghi.xml")
     prefix.ofClass shouldBe "AbcdEfGhi"
     prefix.ofKey shouldBe "abcd_ef_ghi__"
   }
 
   it should "fail to invalid file name" in {
-    val Left(e) = LayoutNameParser.readPrefix("0xyz_abcd_ef_ghi.xml")
+    val Left(e) = ResourceNameParser.readPrefix("0xyz_abcd_ef_ghi.xml")
     e shouldBe a[WheatParserError]
   }
 }

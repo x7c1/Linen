@@ -1,5 +1,6 @@
 package x7c1.wheat.build
 
+import sbt.{State, Def, PathFinder}
 import sbt.complete.Parser
 
 object WheatParser {
@@ -24,6 +25,13 @@ object WheatParser {
     }
     parse(x, parser).left.map(WheatParserError)
   }
+
+  def selectFrom(finder: PathFinder): Def.Initialize[State => Parser[Seq[String]]] =
+    Def.setting { state =>
+      val names = finder.get.map(_.getName)
+      exclusiveParser(names)
+    }
+
 }
 
 case class WheatParserError(message: String)
