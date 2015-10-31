@@ -1,8 +1,9 @@
+import play.twirl.sbt.SbtTwirl
 import sbt.Keys._
 import sbt._
-import sbt.complete.Parser
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
+import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatTasks}
 
 import scala.io.Source
 
@@ -14,11 +15,10 @@ object LinenBuild extends Build with LinenSettings {
       "-deprecation",
       "-feature"
     ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.4" % Test
-    ),
+    libraryDependencies ++= Seq(testLibrary),
     logLevel in assembly := Level.Error
   )
+  lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -52,13 +52,40 @@ object LinenBuild extends Build with LinenSettings {
     ).
     dependsOn(`linen-glue`, `wheat-modern`)
 
+  lazy val `wheat-build` = project.
+    settings(
+      sbtPlugin := true,
+      libraryDependencies ++= Seq(testLibrary)
+    ).
+    settings(
+      organization := "x7c1",
+      name         := "wheat-build",
+      version      := "0.1-SNAPSHOT"
+    ).
+    enablePlugins(SbtTwirl)
+
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
-    settings(LinenTasks.settings:_*)
+    settings(WheatTasks.settings:_*).
+    settings(
+      WheatTasks.packages := linenPackages,
+      WheatTasks.directories := linenDirectories
+    )
 
 }
 
 trait LinenSettings {
+
+  lazy val linenPackages = WheatPackages(
+    starter = "x7c1.linen",
+    starterLayout = "x7c1.linen.res.layout",
+    glueLayout = "x7c1.linen.glue.res.layout"
+  )
+
+  lazy val linenDirectories = WheatDirectories(
+    starter = file("linen-starter"),
+    glue = file("linen-glue")
+  )
 
   lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
     file("linen-starter") / "libs-generated" / jar
@@ -96,39 +123,4 @@ trait LinenSettings {
       throw new IllegalStateException("sdk.dir not found")
     }
   }
-}
-
-object LinenTasks {
-  import sbt.complete.DefaultParsers._
-
-  val sample = inputKey[Unit]("sample of tab-completion")
-
-  val settings = Seq(
-    sample := {
-      val selected = parser.parsed
-
-      println("selected files")
-      selected.map(" * " + _).foreach(println)
-    }
-  )
-
-  lazy val parser: Def.Initialize[State => Parser[Seq[String]]] =
-    Def.setting { state =>
-      val items = file("linen-starter") / "src/main/res/layout" * "*.xml"
-      val names = items.get.map(_.getName)
-      exclusiveParser(names)
-    }
-
-  def exclusiveParser(items: Seq[String]): Parser[Seq[String]] = {
-    val base = items match {
-      case Nil => failure("item not remain")
-      case _ => items.map(token(_)).reduce(_ | _)
-    }
-    val recurse = (Space ~> base) flatMap { item =>
-      val (consumed, remains) = items.partition(_ == item)
-      exclusiveParser(remains) map { input => consumed ++ input }
-    }
-    recurse ?? Nil
-  }
-
 }
