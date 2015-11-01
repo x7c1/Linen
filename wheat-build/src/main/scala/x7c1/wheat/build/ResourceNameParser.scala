@@ -1,5 +1,6 @@
 package x7c1.wheat.build
 
+
 object ResourceNameParser {
   import sbt.complete.DefaultParsers._
 

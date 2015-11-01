@@ -1,9 +1,11 @@
-package x7c1.wheat.build
+package x7c1.wheat.build.layout
 
 import sbt._
+import x7c1.wheat.build.{ParsedResourceElement, ParsedResource, ResourceNameParser, WheatParserError}
+
 import scala.xml.XML
 
-class ResourceLoader(layoutDir: File){
+class LayoutResourceLoader(layoutDir: File){
 
   def load(fileName: String): Either[WheatParserError, ParsedResource] =
     ResourceNameParser.readPrefix(fileName).right map { prefix =>

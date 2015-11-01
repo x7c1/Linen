@@ -1,8 +1,9 @@
-package x7c1.wheat.build
+package x7c1.wheat.build.layout
 
 import sbt._
 import x7c1.wheat.build.WheatParser.selectFrom
 import x7c1.wheat.build.WheatTasks.{directories, packages}
+import x7c1.wheat.build._
 
 object LayoutGenerator {
 
@@ -12,7 +13,7 @@ object LayoutGenerator {
     println("selected files")
     names.map(" * " + _).foreach(println)
 
-    val loader = new ResourceLoader(locations.value.layoutSrc)
+    val loader = new LayoutResourceLoader(locations.value.layoutSrc)
     val sources = names map loader.load map (_.right map applyTemplate.value)
     val write = (source: JavaSource) => {
       JavaSourceWriter write source
@@ -33,29 +34,18 @@ object LayoutGenerator {
   )
 
   def applyTemplate = Def setting { layout: ParsedResource =>
-    val sources = new JavaLayoutSourcesFactory(locations.value)
-    sources createFrom layout
+    val factory = new JavaLayoutSourcesFactory(locations.value)
+    factory createFrom layout
   }
 }
-
-case class WheatDirectories(
-  starter: File,
-  glue: File
-)
-
-case class WheatPackages(
-  starter :String,
-  starterLayout: String,
-  glueLayout: String
-)
 
 case class LayoutLocations(
   packages: WheatPackages,
   directories: WheatDirectories){
 
-  val layoutSrc: File = {
-    directories.starter / "src/main/res/layout"
-  }
+  val layoutSrc: File = directories.starter / "src/main/res/layout"
+  val valuesSrc: File = directories.starter / "src/main/res/values"
+
   val layoutDst: File = {
     directories.glue / "src/main/java" / packages.glueLayout.replace(".", "/")
   }
@@ -63,20 +53,3 @@ case class LayoutLocations(
     directories.starter / "src/main/java" / packages.starterLayout.replace(".", "/")
   }
 }
-
-case class ResourcePrefix(
-  raw: String,
-  ofClass: String,
-  ofKey: String
-)
-
-case class ParsedResource(
-  prefix: ResourcePrefix,
-  elements: Seq[ParsedResourceElement]
-)
-
-case class ParsedResourceElement(
-  key: String,
-  label: String,
-  tag: String
-)

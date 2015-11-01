@@ -4,9 +4,11 @@ import java.io.File
 
 import org.scalatest.{Matchers, FlatSpecLike}
 
+import x7c1.wheat.build.layout.{JavaLayoutSourcesFactory, LayoutLocations, LayoutGenerator, LayoutResourceLoader}
+
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
-  def loader = new ResourceLoader(locations.layoutSrc)
+  def loader = new LayoutResourceLoader(locations.layoutSrc)
 
   behavior of LayoutGenerator.getClass.getName
 
