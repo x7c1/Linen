@@ -3,7 +3,7 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
-import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatTasks}
+import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatSettings}
 
 import scala.io.Source
 
@@ -66,10 +66,10 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
-    settings(WheatTasks.settings:_*).
+    settings(WheatSettings.all:_*).
     settings(
-      WheatTasks.packages := linenPackages,
-      WheatTasks.directories := linenDirectories
+      WheatSettings.packages := linenPackages,
+      WheatSettings.directories := linenDirectories
     )
 
 }

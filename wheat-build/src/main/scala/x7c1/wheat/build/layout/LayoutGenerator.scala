@@ -2,7 +2,7 @@ package x7c1.wheat.build.layout
 
 import sbt._
 import x7c1.wheat.build.WheatParser.selectFrom
-import x7c1.wheat.build.WheatTasks.{directories, packages}
+import x7c1.wheat.build.WheatSettings.{directories, packages}
 import x7c1.wheat.build._
 
 object LayoutGenerator {
@@ -34,7 +34,7 @@ object LayoutGenerator {
   )
 
   def applyTemplate = Def setting { layout: ParsedResource =>
-    val factory = new JavaLayoutSourcesFactory(locations.value)
+    val factory = new LayoutSourcesFactory(locations.value)
     factory createFrom layout
   }
 }

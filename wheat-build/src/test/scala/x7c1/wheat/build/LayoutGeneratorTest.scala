@@ -1,7 +1,7 @@
 package x7c1.wheat.build
 
 import org.scalatest.{FlatSpecLike, Matchers}
-import x7c1.wheat.build.layout.{JavaLayoutSourcesFactory, LayoutGenerator, LayoutResourceLoader}
+import x7c1.wheat.build.layout.{LayoutSourcesFactory, LayoutGenerator, LayoutResourceLoader}
 
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
@@ -30,7 +30,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
   it can "generate java source" in {
     val Right(layout) = loader load "comment_row.xml"
-    val sources = new JavaLayoutSourcesFactory(locations).createFrom(layout)
+    val sources = new LayoutSourcesFactory(locations).createFrom(layout)
     val source = sources.head.code
 
     source should include("import android.view.View;")

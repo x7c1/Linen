@@ -4,7 +4,7 @@ import sbt.{File, Def}
 import x7c1.wheat.build.layout.LayoutGenerator
 import x7c1.wheat.build.values.ValuesGenerator
 
-object WheatTasks {
+object WheatSettings {
 
   val packages = Def.settingKey[WheatPackages]("project packages")
   val directories = Def.settingKey[WheatDirectories]("project directories")
@@ -12,7 +12,7 @@ object WheatTasks {
   val generateLayout = Def.inputKey[Unit]("Generates res/layout files")
   val generateValues = Def.inputKey[Unit]("Generates res/values files")
 
-  def settings = Seq(
+  def all = Seq(
     generateLayout := LayoutGenerator.task.evaluated,
     generateValues := ValuesGenerator.task.evaluated
   )

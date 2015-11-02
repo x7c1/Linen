@@ -2,7 +2,7 @@ package x7c1.wheat.build.values
 
 import sbt._
 import x7c1.wheat.build.WheatParser.selectFrom
-import x7c1.wheat.build.WheatTasks.{directories, packages}
+import x7c1.wheat.build.WheatSettings.{directories, packages}
 import x7c1.wheat.build.{JavaSource, JavaSourceWriter, ParsedResource, WheatDirectories, WheatPackages}
 
 object ValuesGenerator {
