@@ -1,10 +1,7 @@
 package x7c1.wheat.build
 
-import java.io.File
-
-import org.scalatest.{Matchers, FlatSpecLike}
-
-import x7c1.wheat.build.layout.{JavaLayoutSourcesFactory, LayoutLocations, LayoutGenerator, LayoutResourceLoader}
+import org.scalatest.{FlatSpecLike, Matchers}
+import x7c1.wheat.build.layout.{JavaLayoutSourcesFactory, LayoutGenerator, LayoutResourceLoader}
 
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
@@ -29,17 +26,8 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
     content.tag shouldBe "TextView"
   }
 
-  def locations = LayoutLocations(
-    packages = WheatPackages(
-      starter = "x7c1.linen",
-      starterLayout = "x7c1.linen.res.layout",
-      glueLayout = "x7c1.linen.glue.res.layout"
-    ),
-    directories = WheatDirectories(
-      starter = new File("linen-starter"),
-      glue = new File("linen-glue")
-    )
-  )
+  def locations = SampleLocations.layout
+
   it can "generate java source" in {
     val Right(layout) = loader load "comment_row.xml"
     val sources = new JavaLayoutSourcesFactory(locations).createFrom(layout)

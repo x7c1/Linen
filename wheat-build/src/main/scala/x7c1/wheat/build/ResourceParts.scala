@@ -6,7 +6,7 @@ trait ResourceParts {
 }
 
 trait ResourcePartsFactory [A <: ResourceParts]{
-  def createFrom(layout: ParsedResource): A
+  def createFrom(resource: ParsedResource): A
 }
 
 case class ResourcePrefix(

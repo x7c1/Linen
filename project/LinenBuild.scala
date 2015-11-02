@@ -9,13 +9,13 @@ import scala.io.Source
 
 object LinenBuild extends Build with LinenSettings {
 
-  val linenSettings = Seq(
+  lazy val linenSettings = Seq(
     scalaVersion := "2.11.6",
     scalacOptions ++= Seq(
       "-deprecation",
       "-feature"
     ),
-    libraryDependencies ++= Seq(testLibrary),
+    libraryDependencies += testLibrary,
     logLevel in assembly := Level.Error
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
@@ -55,7 +55,7 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `wheat-build` = project.
     settings(
       sbtPlugin := true,
-      libraryDependencies ++= Seq(testLibrary)
+      libraryDependencies += testLibrary
     ).
     settings(
       organization := "x7c1",

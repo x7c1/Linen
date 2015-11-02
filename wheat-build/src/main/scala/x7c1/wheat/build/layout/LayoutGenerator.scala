@@ -44,7 +44,6 @@ case class LayoutLocations(
   directories: WheatDirectories){
 
   val layoutSrc: File = directories.starter / "src/main/res/layout"
-  val valuesSrc: File = directories.starter / "src/main/res/values"
 
   val layoutDst: File = {
     directories.glue / "src/main/java" / packages.glueLayout.replace(".", "/")
