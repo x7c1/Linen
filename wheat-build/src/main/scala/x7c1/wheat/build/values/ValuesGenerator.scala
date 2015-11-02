@@ -3,7 +3,7 @@ package x7c1.wheat.build.values
 import sbt._
 import x7c1.wheat.build.WheatParser.selectFrom
 import x7c1.wheat.build.WheatTasks.{directories, packages}
-import x7c1.wheat.build.{JavaSourceWriter, JavaSource, JavaSourceFactory, ParsedResource, WheatDirectories, WheatPackages}
+import x7c1.wheat.build.{JavaSource, JavaSourceWriter, ParsedResource, WheatDirectories, WheatPackages}
 
 object ValuesGenerator {
   def task = Def inputTask {
@@ -44,22 +44,10 @@ case class ValuesLocations(
 
   val valuesSrc: File = directories.starter / "src/main/res/values"
 
-  val valuesDst = {
+  val valuesDst: File = {
     directories.glue / "src/main/java" / packages.glueValues.replace(".", "/")
   }
-}
-
-class ValuesSourcesFactory(locations: ValuesLocations){
-  def createFrom(values: ParsedResource): Seq[JavaSource] = {
-    val valuesSourceFactory = new JavaSourceFactory(
-      targetDir = locations.valuesDst,
-      classSuffix = "Values",
-      template = x7c1.wheat.build.txt.values.apply,
-      partsFactory = new ValuesInterfacePartsFactory(locations.packages)
-    )
-    val factories = Seq(
-      valuesSourceFactory
-    )
-    factories.map(_.createFrom(values))
+  val providerDst: File = {
+    directories.starter / "src/main/java" / packages.starterValues.replace(".", "/")
   }
 }

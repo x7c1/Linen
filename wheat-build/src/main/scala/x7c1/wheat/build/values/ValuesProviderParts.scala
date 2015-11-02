@@ -34,7 +34,8 @@ private class ValuesProviderPartsImpl(packages: WheatPackages, values: ParsedRes
     val x0 = Seq(
       "import android.content.Context;",
       "import x7c1.wheat.ancient.resource.ValuesProvider;",
-      s"import ${packages.starterValues}.${values.prefix.ofClass}Values;"
+      s"import ${packages.starter}.R;",
+      s"import ${packages.glueValues}.${values.prefix.ofClass}Values;"
     )
     x0 mkString "\n"
   }
@@ -60,7 +61,7 @@ private class ValuesProviderPartsImpl(packages: WheatPackages, values: ParsedRes
   override def parameters = {
     val x0 = "Context context"
     val x1 = values.elements map { x => s"int ${x.label}" }
-    (x0 +: x1) mkString indent(3)
+    (x0 +: x1) mkString indent(",", 3)
   }
 
   override def assignPrivate: String = {
@@ -77,8 +78,7 @@ private class ValuesProviderPartsImpl(packages: WheatPackages, values: ParsedRes
         |        ${x.label} = context.getResources().${toMethod(x.tag)}(${x.label}Id);
         |    }
         |    return ${x.label};
-        |}
-      """.stripMargin
+        |}""".stripMargin
 
     values.elements.
       map(format).

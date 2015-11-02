@@ -34,6 +34,6 @@ private class ValuesInterfacePartsImpl(packages: WheatPackages, values: ParsedRe
 object TypeResolver {
   def toType(tag: String): String = tag match {
     case "string" => "String"
-    case "bool" => "boolean"
+    case "bool" => "Boolean"
   }
 }

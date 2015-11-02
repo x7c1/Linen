@@ -19,7 +19,7 @@ class ValuesInterfacePartsFactoryTest extends FlatSpecLike with Matchers {
 
     parts.methods should include("String nameClicked();")
     parts.methods should include("String contentClicked();")
-    parts.methods should include("boolean isExperiment();")
+    parts.methods should include("Boolean isExperiment();")
   }
 
 }
@@ -56,7 +56,7 @@ class ValuesProviderPartsTest extends FlatSpecLike with Matchers {
       "private String nameClicked;")
 
     parts.fields should include(
-      "private boolean isExperiment;")
+      "private Boolean isExperiment;")
   }
 
 }
@@ -68,16 +68,28 @@ class ValuesSourcesFactoryTest extends FlatSpecLike with Matchers {
 
   behavior of factory.getClass.getName
 
-  it can "generate java source" in {
+  it can "generate java interface source" in {
     val Right(resource) = loader.load("comment.xml")
     val Seq(s1, _*) = factory createFrom resource
 
     s1.code should include("package x7c1.linen.glue.res.values;")
     s1.code should include("public interface CommentValues")
     s1.code should include("String nameClicked();")
-    s1.code should include("boolean isExperiment();")
+    s1.code should include("Boolean isExperiment();")
 
     s1.file.getPath shouldBe
-      "linen-glue/src/main/java/x7c1/linen/glue/res/layout/CommentValues.java"
+      "linen-glue/src/main/java/x7c1/linen/glue/res/values/CommentValues.java"
+  }
+  it can "generate java class source" in {
+    val Right(resource) = loader.load("comment.xml")
+    val Seq(_, s1) = factory createFrom resource
+
+    s1.code should include("package x7c1.linen.res.values;")
+    s1.code should include("public class CommentValuesProvider")
+    s1.code should include("public String nameClicked(){")
+    s1.code should include("public Boolean isExperiment(){")
+
+    s1.file.getPath shouldBe
+      "linen-starter/src/main/java/x7c1/linen/res/values/CommentValuesProvider.java"
   }
 }
