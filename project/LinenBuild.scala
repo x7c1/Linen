@@ -79,7 +79,9 @@ trait LinenSettings {
   lazy val linenPackages = WheatPackages(
     starter = "x7c1.linen",
     starterLayout = "x7c1.linen.res.layout",
-    glueLayout = "x7c1.linen.glue.res.layout"
+    starterValues = "x7c1.linen.res.values",
+    glueLayout = "x7c1.linen.glue.res.layout",
+    glueValues = "x7c1.linen.glue.res.values"
   )
 
   lazy val linenDirectories = WheatDirectories(

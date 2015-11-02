@@ -26,6 +26,7 @@ case class WheatDirectories(
 case class WheatPackages(
   starter :String,
   starterLayout: String,
+  starterValues: String,
   glueLayout: String,
   glueValues: String
 )

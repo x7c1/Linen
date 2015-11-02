@@ -3,13 +3,14 @@ package x7c1.wheat.build
 import java.io.File
 
 import x7c1.wheat.build.layout.LayoutLocations
-import x7c1.wheat.build.values.ValuesLocation
+import x7c1.wheat.build.values.ValuesLocations
 
 object SampleLocations {
 
   def packages = WheatPackages(
     starter = "x7c1.linen",
     starterLayout = "x7c1.linen.res.layout",
+    starterValues = "x7c1.linen.res.values",
     glueLayout = "x7c1.linen.glue.res.layout",
     glueValues = "x7c1.linen.glue.res.values"
   )
@@ -24,7 +25,7 @@ object SampleLocations {
     directories = directories
   )
 
-  def values = ValuesLocation(
+  def values = ValuesLocations(
     packages = packages,
     directories = directories
   )
