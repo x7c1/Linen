@@ -1,7 +1,7 @@
-package x7c1.wheat.build
+package x7c1.wheat.build.layout
 
 import org.scalatest.{FlatSpecLike, Matchers}
-import x7c1.wheat.build.layout.{LayoutSourcesFactory, LayoutGenerator, LayoutResourceLoader}
+import x7c1.wheat.build.SampleLocations
 
 class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
@@ -38,35 +38,5 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
 
     source should include("public final TextView content;")
     source should include("this.content = content;")
-  }
-}
-
-class WheatParserTest extends FlatSpecLike with Matchers {
-  behavior of "WheatParser"
-
-  it can "convert snake to camel" in {
-    val Right(camel) = WheatParser.toCamelCase("abcd_ef_ghi")
-    camel shouldBe "AbcdEfGhi"
-  }
-
-  it should "fail to invalid file name" in {
-    val Left(e) = WheatParser.toCamelCase("0xyz_abcd_ef_ghi.xml")
-    e shouldBe a[WheatParserError]
-  }
-
-}
-
-class ResourceNameParserTest extends FlatSpecLike with Matchers {
-  behavior of "LayoutNameParser"
-
-  it can "read prefix from file name" in {
-    val Right(prefix) = ResourceNameParser.readPrefix("abcd_ef_ghi.xml")
-    prefix.ofClass shouldBe "AbcdEfGhi"
-    prefix.ofKey shouldBe "abcd_ef_ghi__"
-  }
-
-  it should "fail to invalid file name" in {
-    val Left(e) = ResourceNameParser.readPrefix("0xyz_abcd_ef_ghi.xml")
-    e shouldBe a[WheatParserError]
   }
 }
