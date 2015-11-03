@@ -1,7 +1,5 @@
 package x7c1.wheat.build
 
-import sbt.complete.DefaultParsers._
-
 object ResourceLoader {
   def apply(elementsLoader: ResourceElementsLoader): ResourceLoader = {
     new ResourceLoaderImpl(elementsLoader)
@@ -33,12 +31,4 @@ private class ResourceLoaderImpl(elementsLoader: ResourceElementsLoader)
 trait ResourceElementsLoader {
   def create(prefix: String):
     List[Either[WheatParserError, ParsedResourceElement]]
-
-  def camelCase(string: String): Either[WheatParserError, String] = {
-    val alphabet = token('a' to 'z') | token('A' to 'Z')
-    val parser = (alphabet.+.string ~ (token('_') ~> alphabet.+.string).*) map {
-      case (head, tail) => head + tail.map(_.capitalize).mkString
-    }
-    parse(string, parser).left.map(WheatParserError)
-  }
 }

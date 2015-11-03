@@ -1,5 +1,7 @@
 package x7c1.wheat.build
 
+import x7c1.wheat.build.WheatParser.camelize
+
 
 object ResourceNameParser {
   import sbt.complete.DefaultParsers._
@@ -10,7 +12,7 @@ object ResourceNameParser {
 
   private def parserToPrefix =
     any.+.string <~ token(".xml") map {
-      prefix => WheatParser.toCamelCase(prefix).right map {
+      prefix => camelize(prefix).right map {
         camel => ResourcePrefix(prefix, camel, prefix + "__")
       }
     }

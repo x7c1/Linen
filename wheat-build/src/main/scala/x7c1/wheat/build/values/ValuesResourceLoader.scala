@@ -1,6 +1,7 @@
 package x7c1.wheat.build.values
 
 import sbt._
+import x7c1.wheat.build.WheatParser.camelizeTail
 import x7c1.wheat.build.{ParsedResourceElement, ResourceElementsLoader, ResourceLoader}
 
 import scala.xml.XML
@@ -24,7 +25,7 @@ class ValuesElementsLoader (dir: File, fileName: String) extends ResourceElement
         node.label -> attr.buildString(true)
     } collect {
       case (tag, name) if name startsWith prefix =>
-        camelCase(name.replace(prefix, "")).right.map{ label =>
+        camelizeTail(name.replace(prefix, "")).right.map{ label =>
           ParsedResourceElement(key = name, tag = tag, label = label)
         }
     }

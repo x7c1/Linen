@@ -1,6 +1,7 @@
 package x7c1.wheat.build.layout
 
 import sbt._
+import x7c1.wheat.build.WheatParser.camelizeTail
 import x7c1.wheat.build.{ParsedResourceElement, ResourceElementsLoader, ResourceLoader}
 
 import scala.xml.XML
@@ -25,7 +26,7 @@ class LayoutElementsLoader(dir: File, fileName: String) extends ResourceElements
         node.label -> attr.buildString(true).replace("@+id/", "")
     } collect {
       case (tag, id) if id startsWith prefix =>
-        camelCase(id.replace(prefix, "")).right.map{ label =>
+        camelizeTail(id.replace(prefix, "")).right.map{ label =>
           ParsedResourceElement(key = id, tag = tag, label = label)
         }
     }
