@@ -2,7 +2,7 @@ package x7c1.wheat.build
 
 import sbt.Def.{Initialize, inputTask}
 import sbt.Keys.streams
-import sbt.{Def, PathFinder}
+import sbt.{Def, Global, PathFinder}
 import x7c1.wheat.build.WheatParser.selectFrom
 
 class FilesGenerator (
@@ -13,7 +13,7 @@ class FilesGenerator (
   def selector = Def settingDyn selectFrom(finder.value)
 
   def task = inputTask {
-    val logger = WheatLogger(streams.value.log)
+    val logger = WheatLogger((streams in Global).value.log)
     val names = selector.parsed
 
     logger info "selected files"

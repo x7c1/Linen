@@ -3,6 +3,7 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
+import x7c1.wheat.build.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatSettings}
 
 import scala.io.Source
@@ -68,8 +69,8 @@ object LinenBuild extends Build with LinenSettings {
     aggregate(`linen-modern`).
     settings(WheatSettings.all:_*).
     settings(
-      WheatSettings.packages := linenPackages,
-      WheatSettings.directories := linenDirectories
+      packages in wheat := linenPackages,
+      directories in wheat := linenDirectories
     )
 
 }

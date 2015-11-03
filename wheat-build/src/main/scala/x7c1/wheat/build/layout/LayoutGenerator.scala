@@ -1,7 +1,7 @@
 package x7c1.wheat.build.layout
 
 import sbt._
-import x7c1.wheat.build.WheatSettings.{directories, packages}
+import x7c1.wheat.build.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.build.{FilesGenerator, WheatDirectories, WheatPackages}
 
 object LayoutGenerator {
@@ -14,8 +14,8 @@ object LayoutGenerator {
     generator.task
   }
   def locations = Def setting LayoutLocations(
-    packages = packages.value,
-    directories = directories.value
+    packages = (packages in wheat).value,
+    directories = (directories in wheat).value
   )
 }
 

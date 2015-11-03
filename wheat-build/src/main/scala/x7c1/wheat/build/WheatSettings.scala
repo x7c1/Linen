@@ -1,20 +1,23 @@
 package x7c1.wheat.build
 
-import sbt.{File, Def}
+import sbt.Configurations.config
+import sbt.{Def, File}
 import x7c1.wheat.build.layout.LayoutGenerator
 import x7c1.wheat.build.values.ValuesGenerator
 
 object WheatSettings {
 
-  val packages = Def.settingKey[WheatPackages]("project packages")
-  val directories = Def.settingKey[WheatDirectories]("project directories")
+  lazy val packages = Def.settingKey[WheatPackages]("project packages")
+  lazy val directories = Def.settingKey[WheatDirectories]("project directories")
 
-  val generateLayout = Def.inputKey[Unit]("Generates res/layout files")
-  val generateValues = Def.inputKey[Unit]("Generates res/values files")
+  lazy val generateLayout = Def.inputKey[Unit]("Generates res/layout files")
+  lazy val generateValues = Def.inputKey[Unit]("Generates res/values files")
+
+  lazy val wheat = config("wheat")
 
   def all = Seq(
-    generateLayout := LayoutGenerator.task.evaluated,
-    generateValues := ValuesGenerator.task.evaluated
+    generateLayout in wheat := LayoutGenerator.task.evaluated,
+    generateValues in wheat := ValuesGenerator.task.evaluated
   )
 }
 
