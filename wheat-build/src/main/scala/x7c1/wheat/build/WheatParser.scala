@@ -19,10 +19,13 @@ object WheatParser {
   }
 
   def toCamelCase(x: String): Either[WheatParserError, String] = {
-    val alphabet = token('a' to 'z') | token('A' to 'Z')
-    val parser = (alphabet.+.string <~ token('_').?).+ map {
-      _.map(_.capitalize).mkString
+    val alphabet = token('a' to 'z')
+    val numbers = token('0' to '9')
+    val identifier = alphabet.+.string ~ (numbers | alphabet).*.string map {
+      case (a, b) => a + b
     }
+
+    val parser = (identifier <~ token('_').?).+ map { _.map{_.capitalize}.mkString }
     parse(x, parser).left.map(WheatParserError)
   }
 
