@@ -1,9 +1,9 @@
 package x7c1.wheat.build.values
 
-import x7c1.wheat.build.{JavaSourceFactory, JavaSource, ParsedResource}
+import x7c1.wheat.build.{JavaSourceFactory, JavaSourcesFactory, ParsedResource}
 
-class ValuesSourcesFactory(locations: ValuesLocations){
-  def createFrom(values: ParsedResource): Seq[JavaSource] = {
+class ValuesSourcesFactory(locations: ValuesLocations) extends JavaSourcesFactory {
+  override def createFrom(values: ParsedResource) = {
     val valuesSourceFactory = new JavaSourceFactory(
       targetDir = locations.valuesDst,
       classSuffix = "Values",

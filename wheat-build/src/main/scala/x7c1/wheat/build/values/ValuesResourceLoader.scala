@@ -1,28 +1,20 @@
 package x7c1.wheat.build.values
 
 import sbt._
-import sbt.complete.DefaultParsers._
-import x7c1.wheat.build.{ParsedResource, ParsedResourceElement, ResourceNameParser, WheatParserError}
+import x7c1.wheat.build.{ParsedResourceElement, ResourceElementsLoader, ResourceLoader}
 
 import scala.xml.XML
 
-class ValuesResourceLoader(valuesDir: File){
-
-  def load(fileName: String): Either[Seq[WheatParserError], ParsedResource] = {
-    ResourceNameParser.readPrefix(fileName) match {
-      case Right(prefix) =>
-        val (l, r) = createElements(fileName, prefix.ofKey).partition(_.isLeft)
-        val errors = l.map(_.left.get)
-        if (errors.isEmpty) {
-          Right apply ParsedResource(prefix = prefix, elements = r.map(_.right.get))
-        } else {
-          Left apply errors
-        }
-      case Left(error) => Left(Seq(error))
-    }
+class ValuesResourceLoader(dir: File) extends ResourceLoader {
+  override def load(fileName: String) = {
+    val loader = ResourceLoader apply new ValuesElementsLoader(dir, fileName)
+    loader load fileName
   }
-  private def createElements(fileName: String, prefix: String) = {
-    val file = valuesDir / fileName
+}
+
+class ValuesElementsLoader (dir: File, fileName: String) extends ResourceElementsLoader {
+  override def create(prefix: String) = {
+    val file = dir / fileName
     val xml = XML loadFile file
 
     xml.descendant map { node =>
@@ -37,13 +29,4 @@ class ValuesResourceLoader(valuesDir: File){
         }
     }
   }
-
-  def camelCase(string: String): Either[WheatParserError, String] = {
-    val alphabet = token('a' to 'z') | token('A' to 'Z')
-    val parser = (alphabet.+.string ~ (token('_') ~> alphabet.+.string).+) map {
-      case (head, tail) => head + tail.map(_.capitalize).mkString
-    }
-    parse(string, parser).left.map(WheatParserError)
-  }
-
 }

@@ -1,21 +1,20 @@
 package x7c1.wheat.build.layout
 
 import sbt._
-import x7c1.wheat.build.{ParsedResourceElement, ParsedResource, ResourceNameParser, WheatParserError}
+import x7c1.wheat.build.{ParsedResourceElement, ResourceElementsLoader, ResourceLoader}
 
 import scala.xml.XML
 
-class LayoutResourceLoader(layoutDir: File){
+class LayoutResourceLoader(dir: File) extends ResourceLoader {
+  override def load(fileName: String) = {
+    val loader = ResourceLoader apply new LayoutElementsLoader(dir, fileName)
+    loader load fileName
+  }
+}
 
-  def load(fileName: String): Either[WheatParserError, ParsedResource] =
-    ResourceNameParser.readPrefix(fileName).right map { prefix =>
-      ParsedResource(
-        prefix = prefix,
-        elements = createElements(fileName, prefix.ofKey))
-    }
-
-  private def createElements(fileName: String, prefix: String) = {
-    val file = layoutDir / fileName
+class LayoutElementsLoader(dir: File, fileName: String) extends ResourceElementsLoader {
+  override def create(prefix: String) = {
+    val file = dir / fileName
     val xml = XML loadFile file
     val namespace = "http://schemas.android.com/apk/res/android"
 
@@ -26,9 +25,9 @@ class LayoutResourceLoader(layoutDir: File){
         node.label -> attr.buildString(true).replace("@+id/", "")
     } collect {
       case (tag, id) if id startsWith prefix =>
-        ParsedResourceElement(
-          key = id, tag = tag,
-          label = id.replace(prefix, ""))
+        camelCase(id.replace(prefix, "")).right.map{ label =>
+          ParsedResourceElement(key = id, tag = tag, label = label)
+        }
     }
   }
 }

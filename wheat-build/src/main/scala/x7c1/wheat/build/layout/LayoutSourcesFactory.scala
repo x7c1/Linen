@@ -1,9 +1,9 @@
 package x7c1.wheat.build.layout
 
-import x7c1.wheat.build.{ParsedResource, JavaSource, JavaSourceFactory}
+import x7c1.wheat.build.{JavaSourceFactory, JavaSourcesFactory, ParsedResource}
 
-class LayoutSourcesFactory(locations: LayoutLocations){
-  def createFrom(layout: ParsedResource): Seq[JavaSource] = {
+class LayoutSourcesFactory(locations: LayoutLocations) extends JavaSourcesFactory {
+  override def createFrom(layout: ParsedResource) = {
     val layoutSourceFactory = new JavaSourceFactory(
       targetDir = locations.layoutDst,
       classSuffix = "Layout",

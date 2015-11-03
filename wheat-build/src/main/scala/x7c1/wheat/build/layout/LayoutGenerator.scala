@@ -1,42 +1,22 @@
 package x7c1.wheat.build.layout
 
 import sbt._
-import x7c1.wheat.build.WheatParser.selectFrom
 import x7c1.wheat.build.WheatSettings.{directories, packages}
-import x7c1.wheat.build._
+import x7c1.wheat.build.{FilesGenerator, WheatDirectories, WheatPackages}
 
 object LayoutGenerator {
-
-  def task = Def inputTask {
-    val names = selectLayoutFiles.parsed
-
-    println("selected files")
-    names.map(" * " + _).foreach(println)
-
-    val loader = new LayoutResourceLoader(locations.value.layoutSrc)
-    val sources = names map loader.load map (_.right map applyTemplate.value)
-    val write = (source: JavaSource) => {
-      JavaSourceWriter write source
-      println(" * " + source.file.getPath)
-    }
-    println("generated files")
-    sources map (_.right foreach (_ foreach write))
+  def task = {
+    val generator = new FilesGenerator(
+      finder = Def setting locations.value.layoutSrc * "*.xml",
+      loader = Def setting new LayoutResourceLoader(locations.value.layoutSrc),
+      generator = Def setting new LayoutSourcesFactory(locations.value)
+    )
+    generator.task
   }
-
-  def selectLayoutFiles = Def settingDyn {
-    val finder = locations.value.layoutSrc * "*.xml"
-    selectFrom(finder)
-  }
-
   def locations = Def setting LayoutLocations(
     packages = packages.value,
     directories = directories.value
   )
-
-  def applyTemplate = Def setting { layout: ParsedResource =>
-    val factory = new LayoutSourcesFactory(locations.value)
-    factory createFrom layout
-  }
 }
 
 case class LayoutLocations(
