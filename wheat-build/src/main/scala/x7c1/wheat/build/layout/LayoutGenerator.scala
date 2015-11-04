@@ -5,14 +5,14 @@ import x7c1.wheat.build.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.build.{FilesGenerator, WheatDirectories, WheatPackages}
 
 object LayoutGenerator {
-  def task = {
-    val generator = new FilesGenerator(
-      finder = Def setting locations.value.layoutSrc * "*.xml",
-      loader = Def setting new LayoutResourceLoader(locations.value.layoutSrc),
-      generator = Def setting new LayoutSourcesFactory(locations.value)
-    )
-    generator.task
-  }
+
+  def task: Def.Initialize[InputTask[Unit]] = Def settingDyn generator.value.task
+
+  def generator = Def setting new FilesGenerator(
+    finder = locations.value.layoutSrc * "*.xml",
+    loader = new LayoutResourceLoader(locations.value.layoutSrc),
+    generator = new LayoutSourcesFactory(locations.value)
+  )
   def locations = Def setting LayoutLocations(
     packages = (packages in wheat).value,
     directories = (directories in wheat).value

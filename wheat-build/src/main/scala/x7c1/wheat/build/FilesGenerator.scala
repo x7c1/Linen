@@ -1,25 +1,24 @@
 package x7c1.wheat.build
 
-import sbt.Def.{Initialize, inputTask}
+import sbt.Def.inputTask
 import sbt.Keys.streams
-import sbt.{Def, Global, PathFinder}
+import sbt.PathFinder
 import x7c1.wheat.build.WheatParser.selectFrom
+import x7c1.wheat.build.WheatSettings.wheat
 
 class FilesGenerator (
-  finder: Initialize[PathFinder],
-  loader: Initialize[ResourceLoader],
-  generator: Initialize[JavaSourcesFactory] ){
-
-  def selector = Def settingDyn selectFrom(finder.value)
+  finder: PathFinder,
+  loader: ResourceLoader,
+  generator: JavaSourcesFactory ){
 
   def task = inputTask {
-    val logger = WheatLogger((streams in Global).value.log)
-    val names = selector.parsed
+    val logger = WheatLogger((streams in wheat).value.log)
+    val names = selectFrom(finder).parsed
 
     logger info "selected files"
     names.map(" * " + _).foreach(logger.info)
 
-    val list = names map loader.value.load map (_.right map generator.value.createFrom)
+    val list = names map loader.load map (_.right map generator.createFrom)
     logger info "generated files"
 
     list foreach {
