@@ -31,4 +31,18 @@ case class LayoutLocations(
   val providerDst: File = {
     directories.starter / "src/main/java" / packages.starterLayout.replace(".", "/")
   }
+
+  override def toString = {
+    val lines = Seq(
+      "(",
+      "  source",
+      "    layout => " + layoutSrc,
+      "  destinations",
+      "    holder => " + layoutDst,
+      "    provider => " + providerDst,
+      ")"
+    )
+    lines mkString "\n"
+  }
+
 }

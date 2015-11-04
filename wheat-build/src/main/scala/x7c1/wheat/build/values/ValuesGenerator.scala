@@ -31,4 +31,17 @@ case class ValuesLocations(
   val providerDst: File = {
     directories.starter / "src/main/java" / packages.starterValues.replace(".", "/")
   }
+
+  override def toString = {
+    val lines = Seq(
+      "(",
+      "  source",
+      "    values => " + valuesSrc,
+      "  destinations",
+      "    interface => " + valuesDst,
+      "    provider => " + providerDst,
+      ")"
+    )
+    lines mkString "\n"
+  }
 }
