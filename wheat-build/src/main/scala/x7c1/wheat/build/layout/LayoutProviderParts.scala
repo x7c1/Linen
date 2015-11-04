@@ -1,60 +1,9 @@
-package x7c1.wheat.build
+package x7c1.wheat.build.layout
 
+import x7c1.wheat.build.{ResourcePrefix, ResourceParts}
+import x7c1.wheat.build.{ResourcePartsFactory, WheatPackages, ParsedResource, Indent}
 import x7c1.wheat.build.PackageResolver.toPackage
 
-
-trait ResourceParts {
-  def prefix: ResourcePrefix
-}
-trait ResourcePartsFactory [A <: ResourceParts]{
-  def createFrom(layout: ParsedResource): A
-}
-
-trait LayoutParts extends ResourceParts {
-  def declarePackage: String
-  def prefix: ResourcePrefix
-  def imports: String
-  def fields: String
-  def arguments: String
-  def assignments: String
-}
-
-class LayoutPartsFactory (packages: WheatPackages)
-  extends ResourcePartsFactory[LayoutParts] {
-
-  override def createFrom(layout: ParsedResource): LayoutParts = {
-    new LayoutPartsImpl(packages, layout)
-  }
-}
-
-class LayoutPartsImpl (packages: WheatPackages, layout: ParsedResource)
-  extends LayoutParts with Indent {
-
-  override def declarePackage = s"package ${packages.glueLayout};"
-
-  override def prefix = layout.prefix
-
-  override def imports = {
-    val x0 = Seq("import android.view.View;")
-    val x1 = layout.elements.map{ x => s"import ${toPackage(x.tag)};" }
-    (x0 ++ x1).distinct mkString "\n"
-  }
-  override def fields = {
-    val x0 = Seq("public final View view;")
-    val x1 = layout.elements.map { x => s"public final ${x.tag} ${x.label};" }
-    (x0 ++ x1) mkString indent(1)
-  }
-  override def arguments = {
-    val x0 = Seq("View view")
-    val x1 = layout.elements.map{x => s"${x.tag} ${x.label}"}
-    (x0 ++ x1) mkString indent(",", 2)
-  }
-  override def assignments = {
-    val x0 = Seq("this.view = view;")
-    val x1 = layout.elements.map{ x => s"this.${x.label} = ${x.label};"}
-    (x0 ++ x1) mkString indent(2)
-  }
-}
 
 trait LayoutProviderParts extends ResourceParts {
   def declarePackage: String
@@ -74,7 +23,7 @@ class LayoutProviderPartsFactory (packages: WheatPackages)
   }
 }
 
-class LayoutProviderPartsImpl (packages: WheatPackages, layout: ParsedResource)
+private class LayoutProviderPartsImpl (packages: WheatPackages, layout: ParsedResource)
   extends LayoutProviderParts with Indent {
 
   override def declarePackage = s"package ${packages.starterLayout};"
@@ -96,7 +45,7 @@ class LayoutProviderPartsImpl (packages: WheatPackages, layout: ParsedResource)
       s"import ${packages.starter}.R;",
       s"import ${packages.glueLayout}.${layout.prefix.ofClass}Layout;"
     )
-    (x0 ++ x1 ++  x2).distinct mkString "\n"
+    (x0 ++ x1 ++ x2).distinct mkString "\n"
   }
   override def localVariables = {
     val x0 = Seq("final View view;")
@@ -129,9 +78,4 @@ class LayoutProviderPartsImpl (packages: WheatPackages, layout: ParsedResource)
     val x1 = layout.elements.map(_.label)
     (x0 ++ x1) mkString indent(",", 3)
   }
-}
-
-trait Indent {
-  def indent(n: Int) = "\n" + ("    " * n)
-  def indent(tail: String, n: Int) = tail + "\n" + ("    " * n)
 }

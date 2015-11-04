@@ -1,32 +1,34 @@
 package x7c1.wheat.build
 
-import sbt._
-import scala.xml.XML
+object ResourceLoader {
+  def apply(elementsLoader: ResourceElementsLoader): ResourceLoader = {
+    new ResourceLoaderImpl(elementsLoader)
+  }
+ }
 
-class ResourceLoader(layoutDir: File){
+trait ResourceLoader {
+  def load(fileName: String): Either[Seq[WheatParserError], ParsedResource]
+}
 
-  def load(fileName: String): Either[WheatParserError, ParsedResource] =
-    ResourceNameParser.readPrefix(fileName).right map { prefix =>
-      ParsedResource(
-        prefix = prefix,
-        elements = createElements(fileName, prefix.ofKey))
-    }
+private class ResourceLoaderImpl(elementsLoader: ResourceElementsLoader)
+  extends ResourceLoader {
 
-  private def createElements(fileName: String, prefix: String) = {
-    val file = layoutDir / fileName
-    val xml = XML loadFile file
-    val namespace = "http://schemas.android.com/apk/res/android"
-
-    xml.descendant map { node =>
-      node -> node.attribute(namespace, "id").flatMap(_.headOption)
-    } collect {
-      case (node, Some(attr)) =>
-        node.label -> attr.buildString(true).replace("@+id/", "")
-    } collect {
-      case (tag, id) if id startsWith prefix =>
-        ParsedResourceElement(
-          key = id, tag = tag,
-          label = id.replace(prefix, ""))
+  override def load(fileName: String): Either[Seq[WheatParserError], ParsedResource] = {
+    ResourceNameParser.readPrefix(fileName) match {
+      case Right(prefix) =>
+        val (l, r) = elementsLoader.create(prefix.ofKey).partition(_.isLeft)
+        val errors = l.map(_.left.get)
+        if (errors.isEmpty) {
+          Right apply ParsedResource(prefix = prefix, elements = r.map(_.right.get))
+        } else {
+          Left apply errors
+        }
+      case Left(error) => Left(Seq(error))
     }
   }
+}
+
+trait ResourceElementsLoader {
+  def create(prefix: String):
+    List[Either[WheatParserError, ParsedResourceElement]]
 }

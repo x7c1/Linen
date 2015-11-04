@@ -3,19 +3,20 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
-import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatTasks}
+import x7c1.wheat.build.WheatSettings.{directories, packages, wheat}
+import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatSettings}
 
 import scala.io.Source
 
 object LinenBuild extends Build with LinenSettings {
 
-  val linenSettings = Seq(
+  lazy val linenSettings = Seq(
     scalaVersion := "2.11.6",
     scalacOptions ++= Seq(
       "-deprecation",
       "-feature"
     ),
-    libraryDependencies ++= Seq(testLibrary),
+    libraryDependencies += testLibrary,
     logLevel in assembly := Level.Error
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
@@ -55,7 +56,7 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `wheat-build` = project.
     settings(
       sbtPlugin := true,
-      libraryDependencies ++= Seq(testLibrary)
+      libraryDependencies += testLibrary
     ).
     settings(
       organization := "x7c1",
@@ -66,10 +67,10 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
-    settings(WheatTasks.settings:_*).
+    settings(WheatSettings.all:_*).
     settings(
-      WheatTasks.packages := linenPackages,
-      WheatTasks.directories := linenDirectories
+      packages in wheat := linenPackages,
+      directories in wheat := linenDirectories
     )
 
 }
@@ -79,7 +80,9 @@ trait LinenSettings {
   lazy val linenPackages = WheatPackages(
     starter = "x7c1.linen",
     starterLayout = "x7c1.linen.res.layout",
-    glueLayout = "x7c1.linen.glue.res.layout"
+    starterValues = "x7c1.linen.res.values",
+    glueLayout = "x7c1.linen.glue.res.layout",
+    glueValues = "x7c1.linen.glue.res.values"
   )
 
   lazy val linenDirectories = WheatDirectories(

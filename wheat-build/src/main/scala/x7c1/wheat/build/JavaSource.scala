@@ -24,6 +24,10 @@ class JavaSourceFactory [A <: ResourceParts](
   }
 }
 
+trait JavaSourcesFactory {
+  def createFrom(resource: ParsedResource): Seq[JavaSource]
+}
+
 object JavaSourceWriter {
   def write(source: JavaSource): Unit = {
     val parent = source.file.getParentFile

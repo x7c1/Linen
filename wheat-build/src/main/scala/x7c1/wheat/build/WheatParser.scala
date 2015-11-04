@@ -18,12 +18,24 @@ object WheatParser {
     recurse ?? Nil
   }
 
-  def toCamelCase(x: String): Either[WheatParserError, String] = {
-    val alphabet = token('a' to 'z') | token('A' to 'Z')
-    val parser = (alphabet.+.string <~ token('_').?).+ map {
-      _.map(_.capitalize).mkString
+  lazy val identifier: Parser[String] = {
+    val alphabet = token('a' to 'z')
+    val numbers = token('0' to '9')
+    alphabet.+.string ~ (numbers | alphabet).*.string map {
+      case (a, b) => a + b
     }
-    parse(x, parser).left.map(WheatParserError)
+  }
+
+  def camelize(string: String): Either[WheatParserError, String] = {
+    val parser = (identifier <~ token('_').?).+ map { _.map{_.capitalize}.mkString }
+    parse(string, parser).left.map(WheatParserError)
+  }
+
+  def camelizeTail(string: String): Either[WheatParserError, String] = {
+    val parser = (identifier ~ (token('_') ~> identifier).*) map {
+      case (head, tail) => head + tail.map(_.capitalize).mkString
+    }
+    parse(string, parser).left.map(WheatParserError)
   }
 
   def selectFrom(finder: PathFinder): Def.Initialize[State => Parser[Seq[String]]] =
