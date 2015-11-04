@@ -15,3 +15,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn scala.beans.**
+-dontwarn scala.concurrent.**
+-dontwarn scala.sys.process.**
+
+# to use `format` method of String class
+-keepclassmembers class * {
+    java.lang.String toString();
+}
