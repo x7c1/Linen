@@ -45,7 +45,7 @@ class SampleAdapter(
   def onClickText(message: String) = (view: View) => {
     val toast = Toast.makeText(view.context, message, Toast.LENGTH_SHORT )
     toast.show()
-    Log.e("SampleAdapter", message)
+    Log.e(getClass.getName, message)
   }
   override def getItem(i: Int) = sampleList(i)
 

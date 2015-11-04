@@ -6,10 +6,19 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        release {
+            storeFile file(project.properties['linen.storeFile'])
+            storePassword project.properties['linen.storePassword']
+            keyAlias project.properties['linen.keyAlias']
+            keyPassword project.properties['linen.keyPassword']
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
