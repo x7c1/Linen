@@ -1,5 +1,8 @@
 .gradle
+gradle.properties
 /local.properties
+*.keystore
+
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store

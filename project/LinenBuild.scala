@@ -38,9 +38,16 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value
     )
 
+  lazy val `wheat-macros` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    settings(libraryDependencies +=
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value )
+
   lazy val `wheat-modern` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath)
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    dependsOn(`wheat-macros`)
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
@@ -49,7 +56,7 @@ object LinenBuild extends Build with LinenSettings {
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value,
-      assemblyMergeStrategy in assembly := excludeGlue.value
+      assemblyMergeStrategy in assembly := discardGradleTargets.value
     ).
     dependsOn(`linen-glue`, `wheat-modern`)
 
@@ -111,13 +118,18 @@ trait LinenSettings {
     (dirs * "*.jar").classpath
   }
 
-  lazy val excludeGlue: Def.Initialize[String => MergeStrategy] =
+  lazy val discardGradleTargets: Def.Initialize[String => MergeStrategy] = {
+    val forGradle = (path: String) =>
+      (path startsWith "x7c1/linen/glue") ||
+      (path startsWith "x7c1/wheat/ancient")
+
     Def.setting {
-      case path if path startsWith "x7c1/linen/glue" => MergeStrategy.discard
+      case path if forGradle(path) => MergeStrategy.discard
       case path =>
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
     }
+  }
 
   private lazy val androidSdk = {
     val lines = Source.fromFile(file("local.properties")).getLines()

@@ -1,13 +1,13 @@
 package x7c1.linen.modern
 
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.{View, ViewGroup}
 import android.widget.{BaseAdapter, Toast}
 import x7c1.linen.glue.res.layout.CommentRowLayout
 import x7c1.linen.glue.res.values.CommentValues
 import x7c1.wheat.ancient.SampleStruct
 import x7c1.wheat.ancient.resource.{LayoutProvider, ValuesProvider}
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports
 
 class SampleImpl extends SampleStruct {
@@ -45,7 +45,7 @@ class SampleAdapter(
   def onClickText(message: String) = (view: View) => {
     val toast = Toast.makeText(view.context, message, Toast.LENGTH_SHORT )
     toast.show()
-    Log.e("SampleAdapter", message)
+    Log error message
   }
   override def getItem(i: Int) = sampleList(i)
 
