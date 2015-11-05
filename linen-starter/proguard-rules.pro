@@ -20,6 +20,8 @@
 -dontwarn scala.concurrent.**
 -dontwarn scala.sys.process.**
 
+-dontwarn x7c1.wheat.macros.**
+
 # to use `format` method of String class
 -keepclassmembers class * {
     java.lang.String toString();
