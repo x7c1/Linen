@@ -29,6 +29,13 @@ Library layer, which is independent from concrete application.
  * wheat-ancient
    * Java library called by Java projects like `linen-glue`.
 
+### Tips
+
+* ./gradlew --daemon --parallel assembleDebug
+* adb -s ${device} uninstall x7c1.linen
+* sbt ";wheat-build/publishLocal;reload;wheat:layoutLocations"
+* sbt "wheat:generateLayout comment_row.xml"
+
 ## License
 
 This repository is published under the MIT License.
