@@ -29,7 +29,7 @@ Library layer, which is independent from concrete application.
  * wheat-ancient
    * Java library called by Java projects like `linen-glue`.
 
-### Tips
+## Tips
 
 * ./gradlew --daemon --parallel assembleDebug
 * adb -s ${device} uninstall x7c1.linen
