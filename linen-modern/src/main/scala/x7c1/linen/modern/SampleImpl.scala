@@ -32,12 +32,10 @@ class SampleAdapter(
     val comment = sampleList(i)
 
     layout.name.text = comment.name
-    layout.name onClick
-      onClickText(values.get.nameClicked format comment.name)
+    layout.name onClick onClickText(values.get.nameClicked format comment.name)
 
     layout.content.text = comment.content
-    layout.content onClick
-      onClickText(values.get.contentClicked format comment.content)
+    layout.content onClick onClickText(values.get.contentClicked format comment.content)
 
     layout.view
   }
