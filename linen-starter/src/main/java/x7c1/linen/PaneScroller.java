@@ -1,6 +1,5 @@
 package x7c1.linen;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Scroller;
@@ -10,18 +9,16 @@ class PaneScroller implements Runnable {
 	private final Scroller scroller;
 	private final ViewGroup container;
 
-	private int lastX = 0;
-
-	public PaneScroller(Context context, ViewGroup container) {
-		this.scroller = new Scroller(context);
+	public PaneScroller(ViewGroup container) {
+		this.scroller = new Scroller(container.getContext());
 		this.container = container;
 	}
+
 	public static FlingDetector.OnFlingListener createListener(ViewGroup container){
 		return new Listener(container);
 	}
 
 	public void start(FlingDetector.FlingEvent event){
-		int initialX = 0;
 
 		/*
 		int maxX = Integer.MAX_VALUE;
@@ -31,16 +28,37 @@ class PaneScroller implements Runnable {
 		scroller.fling(initialX, 0, initialVelocity, 0, minX, maxX, 0, 0);
 		*/
 
-		if (event.getVelocityX() > 0){
-			scroller.startScroll(0, 0, 400, 0, 750);
+		int current = container.getScrollX();
+		float velocityX = event.getVelocityX();
+
+		final int dx;
+		if (velocityX < 0){
+			if (current < 0){
+				dx = 0 - current;
+			} else if (current < 1000){
+				dx = 1000 - current;
+			} else if (current < 2000) {
+				dx = 2000 - current;
+			} else {
+				dx = 0;
+			}
+			Log.d("PaneScroller.start", "v<0 dx:" + dx);
 		} else {
-			scroller.startScroll(0, 0, -400, 0, 750);
+			if (current > 2000){
+				dx = 2000 - current;
+			} else if (current > 1000) {
+				dx = 1000 - current;
+			} else if (current > 0){
+				dx = 0 - current;
+			} else {
+				dx = 0;
+			}
+			Log.d("PaneScroller.start", "v>0 dx" + dx);
 		}
+		Log.d("PaneScroller.start", "current scroll:" + current);
 
-		Log.i("PaneScroller.start", "starting fling:" + initialX);
-		Log.i("PaneScroller.start", "current scroll:" + container.getScrollX());
+		scroller.startScroll(current, 0, dx, 0, 500);
 
-		lastX = initialX;
 		container.post(this);
 	}
 
@@ -51,12 +69,7 @@ class PaneScroller implements Runnable {
 		}
 		boolean more = scroller.computeScrollOffset();
 		int x = scroller.getCurrX();
-
-		int diff = lastX - x;
-		if (diff != 0){
-			container.scrollBy(diff, 0);
-			lastX = x;
-		}
+		container.scrollTo(x, 0);
 		if (more){
 			container.post(this);
 		}
@@ -64,15 +77,15 @@ class PaneScroller implements Runnable {
 
 	private static class Listener implements FlingDetector.OnFlingListener {
 
-		final private ViewGroup container;
+		private final PaneScroller scroller;
 
 		public Listener(ViewGroup container) {
-			this.container = container;
+			scroller = new PaneScroller(container);
 		}
 
 		@Override
 		public boolean onFling(FlingDetector.FlingEvent event) {
-			new PaneScroller(container.getContext(), container).start(event);
+			scroller.start(event);
 			return false;
 		}
 	}
