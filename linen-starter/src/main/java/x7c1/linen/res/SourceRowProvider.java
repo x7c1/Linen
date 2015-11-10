@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import x7c1.linen.R;
-import x7c1.linen.SourceRow;
+import x7c1.linen.glue.res.layout.SourceRow;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 
 public class SourceRowProvider implements ViewHolderProvider<SourceRow> {

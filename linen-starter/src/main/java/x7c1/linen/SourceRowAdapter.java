@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import x7c1.linen.glue.res.layout.SourceRow;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 
 public class SourceRowAdapter extends RecyclerView.Adapter<SourceRow>{
