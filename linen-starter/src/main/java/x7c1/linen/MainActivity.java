@@ -3,6 +3,8 @@ package x7c1.linen;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -35,7 +37,11 @@ public class MainActivity extends AppCompatActivity {
 		String str = new SampleImpl().getFoo(this);
 		view.setText(str);
 
-		ListView listView = (ListView) findViewById(R.id.sample_right_list);
+		RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
+		leftView.setLayoutManager(new LinearLayoutManager(this));
+		leftView.setAdapter(new SourceRowAdapter(this));
+
+		ListView rightListView = (ListView) findViewById(R.id.sample_right_list);
 
 		View left = findViewById(R.id.swipe_layout_left);
 		updateWidth(0.9, left);
@@ -50,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 				new CommentRowLayoutProvider(this),
 				new CommentValuesProvider(this)
 		);
-		listView.setAdapter(adapter);
+		rightListView.setAdapter(adapter);
 
 		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final GestureDetector detector = forHorizontal(

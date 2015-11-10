@@ -23,10 +23,11 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/sample_left_list"
-                android:layout_width="150dp"
-                android:layout_height="400dp" />
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" />
+
         </x7c1.linen.CustomSwipeToRefresh>
 
         <android.support.v4.widget.SwipeRefreshLayout
@@ -58,10 +59,7 @@
     </LinearLayout>
 
     <View
-        android:orientation="horizontal"
         android:id="@+id/dummy_surface"
-        android:alpha="0.2"
-        android:background="@color/opaque_red"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
