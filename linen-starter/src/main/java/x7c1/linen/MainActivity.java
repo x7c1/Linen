@@ -2,9 +2,7 @@ package x7c1.linen;
 
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -39,8 +37,14 @@ public class MainActivity extends AppCompatActivity {
 
 		ListView listView = (ListView) findViewById(R.id.sample_right_list);
 
-		View right = findViewById(R.id.swipe_layout_sample);
-		right.setLayoutParams(changeParams(right.getLayoutParams()));
+		View left = findViewById(R.id.swipe_layout_left);
+		updateWidth(0.9, left);
+
+		View center = findViewById(R.id.swipe_layout_center);
+		updateWidth(0.8, center);
+
+		View right = findViewById(R.id.swipe_layout_right);
+		updateWidth(0.9, right);
 
 		BaseAdapter adapter = new SampleAdapter(
 				new CommentRowLayoutProvider(this),
@@ -49,16 +53,8 @@ public class MainActivity extends AppCompatActivity {
 		listView.setAdapter(adapter);
 
 		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
-		final SwipeRefreshLayout target = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_left);
-
-		target.post(new Runnable() {
-			@Override
-			public void run() {
-				Log.e("hoge", "" + container.getScrollY());
-				container.scrollTo(0, 0);
-			}
-		});
-		final GestureDetector detector = forHorizontal(this, createListener(container));
+		final GestureDetector detector = forHorizontal(
+				this, createListener(container, getDisplaySize()));
 
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
@@ -74,13 +70,18 @@ public class MainActivity extends AppCompatActivity {
 		target0.setOnTouchListener(listener);
 	}
 
-	private ViewGroup.LayoutParams changeParams(ViewGroup.LayoutParams params){
+	private void updateWidth(double ratio, View view){
+		ViewGroup.LayoutParams params = view.getLayoutParams();
+		Point size = getDisplaySize();
+		params.width = (int) (ratio * size.x);
+		view.setLayoutParams(params);
+	}
+
+	private Point getDisplaySize(){
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-
-		params.width = size.x;
-		return params;
+		return size;
 	}
 
 	@Override

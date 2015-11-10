@@ -1,5 +1,6 @@
 package x7c1.linen;
 
+import android.graphics.Point;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Scroller;
@@ -8,30 +9,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import x7c1.linen.FlingDetector.FlingEvent;
+import x7c1.linen.FlingDetector.OnFlingListener;
+
+import static java.lang.Math.max;
+
 class PaneScroller implements Runnable {
 
 	private final Scroller scroller;
 	private final ViewGroup container;
+	private final Point displaySize;
 
-	public PaneScroller(ViewGroup container) {
+	public PaneScroller(ViewGroup container, Point displaySize) {
+		this.displaySize = displaySize;
 		this.scroller = new Scroller(container.getContext());
 		this.container = container;
 	}
 
-	public static FlingDetector.OnFlingListener createListener(ViewGroup container){
-		return new Listener(container);
+	public static OnFlingListener createListener(ViewGroup container, Point displaySize){
+		return new Listener(container, displaySize);
 	}
 
-	public void start(FlingDetector.FlingEvent event){
-
-		/*
-		int maxX = Integer.MAX_VALUE;
-		int minX = Integer.MIN_VALUE;
-		int maxX = 200;
-		int minX = -200;
-		scroller.fling(initialX, 0, initialVelocity, 0, minX, maxX, 0, 0);
-		*/
-
+	public void start(FlingEvent event){
 		int current = container.getScrollX();
 		float velocityX = event.getVelocityX();
 
@@ -41,11 +40,11 @@ class PaneScroller implements Runnable {
 			Log.d("PaneScroller.start", "v<0 dx:" + dx);
 		} else {
 			dx = getPrevious();
-			Log.d("PaneScroller.start", "v>0 dx" + dx);
+			Log.d("PaneScroller.start", "v>0 dx:" + dx);
 		}
 		Log.d("PaneScroller.start", "current scroll:" + current);
 
-		scroller.startScroll(current, 0, dx, 0, 500);
+		scroller.startScroll(current, 0, dx, 0, 350);
 
 		container.post(this);
 	}
@@ -65,15 +64,18 @@ class PaneScroller implements Runnable {
 
 	private List<Integer> getPositions(){
 		List<Integer> positions = new ArrayList<>();
-		positions.add(0);
 
+		int display = displaySize.x;
 		int length = container.getChildCount();
-		for (int i = 0, width = 0; i < length; i++){
-			width += container.getChildAt(i).getWidth();
-			positions.add(width);
-		}
-		positions.remove(positions.size() - 1);
+		for (int i = 0, start = 0; i < length; i++){
+			int width = container.getChildAt(i).getWidth();
+			int position = (i == length - 1) ?
+				(start - (display - width)):
+				(start - (display - width) / 2);
 
+			start += width;
+			positions.add(max(0, position));
+		}
 		return positions;
 	}
 	private int getNext(){
@@ -97,16 +99,16 @@ class PaneScroller implements Runnable {
 		}
 		return 0;
 	}
-	private static class Listener implements FlingDetector.OnFlingListener {
+	private static class Listener implements OnFlingListener {
 
 		private final PaneScroller scroller;
 
-		public Listener(ViewGroup container) {
-			scroller = new PaneScroller(container);
+		public Listener(ViewGroup container, Point displaySize) {
+			scroller = new PaneScroller(container, displaySize);
 		}
 
 		@Override
-		public boolean onFling(FlingDetector.FlingEvent event) {
+		public boolean onFling(FlingEvent event) {
 			scroller.start(event);
 			return false;
 		}

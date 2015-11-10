@@ -43,7 +43,7 @@
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_layout_sample"
+            android:id="@+id/swipe_layout_right"
             android:background="@color/opaque_green"
             android:layout_width="150dp"
             android:layout_height="wrap_content">

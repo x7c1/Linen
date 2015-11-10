@@ -1,7 +1,6 @@
 package x7c1.linen;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
@@ -74,7 +73,6 @@ class FlingDetector {
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 			final boolean consumed;
 			if (abs(velocityX) > abs(velocityY)){
-				Log.d("onFling", "start" + e1);
 				FlingEvent event = new FlingEvent(e1, e2, velocityX, velocityY);
 				consumed = listener.onFling(event);
 			} else {
