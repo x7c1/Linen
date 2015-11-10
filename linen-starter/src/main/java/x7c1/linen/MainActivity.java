@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
+import x7c1.linen.modern.SourceRowAdapter;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 import x7c1.linen.res.values.CommentValuesProvider;

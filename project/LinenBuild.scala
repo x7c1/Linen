@@ -111,9 +111,10 @@ trait LinenSettings {
 
   lazy val androidSdkClasspath = {
     val dirs = {
-      val support = "extras/android/support/v7/appcompat/libs"
+      val appcompat = "extras/android/support/v7/appcompat/libs"
+      val recycler = "extras/android/support/v7/recyclerview/libs"
       val platform = "platforms/android-23"
-      (androidSdk / platform) +++ (androidSdk / support)
+      (androidSdk / platform) +++ (androidSdk / appcompat) +++ (androidSdk / recycler)
     }
     (dirs * "*.jar").classpath
   }
