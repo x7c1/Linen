@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
+import x7c1.linen.res.SourceRowProvider;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
 import x7c1.linen.res.values.CommentValuesProvider;
 
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 		RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
 		leftView.setLayoutManager(new LinearLayoutManager(this));
-		leftView.setAdapter(new SourceRowAdapter(this));
+		leftView.setAdapter(new SourceRowAdapter(new SourceRowProvider(this)));
 
 		ListView rightListView = (ListView) findViewById(R.id.sample_right_list);
 
