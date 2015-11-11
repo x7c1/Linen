@@ -17,9 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import x7c1.linen.modern.PaneController;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
+import x7c1.linen.modern.ScrollObserver;
 import x7c1.linen.modern.SourceRowAdapter;
+import x7c1.linen.modern.SourceStore;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 import x7c1.linen.res.values.CommentValuesProvider;
@@ -39,9 +42,14 @@ public class MainActivity extends AppCompatActivity {
 		String str = new SampleImpl().getFoo(this);
 		view.setText(str);
 
-		RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
+		final RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
 		leftView.setLayoutManager(new LinearLayoutManager(this));
-		leftView.setAdapter(new SourceRowAdapter(new SourceRowProvider(this)));
+		leftView.setAdapter(new SourceRowAdapter(
+				new SourceStore(),
+				new PaneController(),
+				new SourceRowProvider(this)));
+
+		new ScrollObserver(leftView).init();
 
 		ListView rightListView = (ListView) findViewById(R.id.sample_right_list);
 
