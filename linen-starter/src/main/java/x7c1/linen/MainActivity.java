@@ -67,9 +67,8 @@ public class MainActivity extends AppCompatActivity {
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				detector.onTouchEvent(event);
-				container.dispatchTouchEvent(event);
-				return false;
+				return detector.onTouchEvent(event) ||
+					container.dispatchTouchEvent(event);
 			}
 		};
 

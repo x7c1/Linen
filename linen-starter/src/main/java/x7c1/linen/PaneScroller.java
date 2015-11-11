@@ -110,7 +110,7 @@ class PaneScroller implements Runnable {
 		@Override
 		public boolean onFling(FlingEvent event) {
 			scroller.start(event);
-			return false;
+			return true;
 		}
 	}
 }
