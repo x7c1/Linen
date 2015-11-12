@@ -8,7 +8,7 @@ class RichView[A <: View](view: A){
 
   def context: Context = view.getContext
 
-  def onClick[B](f: A => B) = view.setOnClickListener(new OnClickListener {
+  def onClick[B](f: A => B): Unit = view.setOnClickListener(new OnClickListener {
     override def onClick(view: View): Unit = f(view.asInstanceOf[A])
   })
 }
