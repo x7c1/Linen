@@ -20,6 +20,7 @@ object LinenBuild extends Build with LinenSettings {
     logLevel in assembly := Level.Error
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
+  lazy val scalaz = "org.scalaz" %% "scalaz-concurrent" % "7.1.5"
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -32,6 +33,7 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
+    settings(libraryDependencies += scalaz).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
@@ -51,15 +53,13 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
-    settings(libraryDependencies ++= Seq(
-      "org.scalaz" %% "scalaz-concurrent" % "7.1.5" )
-    ).
+    settings(libraryDependencies += scalaz).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value,
-      assemblyMergeStrategy in assembly := discardGradleTargets.value
+      assemblyMergeStrategy in assembly := discardTargets.value
     ).
     dependsOn(`linen-glue`, `wheat-modern`)
 
@@ -122,13 +122,14 @@ trait LinenSettings {
     (dirs * "*.jar").classpath
   }
 
-  lazy val discardGradleTargets: Def.Initialize[String => MergeStrategy] = {
-    val forGradle = (path: String) =>
+  lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
+    val ignore = (path: String) =>
+      (path startsWith "scalaz") ||
       (path startsWith "x7c1/linen/glue") ||
       (path startsWith "x7c1/wheat/ancient")
 
     Def.setting {
-      case path if forGradle(path) => MergeStrategy.discard
+      case path if ignore(path) => MergeStrategy.discard
       case path =>
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
