@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import x7c1.linen.modern.PaneContainer;
 import x7c1.linen.modern.PaneController;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
@@ -42,11 +43,12 @@ public class MainActivity extends AppCompatActivity {
 		String str = new SampleImpl().getFoo(this);
 		view.setText(str);
 
+		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
 		leftView.setLayoutManager(new LinearLayoutManager(this));
 		leftView.setAdapter(new SourceRowAdapter(
 				new SourceStore(),
-				new PaneController(view),
+				new PaneController(new PaneContainer(container)),
 				new SourceRowProvider(this)));
 
 		new ScrollObserver(leftView).init();
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 		);
 		rightListView.setAdapter(adapter);
 
-		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final GestureDetector detector = forHorizontal(
 				this, createListener(container, getDisplaySize()));
 

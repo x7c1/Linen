@@ -4,7 +4,7 @@ package x7c1.linen.modern
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Scroller
 import x7c1.linen.glue.res.layout.SourceRow
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -13,7 +13,7 @@ import x7c1.wheat.modern.kinds.CallbackTask
 import x7c1.wheat.modern.kinds.CallbackTask.taskOf
 
 import scalaz.concurrent.Task
-import scalaz.{\/-, -\/}
+import scalaz.{-\/, \/-}
 
 
 class SourceRowAdapter(
@@ -42,29 +42,28 @@ trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
 }
 
-class PaneController(sampleText: TextView) extends OnSourceSelectedListener {
+class PaneController(
+  container: PaneContainer) extends OnSourceSelectedListener {
 
-  def container = new Container
+  def sourcesArea = new SourcesArea(displayPosition = 0)
 
-  def entriesArea = new EntriesArea
-
-  def sourcesArea = new SourcesArea
+  def entriesArea = new EntriesArea(displayPosition = 864)
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info event
 
-    val task1 = for {
-      _ <- taskOf(container focusOn entriesArea)
+    val focus = for {
+      _ <- taskOf(container scrollTo entriesArea)
       _ <- taskOf(sourcesArea scrollTo event.position)
     } yield {
-      Log info s"[done] source selected $event"
+      Log info s"[done] focus source-${event.sourceId}"
     }
-    val task2 = for {
+    val show = for {
       _ <- taskOf(entriesArea displayOrLoad event.sourceId)
     } yield {
-      Log info s"[done] entries loaded ${event.sourceId}"
+      Log info s"[done] show source-${event.sourceId}"
     }
-    Seq(task1, task2) foreach runAsync
+    Seq(focus, show) foreach runAsync
   }
 
   def runAsync[A](task: CallbackTask[A]) = {
@@ -76,11 +75,36 @@ class PaneController(sampleText: TextView) extends OnSourceSelectedListener {
 
 }
 
-class Container {
-  def focusOn(pane: Pane)(onFinish: ContainerFocusedEvent => Unit): Unit = {
-    Log info "start"
+class PaneContainer(view: ViewGroup) {
+  private lazy val scroller = new Scroller(view.getContext)
 
-    onFinish(new ContainerFocusedEvent)
+  def scrollTo(pane: Pane)(onFinish: ContainerFocusedEvent => Unit): Unit = {
+    val current = view.getScrollX
+    val dx = pane.displayPosition - current
+    val duration = 350
+
+    Log info s"[init] current:$current, dx:$dx"
+    scroller.startScroll(current, 0, dx, 0, duration)
+
+    if (!scroller.isFinished){
+      view.post(new ContainerScroller(onFinish))
+    }
+  }
+  private class ContainerScroller(
+    onFinish: ContainerFocusedEvent => Unit) extends Runnable {
+
+    override def run(): Unit = {
+      val more = scroller.computeScrollOffset()
+      val current = scroller.getCurrX
+      view.scrollTo(current, 0)
+
+      if (more){
+        view.post(this)
+      } else {
+        Log info s"[done] current:$current"
+        onFinish(new ContainerFocusedEvent)
+      }
+    }
   }
 }
 
