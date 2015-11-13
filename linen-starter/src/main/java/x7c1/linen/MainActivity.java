@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 		leftView.setLayoutManager(new LinearLayoutManager(this));
 		leftView.setAdapter(new SourceRowAdapter(
 				new SourceStore(),
-				new PaneController(),
+				new PaneController(view),
 				new SourceRowProvider(this)));
 
 		new ScrollObserver(leftView).init();

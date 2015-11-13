@@ -23,6 +23,7 @@ object CallbackTask {
   implicit def apply[EVENT](execute: (EVENT => Unit) => Unit): CallbackTask[EVENT] = {
     new CallbackTask(execute)
   }
+  def taskOf[A](f: (A => Unit) => Unit): CallbackTask[A] = CallbackTask(f)
 }
 
 class CallbackTask[EVENT](
@@ -31,4 +32,6 @@ class CallbackTask[EVENT](
   override type This[A] = CallbackTask[A]
 
   override def apply(f: EVENT => Unit): Unit = callback(f)
+
+  def apply(): Unit = callback(_ => ())
 }

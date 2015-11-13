@@ -1,12 +1,19 @@
 package x7c1.linen.modern
 
+//import android.os.AsyncTask
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
+import android.widget.TextView
 import x7c1.linen.glue.res.layout.SourceRow
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.kinds.CallbackTask
+import x7c1.wheat.modern.kinds.CallbackTask.taskOf
+
+import scalaz.concurrent.Task
+import scalaz.{\/-, -\/}
 
 
 class SourceRowAdapter(
@@ -35,34 +42,54 @@ trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
 }
 
-class PaneController extends OnSourceSelectedListener {
+class PaneController(sampleText: TextView) extends OnSourceSelectedListener {
 
-  /*
-  def execute
-  def container
-  def entriesArea
-  def sourcesArea
-  */
+  def container = new Container
+
+  def entriesArea = new EntriesArea
+
+  def sourcesArea = new SourcesArea
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info event
-    /*
-    val select = container.focusOn(entriesArea) then {
-      sourcesArea select event.position
-    }
-    val load = entriesArea.displayOrLoad(event.sourceId)
 
-    execute.inParallel(select and load)
-    */
+    val task1 = for {
+      _ <- taskOf(container focusOn entriesArea)
+      _ <- taskOf(sourcesArea scrollTo event.position)
+    } yield {
+      Log info s"[done] source selected $event"
+    }
+    val task2 = for {
+      _ <- taskOf(entriesArea displayOrLoad event.sourceId)
+    } yield {
+      Log info s"[done] entries loaded ${event.sourceId}"
+    }
+    Seq(task1, task2) foreach runAsync
+  }
+
+  def runAsync[A](task: CallbackTask[A]) = {
+    Task(task()) runAsync {
+      case \/-(_) =>
+      case -\/(e) => Log error e.toString
+    }
   }
 
 }
+
+class Container {
+  def focusOn(pane: Pane)(onFinish: ContainerFocusedEvent => Unit): Unit = {
+    Log info "start"
+
+    onFinish(new ContainerFocusedEvent)
+  }
+}
+
+class ContainerFocusedEvent
 
 class ScrollObserver (recyclerView: RecyclerView){
 
   def init() = {
     recyclerView onScroll { event =>
-//      Log debug event
     }
   }
 

@@ -11,7 +11,7 @@ import scala.io.Source
 object LinenBuild extends Build with LinenSettings {
 
   lazy val linenSettings = Seq(
-    scalaVersion := "2.11.6",
+    scalaVersion := "2.11.7",
     scalacOptions ++= Seq(
       "-deprecation",
       "-feature"
@@ -51,6 +51,9 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
+    settings(libraryDependencies ++= Seq(
+      "org.scalaz" %% "scalaz-concurrent" % "7.1.5" )
+    ).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
