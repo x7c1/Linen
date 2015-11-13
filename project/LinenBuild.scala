@@ -77,6 +77,7 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
+    settings(linenTasks(`linen-modern`):_*).
     settings(WheatSettings.all:_*).
     settings(
       packages in wheat := linenPackages,
@@ -134,6 +135,25 @@ trait LinenSettings {
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
     }
+  }
+
+  lazy val assembleAndInstall =
+    Def.taskKey[Unit]("Build android app and install to connected device.")
+
+  def linenTasks(project: Project) = Seq(
+    assembleAndInstall := installTask.value,
+    assembleAndInstall <<= (assembleAndInstall dependsOn (assembly in project))
+  )
+
+  def installTask = Def task {
+    val lines = "adb devices".lines_!.toSeq
+    val device = lines(1).split("\t").head
+    val list = Seq(
+      "./gradlew --daemon --parallel assembleDebug",
+      s"adb -s $device install -r ./linen-starter/build/outputs/apk/linen-starter-debug.apk",
+      s"adb -s $device shell am start -n x7c1.linen/x7c1.linen.MainActivity"
+    )
+    list foreach {_ !< streams.value.log}
   }
 
   private lazy val androidSdk = {
