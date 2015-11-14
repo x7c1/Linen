@@ -1,6 +1,5 @@
 package x7c1.linen.modern
 
-//import android.os.AsyncTask
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
@@ -86,14 +85,12 @@ class PaneContainer(view: ViewGroup) {
     Log info s"[init] current:$current, dx:$dx"
     scroller.startScroll(current, 0, dx, 0, duration)
 
-    if (!scroller.isFinished){
-      view.post(new ContainerScroller(onFinish))
-    }
+    view.post(new ContainerScroller(onFinish))
   }
   private class ContainerScroller(
     onFinish: ContainerFocusedEvent => Unit) extends Runnable {
 
-    override def run(): Unit = {
+    override def run(): Unit = if (!scroller.isFinished) {
       val more = scroller.computeScrollOffset()
       val current = scroller.getCurrX
       view.scrollTo(current, 0)
