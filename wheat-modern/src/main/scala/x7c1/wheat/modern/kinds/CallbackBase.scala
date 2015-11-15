@@ -3,17 +3,15 @@ package x7c1.wheat.modern.kinds
 trait CallbackBase[EVENT] extends ((EVENT => Unit) => Unit) {
   import scala.language.higherKinds
 
-  type F[A] = (A => Unit) => Unit
-
   type This[A] <: CallbackBase[A]
 
-  type Builder[A] = F[A] => This[A]
+  type Builder[A] = ((A => Unit) => Unit) => This[A]
 
   def map[A: Builder](f: EVENT => A): This[A] = implicitly[Builder[A]] apply {
-    (g: A => Unit) => apply(f andThen g)
+    g => apply(f andThen g)
   }
-  def flatMap[A: Builder](f: EVENT => F[A]): This[A] = implicitly[Builder[A]] apply {
-    (g: A => Unit) => apply(e => f(e) apply g)
+  def flatMap[A: Builder](f: EVENT => This[A]): This[A] = implicitly[Builder[A]] apply {
+    g => apply(e => f(e) apply g)
   }
 }
 
