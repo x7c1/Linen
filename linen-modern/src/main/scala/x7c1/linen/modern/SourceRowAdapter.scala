@@ -90,12 +90,11 @@ class PaneContainer(view: ViewGroup) {
   private class ContainerScroller(
     onFinish: ContainerFocusedEvent => Unit) extends Runnable {
 
-    override def run(): Unit = if (!scroller.isFinished) {
+    override def run(): Unit = {
       val more = scroller.computeScrollOffset()
       val current = scroller.getCurrX
-      view.scrollTo(current, 0)
-
       if (more){
+        view.scrollTo(current, 0)
         view.post(this)
       } else {
         Log info s"[done] current:$current"
