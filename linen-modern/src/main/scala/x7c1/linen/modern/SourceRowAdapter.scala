@@ -51,8 +51,8 @@ class PaneController(
     Log info event
 
     val focus = for {
-      _ <- taskOf(container scrollTo entriesArea)
       _ <- taskOf(sourcesArea scrollTo event.position)
+      _ <- taskOf(container scrollTo entriesArea)
     } yield {
       Log info s"[done] focus source-${event.sourceId}"
     }
