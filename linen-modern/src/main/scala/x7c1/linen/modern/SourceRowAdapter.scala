@@ -42,9 +42,8 @@ trait OnSourceSelectedListener {
 }
 
 class PaneController(
-  container: PaneContainer) extends OnSourceSelectedListener {
-
-  def sourcesArea = new SourcesArea(displayPosition = 0)
+  container: PaneContainer,
+  sourcesArea: SourcesArea ) extends OnSourceSelectedListener {
 
   def entriesArea = new EntriesArea(displayPosition = 864)
 

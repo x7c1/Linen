@@ -24,6 +24,7 @@ import x7c1.linen.modern.SampleImpl;
 import x7c1.linen.modern.ScrollObserver;
 import x7c1.linen.modern.SourceRowAdapter;
 import x7c1.linen.modern.SourceStore;
+import x7c1.linen.modern.SourcesArea;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 import x7c1.linen.res.values.CommentValuesProvider;
@@ -45,10 +46,14 @@ public class MainActivity extends AppCompatActivity {
 
 		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
+
 		leftView.setLayoutManager(new LinearLayoutManager(this));
 		leftView.setAdapter(new SourceRowAdapter(
 				new SourceStore(),
-				new PaneController(new PaneContainer(container)),
+				new PaneController(
+						new PaneContainer(container),
+						new SourcesArea(leftView, 0)
+				),
 				new SourceRowProvider(this)));
 
 		new ScrollObserver(leftView).init();

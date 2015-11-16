@@ -25,6 +25,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/sample_left_list"
+
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
 
