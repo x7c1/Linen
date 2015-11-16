@@ -1,12 +1,11 @@
 package x7c1.linen.modern
 
-import java.util.{Timer, TimerTask}
-
 import android.content.Context
 import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.chrono.BufferingTimer
 
 trait Pane {
   def displayPosition: Int
@@ -30,7 +29,7 @@ class SourcesArea(
   override val displayPosition: Int = 0) extends Pane {
 
   import x7c1.wheat.modern.decorator.Imports._
-  private val timer = new BufferedTimer(delay = 100)
+  private val timer = new BufferingTimer(delay = 100)
 
   recyclerView onScroll { e =>
     val position = layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -47,20 +46,6 @@ class SourcesArea(
     val scroller = new SmoothScroller(recyclerView.getContext, layoutManager, onFinish)
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
-  }
-}
-
-class BufferedTimer (delay: Int){
-  private val timer = new Timer()
-  private var task: Option[TimerTask] = None
-
-  def touch[A](f: => A) = {
-    task foreach { _.cancel() }
-    task = Some apply new BufferTask(f)
-    task foreach { timer.schedule(_, delay) }
-  }
-  private class BufferTask[A](f: => A) extends java.util.TimerTask {
-    override def run(): Unit = f
   }
 }
 
