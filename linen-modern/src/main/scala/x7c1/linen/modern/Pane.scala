@@ -12,6 +12,7 @@ trait Pane {
 }
 
 class EntriesArea(
+  recyclerView: RecyclerView,
   override val displayPosition: Int) extends Pane {
 
   def displayOrLoad(sourceId: Long)(onFinish: EntriesLoadedEvent => Unit): Unit = {
@@ -34,7 +35,13 @@ class SourcesArea(
   recyclerView onScroll { e =>
     val position = layoutManager.findFirstCompletelyVisibleItemPosition()
     timer touch {
-      Log info position.toString
+      onSourceFocused onSourceFocused new SourceFocusedEvent(position)
+    }
+  }
+
+  def onSourceFocused = new OnSourceFocusedListener {
+    override def onSourceFocused(event: SourceFocusedEvent): Unit = {
+      Log info event.position.toString
     }
   }
   lazy val layoutManager: LinearLayoutManager = {
@@ -47,6 +54,11 @@ class SourcesArea(
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
   }
+}
+
+case class SourceFocusedEvent(position: Int)
+trait OnSourceFocusedListener {
+  def onSourceFocused(event:  SourceFocusedEvent)
 }
 
 class SourceScrolledEvent

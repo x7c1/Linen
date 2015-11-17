@@ -41,22 +41,19 @@ trait OnSourceSelectedListener {
 }
 
 class PaneController(
-  container: PaneContainer,
-  sourcesArea: SourcesArea ) extends OnSourceSelectedListener {
-
-  def entriesArea = new EntriesArea(displayPosition = 864)
+  container: PaneContainer ) extends OnSourceSelectedListener {
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info event
 
     val focus = for {
-      _ <- taskOf(sourcesArea scrollTo event.position)
-      _ <- taskOf(container scrollTo entriesArea)
+      _ <- taskOf(container.sources scrollTo event.position)
+      _ <- taskOf(container scrollTo container.entries)
     } yield {
       Log info s"[done] focus source-${event.sourceId}"
     }
     val show = for {
-      _ <- taskOf(entriesArea displayOrLoad event.sourceId)
+      _ <- taskOf(container.entries displayOrLoad event.sourceId)
     } yield {
       Log info s"[done] show source-${event.sourceId}"
     }
@@ -72,7 +69,11 @@ class PaneController(
 
 }
 
-class PaneContainer(view: ViewGroup) {
+class PaneContainer(
+  view: ViewGroup,
+  val sources: SourcesArea,
+  val entries: EntriesArea ) {
+
   private lazy val scroller = new Scroller(view.getContext)
 
   def scrollTo(pane: Pane)(onFinish: ContainerFocusedEvent => Unit): Unit = {

@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import x7c1.linen.modern.EntriesArea;
 import x7c1.linen.modern.PaneContainer;
 import x7c1.linen.modern.PaneController;
 import x7c1.linen.modern.SampleAdapter;
@@ -45,13 +46,18 @@ public class MainActivity extends AppCompatActivity {
 
 		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
+		final RecyclerView centerView = (RecyclerView) findViewById(R.id.sample_center_list);
+		centerView.setLayoutManager(new LinearLayoutManager(this));
 
 		leftView.setLayoutManager(new LinearLayoutManager(this));
 		leftView.setAdapter(new SourceRowAdapter(
 				new SourceStore(),
 				new PaneController(
-						new PaneContainer(container),
-						new SourcesArea(leftView, 0)
+						new PaneContainer(
+								container,
+								new SourcesArea(leftView, 0),
+								new EntriesArea(centerView, 864)
+						)
 				),
 				new SourceRowProvider(this)));
 
