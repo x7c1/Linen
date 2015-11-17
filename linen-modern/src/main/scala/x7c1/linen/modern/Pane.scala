@@ -13,7 +13,9 @@ trait Pane {
 
 class EntriesArea(
   recyclerView: RecyclerView,
-  override val displayPosition: Int) extends Pane {
+  getPosition: () => Int ) extends Pane {
+
+  override lazy val displayPosition: Int = getPosition()
 
   def displayOrLoad(sourceId: Long)(onFinish: EntriesLoadedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
@@ -27,7 +29,7 @@ class EntriesLoadedEvent
 
 class SourcesArea(
   recyclerView: RecyclerView,
-  override val displayPosition: Int = 0) extends Pane {
+  getPosition: () => Int ) extends Pane {
 
   import x7c1.wheat.modern.decorator.Imports._
   private val timer = new BufferingTimer(delay = 100)
@@ -38,6 +40,7 @@ class SourcesArea(
       onSourceFocused onSourceFocused new SourceFocusedEvent(position)
     }
   }
+  override lazy val displayPosition: Int = getPosition()
 
   def onSourceFocused = new OnSourceFocusedListener {
     override def onSourceFocused(event: SourceFocusedEvent): Unit = {
