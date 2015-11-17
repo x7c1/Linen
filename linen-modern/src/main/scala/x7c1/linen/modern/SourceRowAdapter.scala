@@ -7,11 +7,6 @@ import x7c1.linen.glue.res.layout.SourceRow
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.kinds.CallbackTask
-import x7c1.wheat.modern.kinds.CallbackTask.taskOf
-
-import scalaz.concurrent.Task
-import scalaz.{-\/, \/-}
 
 
 class SourceRowAdapter(
@@ -38,35 +33,6 @@ class SourceRowAdapter(
 
 trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
-}
-
-class SourceSelectObserver(
-  container: PaneContainer ) extends OnSourceSelectedListener {
-
-  override def onSourceSelected(event: SourceSelectedEvent): Unit = {
-    Log info event
-
-    val focus = for {
-      _ <- taskOf(container.sources scrollTo event.position)
-      _ <- taskOf(container scrollTo container.entries)
-    } yield {
-      Log info s"[done] focus source-${event.sourceId}"
-    }
-    val show = for {
-      _ <- taskOf(container.entries displayOrLoad event.sourceId)
-    } yield {
-      Log info s"[done] show source-${event.sourceId}"
-    }
-    Seq(focus, show) foreach runAsync
-  }
-
-  def runAsync[A](task: CallbackTask[A]) = {
-    Task(task()) runAsync {
-      case \/-(_) =>
-      case -\/(e) => Log error e.toString
-    }
-  }
-
 }
 
 class PaneContainer(

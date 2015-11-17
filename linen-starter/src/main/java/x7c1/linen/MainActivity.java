@@ -3,25 +3,18 @@ package x7c1.linen;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import x7c1.linen.glue.res.layout.ActivityMain;
-import x7c1.linen.modern.EntriesArea;
-import x7c1.linen.modern.PaneContainer;
+import x7c1.linen.modern.ContainerInitializer;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
-import x7c1.linen.modern.SourceRowAdapter;
-import x7c1.linen.modern.SourceSelectObserver;
-import x7c1.linen.modern.SourceStore;
-import x7c1.linen.modern.SourcesArea;
 import x7c1.linen.res.layout.ActivityMainProvider;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
@@ -43,25 +36,12 @@ public class MainActivity extends AppCompatActivity {
 		String str = new SampleImpl().getFoo(this);
 		layout.sampleText.setText(str);
 
-		layout.sampleCenterList.setLayoutManager(new LinearLayoutManager(this));
-
-		layout.sampleLeftList.setLayoutManager(new LinearLayoutManager(this));
-		layout.sampleLeftList.setAdapter(new SourceRowAdapter(
-				new SourceStore(),
-				new SourceSelectObserver(
-						new PaneContainer(
-								layout.swipeContainer,
-								new SourcesArea(layout.sampleLeftList, 0),
-								new EntriesArea(layout.sampleCenterList, 864)
-						)
-				),
-				new SourceRowProvider(this)));
-
-		updateWidth(0.9, layout.swipeLayoutLeft);
-
-		updateWidth(0.8, layout.swipeLayoutCenter);
-
-		updateWidth(0.9, layout.swipeLayoutRight);
+		ContainerInitializer initializer = new ContainerInitializer(
+			this,
+			layout,
+			new SourceRowProvider(this)
+		);
+		initializer.setup();
 
 		BaseAdapter adapter = new SampleAdapter(
 				new CommentRowLayoutProvider(this),
@@ -82,13 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
 		layout.dummySurface.setLongClickable(true);
 		layout.dummySurface.setOnTouchListener(listener);
-	}
-
-	private void updateWidth(double ratio, View view){
-		ViewGroup.LayoutParams params = view.getLayoutParams();
-		Point size = getDisplaySize();
-		params.width = (int) (ratio * size.x);
-		view.setLayoutParams(params);
 	}
 
 	private Point getDisplaySize(){
