@@ -10,23 +10,23 @@ trait Pane {
   def displayPosition: Int
 }
 
-class EntriesArea(
+class EntryArea(
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
 
-  def displayOrLoad(sourceId: Long)(onFinish: EntriesLoadedEvent => Unit): Unit = {
+  def displayOrLoad(sourceId: Long)(onFinish: EntryLoadedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
     Thread sleep 500
-    onFinish(new EntriesLoadedEvent)
+    onFinish(new EntryLoadedEvent)
   }
 }
 
-class EntriesLoadedEvent
+class EntryLoadedEvent
 
-class SourcesArea(
+class SourceArea(
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 

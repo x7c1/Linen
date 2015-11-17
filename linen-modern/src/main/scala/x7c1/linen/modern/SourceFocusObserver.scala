@@ -8,12 +8,12 @@ import scalaz.{-\/, \/-}
 
 class SourceFocusObserver(
   sourceAccessor: SourceAccessor,
-  entriesArea: EntriesArea ) extends OnSourceFocusedListener {
+  entryArea: EntryArea ) extends OnSourceFocusedListener {
 
   override def onSourceFocused(event: SourceFocusedEvent): Unit = {
     val source = sourceAccessor get event.position
     val load = for {
-      _ <- taskOf(entriesArea displayOrLoad source.id)
+      _ <- taskOf(entryArea displayOrLoad source.id)
     } yield {
       Log info s"[done] load entries of source-${source.id}"
     }

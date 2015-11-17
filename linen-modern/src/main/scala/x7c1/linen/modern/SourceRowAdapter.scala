@@ -37,8 +37,8 @@ trait OnSourceSelectedListener {
 
 class PaneContainer(
   view: ViewGroup,
-  val sources: SourcesArea,
-  val entries: EntriesArea ) {
+  val sourceArea: SourceArea,
+  val entryArea: EntryArea ) {
 
   private lazy val scroller = new Scroller(view.getContext)
 

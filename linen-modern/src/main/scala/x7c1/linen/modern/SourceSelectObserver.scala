@@ -14,13 +14,13 @@ class SourceSelectObserver(
     Log info event
 
     val focus = for {
-      _ <- taskOf(container.sources scrollTo event.position)
-      _ <- taskOf(container scrollTo container.entries)
+      _ <- taskOf(container.sourceArea scrollTo event.position)
+      _ <- taskOf(container scrollTo container.entryArea)
     } yield {
       Log info s"[done] focus source-${event.sourceId}"
     }
     val show = for {
-      _ <- taskOf(container.entries displayOrLoad event.sourceId)
+      _ <- taskOf(container.entryArea displayOrLoad event.sourceId)
     } yield {
       Log info s"[done] show source-${event.sourceId}"
     }

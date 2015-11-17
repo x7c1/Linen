@@ -21,11 +21,11 @@ class ContainerInitializer(
     updateWidth(0.8, layout.swipeLayoutCenter)
     updateWidth(0.9, layout.swipeLayoutRight)
 
-    setupSourcesArea()
+    setupSourceArea()
 
     layout.sampleCenterList setLayoutManager new LinearLayoutManager(activity)
   }
-  def setupSourcesArea() = {
+  def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
     val timer = new BufferingTimer(delay = 100)
     val adapter = new SourceRowAdapter(
@@ -35,7 +35,7 @@ class ContainerInitializer(
     )
     lazy val observer = new SourceFocusObserver(
       sourceStore,
-      entriesArea
+      entryArea
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
@@ -54,14 +54,14 @@ class ContainerInitializer(
     display getSize size
     size
   }
-  private lazy val sourcesArea = {
-    new SourcesArea(
+  private lazy val sourceArea = {
+    new SourceArea(
       recyclerView = layout.sampleLeftList,
       getPosition = () => panePosition of layout.swipeLayoutLeft
     )
   }
-  private lazy val entriesArea = {
-    new EntriesArea(
+  private lazy val entryArea = {
+    new EntryArea(
       recyclerView = layout.sampleCenterList,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
@@ -74,8 +74,8 @@ class ContainerInitializer(
   private lazy val container = {
     new PaneContainer(
       layout.swipeContainer,
-      sourcesArea,
-      entriesArea
+      sourceArea,
+      entryArea
     )
   }
   private def updateWidth(ratio: Double, view: View): Unit = {
