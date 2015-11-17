@@ -5,7 +5,6 @@ import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.chrono.BufferingTimer
 
 trait Pane {
   def displayPosition: Int
@@ -31,25 +30,8 @@ class SourcesArea(
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
-  import x7c1.wheat.modern.decorator.Imports._
-  private val timer = new BufferingTimer(delay = 100)
-
-  recyclerView onScroll { e =>
-    val position = layoutManager.findFirstCompletelyVisibleItemPosition()
-    timer touch {
-      onSourceFocused onSourceFocused new SourceFocusedEvent(position)
-    }
-  }
   override lazy val displayPosition: Int = getPosition()
 
-  def onSourceFocused = new OnSourceFocusedListener {
-    override def onSourceFocused(event: SourceFocusedEvent): Unit = {
-      Log info event.position.toString
-    }
-  }
-  lazy val layoutManager: LinearLayoutManager = {
-    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
-  }
   def scrollTo(position: Int)(onFinish: SourceScrolledEvent => Unit): Unit = {
     Log info s"[init] position:$position"
 
@@ -57,9 +39,13 @@ class SourcesArea(
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
   }
+  private lazy val layoutManager = {
+    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+  }
 }
 
 case class SourceFocusedEvent(position: Int)
+
 trait OnSourceFocusedListener {
   def onSourceFocused(event:  SourceFocusedEvent)
 }
