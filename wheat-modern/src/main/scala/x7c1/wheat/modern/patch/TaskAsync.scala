@@ -1,6 +1,7 @@
 package x7c1.wheat.modern.patch
 
 import android.os.AsyncTask
+import x7c1.wheat.modern.chrono.BufferingTimer
 
 /**
  *
@@ -17,6 +18,16 @@ trait TaskAsync[Params, Progress, Result] {
 
   def execute(params: Params*): AsyncTask[Params, Progress, Result] = {
     new AsyncTaskWrapper(this).execute(params:_*)
+  }
+}
+
+object TaskAsync {
+  def run[A](delay: Int)(f: => A) = {
+    val timer = new BufferingTimer(delay)
+    val task = new TaskAsync[Unit, Unit, Unit] {
+      override def doInBackground(params: Unit*): Unit = f
+    }
+    timer touch task.execute()
   }
 }
 

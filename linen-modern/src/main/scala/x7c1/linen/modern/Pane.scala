@@ -5,12 +5,14 @@ import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.decorator.Imports._
 
 trait Pane {
   def displayPosition: Int
 }
 
 class EntryArea(
+  val entryStorage: EntryStorage,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
@@ -19,8 +21,15 @@ class EntryArea(
   def displayOrLoad(sourceId: Long)(onFinish: EntryLoadedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
-    Thread sleep 500
-    onFinish(new EntryLoadedEvent)
+    EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
+      val entries = e.entries filterNot { entryStorage has _.sourceId }
+
+      entryStorage appendAll entries
+      Log info s"[done] append entries(${entries.length})"
+
+      recyclerView runUi { _.getAdapter.notifyDataSetChanged() }
+      onFinish(new EntryLoadedEvent)
+    }
   }
 }
 

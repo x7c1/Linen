@@ -17,6 +17,7 @@ import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
 import x7c1.linen.res.layout.ActivityMainProvider;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
+import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 import x7c1.linen.res.values.CommentValuesProvider;
 
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
 		ContainerInitializer initializer = new ContainerInitializer(
 			this,
 			layout,
-			new SourceRowProvider(this)
+			new SourceRowProvider(this),
+			new EntryRowProvider(this)
 		);
 		initializer.setup();
 

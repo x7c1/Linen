@@ -9,8 +9,9 @@ case class Source(
   description: String
 )
 
-case class SourceItem(
-  id: Long,
+case class Entry(
+  sourceId: Long,
+  entryId: Long,
   url: String,
   title: String,
   content: String,
@@ -26,5 +27,6 @@ object LinenDate {
 }
 
 private class LinenDateImpl extends LinenDate {
-  override def format: String = new Date().toString
+  private val underlying = new Date()
+  override def format: String = underlying.toString
 }

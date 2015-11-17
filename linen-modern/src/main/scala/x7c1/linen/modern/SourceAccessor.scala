@@ -4,7 +4,7 @@ trait SourceAccessor {
   def get: Seq[Source]
 }
 
-class SourceStore extends SourceAccessor {
+class SourceStorage extends SourceAccessor {
 
   override def get: Seq[Source] = {
     dummyList
@@ -19,4 +19,3 @@ class SourceStore extends SourceAccessor {
   }
 
 }
-
