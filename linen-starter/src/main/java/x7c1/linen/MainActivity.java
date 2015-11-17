@@ -21,7 +21,6 @@ import x7c1.linen.modern.PaneContainer;
 import x7c1.linen.modern.PaneController;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
-import x7c1.linen.modern.ScrollObserver;
 import x7c1.linen.modern.SourceRowAdapter;
 import x7c1.linen.modern.SourceStore;
 import x7c1.linen.modern.SourcesArea;
@@ -55,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
 						new SourcesArea(leftView, 0)
 				),
 				new SourceRowProvider(this)));
-
-		new ScrollObserver(leftView).init();
 
 		ListView rightListView = (ListView) findViewById(R.id.sample_right_list);
 

@@ -1,6 +1,5 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import android.widget.Scroller
@@ -104,12 +103,3 @@ class PaneContainer(view: ViewGroup) {
 }
 
 class ContainerFocusedEvent
-
-class ScrollObserver (recyclerView: RecyclerView){
-
-  def init() = {
-    recyclerView onScroll { event =>
-    }
-  }
-
-}
