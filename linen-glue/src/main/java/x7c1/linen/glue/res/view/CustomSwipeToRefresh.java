@@ -1,4 +1,4 @@
-package x7c1.linen;
+package x7c1.linen.glue.res.view;
 
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;

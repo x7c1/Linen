@@ -40,7 +40,7 @@ trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
 }
 
-class PaneController(
+class SourceSelectObserver(
   container: PaneContainer ) extends OnSourceSelectedListener {
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
