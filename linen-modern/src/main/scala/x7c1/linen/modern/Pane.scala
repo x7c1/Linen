@@ -19,15 +19,28 @@ class EntryArea(
 
   override lazy val displayPosition: Int = getPosition()
 
+  private var loading = false
+
   def displayOrLoad(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
+    if (loading){
+      Log info s"[abort] already loading"
+      return
+    }
+    loading = true
+
+    val onComplete = (e: EntryDisplayedEvent) => {
+      Log info s"[done] sourceId:$sourceId"
+      loading = false
+      onFinish(e)
+    }
     sources.firstEntryIdOf(sourceId) match {
       case Some(entryId) =>
         val position = entries indexOf entryId
-        scrollTo(position){ _ => onFinish(new EntryDisplayedEvent) }
+        scrollTo(position){ _ => onComplete(new EntryDisplayedEvent) }
       case _ =>
-        startLoading(sourceId)(onFinish)
+        startLoading(sourceId)(onComplete)
     }
   }
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
@@ -38,16 +51,15 @@ class EntryArea(
       entries.insertAll(position, newer)
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
 
-      Log info s"[done] append entries(${newer.length})"
+      Log info s"[done] entries(${newer.length}) inserted"
 
       recyclerView runUi { view =>
         view.getAdapter.notifyDataSetChanged()
         e.entries.headOption.foreach { entry =>
           val y = entries indexOf entry.entryId
-          scrollTo(y)(_ => ())
+          scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
         }
       }
-      onFinish(new EntryDisplayedEvent)
     }
   }
 
@@ -108,10 +120,10 @@ class SmoothScroller(
     LinearSmoothScroller.SNAP_TO_START
   }
   override def onStart() = {
-    Log info s"[init]"
+    Log debug s"[init]"
   }
   override def onStop(): Unit = {
-    Log info s"[done]"
+    Log debug s"[done]"
     onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {

@@ -27,7 +27,7 @@ class ContainerInitializer(
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
-    val timer = new BufferingTimer(delay = 100)
+    val timer = new BufferingTimer(delay = 75)
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       new SourceSelectObserver(container),
