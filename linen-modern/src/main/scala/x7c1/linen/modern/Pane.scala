@@ -19,9 +19,18 @@ class EntryArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  def displayOrLoad(sourceId: Long)(onFinish: EntryLoadedEvent => Unit): Unit = {
+  def displayOrLoad(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
+    sources.firstEntryIdOf(sourceId) match {
+      case Some(entryId) =>
+        val position = entries indexOf entryId
+        scrollTo(position){ _ => onFinish(new EntryDisplayedEvent) }
+      case _ =>
+        startLoading(sourceId)(onFinish)
+    }
+  }
+  def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
     EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
       val newer = e.entries filterNot { sources has _.sourceId }
       sources.entryIdBefore(sourceId) match {
@@ -31,13 +40,32 @@ class EntryArea(
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
       Log info s"[done] append entries(${newer.length})"
 
-      recyclerView runUi { _.getAdapter.notifyDataSetChanged() }
-      onFinish(new EntryLoadedEvent)
+      recyclerView runUi { view =>
+        view.getAdapter.notifyDataSetChanged()
+        e.entries.headOption.foreach { entry =>
+          val y = entries indexOf entry.entryId
+          scrollTo(y)(_ => ())
+        }
+      }
+      onFinish(new EntryDisplayedEvent)
     }
+  }
+
+  def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
+    Log info s"[init] position:$position"
+
+    val scroller = new SmoothScroller(
+      recyclerView.getContext, speed = 25F, layoutManager, onFinish
+    )
+    scroller setTargetPosition position
+    layoutManager startSmoothScroll scroller
+  }
+  private lazy val layoutManager = {
+    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
 }
 
-class EntryLoadedEvent
+class EntryDisplayedEvent
 
 class SourceArea(
   recyclerView: RecyclerView,
@@ -45,10 +73,12 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  def scrollTo(position: Int)(onFinish: SourceScrolledEvent => Unit): Unit = {
+  def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
     Log info s"[init] position:$position"
 
-    val scroller = new SmoothScroller(recyclerView.getContext, layoutManager, onFinish)
+    val scroller = new SmoothScroller(
+      recyclerView.getContext, speed = 75F, layoutManager, onFinish
+    )
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
   }
@@ -63,15 +93,16 @@ trait OnSourceFocusedListener {
   def onSourceFocused(event:  SourceFocusedEvent)
 }
 
-class SourceScrolledEvent
+class ScrollerStopEvent
 
 class SmoothScroller(
   context: Context,
-  manager: LinearLayoutManager,
-  onFinish: SourceScrolledEvent => Unit) extends LinearSmoothScroller(context: Context) {
+  speed: Float,
+  layoutManager: LinearLayoutManager,
+  onFinish: ScrollerStopEvent => Unit) extends LinearSmoothScroller(context: Context) {
 
   override def computeScrollVectorForPosition(i: Int): PointF = {
-    manager.computeScrollVectorForPosition(i)
+    layoutManager.computeScrollVectorForPosition(i)
   }
   override def getVerticalSnapPreference: Int = {
     LinearSmoothScroller.SNAP_TO_START
@@ -81,9 +112,9 @@ class SmoothScroller(
   }
   override def onStop(): Unit = {
     Log info s"[done]"
-    onFinish(new SourceScrolledEvent)
+    onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
-    75.0F / displayMetrics.densityDpi
+    speed / displayMetrics.densityDpi
   }
 }

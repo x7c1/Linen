@@ -20,7 +20,9 @@ class SourceBuffer extends SourceAccessor {
   def has(sourceId: Long): Boolean = {
     entriesMapping.get(sourceId).exists(_.nonEmpty)
   }
-
+  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+    entriesMapping.get(sourceId).flatMap(_.headOption)
+  }
   def entryIdBefore(sourceId: Long): Option[Long] = {
     val position = underlying.indexWhere(_.id == sourceId)
     val id = Range(position-1, -1, -1).view.

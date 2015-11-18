@@ -19,6 +19,9 @@ class EntryBuffer extends EntryAccessor {
     val position = underlying.indexWhere(_.entryId == entryId) + 1
     underlying.insertAll(position, entries)
   }
+  def indexOf(entryId: Long): Int =
+    underlying.indexWhere(_.entryId == entryId)
+
   def appendAll(entries: Seq[Entry]): Unit = {
     underlying ++= entries
   }
@@ -38,7 +41,7 @@ object EntryLoader {
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
       title = s"$sourceId-$n entry",
-      content = s"sample $sourceId-$n " * 5,
+      content = s"sample content $sourceId-$n " * 5,
       createdAt = LinenDate.dummy()
     )
   }
