@@ -33,11 +33,11 @@ class EntryArea(
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
     EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
       val newer = e.entries filterNot { sources has _.sourceId }
-      sources.entryIdBefore(sourceId) match {
-        case Some(id) => entries.insertAfter(id, newer)
-        case _ => entries appendAll newer
-      }
+      val position = entries positionAfter sources.entryIdBefore(sourceId)
+
+      entries.insertAll(position, newer)
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
+
       Log info s"[done] append entries(${newer.length})"
 
       recyclerView runUi { view =>

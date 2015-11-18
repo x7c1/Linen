@@ -15,15 +15,17 @@ class EntryBuffer extends EntryAccessor {
 
   override def get: Seq[Entry] = underlying
 
-  def insertAfter(entryId: Long, entries: Seq[Entry]) = {
-    val position = underlying.indexWhere(_.entryId == entryId) + 1
-    underlying.insertAll(position, entries)
-  }
   def indexOf(entryId: Long): Int =
     underlying.indexWhere(_.entryId == entryId)
 
-  def appendAll(entries: Seq[Entry]): Unit = {
-    underlying ++= entries
+  def positionAfter(entryId: Option[Long]) = {
+    entryId match {
+      case Some(id) => underlying.indexWhere(_.entryId == id) + 1
+      case _ => 0
+    }
+  }
+  def insertAll(position: Int, entries: Seq[Entry]) = {
+    underlying.insertAll(position, entries)
   }
 }
 
