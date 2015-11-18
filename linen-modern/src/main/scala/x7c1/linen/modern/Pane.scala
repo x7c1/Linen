@@ -7,6 +7,8 @@ import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
+import scala.collection.mutable
+
 trait Pane {
   def displayPosition: Int
 }
@@ -19,20 +21,22 @@ class EntryArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  private var loading = false
+  private val loadingMap = mutable.Map[Long, Boolean]()
+
+  def isLoading(sourceId: Long) = loadingMap.getOrElse(sourceId, false)
 
   def displayOrLoad(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
-    if (loading){
-      Log info s"[abort] already loading"
+    if (isLoading(sourceId)){
+      Log warn s"[abort] (sourceId:$sourceId) already loading"
       return
     }
-    loading = true
+    loadingMap(sourceId) = true
 
     val onComplete = (e: EntryDisplayedEvent) => {
       Log info s"[done] sourceId:$sourceId"
-      loading = false
+      loadingMap(sourceId) = false
       onFinish(e)
     }
     sources.firstEntryIdOf(sourceId) match {
@@ -47,6 +51,7 @@ class EntryArea(
     EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
       val newer = e.entries filterNot { sources has _.sourceId }
       val position = entries positionAfter sources.entryIdBefore(sourceId)
+      val current = layoutManager.findFirstCompletelyVisibleItemPosition()
 
       entries.insertAll(position, newer)
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
@@ -54,10 +59,15 @@ class EntryArea(
       Log info s"[done] entries(${newer.length}) inserted"
 
       recyclerView runUi { view =>
-        view.getAdapter.notifyDataSetChanged()
-        e.entries.headOption.foreach { entry =>
-          val y = entries indexOf entry.entryId
-          scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
+        if (current == position){
+          layoutManager.scrollToPositionWithOffset(current + newer.length, 0)
+        }
+        recyclerView runUi { _ =>
+          view.getAdapter.notifyDataSetChanged()
+          e.entries.headOption.foreach { entry =>
+            val y = entries indexOf entry.entryId
+            scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
+          }
         }
       }
     }
@@ -67,10 +77,22 @@ class EntryArea(
     Log info s"[init] position:$position"
 
     val scroller = new SmoothScroller(
-      recyclerView.getContext, timePerInch = 25F, layoutManager, onFinish
+      recyclerView.getContext, timePerInch = 125F, layoutManager, onFinish
     )
-    scroller setTargetPosition position
-    layoutManager startSmoothScroll scroller
+    val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+    val diff = current - position
+    val space =
+      if (diff < 0) -1
+      else if(diff > 0) 1
+      else 0
+
+    recyclerView runUi { _ =>
+      layoutManager.scrollToPositionWithOffset(position + space, 0)
+      recyclerView runUi { _ =>
+        scroller setTargetPosition position
+        layoutManager startSmoothScroll scroller
+      }
+    }
   }
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]

@@ -32,12 +32,12 @@ class EntryBuffer extends EntryAccessor {
 object EntryLoader {
   def load(sourceId: Long)(onFinish: EntriesLoadingResult => Unit) = {
     // dummy
-    TaskAsync.run(delay = 1000){
+    TaskAsync.run(delay = 500){
       Log info s"[done] source-$sourceId"
       onFinish(new EntriesLoadSuccess(createDummy(sourceId)))
     }
   }
-  def createDummy(sourceId: Long) = (1 to 5) map { n =>
+  def createDummy(sourceId: Long) = (1 to 50) map { n =>
     Entry(
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
