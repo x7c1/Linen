@@ -67,7 +67,7 @@ class EntryArea(
     Log info s"[init] position:$position"
 
     val scroller = new SmoothScroller(
-      recyclerView.getContext, speed = 25F, layoutManager, onFinish
+      recyclerView.getContext, timePerInch = 25F, layoutManager, onFinish
     )
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
@@ -89,7 +89,7 @@ class SourceArea(
     Log info s"[init] position:$position"
 
     val scroller = new SmoothScroller(
-      recyclerView.getContext, speed = 75F, layoutManager, onFinish
+      recyclerView.getContext, timePerInch = 75F, layoutManager, onFinish
     )
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
@@ -109,7 +109,7 @@ class ScrollerStopEvent
 
 class SmoothScroller(
   context: Context,
-  speed: Float,
+  timePerInch: Float,
   layoutManager: LinearLayoutManager,
   onFinish: ScrollerStopEvent => Unit) extends LinearSmoothScroller(context: Context) {
 
@@ -127,6 +127,6 @@ class SmoothScroller(
     onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
-    speed / displayMetrics.densityDpi
+    timePerInch / displayMetrics.densityDpi
   }
 }
