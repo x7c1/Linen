@@ -9,16 +9,16 @@ trait EntryAccessor {
   def get: Seq[Entry]
 }
 
-class EntryStorage extends EntryAccessor {
+class EntryBuffer extends EntryAccessor {
+
+  private val underlying = ListBuffer[Entry]()
 
   override def get: Seq[Entry] = underlying
 
-  def has(sourceId: Long): Boolean = {
-    underlying.exists(_.sourceId == sourceId)
+  def insertAfter(entryId: Long, entries: Seq[Entry]) = {
+    val position = underlying.indexWhere(_.entryId == entryId) + 1
+    underlying.insertAll(position, entries)
   }
-
-  private lazy val underlying = ListBuffer[Entry]()
-
   def appendAll(entries: Seq[Entry]): Unit = {
     underlying ++= entries
   }
@@ -37,7 +37,7 @@ object EntryLoader {
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
-      title = s"entry-$n in source-$sourceId",
+      title = s"$sourceId-$n entry",
       content = s"sample $sourceId-$n " * 5,
       createdAt = LinenDate.dummy()
     )

@@ -28,14 +28,13 @@ class ContainerInitializer(
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
     val timer = new BufferingTimer(delay = 100)
-    val storage = new SourceStorage
     val adapter = new SourceRowAdapter(
-      storage,
+      sourceBuffer,
       new SourceSelectObserver(container),
       sourceRowProvider
     )
     lazy val observer = new SourceFocusObserver(
-      storage,
+      sourceBuffer,
       entryArea
     )
     layout.sampleLeftList setLayoutManager manager
@@ -50,7 +49,7 @@ class ContainerInitializer(
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
-      entryArea.entryStorage,
+      entryArea.entries,
       entryRowProvider
     )
     layout.sampleCenterList setLayoutManager manager
@@ -63,6 +62,8 @@ class ContainerInitializer(
     display getSize size
     size
   }
+  private lazy val sourceBuffer = new SourceBuffer
+
   private lazy val sourceArea = {
     new SourceArea(
       recyclerView = layout.sampleLeftList,
@@ -71,7 +72,8 @@ class ContainerInitializer(
   }
   private lazy val entryArea = {
     new EntryArea(
-      entryStorage = new EntryStorage,
+      entries = new EntryBuffer,
+      sources = sourceBuffer,
       recyclerView = layout.sampleCenterList,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
