@@ -19,13 +19,11 @@
 
         <x7c1.linen.glue.res.view.CustomSwipeToRefresh
             android:id="@+id/activity_main__swipe_layout_left"
-            android:background="@color/opaque_red"
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__sample_left_list"
-
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
 
