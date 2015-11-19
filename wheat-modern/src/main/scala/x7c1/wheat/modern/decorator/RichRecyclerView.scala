@@ -1,7 +1,9 @@
 package x7c1.wheat.modern.decorator
 
+
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.OnScrollListener
+
 
 class RichRecyclerView[A <: RecyclerView](view: A){
   def onScroll[B](f: ScrollEvent[A] => B): Unit = {

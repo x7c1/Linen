@@ -3,27 +3,21 @@ package x7c1.linen;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import x7c1.linen.modern.PaneController;
+import x7c1.linen.glue.res.layout.ActivityMain;
+import x7c1.linen.modern.ContainerInitializer;
 import x7c1.linen.modern.SampleAdapter;
 import x7c1.linen.modern.SampleImpl;
-import x7c1.linen.modern.ScrollObserver;
-import x7c1.linen.modern.SourceRowAdapter;
-import x7c1.linen.modern.SourceStore;
+import x7c1.linen.res.layout.ActivityMainProvider;
 import x7c1.linen.res.layout.CommentRowLayoutProvider;
+import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 import x7c1.linen.res.values.CommentValuesProvider;
 
@@ -36,60 +30,40 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
 
-		TextView view = (TextView) findViewById(R.id.sample_text);
+		final ActivityMain layout = new ActivityMainProvider(this).inflate(null, false);
+		setContentView(layout.itemView);
+
 		String str = new SampleImpl().getFoo(this);
-		view.setText(str);
+		layout.sampleText.setText(str);
 
-		final RecyclerView leftView = (RecyclerView) findViewById(R.id.sample_left_list);
-		leftView.setLayoutManager(new LinearLayoutManager(this));
-		leftView.setAdapter(new SourceRowAdapter(
-				new SourceStore(),
-				new PaneController(),
-				new SourceRowProvider(this)));
-
-		new ScrollObserver(leftView).init();
-
-		ListView rightListView = (ListView) findViewById(R.id.sample_right_list);
-
-		View left = findViewById(R.id.swipe_layout_left);
-		updateWidth(0.9, left);
-
-		View center = findViewById(R.id.swipe_layout_center);
-		updateWidth(0.8, center);
-
-		View right = findViewById(R.id.swipe_layout_right);
-		updateWidth(0.9, right);
+		ContainerInitializer initializer = new ContainerInitializer(
+			this,
+			layout,
+			new SourceRowProvider(this),
+			new EntryRowProvider(this)
+		);
+		initializer.setup();
 
 		BaseAdapter adapter = new SampleAdapter(
 				new CommentRowLayoutProvider(this),
 				new CommentValuesProvider(this)
 		);
-		rightListView.setAdapter(adapter);
+		layout.sampleRightList.setAdapter(adapter);
 
-		final ViewGroup container = (LinearLayout) findViewById(R.id.swipe_container);
 		final GestureDetector detector = forHorizontal(
-				this, createListener(container, getDisplaySize()));
+				this, createListener(layout.swipeContainer, getDisplaySize()));
 
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				return detector.onTouchEvent(event) ||
-					container.dispatchTouchEvent(event);
+					layout.swipeContainer.dispatchTouchEvent(event);
 			}
 		};
 
-		View target0 = findViewById(R.id.dummy_surface);
-		target0.setLongClickable(true);
-		target0.setOnTouchListener(listener);
-	}
-
-	private void updateWidth(double ratio, View view){
-		ViewGroup.LayoutParams params = view.getLayoutParams();
-		Point size = getDisplaySize();
-		params.width = (int) (ratio * size.x);
-		view.setLayoutParams(params);
+		layout.dummySurface.setLongClickable(true);
+		layout.dummySurface.setOnTouchListener(listener);
 	}
 
 	private Point getDisplaySize(){

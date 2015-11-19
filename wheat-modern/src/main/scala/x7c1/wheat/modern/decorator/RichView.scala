@@ -11,4 +11,10 @@ class RichView[A <: View](view: A){
   def onClick[B](f: A => B): Unit = view.setOnClickListener(new OnClickListener {
     override def onClick(view: View): Unit = f(view.asInstanceOf[A])
   })
+
+  def runUi[B](f: A => B): Unit = {
+    view post new Runnable {
+      override def run(): Unit = f(view)
+    }
+  }
 }

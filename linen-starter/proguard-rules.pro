@@ -26,3 +26,8 @@
 -keepclassmembers class * {
     java.lang.String toString();
 }
+
+# to use scalaz
+-dontwarn scala.util.parsing.**
+-dontwarn scala.xml.**
+-dontwarn javax.swing.**

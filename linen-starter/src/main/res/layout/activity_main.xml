@@ -5,52 +5,51 @@
                 tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/sample_text"
+        android:id="@+id/activity_main__sample_text"
         android:text="@string/hello_world"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <LinearLayout
-        android:id="@+id/swipe_container"
-        android:layout_below="@+id/sample_text"
+        android:id="@+id/activity_main__swipe_container"
+        android:layout_below="@+id/activity_main__sample_text"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <x7c1.linen.CustomSwipeToRefresh
-            android:id="@+id/swipe_layout_left"
-            android:background="@color/opaque_red"
+        <x7c1.linen.glue.res.view.CustomSwipeToRefresh
+            android:id="@+id/activity_main__swipe_layout_left"
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/sample_left_list"
+                android:id="@+id/activity_main__sample_left_list"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
 
-        </x7c1.linen.CustomSwipeToRefresh>
+        </x7c1.linen.glue.res.view.CustomSwipeToRefresh>
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_layout_center"
+            android:id="@+id/activity_main__swipe_layout_center"
             android:background="@color/opaque_blue"
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
-            <ListView
-                android:id="@+id/sample_center_list"
-                android:layout_width="150dp"
-                android:layout_height="400dp" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/activity_main__sample_center_list"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_layout_right"
+            android:id="@+id/activity_main__swipe_layout_right"
             android:background="@color/opaque_green"
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
             <ListView
-                android:id="@+id/sample_right_list"
+                android:id="@+id/activity_main__sample_right_list"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
 
@@ -59,7 +58,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/dummy_surface"
+        android:id="@+id/activity_main__dummy_surface"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
