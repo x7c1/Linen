@@ -3,6 +3,7 @@ package x7c1.linen.modern
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 trait EntryAccessor {
@@ -29,14 +30,43 @@ class EntryBuffer extends EntryAccessor {
   }
 }
 
-object EntryLoader {
-  def load(sourceId: Long)(onFinish: EntriesLoadingResult => Unit) = {
+class EntryLoader {
+
+  private val cache = new mutable.HashMap[Long, Seq[Entry]]
+
+  def load(sourceId: Long)(onFinish: EntriesLoadingResult => Unit) =
+    cache.get(sourceId) match {
+      case Some(entries) => onFinish(new EntriesLoadSuccess(entries))
+      case None =>
+        TaskAsync.run(delay = 500){
+          Log info s"[done] source-$sourceId"
+          onFinish(new EntriesLoadSuccess(createDummy(sourceId)))
+        }
+    }
+
+  private val prefetching = mutable.Map[Long, Boolean]()
+
+  def prefetch(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit): Unit = {
+    if (cache.get(sourceId).nonEmpty){
+      Log info s"[cancel] source-$sourceId already cached"
+      return
+    }
+    if (prefetching.getOrElse(sourceId, false)){
+      Log info s"[cancel] source-$sourceId already triggered"
+      return
+    }
+    prefetching(sourceId) = true
+
     // dummy
     TaskAsync.run(delay = 500){
-      Log info s"[done] source-$sourceId"
-      onFinish(new EntriesLoadSuccess(createDummy(sourceId)))
+      cache(sourceId) = createDummy(sourceId)
+      prefetching(sourceId) = false
+
+      Log debug s"[done] source-$sourceId"
+      onFinish(new EntriesPrefetchTriggered(sourceId))
     }
   }
+
   def createDummy(sourceId: Long) = (1 to 50) map { n =>
     Entry(
       sourceId = sourceId,
@@ -53,3 +83,7 @@ sealed trait EntriesLoadingResult
 
 case class EntriesLoadSuccess(
   entries: Seq[Entry] ) extends EntriesLoadingResult
+
+case class EntriesPrefetchTriggered(
+  sourceId: Long
+)

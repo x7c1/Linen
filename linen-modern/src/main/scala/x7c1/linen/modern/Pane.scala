@@ -16,6 +16,7 @@ trait Pane {
 class EntryArea(
   val entries: EntryBuffer,
   sources: SourceBuffer,
+  loader: EntryLoader,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
@@ -47,22 +48,22 @@ class EntryArea(
         startLoading(sourceId)(onComplete)
     }
   }
+
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
-    EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
+    loader.load(sourceId){ case e: EntriesLoadSuccess =>
       val newer = e.entries filterNot { sources has _.sourceId }
       val position = entries positionAfter sources.entryIdBefore(sourceId)
       val current = layoutManager.findFirstCompletelyVisibleItemPosition()
 
       entries.insertAll(position, newer)
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
+      Log debug s"[done] entries(${newer.length}) inserted"
 
-      Log info s"[done] entries(${newer.length}) inserted"
-
-      recyclerView runUi { view =>
+      recyclerView runUi { _ =>
         if (current == position){
           layoutManager.scrollToPositionWithOffset(current + newer.length, 0)
         }
-        recyclerView runUi { _ =>
+        recyclerView runUi { view =>
           view.getAdapter.notifyDataSetChanged()
           e.entries.headOption.foreach { entry =>
             val y = entries indexOf entry.entryId

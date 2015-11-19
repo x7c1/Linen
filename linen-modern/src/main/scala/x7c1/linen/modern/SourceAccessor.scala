@@ -5,6 +5,8 @@ import scala.collection.mutable.ListBuffer
 
 trait SourceAccessor {
   def get: Seq[Source]
+
+  def takeAfter(sourceId: Long, count: Int): Seq[Source]
 }
 
 class SourceBuffer extends SourceAccessor {
@@ -16,7 +18,10 @@ class SourceBuffer extends SourceAccessor {
   override def get: Seq[Source] = {
     underlying
   }
-
+  override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
+    val sources = underlying.dropWhile(_.id != sourceId).tail
+    sources take count
+  }
   def has(sourceId: Long): Boolean = {
     entriesMapping.get(sourceId).exists(_.nonEmpty)
   }

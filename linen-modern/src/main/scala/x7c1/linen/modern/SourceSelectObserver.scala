@@ -8,7 +8,8 @@ import scalaz.{-\/, \/-}
 import scalaz.concurrent.Task
 
 class SourceSelectObserver(
-  container: PaneContainer ) extends OnSourceSelectedListener {
+  container: PaneContainer,
+  entryPrefetcher: EntryPrefetcher ) extends OnSourceSelectedListener {
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info event
@@ -24,9 +25,10 @@ class SourceSelectObserver(
     } yield {
       Log info s"[done] show source-${event.sourceId}"
     }
-    Seq(focus, show) foreach runAsync
-  }
+    val prefetch = entryPrefetcher createTaskOf event.sourceId
 
+    Seq(focus, show, prefetch) foreach runAsync
+  }
   def runAsync[A](task: CallbackTask[A]) = {
     Task(task()) runAsync {
       case \/-(_) =>
