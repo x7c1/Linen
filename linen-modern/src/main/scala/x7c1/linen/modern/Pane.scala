@@ -59,12 +59,11 @@ class EntryArea(
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
       Log debug s"[done] entries(${newer.length}) inserted"
 
-      recyclerView runUi { _ =>
-        if (current == position){
-          layoutManager.scrollToPositionWithOffset(current + newer.length, 0)
-        }
-        recyclerView runUi { view =>
-          view.getAdapter.notifyDataSetChanged()
+      recyclerView runUi { view =>
+        val base = if(current == position) -1 else 0
+        view.getAdapter.notifyItemRangeInserted(position + base, newer.length)
+
+        recyclerView runUi { _ =>
           e.entries.headOption.foreach { entry =>
             val y = entries indexOf entry.entryId
             scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
