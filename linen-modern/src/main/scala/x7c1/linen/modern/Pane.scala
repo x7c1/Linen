@@ -52,15 +52,12 @@ class EntryArea(
 
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
     EntryLoader(entryCacher).load(sourceId){ e =>
-      val previousEntryId: Option[Long] = {
-        val id = sources.collectLastFrom(sourceId){
-          case source if entries.has(source.id) =>
-            entries.lastEntryIdOf(source.id)
+      val position = {
+        val previousId = sources.collectLastFrom(sourceId){
+          case source if entries.has(source.id) => entries.lastEntryIdOf(source.id)
         }
-        id.flatten
+        entries positionAfter previousId.flatten
       }
-      val position = entries positionAfter previousEntryId
-      val current = layoutManager.findFirstCompletelyVisibleItemPosition()
       val newer = entries.insertAll(position, sourceId, e.entries)
       Log debug s"[done] entries(${newer.length}) inserted"
 
@@ -68,6 +65,7 @@ class EntryArea(
       sourceStateBuffer.updateState(sourceId, SourcePrefetched)
 
       recyclerView runUi { view =>
+        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
         val base = if(current == position) -1 else 0
         view.getAdapter.notifyItemRangeInserted(position + base, newer.length)
 
