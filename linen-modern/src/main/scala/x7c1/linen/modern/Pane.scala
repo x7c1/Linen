@@ -15,7 +15,7 @@ trait Pane {
 
 class EntryArea(
   val entries: EntryBuffer,
-  sources: SourceBuffer,
+  sources: SourceAccessor,
   sourceStateBuffer: SourceStateBuffer,
   entryCacher: EntryCacher,
   recyclerView: RecyclerView,
@@ -41,7 +41,7 @@ class EntryArea(
       loadingMap(sourceId) = false
       onFinish(e)
     }
-    sources.firstEntryIdOf(sourceId) match {
+    entries.firstEntryIdOf(sourceId) match {
       case Some(entryId) =>
         val position = entries indexOf entryId
         scrollTo(position){ _ => onComplete(new EntryDisplayedEvent) }
@@ -52,12 +52,19 @@ class EntryArea(
 
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
     EntryLoader(entryCacher).load(sourceId){ e =>
-      val newer = e.entries filterNot { sources has _.sourceId }
-      val position = entries positionAfter sources.entryIdBefore(sourceId)
+      val newer = e.entries filterNot { entries has _.sourceId }
+      val previousEntryId: Option[Long] = {
+        val id = sources.collectLastFrom(sourceId){
+          case source if entries.has(source.id) =>
+            entries.lastEntryIdOf(source.id)
+        }
+        id.flatten
+      }
+      val position = entries positionAfter previousEntryId
       val current = layoutManager.findFirstCompletelyVisibleItemPosition()
 
       entries.insertAll(position, newer)
-      sources.updateMapping(sourceId, e.entries.map(_.entryId))
+      entries.updateMapping(sourceId, e.entries.map(_.entryId))
       sourceStateBuffer.updateState(sourceId, SourcePrefetched)
 
       Log debug s"[done] entries(${newer.length}) inserted"

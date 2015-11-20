@@ -29,6 +29,22 @@ class EntryBuffer extends EntryAccessor {
   def insertAll(position: Int, entries: Seq[Entry]) = {
     underlying.insertAll(position, entries)
   }
+
+  private lazy val entriesMapping = mutable.Map[Long, Seq[Long]]()
+
+  def has(sourceId: Long): Boolean = {
+    entriesMapping.get(sourceId).exists(_.nonEmpty)
+  }
+  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+    entriesMapping.get(sourceId).flatMap(_.headOption)
+  }
+  def lastEntryIdOf(sourceId: Long): Option[Long] = {
+    entriesMapping.get(sourceId).flatMap(_.lastOption)
+  }
+  def updateMapping(sourceId: Long, entryIdList: Seq[Long]) = {
+    entriesMapping(sourceId) = entryIdList
+  }
+
 }
 
 class EntryCacher {
