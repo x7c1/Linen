@@ -22,7 +22,7 @@ class SourceFocusObserver(
       Log debug s"[ok] load entries of source-${source.id}"
     }
     val prefetch = for {
-      _ <- taskOf(entryPrefetcher startFrom source.id)
+      _ <- taskOf(entryPrefetcher triggerBy source.id)
     } yield {
       Log debug s"[ok] prefetch started around sourceId:${source.id}"
     }

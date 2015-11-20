@@ -12,7 +12,7 @@ class EntryPrefetcher(
   entryPrefetchedListener: OnPrefetchDoneListener,
   entryCacher: EntryCacher){
 
-  def startFrom(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit) = {
+  def triggerBy(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit) = {
     Log info s"[init] sourceId:$sourceId"
 
     val sources = sourceAccessor.takeAfter(sourceId, 10)
@@ -38,7 +38,7 @@ class EntryPrefetcher(
     EntryLoader(entryCacher).load(sourceId){ e =>
       prefetching(sourceId) = false
       Log debug s"[done] source-$sourceId"
-      entryPrefetchedListener onPrefetchDone new EntriesPrefetchedEvent(sourceId)
+      entryPrefetchedListener onPrefetchDone new PrefetchDoneEvent(sourceId)
     }
   }
 
@@ -49,7 +49,7 @@ case class EntriesPrefetchTriggered(
 )
 
 trait OnPrefetchDoneListener {
-  def onPrefetchDone(event: EntriesPrefetchedEvent): Unit
+  def onPrefetchDone(event: PrefetchDoneEvent): Unit
 }
 
 class SourceChangedNotifier(
@@ -59,7 +59,7 @@ class SourceChangedNotifier(
 
   private val timer = new BufferingTimer(delay = 200)
 
-  override def onPrefetchDone(event: EntriesPrefetchedEvent): Unit = {
+  override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
     /*
     update
      */
@@ -70,6 +70,6 @@ class SourceChangedNotifier(
   }
 }
 
-case class EntriesPrefetchedEvent(
+case class PrefetchDoneEvent(
   sourceId: Long
 )

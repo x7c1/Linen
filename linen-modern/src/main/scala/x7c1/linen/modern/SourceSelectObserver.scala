@@ -26,7 +26,7 @@ class SourceSelectObserver(
       Log debug s"[ok] show source-${event.sourceId}"
     }
     val prefetch = for {
-      _ <- taskOf(entryPrefetcher startFrom event.sourceId)
+      _ <- taskOf(entryPrefetcher triggerBy event.sourceId)
     } yield {
       Log debug s"[ok] prefetch started around sourceId:${event.sourceId}"
     }
