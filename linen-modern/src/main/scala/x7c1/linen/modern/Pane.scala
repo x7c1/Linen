@@ -16,7 +16,7 @@ trait Pane {
 class EntryArea(
   val entries: EntryBuffer,
   sources: SourceBuffer,
-  loader: EntryLoader,
+  entryCacher: EntryCacher,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
@@ -50,7 +50,7 @@ class EntryArea(
   }
 
   def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
-    loader.load(sourceId){ case e: EntriesLoadSuccess =>
+    EntryLoader(entryCacher).load(sourceId){ e =>
       val newer = e.entries filterNot { sources has _.sourceId }
       val position = entries positionAfter sources.entryIdBefore(sourceId)
       val current = layoutManager.findFirstCompletelyVisibleItemPosition()

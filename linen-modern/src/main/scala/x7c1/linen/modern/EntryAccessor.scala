@@ -30,19 +30,9 @@ class EntryBuffer extends EntryAccessor {
   }
 }
 
-class EntryLoader {
+class EntryCacher {
 
   private val cache = new mutable.HashMap[Long, Seq[Entry]]
-
-  def load(sourceId: Long)(onFinish: EntriesLoadingResult => Unit) =
-    cache.get(sourceId) match {
-      case Some(entries) => onFinish(new EntriesLoadSuccess(entries))
-      case None =>
-        TaskAsync.run(delay = 500){
-          Log info s"[done] source-$sourceId"
-          onFinish(new EntriesLoadSuccess(createDummy(sourceId)))
-        }
-    }
 
   def findCache(sourceId: Long): Option[Seq[Entry]] = {
     cache.get(sourceId)
@@ -50,6 +40,21 @@ class EntryLoader {
   def updateCache(sourceId: Long, entries: Seq[Entry]) = {
     cache(sourceId) = entries
   }
+}
+
+class EntryLoader (cacher: EntryCacher, listener: OnEntriesLoadedListener){
+
+  def load(sourceId: Long) =
+    cacher.findCache(sourceId) match {
+      case Some(entries) => listener.onEntryLoaded(new EntriesLoadedEvent(entries))
+      case None =>
+        TaskAsync.run(delay = 500){
+          Log info s"[done] source-$sourceId"
+          val entries = createDummy(sourceId)
+          cacher.updateCache(sourceId, entries)
+          listener.onEntryLoaded(new EntriesLoadedEvent(entries))
+        }
+    }
 
   def createDummy(sourceId: Long) = (1 to 50) map { n =>
     Entry(
@@ -63,7 +68,24 @@ class EntryLoader {
   }
 }
 
-sealed trait EntriesLoadingResult
+object EntryLoader {
+  def apply(cacher: EntryCacher): EntryLoadExecutor = new EntryLoadExecutor(cacher)
+}
 
-case class EntriesLoadSuccess(
-  entries: Seq[Entry] ) extends EntriesLoadingResult
+class EntryLoadExecutor(cacher: EntryCacher){
+  def load(sourceId: Long)(f: EntriesLoadedEvent => Unit) = {
+    val listener = new OnEntriesLoadedListener {
+      override def onEntryLoaded(e: EntriesLoadedEvent): Unit = f(e)
+    }
+    new EntryLoader(cacher, listener) load sourceId
+  }
+}
+
+sealed trait EntryLoaderEvent
+
+case class EntriesLoadedEvent(
+  entries: Seq[Entry] ) extends EntryLoaderEvent
+
+trait OnEntriesLoadedListener {
+  def onEntryLoaded(e: EntriesLoadedEvent): Unit
+}

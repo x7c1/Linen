@@ -5,7 +5,6 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.chrono.BufferingTimer
 import x7c1.wheat.modern.kinds.CallbackTask
 import x7c1.wheat.modern.kinds.CallbackTask.taskOf
-import x7c1.wheat.modern.patch.TaskAsync
 
 import scala.collection.mutable
 
@@ -13,14 +12,14 @@ import scala.collection.mutable
 class EntryPrefetcher(
   sourceAccessor: SourceAccessor,
   entryPrefetchedListener: OnEntryPrefetchedListener,
-  entryLoader: EntryLoader){
+  entryCacher: EntryCacher){
 
   def prefetchAfter(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit) = {
     Log info s"[init] sourceId:$sourceId"
 
     val sources = sourceAccessor.takeAfter(sourceId, 10)
     sources.foreach { source =>
-      prefetch(source.id)(entryPrefetchedListener.onEntryPrefetched)
+      prefetch(source.id)
     }
     onFinish(new EntriesPrefetchTriggered(sourceId))
   }
@@ -35,25 +34,21 @@ class EntryPrefetcher(
 
   private val prefetching = mutable.Map[Long, Boolean]()
 
-  def prefetch(sourceId: Long)(onFinish: EntriesPrefetchedEvent => Unit): Unit = {
-    if (entryLoader.findCache(sourceId).nonEmpty){
+  def prefetch(sourceId: Long): Unit = {
+    if (entryCacher.findCache(sourceId).nonEmpty){
       Log info s"[cancel] source-$sourceId already cached"
       return
     }
     if (prefetching.getOrElse(sourceId, false)){
-      Log info s"[cancel] source-$sourceId already triggered"
+      Log info s"[cancel] source-$sourceId prefetching already started"
       return
     }
     prefetching(sourceId) = true
 
-    // dummy
-    TaskAsync.run(delay = 500){
-      val entries = entryLoader.createDummy(sourceId)
-      entryLoader.updateCache(sourceId, entries)
+    EntryLoader(entryCacher).load(sourceId){ e =>
       prefetching(sourceId) = false
-
       Log debug s"[done] source-$sourceId"
-      onFinish(new EntriesPrefetchedEvent(sourceId))
+      entryPrefetchedListener.onEntryPrefetched(new EntriesPrefetchedEvent(sourceId))
     }
   }
 

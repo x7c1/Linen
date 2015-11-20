@@ -31,7 +31,7 @@ class ContainerInitializer(
     val prefetcher = new EntryPrefetcher(
       sourceBuffer,
       new SourceChangedNotifier(layout.sampleLeftList),
-      entryLoader
+      entryCacher
     )
     val adapter = new SourceRowAdapter(
       sourceBuffer,
@@ -71,7 +71,7 @@ class ContainerInitializer(
 
   private lazy val sourceBuffer = new SourceBuffer
 
-  private lazy val entryLoader = new EntryLoader
+  private lazy val entryCacher = new EntryCacher
 
   private lazy val sourceArea = {
     new SourceArea(
@@ -83,7 +83,7 @@ class ContainerInitializer(
     new EntryArea(
       entries = new EntryBuffer,
       sources = sourceBuffer,
-      loader = entryLoader,
+      entryCacher = entryCacher,
       recyclerView = layout.sampleCenterList,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
