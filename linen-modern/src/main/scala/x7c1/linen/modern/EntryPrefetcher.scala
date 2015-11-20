@@ -2,7 +2,6 @@ package x7c1.linen.modern
 
 import android.support.v7.widget.RecyclerView
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.chrono.BufferingTimer
 
 import scala.collection.mutable
 
@@ -35,7 +34,7 @@ class EntryPrefetcher(
     }
     prefetching(sourceId) = true
 
-    EntryLoader(entryCacher).load(sourceId){ e =>
+    EntryLoader(entryCacher).load(sourceId){ _ =>
       prefetching(sourceId) = false
       Log debug s"[done] source-$sourceId"
       entryPrefetchedListener onPrefetchDone new PrefetchDoneEvent(sourceId)
@@ -48,24 +47,38 @@ case class EntriesPrefetchTriggered(
   sourceId: Long
 )
 
-trait OnPrefetchDoneListener {
+trait OnPrefetchDoneListener { self =>
+
   def onPrefetchDone(event: PrefetchDoneEvent): Unit
+
+  def append(listener: OnPrefetchDoneListener): OnPrefetchDoneListener = {
+    new OnPrefetchDoneListener {
+      override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
+        self onPrefetchDone event
+        listener onPrefetchDone event
+      }
+    }
+  }
+}
+
+class SourceStateUpdater(
+  sourceStateBuffer: SourceStateBuffer) extends OnPrefetchDoneListener {
+
+  override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
+    sourceStateBuffer.updateState(event.sourceId, SourcePrefetched)
+  }
 }
 
 class SourceChangedNotifier(
+  sourceAccessor: SourceAccessor,
   recyclerView: RecyclerView) extends OnPrefetchDoneListener {
 
   import x7c1.wheat.modern.decorator.Imports._
 
-  private val timer = new BufferingTimer(delay = 200)
-
   override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
-    /*
-    update
-     */
-    timer touch {
-      Log error s"${event.sourceId}"
-      recyclerView runUi { _.getAdapter.notifyDataSetChanged() }
+    recyclerView runUi { view =>
+      val position = sourceAccessor.positionOf(event.sourceId)
+      view.getAdapter.notifyItemChanged(position)
     }
   }
 }

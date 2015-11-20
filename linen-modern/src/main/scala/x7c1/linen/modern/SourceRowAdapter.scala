@@ -1,7 +1,7 @@
 package x7c1.linen.modern
 
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.ViewGroup
+import android.view.{View, ViewGroup}
 import android.widget.Scroller
 import x7c1.linen.glue.res.layout.SourceRow
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -11,6 +11,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class SourceRowAdapter(
   sourceAccessor: SourceAccessor,
+  sourceStateAccessor: SourceStateAccessor,
   sourceSelectedListener: OnSourceSelectedListener,
   viewHolderProvider: ViewHolderProvider[SourceRow]) extends Adapter[SourceRow]{
 
@@ -26,10 +27,21 @@ class SourceRowAdapter(
       val event = SourceSelectedEvent(source, position)
       sourceSelectedListener onSourceSelected event
     }
+    holder.statePrefetched.setVisibility(View.GONE)
+    holder.stateUnloaded.setVisibility(View.GONE)
+
+    sourceStateAccessor.findState(source.id) match {
+      case Some(SourcePrefetched) =>
+        holder.statePrefetched.setVisibility(View.VISIBLE)
+      case _ =>
+        holder.stateUnloaded.setVisibility(View.VISIBLE)
+    }
   }
 
   override def getItemCount = sourceAccessor.get.length
 }
+
+
 
 trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit

@@ -16,6 +16,7 @@ trait Pane {
 class EntryArea(
   val entries: EntryBuffer,
   sources: SourceBuffer,
+  sourceStateBuffer: SourceStateBuffer,
   entryCacher: EntryCacher,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
@@ -57,6 +58,8 @@ class EntryArea(
 
       entries.insertAll(position, newer)
       sources.updateMapping(sourceId, e.entries.map(_.entryId))
+      sourceStateBuffer.updateState(sourceId, SourcePrefetched)
+
       Log debug s"[done] entries(${newer.length}) inserted"
 
       recyclerView runUi { view =>

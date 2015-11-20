@@ -14,14 +14,20 @@ public class SourceRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
     public final TextView description;
+    public final View stateUnloaded;
+    public final View statePrefetched;
 
     public SourceRow(
         View itemView,
         TextView title,
-        TextView description
+        TextView description,
+        View stateUnloaded,
+        View statePrefetched
     ){
         super(itemView);
         this.title = title;
         this.description = description;
+        this.stateUnloaded = stateUnloaded;
+        this.statePrefetched = statePrefetched;
     }
 }

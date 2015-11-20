@@ -7,6 +7,8 @@ trait SourceAccessor {
   def get: Seq[Source]
 
   def takeAfter(sourceId: Long, count: Int): Seq[Source]
+
+  def positionOf(sourceId: Long): Int
 }
 
 class SourceBuffer extends SourceAccessor {
@@ -21,6 +23,9 @@ class SourceBuffer extends SourceAccessor {
   override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
     val sources = underlying.dropWhile(_.id != sourceId).tail
     sources take count
+  }
+  override def positionOf(sourceId: Long): Int = {
+    underlying.indexWhere(_.id == sourceId)
   }
   def has(sourceId: Long): Boolean = {
     entriesMapping.get(sourceId).exists(_.nonEmpty)
