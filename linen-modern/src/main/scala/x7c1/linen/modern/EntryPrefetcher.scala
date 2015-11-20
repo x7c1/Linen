@@ -1,6 +1,5 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.RecyclerView
 import x7c1.wheat.macros.logger.Log
 
 import scala.collection.mutable
@@ -8,7 +7,7 @@ import scala.collection.mutable
 
 class EntryPrefetcher(
   sourceAccessor: SourceAccessor,
-  entryPrefetchedListener: OnPrefetchDoneListener,
+  entryLoadedListener: OnEntryLoadedListener,
   entryCacher: EntryCacher){
 
   def triggerBy(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit) = {
@@ -34,55 +33,15 @@ class EntryPrefetcher(
     }
     prefetching(sourceId) = true
 
-    EntryLoader(entryCacher).load(sourceId){ _ =>
+    EntryLoader(entryCacher).load(sourceId){ event =>
       prefetching(sourceId) = false
       Log debug s"[done] source-$sourceId"
-      entryPrefetchedListener onPrefetchDone new PrefetchDoneEvent(sourceId)
+      entryLoadedListener onEntryLoaded event
     }
   }
 
 }
 
 case class EntriesPrefetchTriggered(
-  sourceId: Long
-)
-
-trait OnPrefetchDoneListener { self =>
-
-  def onPrefetchDone(event: PrefetchDoneEvent): Unit
-
-  def append(listener: OnPrefetchDoneListener): OnPrefetchDoneListener = {
-    new OnPrefetchDoneListener {
-      override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
-        self onPrefetchDone event
-        listener onPrefetchDone event
-      }
-    }
-  }
-}
-
-class SourceStateUpdater(
-  sourceStateBuffer: SourceStateBuffer) extends OnPrefetchDoneListener {
-
-  override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
-    sourceStateBuffer.updateState(event.sourceId, SourcePrefetched)
-  }
-}
-
-class SourceChangedNotifier(
-  sourceAccessor: SourceAccessor,
-  recyclerView: RecyclerView) extends OnPrefetchDoneListener {
-
-  import x7c1.wheat.modern.decorator.Imports._
-
-  override def onPrefetchDone(event: PrefetchDoneEvent): Unit = {
-    recyclerView runUi { view =>
-      val position = sourceAccessor.positionOf(event.sourceId)
-      view.getAdapter.notifyItemChanged(position)
-    }
-  }
-}
-
-case class PrefetchDoneEvent(
   sourceId: Long
 )

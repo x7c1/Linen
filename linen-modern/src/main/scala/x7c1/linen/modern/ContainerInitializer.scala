@@ -28,15 +28,13 @@ class ContainerInitializer(
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
     val timer = new BufferingTimer(delay = 75)
-    val onEntryPrefetched =
+    val onEntryLoaded =
       new SourceStateUpdater(sourceStateBuffer) append
-      new SourceChangedNotifier(
-        sourceBuffer,
-        layout.sampleLeftList
-      )
+      new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
+
     val prefetcher = new EntryPrefetcher(
       sourceBuffer,
-      onEntryPrefetched,
+      onEntryLoaded,
       entryCacher
     )
     val adapter = new SourceRowAdapter(
