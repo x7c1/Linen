@@ -13,14 +13,19 @@ class SourceFocusObserver(
   entryArea: EntryArea ) extends OnSourceFocusedListener {
 
   override def onSourceFocused(event: SourceFocusedEvent): Unit = {
+    Log info s"[init] ${event.dump}"
+
     val source = sourceAccessor get event.position
     val load = for {
       _ <- taskOf(entryArea displayOrLoad source.id)
     } yield {
-      Log info s"[done] load entries of source-${source.id}"
+      Log debug s"[ok] load entries of source-${source.id}"
     }
-    val prefetch = entryPrefetcher createTaskOf source.id
-
+    val prefetch = for {
+      _ <- taskOf(entryPrefetcher startFrom source.id)
+    } yield {
+      Log debug s"[ok] prefetch started around sourceId:${source.id}"
+    }
     Seq(load, prefetch) foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {

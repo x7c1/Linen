@@ -121,7 +121,9 @@ class SourceArea(
   }
 }
 
-case class SourceFocusedEvent(position: Int)
+case class SourceFocusedEvent(position: Int){
+  def dump: String = s"position:$position"
+}
 
 trait OnSourceFocusedListener {
   def onSourceFocused(event:  SourceFocusedEvent)
