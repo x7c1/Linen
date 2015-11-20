@@ -44,27 +44,11 @@ class EntryLoader {
         }
     }
 
-  private val prefetching = mutable.Map[Long, Boolean]()
-
-  def prefetch(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit): Unit = {
-    if (cache.get(sourceId).nonEmpty){
-      Log info s"[cancel] source-$sourceId already cached"
-      return
-    }
-    if (prefetching.getOrElse(sourceId, false)){
-      Log info s"[cancel] source-$sourceId already triggered"
-      return
-    }
-    prefetching(sourceId) = true
-
-    // dummy
-    TaskAsync.run(delay = 500){
-      cache(sourceId) = createDummy(sourceId)
-      prefetching(sourceId) = false
-
-      Log debug s"[done] source-$sourceId"
-      onFinish(new EntriesPrefetchTriggered(sourceId))
-    }
+  def findCache(sourceId: Long): Option[Seq[Entry]] = {
+    cache.get(sourceId)
+  }
+  def updateCache(sourceId: Long, entries: Seq[Entry]) = {
+    cache(sourceId) = entries
   }
 
   def createDummy(sourceId: Long) = (1 to 50) map { n =>
@@ -83,7 +67,3 @@ sealed trait EntriesLoadingResult
 
 case class EntriesLoadSuccess(
   entries: Seq[Entry] ) extends EntriesLoadingResult
-
-case class EntriesPrefetchTriggered(
-  sourceId: Long
-)

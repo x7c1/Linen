@@ -28,7 +28,11 @@ class ContainerInitializer(
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
     val timer = new BufferingTimer(delay = 75)
-    val prefetcher = new EntryPrefetcher(sourceBuffer, entryLoader)
+    val prefetcher = new EntryPrefetcher(
+      sourceBuffer,
+      new SourceChangedNotifier(layout.sampleLeftList),
+      entryLoader
+    )
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       new SourceSelectObserver(container, prefetcher),
@@ -64,6 +68,7 @@ class ContainerInitializer(
     display getSize size
     size
   }
+
   private lazy val sourceBuffer = new SourceBuffer
 
   private lazy val entryLoader = new EntryLoader
