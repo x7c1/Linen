@@ -26,8 +26,11 @@ class EntryBuffer extends EntryAccessor {
       case _ => 0
     }
   }
-  def insertAll(position: Int, entries: Seq[Entry]) = {
-    underlying.insertAll(position, entries)
+  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry]): Seq[Entry] = {
+    val newer = entries filterNot { this has _.sourceId }
+    underlying.insertAll(position, newer)
+    entriesMapping(sourceId) = entries.map(_.entryId)
+    newer
   }
 
   private lazy val entriesMapping = mutable.Map[Long, Seq[Long]]()
@@ -40,9 +43,6 @@ class EntryBuffer extends EntryAccessor {
   }
   def lastEntryIdOf(sourceId: Long): Option[Long] = {
     entriesMapping.get(sourceId).flatMap(_.lastOption)
-  }
-  def updateMapping(sourceId: Long, entryIdList: Seq[Long]) = {
-    entriesMapping(sourceId) = entryIdList
   }
 
 }
