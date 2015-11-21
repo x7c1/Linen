@@ -27,15 +27,10 @@ object UiThreadTask {
 class UiThreadTask[A <: View](view: A){
   import Imports.toRichView
 
-  def apply[B](procedure: A => B): CallbackTask[MainThreadDummyEvent[B]] = {
-    val f: (MainThreadDummyEvent[B] => Unit) => Unit = { onFinish =>
-      view runUi { _ =>
-        val value = procedure(view)
-        onFinish(new MainThreadDummyEvent(value))
-      }
+  def apply[B](procedure: A => B): CallbackTask[B] = {
+    val f: (B => Unit) => Unit = { onFinish =>
+      view runUi { _ => onFinish(procedure(view)) }
     }
     CallbackTask(f)
   }
 }
-
-class MainThreadDummyEvent[A](val value: A)

@@ -65,15 +65,14 @@ class EntryArea(
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
         Log debug s"[done] entries(${inserted.length}) inserted"
 
-        val task = createScrollTask(position, inserted.length, entry)(onFinish)
+        val task = taskToScroll(position, inserted.length)(onFinish)
         task()
     }
     val loader = new EntryLoader(entryCacher, listener1 append listener2)
     loader load targetSourceId
   }
 
-  def createScrollTask
-    (position: Int, insertedLength: Int, headEntry: Entry)
+  def taskToScroll(position: Int, insertedLength: Int)
     (onFinish: EntryDisplayedEvent => Unit) = {
 
     val ui = UiThreadTask from recyclerView
@@ -83,11 +82,9 @@ class EntryArea(
         val base = if(current == position) -1 else 0
         view.getAdapter.notifyItemRangeInserted(position + base, insertedLength)
       }
-      _ <- ui { _ =>
-        val y = entries indexOf headEntry.entryId
-        scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
-      }
-    } yield ()
+    } yield scrollTo(position){ _ =>
+      onFinish(new EntryDisplayedEvent)
+    }
   }
 
   def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
