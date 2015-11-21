@@ -31,5 +31,5 @@ class CallbackTask[EVENT](
 
   override def apply(f: EVENT => Unit): Unit = callback(f)
 
-  def apply(): Unit = callback(_ => ())
+  def execute(): Unit = callback(_ => ())
 }

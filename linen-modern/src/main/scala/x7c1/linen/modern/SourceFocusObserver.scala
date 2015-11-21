@@ -29,7 +29,7 @@ class SourceFocusObserver(
     Seq(load, prefetch) foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
-    Task(task()) runAsync {
+    Task(task.execute()) runAsync {
       case \/-(_) =>
       case -\/(e) => Log error e.toString
     }
