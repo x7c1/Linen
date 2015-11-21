@@ -116,6 +116,12 @@ trait OnEntryLoadedListener { self =>
     }
   }
 }
+object OnEntryLoadedListener {
+  def apply(f: EntryLoadedEvent => Unit): OnEntryLoadedListener =
+    new OnEntryLoadedListener {
+      override def onEntryLoaded(e: EntryLoadedEvent): Unit = f(e)
+    }
+}
 
 class SourceStateUpdater(
   sourceStateBuffer: SourceStateBuffer) extends OnEntryLoadedListener {

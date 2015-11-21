@@ -6,6 +6,7 @@ import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, Rec
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.decorator.UiThreadTask
 
 import scala.collection.mutable
 
@@ -50,33 +51,43 @@ class EntryArea(
     }
   }
 
-  def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
-    EntryLoader(entryCacher).load(sourceId){ e =>
-      val position = {
-        val previousId = sources.collectLastFrom(sourceId){
-          case source if entries.has(source.id) => entries.lastEntryIdOf(source.id)
-        }
-        entries positionAfter previousId.flatten
-      }
-      val newer = entries.insertAll(position, sourceId, e.entries)
-      Log debug s"[done] entries(${newer.length}) inserted"
+  def startLoading(targetSourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
 
-      // deprecated
-      sourceStateBuffer.updateState(sourceId, SourcePrefetched)
-
-      recyclerView runUi { view =>
-        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
-        val base = if(current == position) -1 else 0
-        view.getAdapter.notifyItemRangeInserted(position + base, newer.length)
-
-        recyclerView runUi { _ =>
-          e.entries.headOption.foreach { entry =>
-            val y = entries indexOf entry.entryId
-            scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
-          }
-        }
+    // deprecated
+    val listener1 = new OnEntryLoadedListener {
+      override def onEntryLoaded(e: EntryLoadedEvent): Unit = {
+        sourceStateBuffer.updateState(e.sourceId, SourcePrefetched)
       }
     }
+    val listener2 = OnEntryLoadedListener {
+      case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
+        val position = calculateEntryPositionOf(sourceId)
+        val inserted = entries.insertAll(position, sourceId, loadedEntries)
+        Log debug s"[done] entries(${inserted.length}) inserted"
+
+        val task = createScrollTask(position, inserted.length, entry)(onFinish)
+        task()
+    }
+    val loader = new EntryLoader(entryCacher, listener1 append listener2)
+    loader load targetSourceId
+  }
+
+  def createScrollTask
+    (position: Int, insertedLength: Int, headEntry: Entry)
+    (onFinish: EntryDisplayedEvent => Unit) = {
+
+    val ui = UiThreadTask from recyclerView
+    for {
+      _ <- ui { view =>
+        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+        val base = if(current == position) -1 else 0
+        view.getAdapter.notifyItemRangeInserted(position + base, insertedLength)
+      }
+      _ <- ui { _ =>
+        val y = entries indexOf headEntry.entryId
+        scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
+      }
+    } yield ()
   }
 
   def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
@@ -99,6 +110,12 @@ class EntryArea(
         layoutManager startSmoothScroll scroller
       }
     }
+  }
+  private def calculateEntryPositionOf(sourceId: Long): Int = {
+    val previousId = sources.collectLastFrom(sourceId){
+      case source if entries.has(source.id) => entries.lastEntryIdOf(source.id)
+    }
+    entries positionAfter previousId.flatten
   }
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
