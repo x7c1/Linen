@@ -33,3 +33,23 @@ class CallbackTask[EVENT](
 
   def execute(): Unit = callback(_ => ())
 }
+
+class CallbackDummyEvent
+
+trait OnFinish extends (CallbackDummyEvent => Unit){
+  def by[A]: A => Unit
+}
+
+object OnFinish {
+  import scala.language.implicitConversions
+
+  implicit def fromDummy(f: CallbackDummyEvent => Unit): OnFinish = {
+    apply(f(new CallbackDummyEvent))
+  }
+  def apply[A](f: => A): OnFinish = {
+    new OnFinish {
+      override def by[B]: B => Unit = _ => f
+      override def apply(v1: CallbackDummyEvent): Unit = f
+    }
+  }
+}

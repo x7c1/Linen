@@ -6,7 +6,7 @@ import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, Rec
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.UiThreadTask
-import x7c1.wheat.modern.kinds.CallbackTask
+import x7c1.wheat.modern.kinds.OnFinish
 
 import scala.collection.mutable
 
@@ -32,28 +32,25 @@ class EntryArea(
     Log info s"[init] sourceId:$sourceId"
 
     if (isLoading(sourceId)){
-      Log warn s"[abort] (sourceId:$sourceId) already loading"
+      Log warn s"[cancel] (sourceId:$sourceId) already loading"
       return
     }
     loadingMap(sourceId) = true
 
-    val execute: (EntryDisplayedEvent => Unit) => Unit =
-      entries firstEntryIdOf sourceId match {
-        case Some(entryId) => onFinish =>
-          val position = entries indexOf entryId
-          scrollTo(position){ _ => onFinish(new EntryDisplayedEvent) }.execute()
-        case _ =>
-          startLoading(sourceId)
-      }
-
-    execute { event =>
-      Log info s"[done] sourceId:$sourceId"
+    def execute(f: => Unit) = entries firstEntryIdOf sourceId match {
+      case Some(entryId) =>
+        scrollTo(entries indexOf entryId)(OnFinish(f)).execute()
+      case _ =>
+        startLoading(sourceId)(OnFinish(f))
+    }
+    execute {
       loadingMap(sourceId) = false
-      onFinish(event)
+      Log info s"[done] sourceId:$sourceId"
+      onFinish(new EntryDisplayedEvent)
     }
   }
 
-  private def startLoading(targetSourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
+  private def startLoading(targetSourceId: Long)(done: OnFinish): Unit = {
 
     // deprecated
     val listener1 = new OnEntryLoadedListener {
@@ -65,33 +62,27 @@ class EntryArea(
       case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
         val position = calculateEntryPositionOf(sourceId)
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
-        Log debug s"[done] entries(${inserted.length}) inserted"
-
-        afterInserting(position, inserted.length)(onFinish).execute()
+        Log debug s"[ok] entries(${inserted.length}) inserted"
+        afterInserting(position, inserted.length)(done).execute()
     }
     val loader = new EntryLoader(entryCacher, listener1 append listener2)
     loader load targetSourceId
   }
 
-  private def afterInserting(position: Int, insertedLength: Int)
-    (onFinish: EntryDisplayedEvent => Unit): CallbackTask[Unit] = {
-
+  private def afterInserting(position: Int, length: Int)(done: OnFinish) = {
     val ui = UiThreadTask from recyclerView
     for {
       _ <- ui { view =>
         val current = layoutManager.findFirstCompletelyVisibleItemPosition()
         val base = if(current == position) -1 else 0
-        view.getAdapter.notifyItemRangeInserted(position + base, insertedLength)
+        view.getAdapter.notifyItemRangeInserted(position + base, length)
       }
-      _ <- scrollTo(position){ _ => onFinish(new EntryDisplayedEvent) }
+      _ <- scrollTo(position)(done)
     } yield ()
   }
 
-  private def scrollTo(position: Int)
-    (onFinish: ScrollerStopEvent => Unit): CallbackTask[Unit] = {
-
+  private def scrollTo(position: Int)(done: OnFinish) = {
     Log info s"[init] position:$position"
-
     val ui = UiThreadTask from recyclerView
     for {
       _ <- ui { _ =>
@@ -102,7 +93,8 @@ class EntryArea(
       }
       _ <- ui { _ =>
         val scroller = new SmoothScroller(
-          recyclerView.getContext, timePerInch = 125F, layoutManager, onFinish
+          recyclerView.getContext, timePerInch = 125F, layoutManager,
+          done.by[ScrollerStopEvent]
         )
         scroller setTargetPosition position
         layoutManager startSmoothScroll scroller
@@ -165,10 +157,10 @@ class SmoothScroller(
     LinearSmoothScroller.SNAP_TO_START
   }
   override def onStart() = {
-    Log debug s"[init]"
+    Log debug s"[init] $timePerInch"
   }
   override def onStop(): Unit = {
-    Log debug s"[done]"
+    Log debug s"[done] $timePerInch"
     onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
