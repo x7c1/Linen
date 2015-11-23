@@ -22,6 +22,8 @@ object CallbackTask {
     new CallbackTask(execute)
   }
   def taskOf[A](f: (A => Unit) => Unit): CallbackTask[A] = CallbackTask(f)
+
+  def task[A](f: => A): CallbackTask[A] = taskOf(_(f))
 }
 
 class CallbackTask[EVENT](
