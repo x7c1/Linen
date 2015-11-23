@@ -8,8 +8,7 @@ import x7c1.wheat.modern.kinds.CallbackTask.task
 import x7c1.wheat.modern.kinds.OnFinish
 
 
-class EntryAreaActions(
-  entriesView: RecyclerView) {
+class EntryAreaActions(entriesView: RecyclerView) {
 
   def afterInserting(position: Int, length: Int)(done: OnFinish) = for {
     ui <- task {

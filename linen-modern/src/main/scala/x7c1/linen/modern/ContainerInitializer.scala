@@ -28,13 +28,10 @@ class ContainerInitializer(
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
     val timer = new BufferingTimer(delay = 75)
-    val onEntryLoaded =
-      new SourceStateUpdater(sourceStateBuffer) append
-      new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
 
     val prefetcher = new EntryPrefetcher(
       sourceBuffer,
-      onEntryLoaded,
+      onSourceEntryLoaded,
       entryCacher
     )
     val adapter = new SourceRowAdapter(
@@ -85,11 +82,17 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.swipeLayoutLeft
     )
   }
+
+  private lazy val onSourceEntryLoaded =
+    new SourceStateUpdater(sourceStateBuffer) append
+    new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
+
   private lazy val entryArea = {
     val entries = new EntryBuffer
     new EntryArea(
       entries = entries,
-      sourceBuffer, sourceStateBuffer,
+      sources = sourceBuffer,
+      onEntryLoaded = onSourceEntryLoaded,
       actions = new EntryAreaActions(layout.sampleCenterList),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter

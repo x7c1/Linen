@@ -16,7 +16,7 @@ trait Pane {
 class EntryArea(
   val entries: EntryBuffer,
   sources: SourceAccessor,
-  sourceStateBuffer: SourceStateBuffer,
+  onEntryLoaded: OnEntryLoadedListener,
   actions: EntryAreaActions,
   entryCacher: EntryCacher,
   getPosition: () => Int ) extends Pane {
@@ -50,13 +50,8 @@ class EntryArea(
     }
   }
 
-  def createListener(done: OnFinish) = {
-    val listener1 = new OnEntryLoadedListener {
-      override def onEntryLoaded(e: EntryLoadedEvent): Unit = {
-        sourceStateBuffer.updateState(e.sourceId, SourcePrefetched)
-      }
-    }
-    listener1 append OnEntryLoadedListener {
+  private def createListener(done: OnFinish) = {
+    onEntryLoaded append OnEntryLoadedListener {
       case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
         val position = calculateEntryPositionOf(sourceId)
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
