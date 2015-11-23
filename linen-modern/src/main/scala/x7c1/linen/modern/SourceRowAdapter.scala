@@ -41,8 +41,6 @@ class SourceRowAdapter(
   override def getItemCount = sourceAccessor.get.length
 }
 
-
-
 trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
 }

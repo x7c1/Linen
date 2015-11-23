@@ -86,12 +86,12 @@ class ContainerInitializer(
     )
   }
   private lazy val entryArea = {
+    val entries = new EntryBuffer
     new EntryArea(
-      entries = new EntryBuffer,
-      sources = sourceBuffer,
-      sourceStateBuffer = sourceStateBuffer,
+      entries = entries,
+      sourceBuffer, sourceStateBuffer,
+      actions = new EntryAreaActions(layout.sampleCenterList),
       entryCacher = entryCacher,
-      recyclerView = layout.sampleCenterList,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
   }
