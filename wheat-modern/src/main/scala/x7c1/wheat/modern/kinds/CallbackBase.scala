@@ -23,6 +23,12 @@ object CallbackTask {
   }
   def taskOf[A](f: (A => Unit) => Unit): CallbackTask[A] = CallbackTask(f)
 
+  def taskBy(f: OnFinish => CallbackTask[Unit]): CallbackTask[Unit] =
+    CallbackTask { g =>
+      val done = OnFinish{g({})}
+      f(done).execute()
+    }
+
   def task[A](f: => A): CallbackTask[A] = taskOf(_(f))
 }
 
@@ -38,6 +44,7 @@ class CallbackTask[EVENT](
 
 trait OnFinish {
   def by[A]: A => Unit
+  def force(): Unit = by[Unit]({})
 }
 
 object OnFinish {
