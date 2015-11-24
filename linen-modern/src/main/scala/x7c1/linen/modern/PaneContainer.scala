@@ -3,6 +3,7 @@ package x7c1.linen.modern
 import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.kinds.OnFinish
 
 class PaneContainer(
   view: ViewGroup,
@@ -11,7 +12,7 @@ class PaneContainer(
 
   private lazy val scroller = new Scroller(view.getContext)
 
-  def scrollTo(pane: Pane)(onFinish: ContainerFocusedEvent => Unit): Unit = {
+  def scrollTo(pane: Pane): OnFinish => Unit = done => {
     val current = view.getScrollX
     val dx = pane.displayPosition - current
     val duration = 350
@@ -19,10 +20,9 @@ class PaneContainer(
     Log info s"[init] current:$current, dx:$dx"
     scroller.startScroll(current, 0, dx, 0, duration)
 
-    view.post(new ContainerScroller(onFinish))
+    view.post(new ContainerScroller(done))
   }
-  private class ContainerScroller(
-    onFinish: ContainerFocusedEvent => Unit) extends Runnable {
+  private class ContainerScroller(done: OnFinish) extends Runnable {
 
     override def run(): Unit = {
       val more = scroller.computeScrollOffset()
@@ -32,10 +32,8 @@ class PaneContainer(
         view.post(this)
       } else {
         Log info s"[done] current:$current"
-        onFinish(new ContainerFocusedEvent)
+        done.evalulate()
       }
     }
   }
 }
-
-class ContainerFocusedEvent

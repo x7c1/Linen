@@ -27,7 +27,7 @@ class EntryArea(
 
   def isLoading(sourceId: Long) = loadingMap.getOrElse(sourceId, false)
 
-  def displayOrLoad(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit): Unit = {
+  def displayOrLoad(sourceId: Long)(done: OnFinish): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
     if (isLoading(sourceId)){
@@ -46,7 +46,7 @@ class EntryArea(
     execute {
       loadingMap(sourceId) = false
       Log info s"[done] sourceId:$sourceId"
-      onFinish(new EntryDisplayedEvent)
+      done.evalulate()
     }
   }
 
@@ -68,19 +68,18 @@ class EntryArea(
 
 }
 
-class EntryDisplayedEvent
-
 class SourceArea(
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
 
-  def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
+  def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
 
     val scroller = new SmoothScroller(
-      recyclerView.getContext, timePerInch = 75F, layoutManager, onFinish
+      recyclerView.getContext, timePerInch = 75F, layoutManager,
+      done.by[ScrollerStopEvent]
     )
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller

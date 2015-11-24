@@ -1,5 +1,7 @@
 package x7c1.wheat.modern.kinds
 
+import x7c1.wheat.modern.kinds.callback.TaskProvider
+
 trait CallbackBase[EVENT] extends ((EVENT => Unit) => Unit) {
   import scala.language.higherKinds
 
@@ -21,15 +23,7 @@ object CallbackTask {
   implicit def apply[EVENT](execute: (EVENT => Unit) => Unit): CallbackTask[EVENT] = {
     new CallbackTask(execute)
   }
-  def taskOf[A](f: (A => Unit) => Unit): CallbackTask[A] = CallbackTask(f)
-
-  def taskBy(f: OnFinish => CallbackTask[Unit]): CallbackTask[Unit] =
-    CallbackTask { g =>
-      val done = OnFinish{g({})}
-      f(done).execute()
-    }
-
-  def task[A](f: => A): CallbackTask[A] = taskOf(_(f))
+  def task = TaskProvider
 }
 
 class CallbackTask[EVENT](
@@ -44,7 +38,7 @@ class CallbackTask[EVENT](
 
 trait OnFinish {
   def by[A]: A => Unit
-  def force(): Unit = by[Unit]({})
+  def evalulate(): Unit = by[Unit]({})
 }
 
 object OnFinish {

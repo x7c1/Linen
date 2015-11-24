@@ -2,7 +2,8 @@ package x7c1.linen.modern
 
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.kinds.CallbackTask
-import x7c1.wheat.modern.kinds.CallbackTask.taskOf
+import x7c1.wheat.modern.kinds.CallbackTask.task
+import x7c1.wheat.modern.kinds.callback.Imports._
 
 import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}
@@ -17,12 +18,12 @@ class SourceFocusObserver(
 
     val source = sourceAccessor get event.position
     val load = for {
-      _ <- taskOf(entryArea displayOrLoad source.id)
+      _ <- task of entryArea.displayOrLoad(source.id) _
     } yield {
       Log debug s"[ok] load entries of source-${source.id}"
     }
     val prefetch = for {
-      _ <- taskOf(entryPrefetcher triggerBy source.id)
+      _ <- task apply entryPrefetcher.triggerBy(source.id)
     } yield {
       Log debug s"[ok] prefetch started around sourceId:${source.id}"
     }

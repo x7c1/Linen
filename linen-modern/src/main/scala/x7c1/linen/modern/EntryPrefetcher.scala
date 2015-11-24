@@ -10,14 +10,13 @@ class EntryPrefetcher(
   entryLoadedListener: OnEntryLoadedListener,
   entryCacher: EntryCacher){
 
-  def triggerBy(sourceId: Long)(onFinish: EntriesPrefetchTriggered => Unit) = {
+  def triggerBy(sourceId: Long): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
     val sources = sourceAccessor.takeAfter(sourceId, 10)
     sources.foreach { source =>
       prefetch(source.id)
     }
-    onFinish(new EntriesPrefetchTriggered(sourceId))
   }
 
   private val prefetching = mutable.Map[Long, Boolean]()
@@ -41,7 +40,3 @@ class EntryPrefetcher(
   }
 
 }
-
-case class EntriesPrefetchTriggered(
-  sourceId: Long
-)
