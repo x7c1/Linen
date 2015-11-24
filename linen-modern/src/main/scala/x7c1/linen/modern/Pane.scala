@@ -14,7 +14,7 @@ trait Pane {
 }
 
 class EntryArea(
-  val entries: EntryBuffer,
+  entries: EntryBuffer,
   sources: SourceAccessor,
   onEntryLoaded: OnEntryLoadedListener,
   actions: EntryAreaActions,

@@ -53,11 +53,21 @@ class ContainerInitializer(
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
-      entryArea.entries,
+      entryBuffer,
       entryRowProvider
+    )
+    lazy val observer = new EntryFocusObserver(
+      sourceBuffer,
+      entryBuffer,
+      sourceArea
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
+    layout.sampleCenterList onTouch ItemFocusDetector.createOnTouch(
+      recyclerView = layout.sampleCenterList,
+      layoutManager = manager,
+      onItemFocused = observer
+    )
   }
 
   private lazy val displaySize = {
@@ -84,10 +94,11 @@ class ContainerInitializer(
     new SourceStateUpdater(sourceStateBuffer) append
     new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
 
+  private lazy val entryBuffer = new EntryBuffer
+
   private lazy val entryArea = {
-    val entries = new EntryBuffer
     new EntryArea(
-      entries = entries,
+      entries = entryBuffer,
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
       actions = new EntryAreaActions(layout.sampleCenterList),
