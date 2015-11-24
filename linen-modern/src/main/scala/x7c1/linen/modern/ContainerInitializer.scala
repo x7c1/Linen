@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.{GestureDetector, View}
 import x7c1.linen.glue.res.layout.{ActivityMain, EntryRow, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.chrono.BufferingTimer
 import x7c1.wheat.modern.decorator.Imports._
 
 class ContainerInitializer(
@@ -27,8 +26,6 @@ class ContainerInitializer(
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
-    val timer = new BufferingTimer(delay = 75)
-
     val prefetcher = new EntryPrefetcher(
       sourceBuffer,
       onSourceEntryLoaded,
