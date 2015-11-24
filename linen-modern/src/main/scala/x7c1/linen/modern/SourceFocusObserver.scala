@@ -11,9 +11,9 @@ import scalaz.{-\/, \/-}
 class SourceFocusObserver(
   sourceAccessor: SourceAccessor,
   entryPrefetcher: EntryPrefetcher,
-  entryArea: EntryArea ) extends OnSourceFocusedListener {
+  entryArea: EntryArea ) extends OnItemFocusedListener {
 
-  override def onSourceFocused(event: SourceFocusedEvent): Unit = {
+  override def onItemFocused(event: ItemFocusedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
     val source = sourceAccessor get event.position

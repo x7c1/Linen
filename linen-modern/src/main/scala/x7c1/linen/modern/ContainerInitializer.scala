@@ -5,7 +5,7 @@ import java.lang.Math.max
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
-import android.view.{GestureDetector, View}
+import android.view.View
 import x7c1.linen.glue.res.layout.{ActivityMain, EntryRow, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
@@ -44,15 +44,11 @@ class ContainerInitializer(
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-
-    val detector = {
-      val notifier = new FocusedSourceNotifier(manager, observer)
-      val listener = new GestureFilter(layout.sampleLeftList, notifier)
-      new GestureDetector(layout.sampleLeftList.context, listener)
-    }
-    layout.sampleLeftList onTouch { (_, event) =>
-      detector onTouchEvent event
-    }
+    layout.sampleLeftList onTouch ItemFocusDetector.createOnTouch(
+      recyclerView = layout.sampleLeftList,
+      layoutManager = manager,
+      onItemFocused = observer
+    )
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -72,6 +68,7 @@ class ContainerInitializer(
   }
 
   private lazy val sourceBuffer = new SourceBuffer
+
   private lazy val sourceStateBuffer = new SourceStateBuffer
 
   private lazy val entryCacher = new EntryCacher
@@ -136,4 +133,3 @@ private class PanePosition(children: Seq[View], displayWidth: Int){
     }
   }
 }
-

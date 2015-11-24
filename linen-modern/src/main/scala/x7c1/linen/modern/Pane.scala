@@ -90,12 +90,12 @@ class SourceArea(
   }
 }
 
-case class SourceFocusedEvent(position: Int){
+case class ItemFocusedEvent(position: Int){
   def dump: String = s"position:$position"
 }
 
-trait OnSourceFocusedListener {
-  def onSourceFocused(event:  SourceFocusedEvent)
+trait OnItemFocusedListener {
+  def onItemFocused(event:  ItemFocusedEvent)
 }
 
 class ScrollerStopEvent

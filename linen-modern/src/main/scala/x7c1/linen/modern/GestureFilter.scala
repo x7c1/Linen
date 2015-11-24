@@ -1,12 +1,12 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.{RecyclerView, LinearLayoutManager}
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import android.view.GestureDetector.OnGestureListener
-import android.view.MotionEvent
+import android.view.{GestureDetector, MotionEvent}
 
 class GestureFilter(
   recyclerView: RecyclerView,
-  notifier: FocusedSourceNotifier ) extends OnGestureListener {
+  notifier: FocusedItemNotifier ) extends OnGestureListener {
 
   private lazy val observer = new VerticalScrollObserver(recyclerView, notifier)
 
@@ -29,12 +29,26 @@ class GestureFilter(
   }
 }
 
-class FocusedSourceNotifier(
+object ItemFocusDetector {
+  def createOnTouch(
+    recyclerView: RecyclerView,
+    layoutManager: LinearLayoutManager,
+    onItemFocused: OnItemFocusedListener): (RecyclerView, MotionEvent) => Boolean = {
+
+    val notifier = new FocusedItemNotifier(layoutManager, onItemFocused)
+    val filter = new GestureFilter(recyclerView, notifier)
+    val detector = new GestureDetector(recyclerView.getContext, filter)
+
+    (_, event) => detector onTouchEvent event
+  }
+}
+
+class FocusedItemNotifier(
   layoutManager: LinearLayoutManager,
-  onSourceFocusedListener: OnSourceFocusedListener ) extends OnScrollStoppedListener {
+  onItemFocusedListener: OnItemFocusedListener ) extends OnScrollStoppedListener {
 
   override def onScrollStopped(e: ScrollStoppedEvent): Unit = {
     val position = layoutManager.findFirstCompletelyVisibleItemPosition()
-    onSourceFocusedListener.onSourceFocused(new SourceFocusedEvent(position))
+    onItemFocusedListener.onItemFocused(new ItemFocusedEvent(position))
   }
 }
