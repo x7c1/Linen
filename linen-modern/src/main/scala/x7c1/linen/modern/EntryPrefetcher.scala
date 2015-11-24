@@ -23,7 +23,7 @@ class EntryPrefetcher(
 
   def prefetch(sourceId: Long): Unit = {
     if (entryCacher.findCache(sourceId).nonEmpty){
-      Log info s"[cancel] source-$sourceId already cached"
+      Log verbose s"[cancel] source-$sourceId already cached"
       return
     }
     if (prefetching.getOrElse(sourceId, false)){

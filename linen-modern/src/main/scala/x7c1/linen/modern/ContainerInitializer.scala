@@ -5,7 +5,7 @@ import java.lang.Math.max
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
+import android.view.{GestureDetector, View}
 import x7c1.linen.glue.res.layout.{ActivityMain, EntryRow, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.chrono.BufferingTimer
@@ -47,11 +47,14 @@ class ContainerInitializer(
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-    layout.sampleLeftList onScroll { e =>
-      val position = manager.findFirstCompletelyVisibleItemPosition()
-      timer touch {
-        observer onSourceFocused new SourceFocusedEvent(position)
-      }
+
+    val detector = {
+      val notifier = new FocusedSourceNotifier(manager, observer)
+      val listener = new GestureFilter(layout.sampleLeftList, notifier)
+      new GestureDetector(layout.sampleLeftList.context, listener)
+    }
+    layout.sampleLeftList onTouch { (_, event) =>
+      detector onTouchEvent event
     }
   }
   private def setupEntryArea() = {
@@ -136,3 +139,4 @@ private class PanePosition(children: Seq[View], displayWidth: Int){
     }
   }
 }
+
