@@ -38,7 +38,8 @@ class EntryArea(
 
     def execute(f: => Unit) = entries firstEntryIdOf sourceId match {
       case Some(entryId) =>
-        actions.scrollTo(entries indexOf entryId)(OnFinish(f)).execute()
+        val position = entries indexOf entryId
+        actions.fastScrollTo(position)(OnFinish(f)).execute()
       case _ =>
         val onLoad = createListener(OnFinish(f))
         new EntryLoader(entryCacher, onLoad) load sourceId
@@ -50,8 +51,8 @@ class EntryArea(
     }
   }
 
-  def scrollAllTo(position: Int)(done: OnFinish): Unit = {
-    actions.scrollAllTo(position)(done).execute()
+  def scrollTo(position: Int)(done: OnFinish): Unit = {
+    actions.scrollTo(position)(done).execute()
   }
 
   private def createListener(done: OnFinish) = {
