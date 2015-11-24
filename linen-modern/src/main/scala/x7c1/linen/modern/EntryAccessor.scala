@@ -1,8 +1,10 @@
 package x7c1.linen.modern
 
+import android.support.v7.widget.RecyclerView
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 trait EntryAccessor {
@@ -24,19 +26,54 @@ class EntryBuffer extends EntryAccessor {
       case _ => 0
     }
   }
-  def insertAll(position: Int, entries: Seq[Entry]) = {
-    underlying.insertAll(position, entries)
+  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry]): Seq[Entry] = {
+    val newer = entries filterNot { this has _.sourceId }
+    underlying.insertAll(position, newer)
+    entriesMapping(sourceId) = entries.map(_.entryId)
+    newer
+  }
+
+  private lazy val entriesMapping = mutable.Map[Long, Seq[Long]]()
+
+  def has(sourceId: Long): Boolean = {
+    entriesMapping.get(sourceId).exists(_.nonEmpty)
+  }
+  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+    entriesMapping.get(sourceId).flatMap(_.headOption)
+  }
+  def lastEntryIdOf(sourceId: Long): Option[Long] = {
+    entriesMapping.get(sourceId).flatMap(_.lastOption)
+  }
+
+}
+
+class EntryCacher {
+
+  private val cache = new mutable.HashMap[Long, Seq[Entry]]
+
+  def findCache(sourceId: Long): Option[Seq[Entry]] = {
+    cache.get(sourceId)
+  }
+  def updateCache(sourceId: Long, entries: Seq[Entry]) = {
+    cache(sourceId) = entries
   }
 }
 
-object EntryLoader {
-  def load(sourceId: Long)(onFinish: EntriesLoadingResult => Unit) = {
-    // dummy
-    TaskAsync.run(delay = 500){
-      Log info s"[done] source-$sourceId"
-      onFinish(new EntriesLoadSuccess(createDummy(sourceId)))
+class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
+
+  def load(sourceId: Long) =
+    cacher.findCache(sourceId) match {
+      case Some(entries) =>
+        listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
+      case None =>
+        TaskAsync.run(delay = 500){
+          Log info s"[done] source-$sourceId"
+          val entries = createDummy(sourceId)
+          cacher.updateCache(sourceId, entries)
+          listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
+        }
     }
-  }
+
   def createDummy(sourceId: Long) = (1 to 50) map { n =>
     Entry(
       sourceId = sourceId,
@@ -49,7 +86,37 @@ object EntryLoader {
   }
 }
 
-sealed trait EntriesLoadingResult
+object EntryLoader {
+  def apply(cacher: EntryCacher): EntryLoadExecutor = new EntryLoadExecutor(cacher)
+}
 
-case class EntriesLoadSuccess(
-  entries: Seq[Entry] ) extends EntriesLoadingResult
+class EntryLoadExecutor(cacher: EntryCacher){
+  def load(sourceId: Long)(f: EntryLoadedEvent => Unit) = {
+    val listener = new OnEntryLoadedListener {
+      override def onEntryLoaded(e: EntryLoadedEvent): Unit = f(e)
+    }
+    new EntryLoader(cacher, listener) load sourceId
+  }
+}
+
+class SourceStateUpdater(
+  sourceStateBuffer: SourceStateBuffer) extends OnEntryLoadedListener {
+
+  override def onEntryLoaded(event: EntryLoadedEvent): Unit = {
+    sourceStateBuffer.updateState(event.sourceId, SourcePrefetched)
+  }
+}
+
+class SourceChangedNotifier(
+  sourceAccessor: SourceAccessor,
+  recyclerView: RecyclerView) extends OnEntryLoadedListener {
+
+  import x7c1.wheat.modern.decorator.Imports._
+
+  override def onEntryLoaded(event: EntryLoadedEvent): Unit = {
+    recyclerView runUi { view =>
+      val position = sourceAccessor.positionOf(event.sourceId)
+      view.getAdapter.notifyItemChanged(position)
+    }
+  }
+}

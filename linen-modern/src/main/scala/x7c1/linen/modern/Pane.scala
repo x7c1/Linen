@@ -5,7 +5,7 @@ import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.callback.OnFinish
 
 import scala.collection.mutable
 
@@ -15,8 +15,10 @@ trait Pane {
 
 class EntryArea(
   val entries: EntryBuffer,
-  sources: SourceBuffer,
-  recyclerView: RecyclerView,
+  sources: SourceAccessor,
+  onEntryLoaded: OnEntryLoadedListener,
+  actions: EntryAreaActions,
+  entryCacher: EntryCacher,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
@@ -25,81 +27,47 @@ class EntryArea(
 
   def isLoading(sourceId: Long) = loadingMap.getOrElse(sourceId, false)
 
-  def displayOrLoad(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit): Unit = {
+  def displayOrLoad(sourceId: Long)(done: OnFinish): Unit = {
     Log info s"[init] sourceId:$sourceId"
 
     if (isLoading(sourceId)){
-      Log warn s"[abort] (sourceId:$sourceId) already loading"
+      Log warn s"[cancel] (sourceId:$sourceId) already loading"
       return
     }
     loadingMap(sourceId) = true
 
-    val onComplete = (e: EntryDisplayedEvent) => {
-      Log info s"[done] sourceId:$sourceId"
-      loadingMap(sourceId) = false
-      onFinish(e)
-    }
-    sources.firstEntryIdOf(sourceId) match {
+    def execute(f: => Unit) = entries firstEntryIdOf sourceId match {
       case Some(entryId) =>
-        val position = entries indexOf entryId
-        scrollTo(position){ _ => onComplete(new EntryDisplayedEvent) }
+        actions.scrollTo(entries indexOf entryId)(OnFinish(f)).execute()
       case _ =>
-        startLoading(sourceId)(onComplete)
+        val onLoad = createListener(OnFinish(f))
+        new EntryLoader(entryCacher, onLoad) load sourceId
     }
-  }
-  def startLoading(sourceId: Long)(onFinish: EntryDisplayedEvent => Unit) = {
-    EntryLoader.load(sourceId){ case e: EntriesLoadSuccess =>
-      val newer = e.entries filterNot { sources has _.sourceId }
-      val position = entries positionAfter sources.entryIdBefore(sourceId)
-      val current = layoutManager.findFirstCompletelyVisibleItemPosition()
-
-      entries.insertAll(position, newer)
-      sources.updateMapping(sourceId, e.entries.map(_.entryId))
-
-      Log info s"[done] entries(${newer.length}) inserted"
-
-      recyclerView runUi { view =>
-        if (current == position){
-          layoutManager.scrollToPositionWithOffset(current + newer.length, 0)
-        }
-        recyclerView runUi { _ =>
-          view.getAdapter.notifyDataSetChanged()
-          e.entries.headOption.foreach { entry =>
-            val y = entries indexOf entry.entryId
-            scrollTo(y) { _ => onFinish(new EntryDisplayedEvent) }
-          }
-        }
-      }
+    execute {
+      loadingMap(sourceId) = false
+      Log info s"[done] sourceId:$sourceId"
+      done.evalulate()
     }
   }
 
-  def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
-    Log info s"[init] position:$position"
-
-    val scroller = new SmoothScroller(
-      recyclerView.getContext, timePerInch = 125F, layoutManager, onFinish
-    )
-    val current = layoutManager.findFirstCompletelyVisibleItemPosition()
-    val diff = current - position
-    val space =
-      if (diff < 0) -1
-      else if(diff > 0) 1
-      else 0
-
-    recyclerView runUi { _ =>
-      layoutManager.scrollToPositionWithOffset(position + space, 0)
-      recyclerView runUi { _ =>
-        scroller setTargetPosition position
-        layoutManager startSmoothScroll scroller
-      }
+  private def createListener(done: OnFinish) = {
+    onEntryLoaded append OnEntryLoadedListener {
+      case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
+        val position = calculateEntryPositionOf(sourceId)
+        val inserted = entries.insertAll(position, sourceId, loadedEntries)
+        actions.afterInserting(position, inserted.length)(done).execute()
     }
   }
-  private lazy val layoutManager = {
-    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+
+  private def calculateEntryPositionOf(sourceId: Long): Int = {
+    val previousId = sources.collectLastFrom(sourceId){
+      case source if entries.has(source.id) =>
+        entries.lastEntryIdOf(source.id)
+    }
+    entries positionAfter previousId.flatten
   }
+
 }
-
-class EntryDisplayedEvent
 
 class SourceArea(
   recyclerView: RecyclerView,
@@ -107,11 +75,12 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  def scrollTo(position: Int)(onFinish: ScrollerStopEvent => Unit): Unit = {
+  def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
 
     val scroller = new SmoothScroller(
-      recyclerView.getContext, timePerInch = 75F, layoutManager, onFinish
+      recyclerView.getContext, timePerInch = 75F, layoutManager,
+      done.by[ScrollerStopEvent]
     )
     scroller setTargetPosition position
     layoutManager startSmoothScroll scroller
@@ -121,7 +90,9 @@ class SourceArea(
   }
 }
 
-case class SourceFocusedEvent(position: Int)
+case class SourceFocusedEvent(position: Int){
+  def dump: String = s"position:$position"
+}
 
 trait OnSourceFocusedListener {
   def onSourceFocused(event:  SourceFocusedEvent)
@@ -142,10 +113,10 @@ class SmoothScroller(
     LinearSmoothScroller.SNAP_TO_START
   }
   override def onStart() = {
-    Log debug s"[init]"
+    Log debug s"[init] $timePerInch"
   }
   override def onStop(): Unit = {
-    Log debug s"[done]"
+    Log debug s"[done] $timePerInch"
     onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
