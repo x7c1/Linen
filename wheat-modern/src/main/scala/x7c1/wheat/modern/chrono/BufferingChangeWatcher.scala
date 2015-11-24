@@ -5,8 +5,8 @@ import java.util.{Timer, TimerTask}
 class BufferingChangeWatcher[A](
   getCurrent: () => A,
   onStop: A => Unit,
-  delay: Long = 50,
-  period: Long = 75 ){
+  delay: Long,
+  period: Long ){
 
   private var value: Option[A] = None
 

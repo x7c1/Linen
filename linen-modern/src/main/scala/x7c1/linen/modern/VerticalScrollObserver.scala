@@ -8,6 +8,8 @@ class VerticalScrollObserver(
   listener: OnScrollStoppedListener ) {
 
   private val watcher = new BufferingChangeWatcher[Int](
+    delay = 50,
+    period = 75,
     getCurrent = () => view.computeVerticalScrollOffset(),
     onStop = current => {
       listener onScrollStopped new ScrollStoppedEvent(current)

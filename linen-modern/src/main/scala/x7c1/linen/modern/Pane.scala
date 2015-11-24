@@ -50,6 +50,10 @@ class EntryArea(
     }
   }
 
+  def scrollAllTo(position: Int)(done: OnFinish): Unit = {
+    actions.scrollAllTo(position)(done).execute()
+  }
+
   private def createListener(done: OnFinish) = {
     onEntryLoaded append OnEntryLoadedListener {
       case EntryLoadedEvent(sourceId, loadedEntries) =>
@@ -70,11 +74,16 @@ class EntryArea(
 }
 
 class SourceArea(
+  sources: SourceAccessor,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
 
+  def display(sourceId: Long): OnFinish => Unit = done => {
+    val position = sources.positionOf(sourceId)
+    scrollTo(position)(done)
+  }
   def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
 

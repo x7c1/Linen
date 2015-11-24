@@ -54,10 +54,10 @@ class ContainerInitializer(
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
       entryBuffer,
+      new EntrySelectObserver(container),
       entryRowProvider
     )
     lazy val observer = new EntryFocusObserver(
-      sourceBuffer,
       entryBuffer,
       sourceArea
     )
@@ -85,6 +85,7 @@ class ContainerInitializer(
 
   private lazy val sourceArea = {
     new SourceArea(
+      sources = sourceBuffer,
       recyclerView = layout.sampleLeftList,
       getPosition = () => panePosition of layout.swipeLayoutLeft
     )

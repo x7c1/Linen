@@ -42,6 +42,21 @@ class EntryAreaActions(entriesView: RecyclerView) {
     }
   } yield ()
 
+  def scrollAllTo(position: Int)(done: OnFinish) = for {
+    ui <- task {
+      UiThreadTask from entriesView
+    }
+    scroller <- task {
+      new SmoothScroller(
+        entriesView.getContext, timePerInch = 45F, layoutManager,
+        done.by[ScrollerStopEvent] )
+    }
+    _ <- ui { _ =>
+      scroller setTargetPosition position
+      layoutManager startSmoothScroll scroller
+    }
+  } yield ()
+
   private lazy val layoutManager = {
     entriesView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
