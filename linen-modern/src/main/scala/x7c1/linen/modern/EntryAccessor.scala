@@ -63,7 +63,8 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
 
   def load(sourceId: Long) =
     cacher.findCache(sourceId) match {
-      case Some(entries) => listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
+      case Some(entries) =>
+        listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
       case None =>
         TaskAsync.run(delay = 500){
           Log info s"[done] source-$sourceId"

@@ -5,7 +5,7 @@ import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.kinds.OnFinish
+import x7c1.wheat.modern.callback.OnFinish
 
 import scala.collection.mutable
 
@@ -61,7 +61,8 @@ class EntryArea(
 
   private def calculateEntryPositionOf(sourceId: Long): Int = {
     val previousId = sources.collectLastFrom(sourceId){
-      case source if entries.has(source.id) => entries.lastEntryIdOf(source.id)
+      case source if entries.has(source.id) =>
+        entries.lastEntryIdOf(source.id)
     }
     entries positionAfter previousId.flatten
   }

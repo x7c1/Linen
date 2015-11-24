@@ -1,9 +1,9 @@
 package x7c1.linen.modern
 
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.kinds.CallbackTask
-import x7c1.wheat.modern.kinds.CallbackTask.task
-import x7c1.wheat.modern.kinds.callback.Imports._
+import x7c1.wheat.modern.callback.CallbackTask
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.Imports._
 
 import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}

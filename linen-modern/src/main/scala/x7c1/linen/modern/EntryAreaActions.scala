@@ -2,9 +2,8 @@ package x7c1.linen.modern
 
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.UiThreadTask
-import x7c1.wheat.modern.kinds.CallbackTask.task
-import x7c1.wheat.modern.kinds.OnFinish
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.{UiThreadTask, OnFinish}
 
 
 class EntryAreaActions(entriesView: RecyclerView) {

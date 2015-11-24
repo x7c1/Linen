@@ -3,7 +3,7 @@ package x7c1.linen.modern
 import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.kinds.OnFinish
+import x7c1.wheat.modern.callback.OnFinish
 
 class PaneContainer(
   view: ViewGroup,

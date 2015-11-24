@@ -1,6 +1,5 @@
-package x7c1.wheat.modern.kinds.callback
+package x7c1.wheat.modern.callback
 
-import x7c1.wheat.modern.kinds.CallbackTask
 
 object TaskProvider {
 
