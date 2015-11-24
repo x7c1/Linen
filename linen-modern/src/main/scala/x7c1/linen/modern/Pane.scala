@@ -52,7 +52,7 @@ class EntryArea(
 
   private def createListener(done: OnFinish) = {
     onEntryLoaded append OnEntryLoadedListener {
-      case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
+      case EntryLoadedEvent(sourceId, loadedEntries) =>
         val position = calculateEntryPositionOf(sourceId)
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
         actions.afterInserting(position, inserted.length)(done).execute()
