@@ -12,7 +12,8 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.LinearLayout;
-import x7c1.linen.glue.res.view.CustomSwipeToRefresh;
+import android.widget.RelativeLayout;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.ListView;
@@ -40,7 +41,8 @@ public class ActivityMainProvider implements ViewHolderProvider<ActivityMain> {
             view,
             (TextView) view.findViewById(R.id.activity_main__sample_text),
             (LinearLayout) view.findViewById(R.id.activity_main__swipe_container),
-            (x7c1.linen.glue.res.view.CustomSwipeToRefresh) view.findViewById(R.id.activity_main__swipe_layout_left),
+            (RelativeLayout) view.findViewById(R.id.activity_main__swipe_layout_left),
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_left_list),
             (android.support.v4.widget.SwipeRefreshLayout) view.findViewById(R.id.activity_main__swipe_layout_center),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_center_list),

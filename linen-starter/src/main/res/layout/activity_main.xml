@@ -4,30 +4,33 @@
                 android:layout_height="match_parent"
                 tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/activity_main__sample_text"
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
     <LinearLayout
         android:id="@+id/activity_main__swipe_container"
-        android:layout_below="@+id/activity_main__sample_text"
+        android:layout_above="@+id/activity_main__sample_text"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <x7c1.linen.glue.res.view.CustomSwipeToRefresh
+        <RelativeLayout
             android:id="@+id/activity_main__swipe_layout_left"
             android:layout_width="150dp"
             android:layout_height="wrap_content">
 
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/activity_main__source_toolbar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:background="@color/opaque_red"
+                />
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__sample_left_list"
+                android:layout_below="@+id/activity_main__source_toolbar"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
 
-        </x7c1.linen.glue.res.view.CustomSwipeToRefresh>
+        </RelativeLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/activity_main__swipe_layout_center"
@@ -56,6 +59,13 @@
         </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/activity_main__sample_text"
+        android:layout_alignParentBottom="true"
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <View
         android:id="@+id/activity_main__dummy_surface"
