@@ -8,36 +8,38 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.widget.ListView;
 import android.widget.TextView;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.ActivityMain;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.MainLayout;
 
-public class ActivityMainProvider implements ViewHolderProvider<ActivityMain> {
+public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
 
     private final LayoutInflater inflater;
 
-    public ActivityMainProvider(Context context){
+    public MainLayoutProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
-    public ActivityMain inflateOn(ViewGroup parent){
+    public MainLayout inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public ActivityMain inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.drawer_layout, parent, attachToRoot);
-        return new ActivityMain(
+    public MainLayout inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.main_layout, parent, attachToRoot);
+        return new MainLayout(
             view,
-            (TextView) view.findViewById(R.id.activity_main__sample_text),
+            (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
             (LinearLayout) view.findViewById(R.id.activity_main__swipe_container),
             (RelativeLayout) view.findViewById(R.id.activity_main__swipe_layout_left),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),
@@ -46,6 +48,7 @@ public class ActivityMainProvider implements ViewHolderProvider<ActivityMain> {
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_center_list),
             (android.support.v4.widget.SwipeRefreshLayout) view.findViewById(R.id.activity_main__swipe_layout_right),
             (ListView) view.findViewById(R.id.activity_main__sample_right_list),
+            (TextView) view.findViewById(R.id.activity_main__sample_text),
             (View) view.findViewById(R.id.activity_main__dummy_surface)
         );
     }

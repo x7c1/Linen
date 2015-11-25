@@ -8,16 +8,16 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public class ActivityMain extends RecyclerView.ViewHolder {
+public class MainLayout extends RecyclerView.ViewHolder {
 
-    public final TextView sampleText;
+    public final LinearLayout menuArea;
     public final LinearLayout swipeContainer;
     public final RelativeLayout swipeLayoutLeft;
     public final android.support.v7.widget.Toolbar sourceToolbar;
@@ -26,11 +26,12 @@ public class ActivityMain extends RecyclerView.ViewHolder {
     public final android.support.v7.widget.RecyclerView sampleCenterList;
     public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight;
     public final ListView sampleRightList;
+    public final TextView sampleText;
     public final View dummySurface;
 
-    public ActivityMain(
+    public MainLayout(
         View itemView,
-        TextView sampleText,
+        LinearLayout menuArea,
         LinearLayout swipeContainer,
         RelativeLayout swipeLayoutLeft,
         android.support.v7.widget.Toolbar sourceToolbar,
@@ -39,10 +40,11 @@ public class ActivityMain extends RecyclerView.ViewHolder {
         android.support.v7.widget.RecyclerView sampleCenterList,
         android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight,
         ListView sampleRightList,
+        TextView sampleText,
         View dummySurface
     ){
         super(itemView);
-        this.sampleText = sampleText;
+        this.menuArea = menuArea;
         this.swipeContainer = swipeContainer;
         this.swipeLayoutLeft = swipeLayoutLeft;
         this.sourceToolbar = sourceToolbar;
@@ -51,6 +53,7 @@ public class ActivityMain extends RecyclerView.ViewHolder {
         this.sampleCenterList = sampleCenterList;
         this.swipeLayoutRight = swipeLayoutRight;
         this.sampleRightList = sampleRightList;
+        this.sampleText = sampleText;
         this.dummySurface = dummySurface;
     }
 }

@@ -6,13 +6,13 @@ import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import x7c1.linen.glue.res.layout.{ActivityMain, EntryRow, SourceRow}
+import x7c1.linen.glue.res.layout.{EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
 class ContainerInitializer(
   activity: Activity,
-  layout: ActivityMain,
+  layout: MainLayout,
   sourceRowProvider: ViewHolderProvider[SourceRow],
   entryRowProvider: ViewHolderProvider[EntryRow]) {
 
