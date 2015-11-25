@@ -13,6 +13,7 @@
     <include layout="@layout/activity_main"/>
 
     <LinearLayout
+        android:id="@+id/drawer_layout__menu_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
