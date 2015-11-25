@@ -3,8 +3,11 @@ package x7c1.linen;
 import android.app.Activity;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -29,12 +32,19 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		final ActivityMain layout = new ActivityMainProvider(this).inflate(null, false);
+
 		layout.sourceToolbar.setTitle("Technology");
+		layout.sourceToolbar.setNavigationIcon(R.drawable.ic_action_menu);
+		layout.sourceToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.i(getClass().getName(), v.getClass().getName());
+
+				DrawerLayout x = (DrawerLayout) layout.itemView.findViewById(R.id.drawer_layout__root);
+				x.openDrawer(Gravity.LEFT);
+			}
+		});
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
-
-
-//		new SupportMenuInflater(this).inflate(R.menu.menu_main, layout.sourceToolbar.getMenu());
-
 
 		setContentView(layout.itemView);
 

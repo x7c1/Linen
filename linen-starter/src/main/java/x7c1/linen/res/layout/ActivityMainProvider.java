@@ -8,18 +8,16 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.RecyclerView;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.ListView;
-import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.ActivityMain;
+import x7c1.wheat.ancient.resource.ViewHolderProvider;
 
 public class ActivityMainProvider implements ViewHolderProvider<ActivityMain> {
 
@@ -36,7 +34,7 @@ public class ActivityMainProvider implements ViewHolderProvider<ActivityMain> {
 
     @Override
     public ActivityMain inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.activity_main, parent, attachToRoot);
+        View view = inflater.inflate(R.layout.drawer_layout, parent, attachToRoot);
         return new ActivityMain(
             view,
             (TextView) view.findViewById(R.id.activity_main__sample_text),
