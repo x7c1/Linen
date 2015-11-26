@@ -24,7 +24,12 @@ class EntrySelectObserver(
     } yield {
       Log info s"[ok] source scrolled to sourceId:${event.sourceId}"
     }
-    Seq(scrollEntry, scrollSource) foreach runAsync
+    val updateToolbar = for {
+      _ <- task apply container.entryArea.updateToolbar(event.sourceId)
+    } yield {
+      Log info s"[ok] update Toolbar"
+    }
+    Seq(scrollEntry, scrollSource, updateToolbar) foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
     Task(task.execute()) runAsync {

@@ -17,9 +17,9 @@ class ContainerInitializer(
   entryRowProvider: ViewHolderProvider[EntryRow]) {
 
   def setup(): Unit = {
-    updateWidth(0.9, layout.swipeLayoutLeft)
-    updateWidth(0.8, layout.swipeLayoutCenter)
-    updateWidth(0.9, layout.swipeLayoutRight)
+    updateWidth(0.95, layout.swipeLayoutLeft)
+    updateWidth(0.9, layout.swipeLayoutCenter)
+    updateWidth(0.95, layout.swipeLayoutRight)
 
     setupSourceArea()
     setupEntryArea()
@@ -59,6 +59,7 @@ class ContainerInitializer(
     )
     lazy val observer = new EntryFocusObserver(
       entryBuffer,
+      entryArea,
       sourceArea
     )
     layout.sampleCenterList setLayoutManager manager
@@ -102,6 +103,7 @@ class ContainerInitializer(
       entries = entryBuffer,
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
+      toolbar = layout.entryToolbar,
       actions = new EntryAreaActions(layout.sampleCenterList),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter

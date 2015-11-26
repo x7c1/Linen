@@ -22,7 +22,8 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.design.widget.CoordinatorLayout swipeLayoutLeft;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sampleLeftList;
-    public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter;
+    public final LinearLayout swipeLayoutCenter;
+    public final android.support.v7.widget.Toolbar entryToolbar;
     public final android.support.v7.widget.RecyclerView sampleCenterList;
     public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight;
     public final ListView sampleRightList;
@@ -36,7 +37,8 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.design.widget.CoordinatorLayout swipeLayoutLeft,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sampleLeftList,
-        android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter,
+        LinearLayout swipeLayoutCenter,
+        android.support.v7.widget.Toolbar entryToolbar,
         android.support.v7.widget.RecyclerView sampleCenterList,
         android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight,
         ListView sampleRightList,
@@ -50,6 +52,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.sourceToolbar = sourceToolbar;
         this.sampleLeftList = sampleLeftList;
         this.swipeLayoutCenter = swipeLayoutCenter;
+        this.entryToolbar = entryToolbar;
         this.sampleCenterList = sampleCenterList;
         this.swipeLayoutRight = swipeLayoutRight;
         this.sampleRightList = sampleRightList;

@@ -10,18 +10,25 @@ import scalaz.concurrent.Task
 
 class EntryFocusObserver(
   entryAccessor: EntryAccessor,
+  entryArea: EntryArea,
   sourceArea: SourceArea) extends OnItemFocusedListener {
 
   override def onItemFocused(event: ItemFocusedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
+    val entry = entryAccessor.get(event.position)
+
     val scrollSource = for {
-      entry <- task apply entryAccessor.get(event.position)
       _ <- task of sourceArea.display(entry.sourceId)
     } yield {
       Log info s"[ok] source scrolled to sourceId:${entry.sourceId}"
     }
-    Seq(scrollSource) foreach runAsync
+    val updateToolbar = for {
+      _ <- task apply entryArea.updateToolbar(entry.sourceId)
+    } yield {
+      Log info s"[ok] update Toolbar"
+    }
+    Seq(scrollSource, updateToolbar) foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
     Task(task.execute()) runAsync {

@@ -2,10 +2,11 @@ package x7c1.linen.modern
 
 import android.content.Context
 import android.graphics.PointF
-import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
+import android.support.v7.widget.{Toolbar, LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.OnFinish
+import x7c1.wheat.modern.decorator.Imports._
 
 import scala.collection.mutable
 
@@ -17,6 +18,7 @@ class EntryArea(
   entries: EntryBuffer,
   sources: SourceAccessor,
   onEntryLoaded: OnEntryLoadedListener,
+  toolbar: Toolbar,
   actions: EntryAreaActions,
   entryCacher: EntryCacher,
   getPosition: () => Int ) extends Pane {
@@ -46,9 +48,17 @@ class EntryArea(
     }
     execute {
       loadingMap(sourceId) = false
+      updateToolbar(sourceId)
+
       Log info s"[done] sourceId:$sourceId"
       done.evalulate()
     }
+  }
+
+  def updateToolbar(sourceId: Long) = {
+    val position = sources positionOf sourceId
+    val source = sources get position
+    toolbar runUi { _ setTitle source.title }
   }
 
   def scrollTo(position: Int)(done: OnFinish): Unit = {

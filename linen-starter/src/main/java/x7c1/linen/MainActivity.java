@@ -45,6 +45,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
+		layout.entryToolbar.inflateMenu(R.menu.menu_main);
 
 		setContentView(layout.itemView);
 

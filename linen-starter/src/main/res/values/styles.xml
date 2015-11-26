@@ -5,9 +5,9 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <color name="opaque_red">#ffbebe</color>
-    <color name="opaque_blue">#cad9fd</color>
+    <color name="opaque_red">#ffcdcd</color>
+    <color name="opaque_blue">#dce6ff</color>
     <color name="opaque_green">#c7fac7</color>
 
-    <color name="light_gray">#dedcdc</color>
+    <color name="light_gray">#e6e6e6</color>
 </resources>
