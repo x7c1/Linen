@@ -79,7 +79,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
         }
     }
 
-  def createDummy(sourceId: Long) = (1 to 50) map { n =>
+  def createDummy(sourceId: Long) = (1 to 10) map { n =>
     Entry(
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,

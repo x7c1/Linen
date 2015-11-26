@@ -17,7 +17,7 @@ class ContainerInitializer(
   entryRowProvider: ViewHolderProvider[EntryRow]) {
 
   def setup(): Unit = {
-    updateWidth(0.95, layout.swipeLayoutLeft)
+    updateWidth(0.85, layout.swipeLayoutLeft)
     updateWidth(0.9, layout.swipeLayoutCenter)
     updateWidth(0.95, layout.swipeLayoutRight)
 

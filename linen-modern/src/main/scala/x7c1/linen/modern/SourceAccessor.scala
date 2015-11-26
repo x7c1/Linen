@@ -41,8 +41,8 @@ class SourceBuffer extends SourceAccessor {
     Source(
       id = n,
       url = s"http://example.com/sample-source-$n",
-      title = s"sample-title-$n",
-      description = s"sample-description-$n" )
+      title = s"$n source title",
+      description = s"$n source description" )
   }
 
 }
