@@ -39,4 +39,17 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
     source should include("public final TextView content;")
     source should include("this.content = content;")
   }
+
+  it can "expand <include> tag" in {
+    val Right(resource) = loader load "main_layout.xml"
+    val elements = resource.elements
+
+    val Some(x1) = elements.find(_.key == "main_layout__menu_area")
+    x1.label shouldBe "menuArea"
+    x1.tag shouldBe "LinearLayout"
+
+    val Some(x2) = elements.find(_.key == "activity_main__source_toolbar")
+    x2.label shouldBe "sourceToolbar"
+    x2.tag shouldBe "android.support.v7.widget.Toolbar"
+  }
 }

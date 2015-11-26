@@ -6,14 +6,13 @@ import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import x7c1.linen.glue.res.layout.{ActivityMain, EntryRow, SourceRow}
+import x7c1.linen.glue.res.layout.{EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.chrono.BufferingTimer
 import x7c1.wheat.modern.decorator.Imports._
 
 class ContainerInitializer(
   activity: Activity,
-  layout: ActivityMain,
+  layout: MainLayout,
   sourceRowProvider: ViewHolderProvider[SourceRow],
   entryRowProvider: ViewHolderProvider[EntryRow]) {
 
@@ -27,8 +26,6 @@ class ContainerInitializer(
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
-    val timer = new BufferingTimer(delay = 75)
-
     val prefetcher = new EntryPrefetcher(
       sourceBuffer,
       onSourceEntryLoaded,
@@ -47,21 +44,30 @@ class ContainerInitializer(
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-    layout.sampleLeftList onScroll { e =>
-      val position = manager.findFirstCompletelyVisibleItemPosition()
-      timer touch {
-        observer onSourceFocused new SourceFocusedEvent(position)
-      }
-    }
+    layout.sampleLeftList onTouch ItemFocusDetector.createOnTouch(
+      recyclerView = layout.sampleLeftList,
+      layoutManager = manager,
+      onItemFocused = observer
+    )
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
-      entryArea.entries,
+      entryBuffer,
+      new EntrySelectObserver(container),
       entryRowProvider
+    )
+    lazy val observer = new EntryFocusObserver(
+      entryBuffer,
+      sourceArea
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
+    layout.sampleCenterList onTouch ItemFocusDetector.createOnTouch(
+      recyclerView = layout.sampleCenterList,
+      layoutManager = manager,
+      onItemFocused = observer
+    )
   }
 
   private lazy val displaySize = {
@@ -72,12 +78,14 @@ class ContainerInitializer(
   }
 
   private lazy val sourceBuffer = new SourceBuffer
+
   private lazy val sourceStateBuffer = new SourceStateBuffer
 
   private lazy val entryCacher = new EntryCacher
 
   private lazy val sourceArea = {
     new SourceArea(
+      sources = sourceBuffer,
       recyclerView = layout.sampleLeftList,
       getPosition = () => panePosition of layout.swipeLayoutLeft
     )
@@ -87,10 +95,11 @@ class ContainerInitializer(
     new SourceStateUpdater(sourceStateBuffer) append
     new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
 
+  private lazy val entryBuffer = new EntryBuffer
+
   private lazy val entryArea = {
-    val entries = new EntryBuffer
     new EntryArea(
-      entries = entries,
+      entries = entryBuffer,
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
       actions = new EntryAreaActions(layout.sampleCenterList),

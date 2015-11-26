@@ -14,7 +14,7 @@ trait Pane {
 }
 
 class EntryArea(
-  val entries: EntryBuffer,
+  entries: EntryBuffer,
   sources: SourceAccessor,
   onEntryLoaded: OnEntryLoadedListener,
   actions: EntryAreaActions,
@@ -38,7 +38,8 @@ class EntryArea(
 
     def execute(f: => Unit) = entries firstEntryIdOf sourceId match {
       case Some(entryId) =>
-        actions.scrollTo(entries indexOf entryId)(OnFinish(f)).execute()
+        val position = entries indexOf entryId
+        actions.fastScrollTo(position)(OnFinish(f)).execute()
       case _ =>
         val onLoad = createListener(OnFinish(f))
         new EntryLoader(entryCacher, onLoad) load sourceId
@@ -50,9 +51,13 @@ class EntryArea(
     }
   }
 
+  def scrollTo(position: Int)(done: OnFinish): Unit = {
+    actions.scrollTo(position)(done).execute()
+  }
+
   private def createListener(done: OnFinish) = {
     onEntryLoaded append OnEntryLoadedListener {
-      case EntryLoadedEvent(sourceId, loadedEntries @ Seq(entry, _*)) =>
+      case EntryLoadedEvent(sourceId, loadedEntries) =>
         val position = calculateEntryPositionOf(sourceId)
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
         actions.afterInserting(position, inserted.length)(done).execute()
@@ -70,11 +75,16 @@ class EntryArea(
 }
 
 class SourceArea(
+  sources: SourceAccessor,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
 
+  def display(sourceId: Long): OnFinish => Unit = done => {
+    val position = sources.positionOf(sourceId)
+    scrollTo(position)(done)
+  }
   def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
 
@@ -90,12 +100,12 @@ class SourceArea(
   }
 }
 
-case class SourceFocusedEvent(position: Int){
+case class ItemFocusedEvent(position: Int){
   def dump: String = s"position:$position"
 }
 
-trait OnSourceFocusedListener {
-  def onSourceFocused(event:  SourceFocusedEvent)
+trait OnItemFocusedListener {
+  def onItemFocused(event:  ItemFocusedEvent)
 }
 
 class ScrollerStopEvent

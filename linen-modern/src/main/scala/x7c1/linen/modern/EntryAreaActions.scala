@@ -18,10 +18,10 @@ class EntryAreaActions(entriesView: RecyclerView) {
       val base = if(current == position) -1 else 0
       view.getAdapter.notifyItemRangeInserted(position + base, length)
     }
-    _ <- scrollTo(position)(done)
+    _ <- fastScrollTo(position)(done)
   } yield ()
 
-  def scrollTo(position: Int)(done: OnFinish) = for {
+  def fastScrollTo(position: Int)(done: OnFinish) = for {
     ui <- task {
       Log info s"[init] position:$position"
       UiThreadTask from entriesView
@@ -37,6 +37,21 @@ class EntryAreaActions(entriesView: RecyclerView) {
         view.getContext, timePerInch = 125F, layoutManager,
         done.by[ScrollerStopEvent]
       )
+      scroller setTargetPosition position
+      layoutManager startSmoothScroll scroller
+    }
+  } yield ()
+
+  def scrollTo(position: Int)(done: OnFinish) = for {
+    ui <- task {
+      UiThreadTask from entriesView
+    }
+    scroller <- task {
+      new SmoothScroller(
+        entriesView.getContext, timePerInch = 45F, layoutManager,
+        done.by[ScrollerStopEvent] )
+    }
+    _ <- ui { _ =>
       scroller setTargetPosition position
       layoutManager startSmoothScroll scroller
     }

@@ -8,45 +8,52 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.LinearLayout;
-import x7c1.linen.glue.res.view.CustomSwipeToRefresh;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.widget.Toolbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public class ActivityMain extends RecyclerView.ViewHolder {
+public class MainLayout extends RecyclerView.ViewHolder {
 
-    public final TextView sampleText;
+    public final LinearLayout menuArea;
     public final LinearLayout swipeContainer;
-    public final x7c1.linen.glue.res.view.CustomSwipeToRefresh swipeLayoutLeft;
+    public final android.support.design.widget.CoordinatorLayout swipeLayoutLeft;
+    public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sampleLeftList;
     public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter;
     public final android.support.v7.widget.RecyclerView sampleCenterList;
     public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight;
     public final ListView sampleRightList;
+    public final TextView sampleText;
     public final View dummySurface;
 
-    public ActivityMain(
+    public MainLayout(
         View itemView,
-        TextView sampleText,
+        LinearLayout menuArea,
         LinearLayout swipeContainer,
-        x7c1.linen.glue.res.view.CustomSwipeToRefresh swipeLayoutLeft,
+        android.support.design.widget.CoordinatorLayout swipeLayoutLeft,
+        android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sampleLeftList,
         android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter,
         android.support.v7.widget.RecyclerView sampleCenterList,
         android.support.v4.widget.SwipeRefreshLayout swipeLayoutRight,
         ListView sampleRightList,
+        TextView sampleText,
         View dummySurface
     ){
         super(itemView);
-        this.sampleText = sampleText;
+        this.menuArea = menuArea;
         this.swipeContainer = swipeContainer;
         this.swipeLayoutLeft = swipeLayoutLeft;
+        this.sourceToolbar = sourceToolbar;
         this.sampleLeftList = sampleLeftList;
         this.swipeLayoutCenter = swipeLayoutCenter;
         this.sampleCenterList = sampleCenterList;
         this.swipeLayoutRight = swipeLayoutRight;
         this.sampleRightList = sampleRightList;
+        this.sampleText = sampleText;
         this.dummySurface = dummySurface;
     }
 }
