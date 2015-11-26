@@ -9,7 +9,7 @@ trait SourceAccessor {
 
   def takeAfter(sourceId: Long, count: Int): Seq[Source]
 
-  def positionOf(sourceId: Long): Int
+  def positionOf(sourceId: Long): Option[Int]
 
   def collectLastFrom[A](sourceId: Long)(f: PartialFunction[Source, A]): Option[A]
 }
@@ -27,8 +27,11 @@ class SourceBuffer extends SourceAccessor {
     val sources = underlying.dropWhile(_.id != sourceId).tail
     sources take count
   }
-  override def positionOf(sourceId: Long): Int = {
-    underlying.indexWhere(_.id == sourceId)
+  override def positionOf(sourceId: Long): Option[Int] = {
+    underlying.indexWhere(_.id == sourceId) match {
+      case -1 => None
+      case position => Some(position)
+    }
   }
   override def collectLastFrom[A](sourceId: Long)(f: PartialFunction[Source, A]): Option[A] = {
     val position = underlying.indexWhere(_.id == sourceId)

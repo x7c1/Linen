@@ -120,8 +120,9 @@ class SourceChangedNotifier(
 
   override def onEntryLoaded(event: EntryLoadedEvent): Unit = {
     recyclerView runUi { view =>
-      val position = sourceAccessor.positionOf(event.sourceId)
-      view.getAdapter.notifyItemChanged(position)
+      sourceAccessor.positionOf(event.sourceId).
+        foreach(view.getAdapter.notifyItemChanged)
+
     }
   }
 }

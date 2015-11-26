@@ -56,9 +56,9 @@ class EntryArea(
   }
 
   def updateToolbar(sourceId: Long) = {
-    val position = sources positionOf sourceId
-    val source = sources get position
-    toolbar runUi { _ setTitle source.title }
+    sources positionOf sourceId map sources.get foreach { source =>
+      toolbar runUi { _ setTitle source.title }
+    }
   }
 
   def scrollTo(position: Int)(done: OnFinish): Unit = {
@@ -92,8 +92,7 @@ class SourceArea(
   override lazy val displayPosition: Int = getPosition()
 
   def display(sourceId: Long): OnFinish => Unit = done => {
-    val position = sources.positionOf(sourceId)
-    scrollTo(position)(done)
+    sources positionOf sourceId foreach { scrollTo(_)(done) }
   }
   def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
@@ -111,6 +110,8 @@ class SourceArea(
 }
 
 case class ItemFocusedEvent(position: Int){
+  require(position > -1, "position must be non negative")
+
   def dump: String = s"position:$position"
 }
 

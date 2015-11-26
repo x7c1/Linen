@@ -49,6 +49,8 @@ class FocusedItemNotifier(
 
   override def onScrollStopped(e: ScrollStoppedEvent): Unit = {
     val position = layoutManager.findFirstCompletelyVisibleItemPosition()
-    onItemFocusedListener.onItemFocused(new ItemFocusedEvent(position))
+    if (position > -1){
+      onItemFocusedListener onItemFocused new ItemFocusedEvent(position)
+    }
   }
 }
