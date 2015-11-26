@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -41,7 +41,7 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             view,
             (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
             (LinearLayout) view.findViewById(R.id.activity_main__swipe_container),
-            (RelativeLayout) view.findViewById(R.id.activity_main__swipe_layout_left),
+            (android.support.design.widget.CoordinatorLayout) view.findViewById(R.id.activity_main__swipe_layout_left),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_left_list),
             (android.support.v4.widget.SwipeRefreshLayout) view.findViewById(R.id.activity_main__swipe_layout_center),

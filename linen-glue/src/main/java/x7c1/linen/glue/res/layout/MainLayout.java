@@ -9,7 +9,7 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.ListView;
@@ -19,7 +19,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
 
     public final LinearLayout menuArea;
     public final LinearLayout swipeContainer;
-    public final RelativeLayout swipeLayoutLeft;
+    public final android.support.design.widget.CoordinatorLayout swipeLayoutLeft;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sampleLeftList;
     public final android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter;
@@ -33,7 +33,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         View itemView,
         LinearLayout menuArea,
         LinearLayout swipeContainer,
-        RelativeLayout swipeLayoutLeft,
+        android.support.design.widget.CoordinatorLayout swipeLayoutLeft,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sampleLeftList,
         android.support.v4.widget.SwipeRefreshLayout swipeLayoutCenter,

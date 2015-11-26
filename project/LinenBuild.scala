@@ -117,8 +117,13 @@ trait LinenSettings {
     val dirs = {
       val appcompat = "extras/android/support/v7/appcompat/libs"
       val recycler = "extras/android/support/v7/recyclerview/libs"
+      val design = "extras/android/support/design/libs"
       val platform = "platforms/android-23"
-      (androidSdk / platform) +++ (androidSdk / appcompat) +++ (androidSdk / recycler)
+
+      (androidSdk / appcompat) +++
+      (androidSdk / recycler) +++
+      (androidSdk / design) +++
+      (androidSdk / platform)
     }
     (dirs * "*.jar").classpath
   }

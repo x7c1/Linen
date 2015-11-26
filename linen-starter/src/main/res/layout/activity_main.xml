@@ -13,27 +13,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <android.support.design.widget.CoordinatorLayout
             android:id="@+id/activity_main__swipe_layout_left"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/activity_main__source_toolbar"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
-                android:background="@color/opaque_red"
-                app:titleTextColor="@android:color/secondary_text_light"
-                />
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/activity_main__source_toolbar"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/actionBarSize"
+                    android:background="@color/opaque_red"
+                    app:titleTextColor="@android:color/secondary_text_light"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    />
+
+            </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__sample_left_list"
                 android:layout_below="@+id/activity_main__source_toolbar"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
+                android:layout_height="fill_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                />
 
-        </RelativeLayout>
+        </android.support.design.widget.CoordinatorLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/activity_main__swipe_layout_center"
