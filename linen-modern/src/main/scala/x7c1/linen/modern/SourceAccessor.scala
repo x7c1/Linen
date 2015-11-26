@@ -3,7 +3,9 @@ package x7c1.linen.modern
 import scala.collection.mutable.ListBuffer
 
 trait SourceAccessor {
-  def get: Seq[Source]
+  def get(position: Int):Source
+
+  def length: Int
 
   def takeAfter(sourceId: Long, count: Int): Seq[Source]
 
@@ -16,9 +18,11 @@ class SourceBuffer extends SourceAccessor {
 
   private lazy val underlying: ListBuffer[Source] = ListBuffer(createDummies:_*)
 
-  override def get: Seq[Source] = {
-    underlying
+  override def get(position: Int): Source = {
+    underlying(position)
   }
+  override def length = underlying.length
+
   override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
     val sources = underlying.dropWhile(_.id != sourceId).tail
     sources take count

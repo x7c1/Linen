@@ -13,7 +13,7 @@ class EntryRowAdapter(
   provider: ViewHolderProvider[EntryRow]) extends Adapter[EntryRow] {
 
   override def getItemCount = {
-    entryAccessor.get.length
+    entryAccessor.length
   }
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     provider inflateOn parent

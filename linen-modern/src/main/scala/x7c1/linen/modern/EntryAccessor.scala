@@ -8,14 +8,19 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 trait EntryAccessor {
-  def get: Seq[Entry]
+
+  def get(position: Int): Entry
+
+  def length: Int
 }
 
 class EntryBuffer extends EntryAccessor {
 
   private val underlying = ListBuffer[Entry]()
 
-  override def get: Seq[Entry] = underlying
+  override def get(position: Int): Entry = underlying(position)
+
+  override def length = underlying.length
 
   def indexOf(entryId: Long): Int =
     underlying.indexWhere(_.entryId == entryId)
