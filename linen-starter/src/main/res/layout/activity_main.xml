@@ -63,8 +63,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="?attr/actionBarSize"
-                    android:background="@color/opaque_red"
-                    app:titleTextColor="@android:color/secondary_text_light" />
+                    android:background="@color/generic_viridian"
+                    style="@style/AppToolbar"
+                    />
 
             </android.support.design.widget.AppBarLayout>
 
