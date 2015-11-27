@@ -11,8 +11,8 @@
     </style>
 
     <color name="opaque_red">#ffcdcd</color>
-    <color name="opaque_blue">#dce6ff</color>
-    <color name="opaque_green">#c7fac7</color>
+    <color name="opaque_blue">#ecf1ff</color>
+    <color name="opaque_green">#ecfff1</color>
 
     <color name="cerulean_blue">#2A52BE</color>
     <color name="amaranth">#e52b50</color>

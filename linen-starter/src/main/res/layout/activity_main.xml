@@ -10,7 +10,6 @@
         android:id="@+id/activity_main__swipe_container"
         android:layout_above="@+id/activity_main__sample_text"
         android:orientation="horizontal"
-        android:background="@color/light_gray"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -18,8 +17,7 @@
             android:id="@+id/activity_main__swipe_layout_left"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
-            android:layout_marginRight="1dp"
+            android:background="@color/opaque_blue"
             >
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
@@ -52,7 +50,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white" >
+            android:background="@color/opaque_green" >
 
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
