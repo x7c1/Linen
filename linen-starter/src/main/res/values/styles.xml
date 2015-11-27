@@ -10,6 +10,33 @@
         <item name="titleTextColor">@android:color/white</item>
     </style>
 
+    <style name="AppCardView">
+        <item name="cardBackgroundColor">@android:color/white</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardPreventCornerOverlap">false</item>
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+
+        <item name="android:layout_marginTop">-3dp</item>
+        <item name="android:layout_marginRight">-2dp</item>
+        <item name="android:layout_marginLeft">-2dp</item>
+
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="AppCardViewRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+
+        <item name="android:paddingTop">7dp</item>
+        <item name="android:paddingBottom">7dp</item>
+
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
     <color name="opaque_red">#ffcdcd</color>
     <color name="opaque_blue">#ecf1ff</color>
     <color name="opaque_green">#ecfff1</color>
