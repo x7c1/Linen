@@ -1,13 +1,24 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+
+        <!-- e.g. option menu on Toolbar -->
+        <item name="colorControlNormal">@color/transparent_white</item>
+    </style>
+
+    <style name="AppToolbar">
+        <item name="titleTextColor">@android:color/white</item>
     </style>
 
     <color name="opaque_red">#ffcdcd</color>
     <color name="opaque_blue">#dce6ff</color>
     <color name="opaque_green">#c7fac7</color>
 
+    <color name="cerulean_blue">#2A52BE</color>
+
     <color name="light_gray">#e6e6e6</color>
+
+    <!-- this value is affected by the opacity of drawer icon (dark theme) -->
+    <color name="transparent_white">#89ffffff</color>
+
 </resources>

@@ -30,9 +30,9 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="?attr/actionBarSize"
-                    android:background="@color/opaque_blue"
+                    android:background="@color/cerulean_blue"
                     app:layout_scrollFlags="scroll|enterAlways"
-                    app:titleTextColor="@android:color/secondary_text_light"
+                    style="@style/AppToolbar"
                     />
 
             </android.support.design.widget.AppBarLayout>
