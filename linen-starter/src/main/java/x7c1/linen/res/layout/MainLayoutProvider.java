@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
@@ -47,8 +45,9 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             (LinearLayout) view.findViewById(R.id.activity_main__swipe_layout_center),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_center_list),
-            (android.support.v4.widget.SwipeRefreshLayout) view.findViewById(R.id.activity_main__swipe_layout_right),
-            (ListView) view.findViewById(R.id.activity_main__sample_right_list),
+            (LinearLayout) view.findViewById(R.id.activity_main__swipe_layout_right),
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_detail_toolbar),
+            (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__sample_right_list),
             (TextView) view.findViewById(R.id.activity_main__sample_text),
             (View) view.findViewById(R.id.activity_main__dummy_surface)
         );

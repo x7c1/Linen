@@ -10,16 +10,13 @@ import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.BaseAdapter;
 
 import x7c1.linen.glue.res.layout.MainLayout;
 import x7c1.linen.modern.ContainerInitializer;
-import x7c1.linen.modern.SampleAdapter;
-import x7c1.linen.res.layout.CommentRowLayoutProvider;
+import x7c1.linen.res.layout.EntryDetailRowProvider;
 import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
-import x7c1.linen.res.values.CommentValuesProvider;
 
 import static x7c1.linen.FlingDetector.forHorizontal;
 import static x7c1.linen.PaneScroller.createListener;
@@ -46,6 +43,7 @@ public class MainActivity extends Activity {
 		});
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
 		layout.entryToolbar.inflateMenu(R.menu.menu_main);
+		layout.entryDetailToolbar.inflateMenu(R.menu.menu_main);
 
 		setContentView(layout.itemView);
 
@@ -53,15 +51,10 @@ public class MainActivity extends Activity {
 			this,
 			layout,
 			new SourceRowProvider(this),
-			new EntryRowProvider(this)
+			new EntryRowProvider(this),
+			new EntryDetailRowProvider(this)
 		);
 		initializer.setup();
-
-		BaseAdapter adapter = new SampleAdapter(
-				new CommentRowLayoutProvider(this),
-				new CommentValuesProvider(this)
-		);
-		layout.sampleRightList.setAdapter(adapter);
 
 		final GestureDetector detector = forHorizontal(
 				this, createListener(layout.swipeContainer, getDisplaySize()));

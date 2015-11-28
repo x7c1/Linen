@@ -74,18 +74,35 @@
 
         </LinearLayout>
 
-        <android.support.v4.widget.SwipeRefreshLayout
+
+        <LinearLayout
             android:id="@+id/activity_main__swipe_layout_right"
-            android:background="@color/opaque_green"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content">
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/opaque_red" >
 
-            <ListView
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/activity_main__entry_detail_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/actionBarSize"
+                    android:background="@color/carnelian"
+                    style="@style/AppToolbar"
+                    />
+
+            </android.support.design.widget.AppBarLayout>
+
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__sample_right_list"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

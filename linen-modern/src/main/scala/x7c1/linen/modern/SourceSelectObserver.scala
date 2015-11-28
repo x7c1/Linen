@@ -23,6 +23,7 @@ class SourceSelectObserver(
     }
     val show = for {
       _ <- task of container.entryArea.displayOrLoad(event.sourceId) _
+      _ <- task of container.entryDetailArea.displayFirstEntryOf(event.sourceId) _
     } yield {
       Log debug s"[ok] show source-${event.sourceId}"
     }

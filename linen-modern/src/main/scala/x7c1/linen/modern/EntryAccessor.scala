@@ -13,6 +13,10 @@ trait EntryAccessor {
   def get(position: Int): Entry
 
   def length: Int
+
+  def firstEntryIdOf(sourceId: Long): Option[Long]
+
+  def indexOf(entryId: Long): Int
 }
 
 class EntryBuffer extends EntryAccessor {
@@ -23,7 +27,7 @@ class EntryBuffer extends EntryAccessor {
 
   override def length = underlying.length
 
-  def indexOf(entryId: Long): Int =
+  override def indexOf(entryId: Long): Int =
     underlying.indexWhere(_.entryId == entryId)
 
   def positionAfter(entryId: Option[Long]) = {
@@ -44,7 +48,7 @@ class EntryBuffer extends EntryAccessor {
   def has(sourceId: Long): Boolean = {
     entriesMapping.get(sourceId).exists(_.nonEmpty)
   }
-  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+  override def firstEntryIdOf(sourceId: Long): Option[Long] = {
     entriesMapping.get(sourceId).flatMap(_.headOption)
   }
   def lastEntryIdOf(sourceId: Long): Option[Long] = {
@@ -85,7 +89,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
-      title = s"$sourceId-$n entry" + DummyString.words(10),
+      title = s"$sourceId-$n entry " + DummyString.words(10),
       content = s"$sourceId-$n " + DummyString.words(100),
       createdAt = LinenDate.dummy()
     )

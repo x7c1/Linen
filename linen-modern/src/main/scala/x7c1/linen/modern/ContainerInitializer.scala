@@ -6,7 +6,7 @@ import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import x7c1.linen.glue.res.layout.{EntryRow, MainLayout, SourceRow}
+import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks
@@ -15,7 +15,8 @@ class ContainerInitializer(
   activity: Activity,
   layout: MainLayout,
   sourceRowProvider: ViewHolderProvider[SourceRow],
-  entryRowProvider: ViewHolderProvider[EntryRow]) {
+  entryRowProvider: ViewHolderProvider[EntryRow],
+  entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]) {
 
   def setup(): Unit = {
     updateWidth(0.85, layout.swipeLayoutLeft)
@@ -24,6 +25,7 @@ class ContainerInitializer(
 
     setupSourceArea()
     setupEntryArea()
+    setupEntryDetailArea()
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -71,6 +73,13 @@ class ContainerInitializer(
       onItemFocused = observer
     )
   }
+  private def setupEntryDetailArea() = {
+    val manager = new LinearLayoutManager(activity)
+    val adapter = new EntryDetailRowAdapter(entryBuffer, entryDetailRowProvider)
+
+    layout.sampleRightList setLayoutManager manager
+    layout.sampleRightList setAdapter adapter
+  }
 
   private lazy val displaySize = {
     val display = activity.getWindowManager.getDefaultDisplay
@@ -110,18 +119,27 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
   }
+
+  private lazy val entryDetailArea =
+    new EntryDetailArea(
+      entries = entryBuffer,
+      recyclerView = layout.sampleRightList,
+      getPosition = () => panePosition of layout.swipeLayoutRight
+    )
+
   private lazy val panePosition = {
     val length = layout.swipeContainer.getChildCount
     val children = 0 to (length - 1) map layout.swipeContainer.getChildAt
     new PanePosition(children, displaySize.x)
   }
-  private lazy val container = {
+  private lazy val container =
     new PaneContainer(
       layout.swipeContainer,
       sourceArea,
-      entryArea
+      entryArea,
+      entryDetailArea
     )
-  }
+
   private def updateWidth(ratio: Double, view: View): Unit = {
     val params = view.getLayoutParams
     params.width = (ratio * displaySize.x).toInt

@@ -37,12 +37,14 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
-    <color name="opaque_red">#ffcdcd</color>
+    <color name="opaque_red">#ffecf1</color>
     <color name="opaque_blue">#ecf1ff</color>
     <color name="opaque_green">#ecfff1</color>
 
-    <color name="cerulean_blue">#2A52BE</color>
     <color name="amaranth">#e52b50</color>
+    <color name="cardinal">#C41E3A</color>
+    <color name="carnelian">#B31B1B</color>
+    <color name="cerulean_blue">#2A52BE</color>
     <color name="generic_viridian">#007F66</color>
 
     <color name="light_gray">#e6e6e6</color>
