@@ -15,14 +15,20 @@
         android:id="@+id/entry_row__title"
         android:textSize="18sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
     <TextView
         android:id="@+id/entry_row__content"
         android:textSize="15sp"
         android:layout_marginTop="3dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        />
 
     <TextView
         android:id="@+id/entry_row__created_at"

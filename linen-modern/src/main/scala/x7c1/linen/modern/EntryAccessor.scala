@@ -6,6 +6,7 @@ import x7c1.wheat.modern.patch.TaskAsync
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 trait EntryAccessor {
 
@@ -84,10 +85,21 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
-      title = s"$sourceId-$n entry",
-      content = s"sample content $sourceId-$n " * 5,
+      title = s"$sourceId-$n entry" + DummyString.words(10),
+      content = s"$sourceId-$n " + DummyString.words(100),
       createdAt = LinenDate.dummy()
     )
+  }
+}
+
+object DummyString {
+  def word: String = {
+    val wordRange = 3 to 10
+    val wordLength = wordRange(Random.nextInt(wordRange.size - 1))
+    Random.alphanumeric.take(wordLength).mkString
+  }
+  def words(n: Int): String = {
+    (0 to n).map(_ => word).mkString(" ")
   }
 }
 
