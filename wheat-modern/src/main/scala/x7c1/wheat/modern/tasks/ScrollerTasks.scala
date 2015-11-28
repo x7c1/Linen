@@ -10,12 +10,12 @@ import x7c1.wheat.modern.callback.{CallbackTask, OnFinish, UiThreadTask}
 
 
 object ScrollerTasks {
-  def apply(recyclerView: RecyclerView): ScrollerTasks = {
-    new ScrollerTasks(recyclerView)
+  def apply(recyclerView: RecyclerView, hastyTimePerInch: Float): ScrollerTasks = {
+    new ScrollerTasks(recyclerView, hastyTimePerInch)
   }
 }
 
-class ScrollerTasks private (recyclerView: RecyclerView) {
+class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float) {
 
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
@@ -49,7 +49,7 @@ class ScrollerTasks private (recyclerView: RecyclerView) {
       }
       _ <- ui { view =>
         val scroller = new SmoothScroller(
-          view.getContext, timePerInch = 125F, layoutManager,
+          view.getContext, timePerInch = hastyTimePerInch, layoutManager,
           done.by[ScrollerStopEvent]
         )
         scroller setTargetPosition position

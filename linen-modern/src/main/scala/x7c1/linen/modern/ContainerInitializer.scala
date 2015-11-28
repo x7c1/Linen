@@ -114,7 +114,7 @@ class ContainerInitializer(
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
       toolbar = layout.entryToolbar,
-      tasks = ScrollerTasks(layout.sampleCenterList),
+      tasks = ScrollerTasks(layout.sampleCenterList, 125F),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )

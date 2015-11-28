@@ -9,11 +9,11 @@ import x7c1.wheat.modern.callback.Imports._
 class EntryDetailArea(
   entries: EntryAccessor,
   recyclerView: RecyclerView,
-  getPosition: () => Int
-) extends Pane {
+  getPosition: () => Int ) extends Pane {
+
   override lazy val displayPosition: Int = getPosition()
 
-  private val tasks = ScrollerTasks(recyclerView)
+  private val tasks = ScrollerTasks(recyclerView, 45F)
 
   def displayFirstEntryOf(sourceId: Long)(done: OnFinish): CallbackTask[Unit] = {
     for {

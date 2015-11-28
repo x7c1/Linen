@@ -90,7 +90,7 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  private val tasks = ScrollerTasks(recyclerView)
+  private val tasks = ScrollerTasks(recyclerView, 125F)
 
   def display(sourceId: Long)(done: OnFinish): CallbackTask[Unit] =
     for {
