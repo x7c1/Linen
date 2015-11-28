@@ -1,6 +1,6 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.{LinearLayoutManager, RecyclerView, Toolbar}
+import android.support.v7.widget.{RecyclerView, Toolbar}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
@@ -101,9 +101,6 @@ class SourceArea(
   def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
     tasks.scrollTo(position)(done).execute()
-  }
-  private lazy val layoutManager = {
-    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
 }
 
