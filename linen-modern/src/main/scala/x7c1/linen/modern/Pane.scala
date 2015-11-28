@@ -113,3 +113,52 @@ case class ItemFocusedEvent(position: Int){
 trait OnItemFocusedListener {
   def onItemFocused(event:  ItemFocusedEvent)
 }
+
+import x7c1.wheat.modern.callback.Imports._
+
+class SourceRowObserver(
+  container: PaneContainer,
+  prefetcher: EntryPrefetcher ) {
+
+  def commonTasksOf(sourceId: Long): Seq[CallbackTask[Unit]] =
+    Seq(display(sourceId), prefetch(sourceId))
+
+  private def display(sourceId: Long): CallbackTask[Unit] = for {
+    _ <- task of container.entryArea.displayOrLoad(sourceId) _
+    _ <- task of container.entryDetailArea.displayFirstEntryOf(sourceId) _
+  } yield {
+    Log debug s"[ok] show source-$sourceId"
+  }
+  private def prefetch(sourceId: Long): CallbackTask[Unit] = for {
+    _ <- task apply prefetcher.triggerBy(sourceId)
+  } yield {
+    Log debug s"[ok] prefetch started around sourceId:$sourceId"
+  }
+}
+
+class EntryRowObserver (
+  container: PaneContainer ){
+
+  def commonTasksOf(sourceId: Long, entryPosition: Int): Seq[CallbackTask[Unit]] =
+    Seq(
+      scrollSourceArea(sourceId),
+      updateEntryAreaToolbar(sourceId),
+      scrollEntryDetailArea(entryPosition)
+    )
+
+  private def scrollSourceArea(sourceId: Long) = for {
+    _ <- task of container.sourceArea.display(sourceId) _
+  } yield {
+    Log debug s"[ok] sourceId:$sourceId"
+  }
+  private def scrollEntryDetailArea(position: Int) = for {
+    _ <- task of container.entryDetailArea.fastScrollTo(position) _
+  } yield {
+    Log debug s"[ok] position:$position"
+  }
+  private def updateEntryAreaToolbar(sourceId: Long) = for {
+    _ <- task apply container.entryArea.updateToolbar(sourceId)
+  } yield {
+    Log debug s"[ok] sourceId:$sourceId"
+  }
+}

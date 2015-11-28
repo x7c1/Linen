@@ -21,4 +21,8 @@ class EntryDetailArea(
       _ <- task of tasks.fastScrollTo(entries indexOf entryId) _
     } yield ()
   }
+
+  def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
+    tasks.fastScrollTo(position)(done)
+  }
 }

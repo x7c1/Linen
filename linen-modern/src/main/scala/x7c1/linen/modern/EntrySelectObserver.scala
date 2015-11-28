@@ -11,6 +11,8 @@ import scalaz.{-\/, \/-}
 class EntrySelectObserver(
   container: PaneContainer) extends OnEntrySelectedListener {
 
+  private val observer = new EntryRowObserver(container)
+
   override def onEntrySelected(event: EntrySelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
@@ -19,17 +21,8 @@ class EntrySelectObserver(
     } yield {
       Log info s"[ok] entry scrolled to position:${event.position}"
     }
-    val scrollSource = for {
-      _ <- task of container.sourceArea.display(event.sourceId) _
-    } yield {
-      Log info s"[ok] source scrolled to sourceId:${event.sourceId}"
-    }
-    val updateToolbar = for {
-      _ <- task apply container.entryArea.updateToolbar(event.sourceId)
-    } yield {
-      Log info s"[ok] update Toolbar"
-    }
-    Seq(scrollEntry, scrollSource, updateToolbar) foreach runAsync
+    val tasks = observer.commonTasksOf(event.sourceId, event.position) :+ scrollEntry
+    tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
     Task(task.execute()) runAsync {

@@ -42,8 +42,8 @@ class ContainerInitializer(
     )
     lazy val observer = new SourceFocusObserver(
       sourceBuffer,
-      prefetcher,
-      entryArea
+      container,
+      prefetcher
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
@@ -62,8 +62,7 @@ class ContainerInitializer(
     )
     lazy val observer = new EntryFocusObserver(
       entryBuffer,
-      entryArea,
-      sourceArea
+      container
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter

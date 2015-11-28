@@ -12,6 +12,8 @@ class SourceSelectObserver(
   container: PaneContainer,
   entryPrefetcher: EntryPrefetcher ) extends OnSourceSelectedListener {
 
+  private val observer = new SourceRowObserver(container, entryPrefetcher)
+
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
@@ -21,18 +23,8 @@ class SourceSelectObserver(
     } yield {
       Log debug s"[ok] focus source-${event.sourceId}"
     }
-    val show = for {
-      _ <- task of container.entryArea.displayOrLoad(event.sourceId) _
-      _ <- task of container.entryDetailArea.displayFirstEntryOf(event.sourceId) _
-    } yield {
-      Log debug s"[ok] show source-${event.sourceId}"
-    }
-    val prefetch = for {
-      _ <- task apply entryPrefetcher.triggerBy(event.sourceId)
-    } yield {
-      Log debug s"[ok] prefetch started around sourceId:${event.sourceId}"
-    }
-    Seq(focus, show, prefetch) foreach runAsync
+    val tasks = observer.commonTasksOf(event.sourceId) :+ focus
+    tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
     Task(task.execute()) runAsync {
