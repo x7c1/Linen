@@ -16,12 +16,14 @@ class SourceSelectObserver(
     Log info s"[init] ${event.dump}"
 
     val focus = for {
+      _ <- observerTasks displayEntryArea event.sourceId
       _ <- task of container.sourceArea.scrollTo(event.position)
       _ <- task of container.scrollTo(container.entryArea)
+      _ <- observerTasks updateEntryDetailArea event.sourceId
     } yield {
-      Log debug s"[ok] focus source-${event.sourceId}"
+      Log debug s"[ok] select source-${event.sourceId}"
     }
-    val tasks = observerTasks.commonTo(event.sourceId) :+ focus
+    val tasks = Seq(focus, observerTasks.prefetch(event.sourceId))
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
@@ -30,4 +32,5 @@ class SourceSelectObserver(
       case -\/(e) => Log error e.toString
     }
   }
+
 }

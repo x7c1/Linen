@@ -14,7 +14,13 @@ class SourceFocusObserver(
     Log info s"[init] ${event.dump}"
 
     val source = sourceAccessor get event.position
-    val tasks = observerTasks.commonTo(source.id)
+    val focus = for {
+      _ <- observerTasks.displayEntryArea(source.id)
+      _ <- observerTasks.updateEntryDetailArea(source.id)
+    } yield {
+      Log debug s"[ok] focus on source.id${source.id}"
+    }
+    val tasks = Seq(focus, observerTasks.prefetch(source.id))
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {

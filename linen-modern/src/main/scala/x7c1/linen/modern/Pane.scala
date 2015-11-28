@@ -121,18 +121,20 @@ class SourceRowObserverTasks(
   entries: EntryAccessor,
   prefetcher: EntryPrefetcher ) {
 
-  def commonTo(sourceId: Long): Seq[CallbackTask[Unit]] =
-    Seq(display(sourceId), prefetch(sourceId))
-
-  private def display(sourceId: Long): CallbackTask[Unit] = for {
+  def displayEntryArea(sourceId: Long): CallbackTask[Unit] = for {
     _ <- task of container.entryArea.displayOrLoad(sourceId) _
+  } yield {
+    Log debug s"[ok] sourceId:$sourceId"
+  }
+
+  def updateEntryDetailArea(sourceId: Long): CallbackTask[Unit] = for {
     Some(entryId) <- task(entries.firstEntryIdOf(sourceId))
     _ <- task of container.entryDetailArea.fastScrollTo(entries indexOf entryId) _
     _ <- task { container.entryDetailArea.updateToolbar(entryId)}
   } yield {
-    Log debug s"[ok] show source-$sourceId"
+    Log debug s"[ok] sourceId:$sourceId, entryId:$entryId"
   }
-  private def prefetch(sourceId: Long): CallbackTask[Unit] = for {
+  def prefetch(sourceId: Long): CallbackTask[Unit] = for {
     _ <- task apply prefetcher.triggerBy(sourceId)
   } yield {
     Log debug s"[ok] prefetch started around sourceId:$sourceId"

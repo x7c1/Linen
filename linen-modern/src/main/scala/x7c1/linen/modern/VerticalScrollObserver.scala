@@ -1,6 +1,7 @@
 package x7c1.linen.modern
 
 import android.support.v7.widget.RecyclerView
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.chrono.BufferingChangeWatcher
 
 class VerticalScrollObserver(
@@ -13,7 +14,8 @@ class VerticalScrollObserver(
     getCurrent = () => view.computeVerticalScrollOffset(),
     onStop = current => {
       listener onScrollStopped new ScrollStoppedEvent(current)
-    }
+    },
+    onError = e => Log error e.toString
   )
   def touch(): Unit = watcher.touch()
 }
