@@ -32,7 +32,7 @@ class PaneContainer(
         view.post(this)
       } else {
         Log info s"[done] current:$current"
-        done.evalulate()
+        done.evaluate()
       }
     }
   }

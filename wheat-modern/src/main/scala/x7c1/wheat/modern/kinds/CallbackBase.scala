@@ -13,4 +13,7 @@ trait CallbackBase[EVENT] extends ((EVENT => Unit) => Unit) {
   def flatMap[A: Builder](f: EVENT => This[A]): This[A] = implicitly[Builder[A]] apply {
     g => apply(e => f(e) apply g)
   }
+  def withFilter(f: EVENT => Boolean)(implicit x: Builder[EVENT]): This[EVENT] = x apply {
+    g => apply(e => if (f(e)) g(e))
+  }
 }

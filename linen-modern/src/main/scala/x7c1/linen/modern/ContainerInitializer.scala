@@ -104,7 +104,7 @@ class ContainerInitializer(
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
       toolbar = layout.entryToolbar,
-      actions = new EntryAreaActions(layout.sampleCenterList),
+      tasks = new RecyclerViewTasks(layout.sampleCenterList),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )

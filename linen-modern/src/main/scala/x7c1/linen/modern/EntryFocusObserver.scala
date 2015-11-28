@@ -5,8 +5,8 @@ import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 
-import scalaz.{-\/, \/-}
 import scalaz.concurrent.Task
+import scalaz.{-\/, \/-}
 
 class EntryFocusObserver(
   entryAccessor: EntryAccessor,
@@ -19,7 +19,7 @@ class EntryFocusObserver(
     val entry = entryAccessor.get(event.position)
 
     val scrollSource = for {
-      _ <- task of sourceArea.display(entry.sourceId)
+      _ <- task of sourceArea.display(entry.sourceId) _
     } yield {
       Log info s"[ok] source scrolled to sourceId:${entry.sourceId}"
     }

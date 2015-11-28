@@ -2,10 +2,11 @@ package x7c1.linen.modern
 
 import android.content.Context
 import android.graphics.PointF
-import android.support.v7.widget.{Toolbar, LinearLayoutManager, LinearSmoothScroller, RecyclerView}
+import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView, Toolbar}
 import android.util.DisplayMetrics
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.OnFinish
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.decorator.Imports._
 
 import scala.collection.mutable
@@ -19,7 +20,7 @@ class EntryArea(
   sources: SourceAccessor,
   onEntryLoaded: OnEntryLoadedListener,
   toolbar: Toolbar,
-  actions: EntryAreaActions,
+  tasks: RecyclerViewTasks,
   entryCacher: EntryCacher,
   getPosition: () => Int ) extends Pane {
 
@@ -41,7 +42,7 @@ class EntryArea(
     def execute(f: => Unit) = entries firstEntryIdOf sourceId match {
       case Some(entryId) =>
         val position = entries indexOf entryId
-        actions.fastScrollTo(position)(OnFinish(f)).execute()
+        tasks.fastScrollTo(position)(OnFinish(f)).execute()
       case _ =>
         val onLoad = createListener(OnFinish(f))
         new EntryLoader(entryCacher, onLoad) load sourceId
@@ -51,7 +52,7 @@ class EntryArea(
       updateToolbar(sourceId)
 
       Log info s"[done] sourceId:$sourceId"
-      done.evalulate()
+      done.evaluate()
     }
   }
 
@@ -62,7 +63,7 @@ class EntryArea(
   }
 
   def scrollTo(position: Int)(done: OnFinish): Unit = {
-    actions.scrollTo(position)(done).execute()
+    tasks.scrollTo(position)(done).execute()
   }
 
   private def createListener(done: OnFinish) = {
@@ -70,7 +71,7 @@ class EntryArea(
       case EntryLoadedEvent(sourceId, loadedEntries) =>
         val position = calculateEntryPositionOf(sourceId)
         val inserted = entries.insertAll(position, sourceId, loadedEntries)
-        actions.afterInserting(position, inserted.length)(done).execute()
+        tasks.notifyAndScroll(position, inserted.length)(done).execute()
     }
   }
 
@@ -91,18 +92,17 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  def display(sourceId: Long): OnFinish => Unit = done => {
-    sources positionOf sourceId foreach { scrollTo(_)(done) }
-  }
+  private val tasks = new RecyclerViewTasks(recyclerView)
+
+  def display(sourceId: Long)(done: OnFinish): CallbackTask[Unit] =
+    for {
+      Some(position) <- task(sources positionOf sourceId)
+      _ <- tasks.fastScrollTo(position)(done)
+    } yield ()
+
   def scrollTo(position: Int): OnFinish => Unit = done => {
     Log info s"[init] position:$position"
-
-    val scroller = new SmoothScroller(
-      recyclerView.getContext, timePerInch = 75F, layoutManager,
-      done.by[ScrollerStopEvent]
-    )
-    scroller setTargetPosition position
-    layoutManager startSmoothScroll scroller
+    tasks.scrollTo(position)(done).execute()
   }
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]

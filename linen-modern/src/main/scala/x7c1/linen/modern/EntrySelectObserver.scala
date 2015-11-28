@@ -20,7 +20,7 @@ class EntrySelectObserver(
       Log info s"[ok] entry scrolled to position:${event.position}"
     }
     val scrollSource = for {
-      _ <- task of container.sourceArea.display(event.sourceId)
+      _ <- task of container.sourceArea.display(event.sourceId) _
     } yield {
       Log info s"[ok] source scrolled to sourceId:${event.sourceId}"
     }

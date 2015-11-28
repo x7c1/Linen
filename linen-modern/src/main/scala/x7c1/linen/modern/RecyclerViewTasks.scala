@@ -3,15 +3,15 @@ package x7c1.linen.modern
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.{UiThreadTask, OnFinish}
+import x7c1.wheat.modern.callback.{CallbackTask, UiThreadTask, OnFinish}
 
 
-class EntryAreaActions(entriesView: RecyclerView) {
+class RecyclerViewTasks(recyclerView: RecyclerView) {
 
-  def afterInserting(position: Int, length: Int)(done: OnFinish) = for {
+  def notifyAndScroll(position: Int, length: Int)(done: OnFinish) = for {
     ui <- task {
-      Log debug s"[init] entries($length)"
-      UiThreadTask from entriesView
+      Log debug s"[init] position:$position, length:$length"
+      UiThreadTask from recyclerView
     }
     _ <- ui { view =>
       val current = layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -21,10 +21,10 @@ class EntryAreaActions(entriesView: RecyclerView) {
     _ <- fastScrollTo(position)(done)
   } yield ()
 
-  def fastScrollTo(position: Int)(done: OnFinish) = for {
+  def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = for {
     ui <- task {
-      Log info s"[init] position:$position"
-      UiThreadTask from entriesView
+      Log debug s"[init] position:$position"
+      UiThreadTask from recyclerView
     }
     _ <- ui { _ =>
       val current = layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -44,11 +44,11 @@ class EntryAreaActions(entriesView: RecyclerView) {
 
   def scrollTo(position: Int)(done: OnFinish) = for {
     ui <- task {
-      UiThreadTask from entriesView
+      UiThreadTask from recyclerView
     }
     scroller <- task {
       new SmoothScroller(
-        entriesView.getContext, timePerInch = 45F, layoutManager,
+        recyclerView.getContext, timePerInch = 45F, layoutManager,
         done.by[ScrollerStopEvent] )
     }
     _ <- ui { _ =>
@@ -58,6 +58,6 @@ class EntryAreaActions(entriesView: RecyclerView) {
   } yield ()
 
   private lazy val layoutManager = {
-    entriesView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
 }
