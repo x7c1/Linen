@@ -8,15 +8,13 @@ import scalaz.{-\/, \/-}
 
 class EntryFocusObserver(
   entryAccessor: EntryAccessor,
-  container: PaneContainer ) extends  OnItemFocusedListener {
-
-  private val observer = new EntryRowObserver(container)
+  observerTasks: EntryRowObserverTasks) extends  OnItemFocusedListener {
 
   override def onItemFocused(event: ItemFocusedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
     val entry = entryAccessor.get(event.position)
-    val tasks = observer.commonTasksOf(entry.sourceId, event.position)
+    val tasks = observerTasks.commonTo(entry.sourceId, event.position)
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {

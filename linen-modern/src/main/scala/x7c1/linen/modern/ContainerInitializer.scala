@@ -34,16 +34,16 @@ class ContainerInitializer(
       onSourceEntryLoaded,
       entryCacher
     )
+    val tasks = new SourceRowObserverTasks(container, entryBuffer, prefetcher)
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       sourceStateBuffer,
-      new SourceSelectObserver(container, prefetcher),
+      new SourceSelectObserver(container, tasks),
       sourceRowProvider
     )
     lazy val observer = new SourceFocusObserver(
       sourceBuffer,
-      container,
-      prefetcher
+      tasks
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
@@ -55,14 +55,15 @@ class ContainerInitializer(
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
+    val tasks = new EntryRowObserverTasks(container, entryBuffer)
     val adapter = new EntryRowAdapter(
       entryBuffer,
-      new EntrySelectObserver(container),
+      new EntrySelectObserver(container, tasks),
       entryRowProvider
     )
     lazy val observer = new EntryFocusObserver(
       entryBuffer,
-      container
+      tasks
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
@@ -122,6 +123,7 @@ class ContainerInitializer(
   private lazy val entryDetailArea =
     new EntryDetailArea(
       entries = entryBuffer,
+      toolbar = layout.entryDetailToolbar,
       recyclerView = layout.sampleRightList,
       getPosition = () => panePosition of layout.swipeLayoutRight
     )

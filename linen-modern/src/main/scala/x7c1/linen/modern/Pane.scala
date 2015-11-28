@@ -116,16 +116,19 @@ trait OnItemFocusedListener {
 
 import x7c1.wheat.modern.callback.Imports._
 
-class SourceRowObserver(
+class SourceRowObserverTasks(
   container: PaneContainer,
+  entries: EntryAccessor,
   prefetcher: EntryPrefetcher ) {
 
-  def commonTasksOf(sourceId: Long): Seq[CallbackTask[Unit]] =
+  def commonTo(sourceId: Long): Seq[CallbackTask[Unit]] =
     Seq(display(sourceId), prefetch(sourceId))
 
   private def display(sourceId: Long): CallbackTask[Unit] = for {
     _ <- task of container.entryArea.displayOrLoad(sourceId) _
-    _ <- task of container.entryDetailArea.displayFirstEntryOf(sourceId) _
+    Some(entryId) <- task(entries.firstEntryIdOf(sourceId))
+    _ <- task of container.entryDetailArea.fastScrollTo(entries indexOf entryId) _
+    _ <- task { container.entryDetailArea.updateToolbar(entryId)}
   } yield {
     Log debug s"[ok] show source-$sourceId"
   }
@@ -136,10 +139,11 @@ class SourceRowObserver(
   }
 }
 
-class EntryRowObserver (
-  container: PaneContainer ){
+class EntryRowObserverTasks (
+  container: PaneContainer,
+  entries: EntryAccessor ){
 
-  def commonTasksOf(sourceId: Long, entryPosition: Int): Seq[CallbackTask[Unit]] =
+  def commonTo(sourceId: Long, entryPosition: Int): Seq[CallbackTask[Unit]] =
     Seq(
       scrollSourceArea(sourceId),
       updateEntryAreaToolbar(sourceId),
@@ -153,6 +157,8 @@ class EntryRowObserver (
   }
   private def scrollEntryDetailArea(position: Int) = for {
     _ <- task of container.entryDetailArea.fastScrollTo(position) _
+    entryId <- task(entries.get(position).entryId)
+    _ <- task { container.entryDetailArea.updateToolbar(entryId)}
   } yield {
     Log debug s"[ok] position:$position"
   }

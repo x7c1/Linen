@@ -10,9 +10,7 @@ import scalaz.{-\/, \/-}
 
 class SourceSelectObserver(
   container: PaneContainer,
-  entryPrefetcher: EntryPrefetcher ) extends OnSourceSelectedListener {
-
-  private val observer = new SourceRowObserver(container, entryPrefetcher)
+  observerTasks: SourceRowObserverTasks ) extends OnSourceSelectedListener {
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
@@ -23,7 +21,7 @@ class SourceSelectObserver(
     } yield {
       Log debug s"[ok] focus source-${event.sourceId}"
     }
-    val tasks = observer.commonTasksOf(event.sourceId) :+ focus
+    val tasks = observerTasks.commonTo(event.sourceId) :+ focus
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {

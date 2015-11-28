@@ -8,16 +8,13 @@ import scalaz.{-\/, \/-}
 
 class SourceFocusObserver(
   sourceAccessor: SourceAccessor,
-  container: PaneContainer,
-  entryPrefetcher: EntryPrefetcher ) extends OnItemFocusedListener {
-
-  private val observer = new SourceRowObserver(container, entryPrefetcher)
+  observerTasks: SourceRowObserverTasks) extends OnItemFocusedListener {
 
   override def onItemFocused(event: ItemFocusedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
     val source = sourceAccessor get event.position
-    val tasks = observer.commonTasksOf(source.id)
+    val tasks = observerTasks.commonTo(source.id)
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {

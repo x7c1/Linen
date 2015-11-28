@@ -9,9 +9,8 @@ import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}
 
 class EntrySelectObserver(
-  container: PaneContainer) extends OnEntrySelectedListener {
-
-  private val observer = new EntryRowObserver(container)
+  container: PaneContainer,
+  observerTasks: EntryRowObserverTasks ) extends OnEntrySelectedListener {
 
   override def onEntrySelected(event: EntrySelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
@@ -21,7 +20,7 @@ class EntrySelectObserver(
     } yield {
       Log info s"[ok] entry scrolled to position:${event.position}"
     }
-    val tasks = observer.commonTasksOf(event.sourceId, event.position) :+ scrollEntry
+    val tasks = observerTasks.commonTo(event.sourceId, event.position) :+ scrollEntry
     tasks foreach runAsync
   }
   def runAsync[A](task: CallbackTask[A]) = {
