@@ -9,6 +9,7 @@ import android.view.View
 import x7c1.linen.glue.res.layout.{EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.tasks.ScrollerTasks
 
 class ContainerInitializer(
   activity: Activity,
@@ -104,7 +105,7 @@ class ContainerInitializer(
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
       toolbar = layout.entryToolbar,
-      tasks = new RecyclerViewTasks(layout.sampleCenterList),
+      tasks = ScrollerTasks(layout.sampleCenterList),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )

@@ -1,13 +1,11 @@
 package x7c1.linen.modern
 
-import android.content.Context
-import android.graphics.PointF
-import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView, Toolbar}
-import android.util.DisplayMetrics
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView, Toolbar}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.tasks.ScrollerTasks
 
 import scala.collection.mutable
 
@@ -20,7 +18,7 @@ class EntryArea(
   sources: SourceAccessor,
   onEntryLoaded: OnEntryLoadedListener,
   toolbar: Toolbar,
-  tasks: RecyclerViewTasks,
+  tasks: ScrollerTasks,
   entryCacher: EntryCacher,
   getPosition: () => Int ) extends Pane {
 
@@ -92,7 +90,7 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  private val tasks = new RecyclerViewTasks(recyclerView)
+  private val tasks = ScrollerTasks(recyclerView)
 
   def display(sourceId: Long)(done: OnFinish): CallbackTask[Unit] =
     for {
@@ -117,30 +115,4 @@ case class ItemFocusedEvent(position: Int){
 
 trait OnItemFocusedListener {
   def onItemFocused(event:  ItemFocusedEvent)
-}
-
-class ScrollerStopEvent
-
-class SmoothScroller(
-  context: Context,
-  timePerInch: Float,
-  layoutManager: LinearLayoutManager,
-  onFinish: ScrollerStopEvent => Unit) extends LinearSmoothScroller(context: Context) {
-
-  override def computeScrollVectorForPosition(i: Int): PointF = {
-    layoutManager.computeScrollVectorForPosition(i)
-  }
-  override def getVerticalSnapPreference: Int = {
-    LinearSmoothScroller.SNAP_TO_START
-  }
-  override def onStart() = {
-    Log debug s"[init] $timePerInch"
-  }
-  override def onStop(): Unit = {
-    Log debug s"[done] $timePerInch"
-    onFinish(new ScrollerStopEvent)
-  }
-  override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
-    timePerInch / displayMetrics.densityDpi
-  }
 }
