@@ -13,7 +13,7 @@ class EntryDetailArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  private val tasks = ScrollerTasks(recyclerView, 45F)
+  private val tasks = ScrollerTasks(recyclerView, 30F)
 
   def updateToolbar(entryId: Long): Unit = {
     val position = entries indexOf entryId

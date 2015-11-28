@@ -17,6 +17,7 @@ class EntrySelectObserver(
 
     val scrollEntry = for {
       _ <- task of container.entryArea.scrollTo(event.position) _
+      _ <- task of container.scrollTo(container.entryDetailArea)
     } yield {
       Log info s"[ok] entry scrolled to position:${event.position}"
     }
