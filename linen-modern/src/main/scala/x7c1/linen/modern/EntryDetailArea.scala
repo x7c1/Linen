@@ -1,7 +1,6 @@
 package x7c1.linen.modern
 
 import android.support.v7.widget.{RecyclerView, Toolbar}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks
@@ -19,7 +18,6 @@ class EntryDetailArea(
   def updateToolbar(entryId: Long): Unit = {
     val position = entries indexOf entryId
     val entry = entries.get(position)
-    Log error entry.title
     toolbar runUi {_ setTitle entry.title}
   }
 
