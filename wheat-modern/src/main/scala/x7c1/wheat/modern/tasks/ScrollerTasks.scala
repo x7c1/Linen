@@ -21,20 +21,6 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
 
-  def notifyAndScroll(position: Int, length: Int)(done: OnFinish): CallbackTask[Unit] =
-    for {
-      ui <- task {
-        Log debug s"[init] position:$position, length:$length"
-        UiThreadTask from recyclerView
-      }
-      _ <- ui { view =>
-        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
-        val base = if(current == position) -1 else 0
-        view.getAdapter.notifyItemRangeInserted(position + base, length)
-      }
-      _ <- fastScrollTo(position)(done)
-    } yield ()
-
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] =
     for {
       ui <- task {

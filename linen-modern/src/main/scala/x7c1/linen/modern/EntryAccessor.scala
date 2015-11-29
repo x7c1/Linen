@@ -1,7 +1,8 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.OnFinish
 import x7c1.wheat.modern.patch.TaskAsync
 
 import scala.collection.mutable
@@ -19,7 +20,7 @@ trait EntryAccessor {
   def indexOf(entryId: Long): Int
 }
 
-class EntryBuffer extends EntryAccessor {
+class EntryBuffer(entryInsertedListener: OnEntryInsertedListener) extends EntryAccessor {
 
   private val underlying = ListBuffer[Entry]()
 
@@ -36,11 +37,12 @@ class EntryBuffer extends EntryAccessor {
       case _ => 0
     }
   }
-  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry]): Seq[Entry] = {
+
+  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry])(done: OnFinish): Unit = {
     val newer = entries filterNot { this has _.sourceId }
     underlying.insertAll(position, newer)
     entriesMapping(sourceId) = entries.map(_.entryId)
-    newer
+    entryInsertedListener.onInserted(position, newer.length)(done)
   }
 
   private lazy val entriesMapping = mutable.Map[Long, Seq[Long]]()
@@ -55,6 +57,27 @@ class EntryBuffer extends EntryAccessor {
     entriesMapping.get(sourceId).flatMap(_.lastOption)
   }
 
+}
+
+trait OnEntryInsertedListener { self =>
+
+  import x7c1.wheat.modern.callback.CallbackTask.task
+  import x7c1.wheat.modern.callback.Imports._
+
+  def onInserted(position: Int, length: Int)(done: OnFinish): Unit
+
+  def append(listener: OnEntryInsertedListener): OnEntryInsertedListener =
+    new OnEntryInsertedListener {
+      override def onInserted(position: Int, length: Int)(done: OnFinish): Unit = {
+        val f = for {
+          _ <- task of self.onInserted(position, length) _
+          _ <- task of listener.onInserted(position, length) _
+        } yield {
+          done.evaluate()
+        }
+        f.execute()
+      }
+    }
 }
 
 class EntryCacher {
@@ -138,7 +161,26 @@ class SourceChangedNotifier(
     recyclerView runUi { view =>
       sourceAccessor.positionOf(event.sourceId).
         foreach(view.getAdapter.notifyItemChanged)
+    }
+  }
+}
 
+class InsertedEntriesNotifier (
+  recyclerView: RecyclerView) extends OnEntryInsertedListener {
+
+  import x7c1.wheat.modern.decorator.Imports._
+
+  private lazy val layoutManager = {
+    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+  }
+  override def onInserted(position: Int, length: Int)(done: OnFinish): Unit = {
+    Log debug s"[init] position:$position, length:$length"
+
+    recyclerView runUi { view =>
+      val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+      val base = if(current == position) -1 else 0
+      view.getAdapter.notifyItemRangeInserted(position + base, length)
+      done.evaluate()
     }
   }
 }

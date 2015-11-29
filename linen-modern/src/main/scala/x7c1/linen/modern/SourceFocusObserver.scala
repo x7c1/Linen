@@ -18,7 +18,7 @@ class SourceFocusObserver(
       _ <- observerTasks.displayEntryArea(source.id)
       _ <- observerTasks.updateEntryDetailArea(source.id)
     } yield {
-      Log debug s"[ok] focus on source.id${source.id}"
+      Log debug s"[ok] focus on source.id:${source.id}"
     }
     val tasks = Seq(focus, observerTasks.prefetch(source.id))
     tasks foreach runAsync

@@ -20,7 +20,6 @@ class EntryDetailArea(
     val entry = entries.get(position)
     toolbar runUi {_ setTitle entry.title}
   }
-
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
     tasks.fastScrollTo(position)(done)
   }

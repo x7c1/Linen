@@ -106,7 +106,10 @@ class ContainerInitializer(
     new SourceStateUpdater(sourceStateBuffer) append
     new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
 
-  private lazy val entryBuffer = new EntryBuffer
+  private lazy val entryBuffer = new EntryBuffer(
+    new InsertedEntriesNotifier(layout.sampleCenterList) append
+    new InsertedEntriesNotifier(layout.sampleRightList)
+  )
 
   private lazy val entryArea = {
     new EntryArea(

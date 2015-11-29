@@ -4,6 +4,7 @@ import android.support.v7.widget.{RecyclerView, Toolbar}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
+import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
@@ -63,13 +64,14 @@ class EntryArea(
   def scrollTo(position: Int)(done: OnFinish): Unit = {
     tasks.scrollTo(position)(done).execute()
   }
-
   private def createListener(done: OnFinish) = {
     onEntryLoaded append OnEntryLoadedListener {
       case EntryLoadedEvent(sourceId, loadedEntries) =>
-        val position = calculateEntryPositionOf(sourceId)
-        val inserted = entries.insertAll(position, sourceId, loadedEntries)
-        tasks.notifyAndScroll(position, inserted.length)(done).execute()
+        (for {
+          position <- task apply calculateEntryPositionOf(sourceId)
+          _ <- task of entries.insertAll(position, sourceId, loadedEntries) _
+          _ <- task of tasks.fastScrollTo(position) _
+        } yield done.evaluate()).execute()
     }
   }
 
