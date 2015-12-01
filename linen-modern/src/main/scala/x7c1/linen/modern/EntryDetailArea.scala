@@ -23,4 +23,7 @@ class EntryDetailArea(
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
     tasks.fastScrollTo(position)(done)
   }
+  def scrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
+    tasks.scrollTo(position)(done)
+  }
 }

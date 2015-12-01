@@ -75,8 +75,11 @@ class ContainerInitializer(
   }
   private def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(activity)
-    val adapter = new EntryDetailRowAdapter(entryBuffer, entryDetailRowProvider)
-
+    val adapter = new EntryDetailRowAdapter(
+      entryBuffer,
+      new EntryDetailSelectedObserver(container),
+      entryDetailRowProvider
+    )
     layout.sampleRightList setLayoutManager manager
     layout.sampleRightList setAdapter adapter
   }
