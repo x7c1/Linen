@@ -106,16 +106,6 @@ class SourceArea(
   }
 }
 
-case class ItemFocusedEvent(position: Int){
-  require(position > -1, "position must be non negative")
-
-  def dump: String = s"position:$position"
-}
-
-trait OnItemFocusedListener {
-  def onItemFocused(event:  ItemFocusedEvent)
-}
-
 import x7c1.wheat.modern.callback.Imports._
 
 class SourceRowObserverTasks(

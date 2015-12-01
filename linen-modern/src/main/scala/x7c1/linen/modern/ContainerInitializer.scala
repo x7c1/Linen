@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.observer.FocusDetector
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 class ContainerInitializer(
@@ -47,9 +47,9 @@ class ContainerInitializer(
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-    layout.sampleLeftList onTouch ItemFocusDetector.createOnTouch(
+    layout.sampleLeftList setOnTouchListener FocusDetector.create(
       recyclerView = layout.sampleLeftList,
-      layoutManager = manager,
+      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       onItemFocused = observer
     )
   }
@@ -67,9 +67,9 @@ class ContainerInitializer(
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
-    layout.sampleCenterList onTouch ItemFocusDetector.createOnTouch(
+    layout.sampleCenterList setOnTouchListener FocusDetector.create(
       recyclerView = layout.sampleCenterList,
-      layoutManager = manager,
+      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       onItemFocused = observer
     )
   }

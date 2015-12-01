@@ -2,6 +2,7 @@ package x7c1.linen.modern
 
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
+import x7c1.wheat.modern.observer.{OnItemFocusedListener, ItemFocusedEvent}
 
 import scalaz.concurrent.Task
 import scalaz.{-\/, \/-}
