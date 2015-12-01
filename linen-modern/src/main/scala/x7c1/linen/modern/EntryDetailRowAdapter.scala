@@ -8,9 +8,6 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.Imports._
 
-import scalaz.{-\/, \/-}
-import scalaz.concurrent.Task
-
 
 class EntryDetailRowAdapter(
   entryAccessor: EntryAccessor,
@@ -48,6 +45,7 @@ class EntryDetailSelectedObserver (
   container: PaneContainer ) extends OnEntryDetailSelectedListener {
 
   import x7c1.wheat.modern.callback.Imports._
+  import x7c1.linen.modern.CallbackTaskRunner.runAsync
 
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent): Unit = {
     val focus = for {
@@ -55,13 +53,7 @@ class EntryDetailSelectedObserver (
     } yield {
       Log debug s"[ok] focus event:$event"
     }
-    Seq(focus) foreach runAsync
+    val tasks = Seq(focus)
+    tasks foreach runAsync { Log error _.toString }
   }
-  def runAsync[A](task: CallbackTask[A]) = {
-    Task(task.execute()) runAsync {
-      case \/-(_) =>
-      case -\/(e) => Log error e.toString
-    }
-  }
-
 }

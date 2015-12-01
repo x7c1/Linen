@@ -1,12 +1,9 @@
 package x7c1.linen.modern
 
+import x7c1.linen.modern.CallbackTaskRunner.runAsync
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
-
-import scalaz.concurrent.Task
-import scalaz.{-\/, \/-}
 
 class SourceSelectObserver(
   container: PaneContainer,
@@ -24,13 +21,7 @@ class SourceSelectObserver(
       Log debug s"[ok] select source-${event.sourceId}"
     }
     val tasks = Seq(focus, observerTasks.prefetch(event.sourceId))
-    tasks foreach runAsync
-  }
-  def runAsync[A](task: CallbackTask[A]) = {
-    Task(task.execute()) runAsync {
-      case \/-(_) =>
-      case -\/(e) => Log error e.toString
-    }
+    tasks foreach runAsync { Log error _.toString }
   }
 
 }

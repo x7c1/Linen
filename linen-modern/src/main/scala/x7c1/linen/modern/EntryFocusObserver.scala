@@ -1,11 +1,8 @@
 package x7c1.linen.modern
 
+import x7c1.linen.modern.CallbackTaskRunner.runAsync
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.observer.{OnItemFocusedListener, ItemFocusedEvent}
-
-import scalaz.concurrent.Task
-import scalaz.{-\/, \/-}
+import x7c1.wheat.modern.observer.{ItemFocusedEvent, OnItemFocusedListener}
 
 class EntryFocusObserver(
   entryAccessor: EntryAccessor,
@@ -16,12 +13,6 @@ class EntryFocusObserver(
 
     val entry = entryAccessor.get(event.position)
     val tasks = observerTasks.commonTo(entry.sourceId, event.position)
-    tasks foreach runAsync
-  }
-  def runAsync[A](task: CallbackTask[A]) = {
-    Task(task.execute()) runAsync {
-      case \/-(_) =>
-      case -\/(e) => Log error e.toString
-    }
+    tasks foreach runAsync { Log error _.toString }
   }
 }
