@@ -1,4 +1,4 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.init
 
 import java.lang.Math.max
 
@@ -7,9 +7,14 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
+import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
+import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
 import x7c1.wheat.modern.tasks.ScrollerTasks
+
 
 class ContainerInitializer(
   activity: Activity,
@@ -32,7 +37,7 @@ class ContainerInitializer(
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       sourceStateBuffer,
-      new SourceSelectObserver(actions),
+      new SourceSelectedObserver(actions),
       sourceRowProvider
     )
     layout.sampleLeftList setLayoutManager manager
@@ -48,7 +53,7 @@ class ContainerInitializer(
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
       entryBuffer,
-      new EntrySelectObserver(actions),
+      new EntrySelectedObserver(actions),
       entryRowProvider
     )
     layout.sampleCenterList setLayoutManager manager

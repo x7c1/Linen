@@ -1,6 +1,7 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.accessor
 
 import x7c1.wheat.macros.logger.Log
+
 import scala.collection.mutable
 
 

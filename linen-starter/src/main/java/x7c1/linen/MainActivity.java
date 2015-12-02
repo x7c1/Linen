@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import x7c1.linen.glue.res.layout.MainLayout;
-import x7c1.linen.modern.ContainerInitializer;
+import x7c1.linen.modern.init.ContainerInitializer;
 import x7c1.linen.res.layout.EntryDetailRowProvider;
 import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;

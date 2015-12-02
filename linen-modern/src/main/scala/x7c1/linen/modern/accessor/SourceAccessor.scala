@@ -1,4 +1,6 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.accessor
+
+import x7c1.linen.modern.struct.Source
 
 import scala.collection.mutable.ListBuffer
 

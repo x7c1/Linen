@@ -1,9 +1,11 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.action.observer
 
-import x7c1.linen.modern.CallbackTaskRunner.runAsync
+import x7c1.linen.modern.action.Actions
+import x7c1.linen.modern.action.observer.CallbackTaskRunner.runAsync
+import x7c1.linen.modern.display.{EntrySelectedEvent, OnEntrySelectedListener}
 import x7c1.wheat.macros.logger.Log
 
-class EntrySelectObserver(actions: Actions) extends OnEntrySelectedListener {
+class EntrySelectedObserver(actions: Actions) extends OnEntrySelectedListener {
   override def onEntrySelected(event: EntrySelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
