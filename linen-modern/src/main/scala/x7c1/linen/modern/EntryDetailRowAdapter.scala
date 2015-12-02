@@ -25,17 +25,17 @@ class EntryDetailRowAdapter(
     holder.content.text = entry.content
     holder.createdAt.text = entry.createdAt.format
     holder.itemView onClick { _ =>
-      val event = DetailSelectedEvent(position, entry)
+      val event = EntryDetailSelectedEvent(position, entry)
       selectedListener onEntryDetailSelected event
     }
   }
 }
 
 trait OnEntryDetailSelectedListener {
-  def onEntryDetailSelected(event: DetailSelectedEvent)
+  def onEntryDetailSelected(event: EntryDetailSelectedEvent)
 }
 
-case class DetailSelectedEvent(position: Int, entry: Entry){
+case class EntryDetailSelectedEvent(position: Int, entry: Entry){
   def dump: String = s"position:$position, entry:$entry"
 }
 
@@ -44,11 +44,11 @@ class EntryDetailSelectedObserver (actions: Actions)
 
   import x7c1.linen.modern.CallbackTaskRunner.runAsync
 
-  override def onEntryDetailSelected(event: DetailSelectedEvent): Unit = {
+  override def onEntryDetailSelected(event: EntryDetailSelectedEvent): Unit = {
     Log info s"[init] ${event.dump}"
 
     val sync = for {
-      _ <- actions.detailArea.onDetailSelected(event)
+      _ <- actions.detailArea.onEntryDetailSelected(event)
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

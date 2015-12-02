@@ -87,7 +87,7 @@ class ContainerInitializer(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
       new EntryAreaAction(container),
-      new DetailAreaAction(container, entryBuffer),
+      new EntryDetailAreaAction(container, entryBuffer),
       new PrefetcherAction(prefetcher)
     )
   }

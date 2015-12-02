@@ -125,8 +125,8 @@ trait OnEntryFocused {
 trait OnEntrySelected {
   def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
 }
-trait OnDetailSelected {
-  def onDetailSelected(event: DetailSelectedEvent): CallbackTask[Unit]
+trait OnEntryDetailSelected {
+  def onEntryDetailSelected(event: EntryDetailSelectedEvent): CallbackTask[Unit]
 }
 
 case class SourceFocusedEvent(
@@ -212,12 +212,12 @@ class EntryAreaAction(container: PaneContainer)
   }
 }
 
-class DetailAreaAction(
+class EntryDetailAreaAction(
   container: PaneContainer,
   entryAccessor: EntryAccessor
 ) extends OnSourceSelected with OnSourceFocused
   with OnEntrySelected with OnEntryFocused
-  with OnDetailSelected {
+  with OnEntryDetailSelected {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fromSource(event.source.id)
@@ -231,7 +231,7 @@ class DetailAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = {
     scrollAndUpdate(event.entry.entryId, event.position)
   }
-  override def onDetailSelected(event: DetailSelectedEvent) = for {
+  override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- task of container.entryDetailArea.scrollTo(event.position) _
     _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
   } yield ()
@@ -264,6 +264,6 @@ class Actions (
   val container: ContainerAction,
   val sourceArea: SourceAreaAction,
   val entryArea: EntryAreaAction,
-  val detailArea: DetailAreaAction,
+  val detailArea: EntryDetailAreaAction,
   val prefetcher: PrefetcherAction
 )
