@@ -124,6 +124,9 @@ trait OnEntryFocused {
 trait OnEntrySelected {
   def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
 }
+trait OnDetailSelected {
+  def onDetailSelected(event: DetailSelectedEvent): CallbackTask[Unit]
+}
 
 case class SourceFocusedEvent(position: Int, source: Source)
 
@@ -147,7 +150,7 @@ class SourceAreaAction(
   with OnEntrySelected with OnEntryFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    scrollTo(event.position)
+    task of container.sourceArea.scrollTo(event.position)
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     fastScrollTo(event.entry.sourceId)
@@ -155,10 +158,6 @@ class SourceAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = {
     fastScrollTo(event.entry.sourceId)
   }
-  private def scrollTo(position: Int) = for {
-    _ <- task of container.sourceArea.scrollTo(position)
-  } yield {}
-
   private def fastScrollTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }
     _ <- task of container.sourceArea.fastScrollTo(position) _
@@ -166,8 +165,7 @@ class SourceAreaAction(
 
 }
 
-class EntryAreaAction(
-  container: PaneContainer)
+class EntryAreaAction(container: PaneContainer)
   extends OnSourceSelected with OnSourceFocused
   with OnEntrySelected with OnEntryFocused {
 
@@ -193,9 +191,10 @@ class EntryAreaAction(
 
 class DetailAreaAction(
   container: PaneContainer,
-  entryAccessor: EntryAccessor )
-  extends OnSourceSelected with OnSourceFocused
-  with OnEntrySelected with OnEntryFocused {
+  entryAccessor: EntryAccessor
+) extends OnSourceSelected with OnSourceFocused
+  with OnEntrySelected with OnEntryFocused
+  with OnDetailSelected {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fromSource(event.source.id)
@@ -204,27 +203,31 @@ class DetailAreaAction(
     fromSource(event.source.id)
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    update(event.entry.entryId, event.position)
+    scrollAndUpdate(event.entry.entryId, event.position)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    update(event.entry.entryId, event.position)
+    scrollAndUpdate(event.entry.entryId, event.position)
   }
+  override def onDetailSelected(event: DetailSelectedEvent) = for {
+    _ <- task of container.entryDetailArea.scrollTo(event.position) _
+    _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
+  } yield ()
+
   private def fromSource(sourceId: Long) = for {
     Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
     entryPosition <- task { entryAccessor indexOf entryId }
-    _ <- update(entryId, entryPosition)
+    _ <- scrollAndUpdate(entryId, entryPosition)
   } yield ()
 
-  private def update(entryId: Long, entryPosition: Int) = for {
+  private def scrollAndUpdate(entryId: Long, entryPosition: Int) = for {
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
     _ <- task { container.entryDetailArea.updateToolbar(entryId) }
   } yield ()
 }
 
 class PrefetcherAction(
-  prefetcher: EntryPrefetcher)
-  extends OnSourceSelected
-  with OnSourceFocused {
+  prefetcher: EntryPrefetcher
+) extends OnSourceSelected with OnSourceFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     task { prefetcher.triggerBy(event.source.id) }

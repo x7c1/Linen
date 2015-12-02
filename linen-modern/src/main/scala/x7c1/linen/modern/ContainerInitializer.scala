@@ -62,7 +62,7 @@ class ContainerInitializer(
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryDetailRowAdapter(
       entryBuffer,
-      new EntryDetailSelectedObserver(container),
+      new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
     layout.sampleRightList setLayoutManager manager

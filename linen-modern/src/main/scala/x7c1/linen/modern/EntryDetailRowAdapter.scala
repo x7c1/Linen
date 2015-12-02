@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.EntryDetailRow
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.Imports._
 
 
@@ -26,34 +25,32 @@ class EntryDetailRowAdapter(
     holder.content.text = entry.content
     holder.createdAt.text = entry.createdAt.format
     holder.itemView onClick { _ =>
-      val event = EntryDetailSelectedEvent(position, entry.entryId)
+      val event = DetailSelectedEvent(position, entry)
       selectedListener onEntryDetailSelected event
     }
   }
 }
 
 trait OnEntryDetailSelectedListener {
-  def onEntryDetailSelected(event: EntryDetailSelectedEvent)
+  def onEntryDetailSelected(event: DetailSelectedEvent)
 }
 
-case class EntryDetailSelectedEvent(
-  position: Int,
-  entryId: Long
-)
+case class DetailSelectedEvent(position: Int, entry: Entry){
+  def dump: String = s"position:$position, entry:$entry"
+}
 
-class EntryDetailSelectedObserver (
-  container: PaneContainer ) extends OnEntryDetailSelectedListener {
+class EntryDetailSelectedObserver (actions: Actions)
+  extends OnEntryDetailSelectedListener {
 
-  import x7c1.wheat.modern.callback.Imports._
   import x7c1.linen.modern.CallbackTaskRunner.runAsync
 
-  override def onEntryDetailSelected(event: EntryDetailSelectedEvent): Unit = {
-    val focus = for {
-      _ <- CallbackTask.task of container.entryDetailArea.scrollTo(event.position) _
-    } yield {
-      Log debug s"[ok] focus event:$event"
-    }
-    val tasks = Seq(focus)
-    tasks foreach runAsync { Log error _.toString }
+  override def onEntryDetailSelected(event: DetailSelectedEvent): Unit = {
+    Log info s"[init] ${event.dump}"
+
+    val sync = for {
+      _ <- actions.detailArea.onDetailSelected(event)
+    } yield ()
+
+    Seq(sync) foreach runAsync { Log error _.toString }
   }
 }
