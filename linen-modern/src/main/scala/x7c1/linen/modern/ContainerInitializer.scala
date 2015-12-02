@@ -29,54 +29,33 @@ class ContainerInitializer(
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
-    val prefetcher = new EntryPrefetcher(
-      sourceBuffer,
-      onSourceEntryLoaded,
-      entryCacher
-    )
-    val actions = new Actions(
-      new ContainerAction(container),
-      new SourceAreaAction(container, sourceBuffer),
-      new EntryAreaAction(container),
-      new DetailAreaAction(container, entryBuffer),
-      new PrefetcherAction(prefetcher)
-    )
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       sourceStateBuffer,
       new SourceSelectObserver(actions),
       sourceRowProvider
     )
-    lazy val observer = new SourceFocusObserver(
-      actions,
-      sourceBuffer
-    )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
     layout.sampleLeftList setOnTouchListener FocusDetector.create(
       recyclerView = layout.sampleLeftList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      onItemFocused = observer
+      onItemFocused = new SourceFocusObserver(actions, sourceBuffer)
     )
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
-    val tasks = new EntryRowObserverTasks(container, entryBuffer)
     val adapter = new EntryRowAdapter(
       entryBuffer,
-      new EntrySelectObserver(container, tasks),
+      new EntrySelectObserver(actions),
       entryRowProvider
-    )
-    lazy val observer = new EntryFocusObserver(
-      entryBuffer,
-      tasks
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
     layout.sampleCenterList setOnTouchListener FocusDetector.create(
       recyclerView = layout.sampleCenterList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      onItemFocused = observer
+      onItemFocused = new EntryFocusObserver(actions, entryBuffer)
     )
   }
   private def setupEntryDetailArea() = {
@@ -96,7 +75,20 @@ class ContainerInitializer(
     display getSize size
     size
   }
-
+  private lazy val actions = {
+    val prefetcher = new EntryPrefetcher(
+      sourceBuffer,
+      onSourceEntryLoaded,
+      entryCacher
+    )
+    new Actions(
+      new ContainerAction(container),
+      new SourceAreaAction(container, sourceBuffer),
+      new EntryAreaAction(container),
+      new DetailAreaAction(container, entryBuffer),
+      new PrefetcherAction(prefetcher)
+    )
+  }
   private lazy val sourceBuffer = new SourceBuffer
 
   private lazy val sourceStateBuffer = new SourceStateBuffer

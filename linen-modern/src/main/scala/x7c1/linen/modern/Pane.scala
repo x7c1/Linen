@@ -55,7 +55,7 @@ class EntryArea(
     }
   }
 
-  def updateToolbar(sourceId: Long) = {
+  def updateToolbar(sourceId: Long): Unit = {
     sources positionOf sourceId map sources.get foreach { source =>
       toolbar runUi { _ setTitle source.title }
     }
@@ -112,36 +112,6 @@ class SourceArea(
 
 import x7c1.wheat.modern.callback.Imports._
 
-class EntryRowObserverTasks (
-  container: PaneContainer,
-  entries: EntryAccessor ){
-
-  def commonTo(sourceId: Long, entryPosition: Int): Seq[CallbackTask[Unit]] =
-    Seq(
-      scrollSourceArea(sourceId),
-      updateEntryAreaToolbar(sourceId),
-      scrollEntryDetailArea(entryPosition)
-    )
-
-  private def scrollSourceArea(sourceId: Long) = for {
-    _ <- task of container.sourceArea.display(sourceId) _
-  } yield {
-    Log debug s"[ok] sourceId:$sourceId"
-  }
-  private def scrollEntryDetailArea(position: Int) = for {
-    _ <- task of container.entryDetailArea.fastScrollTo(position) _
-    entryId <- task(entries.get(position).entryId)
-    _ <- task { container.entryDetailArea.updateToolbar(entryId)}
-  } yield {
-    Log debug s"[ok] position:$position"
-  }
-  private def updateEntryAreaToolbar(sourceId: Long) = for {
-    _ <- task apply container.entryArea.updateToolbar(sourceId)
-  } yield {
-    Log debug s"[ok] sourceId:$sourceId"
-  }
-}
-
 trait OnSourceSelected {
   def onSourceSelected(event: SourceSelectedEvent):CallbackTask[Unit]
 }
@@ -159,12 +129,14 @@ case class SourceFocusedEvent(position: Int, source: Source)
 
 case class EntryFocusedEvent(position: Int, entry: Entry)
 
-class ContainerAction(
-  container: PaneContainer) extends OnSourceSelected {
+class ContainerAction(container: PaneContainer)
+  extends OnSourceSelected with OnEntrySelected {
 
-  override def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit] = {
-    Log info "[init]"
+  override def onSourceSelected(event: SourceSelectedEvent) = {
     task of container.scrollTo(container.entryArea)
+  }
+  override def onEntrySelected(event: EntrySelectedEvent) = {
+    task of container.scrollTo(container.entryDetailArea)
   }
 }
 
@@ -196,13 +168,23 @@ class SourceAreaAction(
 
 class EntryAreaAction(
   container: PaneContainer)
-  extends OnSourceSelected with OnSourceFocused {
+  extends OnSourceSelected with OnSourceFocused
+  with OnEntrySelected with OnEntryFocused {
 
-  override def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit] = {
+  override def onSourceSelected(event: SourceSelectedEvent) = {
     displayOrLoad(event.source.id)
   }
-  override def onSourceFocused(event: SourceFocusedEvent): CallbackTask[Unit] = {
+  override def onSourceFocused(event: SourceFocusedEvent) = {
     displayOrLoad(event.source.id)
+  }
+  override def onEntrySelected(event: EntrySelectedEvent) = {
+    for {
+      _ <- task of container.entryArea.scrollTo(event.position) _
+      _ <- task { container.entryArea.updateToolbar(event.entry.sourceId) }
+    } yield ()
+  }
+  override def onEntryFocused(event: EntryFocusedEvent) = {
+    task { container.entryArea.updateToolbar(event.entry.sourceId) }
   }
   private def displayOrLoad(sourceId: Long) = {
     task of container.entryArea.displayOrLoad(sourceId) _
@@ -212,19 +194,31 @@ class EntryAreaAction(
 class DetailAreaAction(
   container: PaneContainer,
   entryAccessor: EntryAccessor )
-  extends OnSourceSelected with OnSourceFocused {
+  extends OnSourceSelected with OnSourceFocused
+  with OnEntrySelected with OnEntryFocused {
 
-  override def onSourceSelected(event: SourceSelectedEvent) = for {
-    Some(entryId) <- task { entryAccessor firstEntryIdOf event.source.id }
+  override def onSourceSelected(event: SourceSelectedEvent) = {
+    fromSource(event.source.id)
+  }
+  override def onSourceFocused(event: SourceFocusedEvent) = {
+    fromSource(event.source.id)
+  }
+  override def onEntrySelected(event: EntrySelectedEvent) = {
+    update(event.entry.entryId, event.position)
+  }
+  override def onEntryFocused(event: EntryFocusedEvent) = {
+    update(event.entry.entryId, event.position)
+  }
+  private def fromSource(sourceId: Long) = for {
+    Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
     entryPosition <- task { entryAccessor indexOf entryId }
+    _ <- update(entryId, entryPosition)
+  } yield ()
+
+  private def update(entryId: Long, entryPosition: Int) = for {
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
     _ <- task { container.entryDetailArea.updateToolbar(entryId) }
-  } yield {
-    Log debug s"[ok] sourceId:${event.source.id}, entryId:$entryId"
-  }
-  override def onSourceFocused(event: SourceFocusedEvent): CallbackTask[Unit] = {
-    container.entryDetailArea.updateSource(event.source.id)
-  }
+  } yield ()
 }
 
 class PrefetcherAction(
@@ -232,10 +226,10 @@ class PrefetcherAction(
   extends OnSourceSelected
   with OnSourceFocused {
 
-  override def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit] = {
+  override def onSourceSelected(event: SourceSelectedEvent) = {
     task { prefetcher.triggerBy(event.source.id) }
   }
-  override def onSourceFocused(event: SourceFocusedEvent): CallbackTask[Unit] = {
+  override def onSourceFocused(event: SourceFocusedEvent) = {
     task { prefetcher.triggerBy(event.source.id) }
   }
 }
