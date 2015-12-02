@@ -13,7 +13,7 @@ class EntryRowAdapter(
   provider: ViewHolderProvider[EntryRow]) extends Adapter[EntryRow] {
 
   override def getItemCount = {
-    entryAccessor.get.length
+    entryAccessor.length
   }
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     provider inflateOn parent
@@ -25,7 +25,7 @@ class EntryRowAdapter(
     holder.content.text = entry.content
     holder.createdAt.text = entry.createdAt.format
     holder.itemView onClick { _ =>
-      val event = EntrySelectedEvent(position, entry.entryId, entry.sourceId)
+      val event = EntrySelectedEvent(position, entry)
       entrySelectedListener.onEntrySelected(event)
     }
   }
@@ -37,8 +37,7 @@ trait OnEntrySelectedListener {
 
 case class EntrySelectedEvent(
   position: Int,
-  entryId: Long,
-  sourceId: Long ) {
+  entry: Entry ){
 
-  def dump: String = s"entryId:$entryId, position:$position"
+  def dump: String = s"entryId:${entry.entryId}, position:$position"
 }

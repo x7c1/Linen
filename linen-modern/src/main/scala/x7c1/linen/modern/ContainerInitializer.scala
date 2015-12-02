@@ -6,68 +6,69 @@ import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import x7c1.linen.glue.res.layout.{EntryRow, MainLayout, SourceRow}
+import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.observer.FocusDetector
+import x7c1.wheat.modern.tasks.ScrollerTasks
 
 class ContainerInitializer(
   activity: Activity,
   layout: MainLayout,
   sourceRowProvider: ViewHolderProvider[SourceRow],
-  entryRowProvider: ViewHolderProvider[EntryRow]) {
+  entryRowProvider: ViewHolderProvider[EntryRow],
+  entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]) {
 
   def setup(): Unit = {
-    updateWidth(0.9, layout.swipeLayoutLeft)
-    updateWidth(0.8, layout.swipeLayoutCenter)
-    updateWidth(0.9, layout.swipeLayoutRight)
+    updateWidth(0.85, layout.swipeLayoutLeft)
+    updateWidth(0.9, layout.swipeLayoutCenter)
+    updateWidth(0.95, layout.swipeLayoutRight)
 
     setupSourceArea()
     setupEntryArea()
+    setupEntryDetailArea()
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
-    val prefetcher = new EntryPrefetcher(
-      sourceBuffer,
-      onSourceEntryLoaded,
-      entryCacher
-    )
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       sourceStateBuffer,
-      new SourceSelectObserver(container, prefetcher),
+      new SourceSelectObserver(actions),
       sourceRowProvider
-    )
-    lazy val observer = new SourceFocusObserver(
-      sourceBuffer,
-      prefetcher,
-      entryArea
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-    layout.sampleLeftList onTouch ItemFocusDetector.createOnTouch(
+    layout.sampleLeftList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.sampleLeftList,
-      layoutManager = manager,
-      onItemFocused = observer
+      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
+      focusedEventFactory = new SourceFocusedEventFactory(sourceBuffer),
+      onFocused = new SourceFocusedObserver(actions)
     )
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
       entryBuffer,
-      new EntrySelectObserver(container),
+      new EntrySelectObserver(actions),
       entryRowProvider
-    )
-    lazy val observer = new EntryFocusObserver(
-      entryBuffer,
-      sourceArea
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
-    layout.sampleCenterList onTouch ItemFocusDetector.createOnTouch(
+    layout.sampleCenterList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.sampleCenterList,
-      layoutManager = manager,
-      onItemFocused = observer
+      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
+      focusedEventFactory = new EntryFocusedEventFactory(entryBuffer),
+      onFocused = new EntryFocusedObserver(actions)
     )
+  }
+  private def setupEntryDetailArea() = {
+    val manager = new LinearLayoutManager(activity)
+    val adapter = new EntryDetailRowAdapter(
+      entryBuffer,
+      new EntryDetailSelectedObserver(actions),
+      entryDetailRowProvider
+    )
+    layout.sampleRightList setLayoutManager manager
+    layout.sampleRightList setAdapter adapter
   }
 
   private lazy val displaySize = {
@@ -76,7 +77,20 @@ class ContainerInitializer(
     display getSize size
     size
   }
-
+  private lazy val actions = {
+    val prefetcher = new EntryPrefetcher(
+      sourceBuffer,
+      onSourceEntryLoaded,
+      entryCacher
+    )
+    new Actions(
+      new ContainerAction(container),
+      new SourceAreaAction(container, sourceBuffer),
+      new EntryAreaAction(container),
+      new EntryDetailAreaAction(container, entryBuffer),
+      new PrefetcherAction(prefetcher)
+    )
+  }
   private lazy val sourceBuffer = new SourceBuffer
 
   private lazy val sourceStateBuffer = new SourceStateBuffer
@@ -95,30 +109,45 @@ class ContainerInitializer(
     new SourceStateUpdater(sourceStateBuffer) append
     new SourceChangedNotifier(sourceBuffer, layout.sampleLeftList)
 
-  private lazy val entryBuffer = new EntryBuffer
+  private lazy val entryBuffer = new EntryBuffer(
+    new InsertedEntriesNotifier(layout.sampleCenterList) append
+    new InsertedEntriesNotifier(layout.sampleRightList)
+  )
 
   private lazy val entryArea = {
     new EntryArea(
       entries = entryBuffer,
       sources = sourceBuffer,
       onEntryLoaded = onSourceEntryLoaded,
-      actions = new EntryAreaActions(layout.sampleCenterList),
+      toolbar = layout.entryToolbar,
+      tasks = ScrollerTasks(layout.sampleCenterList, 125F),
       entryCacher = entryCacher,
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
   }
+
+  private lazy val entryDetailArea =
+    new EntryDetailArea(
+      sources = sourceBuffer,
+      entries = entryBuffer,
+      toolbar = layout.entryDetailToolbar,
+      recyclerView = layout.sampleRightList,
+      getPosition = () => panePosition of layout.swipeLayoutRight
+    )
+
   private lazy val panePosition = {
     val length = layout.swipeContainer.getChildCount
     val children = 0 to (length - 1) map layout.swipeContainer.getChildAt
     new PanePosition(children, displaySize.x)
   }
-  private lazy val container = {
+  private lazy val container =
     new PaneContainer(
       layout.swipeContainer,
       sourceArea,
-      entryArea
+      entryArea,
+      entryDetailArea
     )
-  }
+
   private def updateWidth(ratio: Double, view: View): Unit = {
     val params = view.getLayoutParams
     params.width = (ratio * displaySize.x).toInt

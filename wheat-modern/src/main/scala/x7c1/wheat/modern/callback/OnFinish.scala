@@ -10,5 +10,5 @@ object OnFinish {
 
 trait OnFinish {
   def by[A]: A => Unit
-  def evalulate(): Unit = by[Unit]({})
+  def evaluate(): Unit = by[Unit]({})
 }

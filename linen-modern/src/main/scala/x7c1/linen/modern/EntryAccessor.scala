@@ -1,23 +1,34 @@
 package x7c1.linen.modern
 
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.OnFinish
 import x7c1.wheat.modern.patch.TaskAsync
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 trait EntryAccessor {
-  def get: Seq[Entry]
+
+  def get(position: Int): Entry
+
+  def length: Int
+
+  def firstEntryIdOf(sourceId: Long): Option[Long]
+
+  def indexOf(entryId: Long): Int
 }
 
-class EntryBuffer extends EntryAccessor {
+class EntryBuffer(entryInsertedListener: OnEntryInsertedListener) extends EntryAccessor {
 
   private val underlying = ListBuffer[Entry]()
 
-  override def get: Seq[Entry] = underlying
+  override def get(position: Int): Entry = underlying(position)
 
-  def indexOf(entryId: Long): Int =
+  override def length = underlying.length
+
+  override def indexOf(entryId: Long): Int =
     underlying.indexWhere(_.entryId == entryId)
 
   def positionAfter(entryId: Option[Long]) = {
@@ -26,11 +37,12 @@ class EntryBuffer extends EntryAccessor {
       case _ => 0
     }
   }
-  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry]): Seq[Entry] = {
+
+  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry])(done: OnFinish): Unit = {
     val newer = entries filterNot { this has _.sourceId }
     underlying.insertAll(position, newer)
     entriesMapping(sourceId) = entries.map(_.entryId)
-    newer
+    entryInsertedListener.onInserted(position, newer.length)(done)
   }
 
   private lazy val entriesMapping = mutable.Map[Long, Seq[Long]]()
@@ -38,13 +50,34 @@ class EntryBuffer extends EntryAccessor {
   def has(sourceId: Long): Boolean = {
     entriesMapping.get(sourceId).exists(_.nonEmpty)
   }
-  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+  override def firstEntryIdOf(sourceId: Long): Option[Long] = {
     entriesMapping.get(sourceId).flatMap(_.headOption)
   }
   def lastEntryIdOf(sourceId: Long): Option[Long] = {
     entriesMapping.get(sourceId).flatMap(_.lastOption)
   }
 
+}
+
+trait OnEntryInsertedListener { self =>
+
+  import x7c1.wheat.modern.callback.CallbackTask.task
+  import x7c1.wheat.modern.callback.Imports._
+
+  def onInserted(position: Int, length: Int)(done: OnFinish): Unit
+
+  def append(listener: OnEntryInsertedListener): OnEntryInsertedListener =
+    new OnEntryInsertedListener {
+      override def onInserted(position: Int, length: Int)(done: OnFinish): Unit = {
+        val f = for {
+          _ <- task of self.onInserted(position, length) _
+          _ <- task of listener.onInserted(position, length) _
+        } yield {
+          done.evaluate()
+        }
+        f.execute()
+      }
+    }
 }
 
 class EntryCacher {
@@ -74,15 +107,26 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
         }
     }
 
-  def createDummy(sourceId: Long) = (1 to 50) map { n =>
+  def createDummy(sourceId: Long) = (1 to 10) map { n =>
     Entry(
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
-      title = s"$sourceId-$n entry",
-      content = s"sample content $sourceId-$n " * 5,
+      title = s"$sourceId-$n entry " + DummyString.words(10),
+      content = s"$sourceId-$n " + DummyString.words(100),
       createdAt = LinenDate.dummy()
     )
+  }
+}
+
+object DummyString {
+  def word: String = {
+    val wordRange = 3 to 10
+    val wordLength = wordRange(Random.nextInt(wordRange.size - 1))
+    Random.alphanumeric.take(wordLength).mkString
+  }
+  def words(n: Int): String = {
+    (0 to n).map(_ => word).mkString(" ")
   }
 }
 
@@ -115,8 +159,28 @@ class SourceChangedNotifier(
 
   override def onEntryLoaded(event: EntryLoadedEvent): Unit = {
     recyclerView runUi { view =>
-      val position = sourceAccessor.positionOf(event.sourceId)
-      view.getAdapter.notifyItemChanged(position)
+      sourceAccessor.positionOf(event.sourceId).
+        foreach(view.getAdapter.notifyItemChanged)
+    }
+  }
+}
+
+class InsertedEntriesNotifier (
+  recyclerView: RecyclerView) extends OnEntryInsertedListener {
+
+  import x7c1.wheat.modern.decorator.Imports._
+
+  private lazy val layoutManager = {
+    recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+  }
+  override def onInserted(position: Int, length: Int)(done: OnFinish): Unit = {
+    Log debug s"[init] position:$position, length:$length"
+
+    recyclerView runUi { view =>
+      val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+      val base = if(current == position) -1 else 0
+      view.getAdapter.notifyItemRangeInserted(position + base, length)
+      done.evaluate()
     }
   }
 }

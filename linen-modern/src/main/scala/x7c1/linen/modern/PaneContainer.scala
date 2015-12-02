@@ -8,7 +8,8 @@ import x7c1.wheat.modern.callback.OnFinish
 class PaneContainer(
   view: ViewGroup,
   val sourceArea: SourceArea,
-  val entryArea: EntryArea ) {
+  val entryArea: EntryArea,
+  val entryDetailArea: EntryDetailArea ) {
 
   private lazy val scroller = new Scroller(view.getContext)
 
@@ -32,7 +33,7 @@ class PaneContainer(
         view.post(this)
       } else {
         Log info s"[done] current:$current"
-        done.evalulate()
+        done.evaluate()
       }
     }
   }

@@ -5,6 +5,7 @@ import java.util.{Timer, TimerTask}
 class BufferingChangeWatcher[A](
   getCurrent: () => A,
   onStop: A => Unit,
+  onError: Throwable => Unit,
   delay: Long,
   period: Long ){
 
@@ -21,7 +22,7 @@ class BufferingChangeWatcher[A](
   }
 
   private class BufferedTask extends TimerTask {
-    override def run(): Unit = {
+    override def run(): Unit = try {
       val current = getCurrent()
       value match {
         case Some(previous) if previous == current =>
@@ -30,6 +31,8 @@ class BufferingChangeWatcher[A](
         case _ =>
       }
       value = Some(current)
+    } catch {
+      case e: Throwable => onError(e)
     }
   }
 
