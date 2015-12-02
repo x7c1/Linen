@@ -18,7 +18,7 @@ class EntrySelectObserver(
     } yield {
       Log info s"[ok] entry scrolled to position:${event.position}"
     }
-    val tasks = observerTasks.commonTo(event.sourceId, event.position) :+ scrollEntry
+    val tasks = observerTasks.commonTo(event.entry.sourceId, event.position) :+ scrollEntry
     tasks foreach runAsync { Log error _.toString }
   }
 }

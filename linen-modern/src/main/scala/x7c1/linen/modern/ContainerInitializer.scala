@@ -34,16 +34,22 @@ class ContainerInitializer(
       onSourceEntryLoaded,
       entryCacher
     )
-    val tasks = new SourceRowObserverTasks(container, entryBuffer, prefetcher)
+    val actions = new Actions(
+      new ContainerAction(container),
+      new SourceAreaAction(container, sourceBuffer),
+      new EntryAreaAction(container),
+      new DetailAreaAction(container, entryBuffer),
+      new PrefetcherAction(prefetcher)
+    )
     val adapter = new SourceRowAdapter(
       sourceBuffer,
       sourceStateBuffer,
-      new SourceSelectObserver(container, tasks),
+      new SourceSelectObserver(actions),
       sourceRowProvider
     )
     lazy val observer = new SourceFocusObserver(
-      sourceBuffer,
-      tasks
+      actions,
+      sourceBuffer
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
@@ -128,6 +134,7 @@ class ContainerInitializer(
 
   private lazy val entryDetailArea =
     new EntryDetailArea(
+      sources = sourceBuffer,
       entries = entryBuffer,
       toolbar = layout.entryDetailToolbar,
       recyclerView = layout.sampleRightList,
