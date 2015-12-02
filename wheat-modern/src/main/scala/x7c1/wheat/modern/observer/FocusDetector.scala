@@ -6,12 +6,13 @@ import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
 
 object FocusDetector {
-  def create(
+  def createListener[A <: ItemFocusedEvent](
     recyclerView: RecyclerView,
     getPosition: () => Int,
-    onItemFocused: OnItemFocusedListener): OnTouchListener = {
+    focusedEventFactory: FocusedEventFactory[A],
+    onFocused: OnItemFocusedListener[A]): OnTouchListener = {
 
-    val notifier = new FocusedItemNotifier(getPosition, onItemFocused)
+    val notifier = new FocusedItemNotifier(getPosition, focusedEventFactory, onFocused)
     val observer = new VerticalTouchScrollObserver(recyclerView, notifier)
     val detector = new GestureDetector(
       recyclerView.getContext,
@@ -25,30 +26,34 @@ object FocusDetector {
   }
 }
 
-case class ItemFocusedEvent(position: Int){
+trait ItemFocusedEvent {
   require(position > -1, "position must be non negative")
-
-  def dump: String = s"position:$position"
+  def position: Int
 }
 
-trait OnItemFocusedListener {
-  def onItemFocused(event: ItemFocusedEvent)
+trait FocusedEventFactory[A <: ItemFocusedEvent]{
+  def createAt(position: Int): A
+}
+
+trait OnItemFocusedListener[A <: ItemFocusedEvent] {
+  def onFocused(event: A): Unit
 }
 
 trait OnScrollStoppedListener {
-  def onScrollStopped(e: ScrollStoppedEvent)
+  def onScrollStopped(e: ScrollStoppedEvent): Unit
 }
 
 case class ScrollStoppedEvent(offset: Int)
 
-private class FocusedItemNotifier(
+private class FocusedItemNotifier[A <: ItemFocusedEvent](
   getPosition: () => Int,
-  onItemFocusedListener: OnItemFocusedListener ) extends OnScrollStoppedListener {
+  focusedEventFactory: FocusedEventFactory[A],
+  onFocusedListener: OnItemFocusedListener[A] ) extends OnScrollStoppedListener {
 
   override def onScrollStopped(e: ScrollStoppedEvent): Unit = {
     val position = getPosition()
     if (position > -1){
-      onItemFocusedListener onItemFocused new ItemFocusedEvent(position)
+      onFocusedListener onFocused focusedEventFactory.createAt(position)
     }
   }
 }

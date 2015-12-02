@@ -37,10 +37,11 @@ class ContainerInitializer(
     )
     layout.sampleLeftList setLayoutManager manager
     layout.sampleLeftList setAdapter adapter
-    layout.sampleLeftList setOnTouchListener FocusDetector.create(
+    layout.sampleLeftList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.sampleLeftList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      onItemFocused = new SourceFocusObserver(actions, sourceBuffer)
+      focusedEventFactory = new SourceFocusedEventFactory(sourceBuffer),
+      onFocused = new SourceFocusedObserver(actions)
     )
   }
   private def setupEntryArea() = {
@@ -52,10 +53,11 @@ class ContainerInitializer(
     )
     layout.sampleCenterList setLayoutManager manager
     layout.sampleCenterList setAdapter adapter
-    layout.sampleCenterList setOnTouchListener FocusDetector.create(
+    layout.sampleCenterList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.sampleCenterList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      onItemFocused = new EntryFocusObserver(actions, entryBuffer)
+      focusedEventFactory = new EntryFocusedEventFactory(entryBuffer),
+      onFocused = new EntryFocusedObserver(actions)
     )
   }
   private def setupEntryDetailArea() = {
