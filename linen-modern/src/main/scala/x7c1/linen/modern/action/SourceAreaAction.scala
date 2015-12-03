@@ -12,7 +12,7 @@ class SourceAreaAction(
   with OnEntrySelected with OnEntryFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    task of container.sourceArea.scrollTo(event.position)
+    task of container.sourceArea.scrollTo(event.position) _
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     fastScrollTo(event.entry.sourceId)

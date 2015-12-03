@@ -23,7 +23,7 @@ class SourceArea(
       _ <- tasks.fastScrollTo(position)(done)
     } yield ()
 
-  def scrollTo(position: Int): OnFinish => Unit = done => {
+  def scrollTo(position: Int)(done: OnFinish): Unit = {
     Log info s"[init] position:$position"
     tasks.scrollTo(position)(done).execute()
   }
