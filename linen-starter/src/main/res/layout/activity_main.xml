@@ -7,14 +7,14 @@
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/activity_main__swipe_container"
+        android:id="@+id/activity_main__pane_container"
         android:layout_above="@+id/activity_main__sample_text"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/activity_main__swipe_layout_left"
+            android:id="@+id/activity_main__source_area"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/opaque_blue"
@@ -36,7 +36,7 @@
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__sample_left_list"
+                android:id="@+id/activity_main__source_list"
                 android:layout_below="@+id/activity_main__source_toolbar"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -46,7 +46,7 @@
         </android.support.design.widget.CoordinatorLayout>
 
         <LinearLayout
-            android:id="@+id/activity_main__swipe_layout_center"
+            android:id="@+id/activity_main__entry_area"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -68,7 +68,7 @@
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__sample_center_list"
+                android:id="@+id/activity_main__entry_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -76,7 +76,7 @@
 
 
         <LinearLayout
-            android:id="@+id/activity_main__swipe_layout_right"
+            android:id="@+id/activity_main__entry_detail_area"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -98,7 +98,7 @@
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__sample_right_list"
+                android:id="@+id/activity_main__entry_detail_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 

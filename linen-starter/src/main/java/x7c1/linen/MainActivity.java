@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import x7c1.linen.glue.res.layout.MainLayout;
-import x7c1.linen.modern.ContainerInitializer;
+import x7c1.linen.modern.init.ContainerInitializer;
 import x7c1.linen.res.layout.EntryDetailRowProvider;
 import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
@@ -57,13 +57,13 @@ public class MainActivity extends Activity {
 		initializer.setup();
 
 		final GestureDetector detector = forHorizontal(
-				this, createListener(layout.swipeContainer, getDisplaySize()));
+				this, createListener(layout.paneContainer, getDisplaySize()));
 
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				return detector.onTouchEvent(event) ||
-					layout.swipeContainer.dispatchTouchEvent(event);
+					layout.paneContainer.dispatchTouchEvent(event);
 			}
 		};
 

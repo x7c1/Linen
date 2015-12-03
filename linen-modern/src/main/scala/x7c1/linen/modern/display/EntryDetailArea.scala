@@ -1,6 +1,7 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.display
 
 import android.support.v7.widget.{RecyclerView, Toolbar}
+import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks

@@ -1,9 +1,13 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.display
 
 import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.OnFinish
+
+trait Pane {
+  def displayPosition: Int
+}
 
 class PaneContainer(
   view: ViewGroup,

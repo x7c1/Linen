@@ -1,9 +1,9 @@
-package x7c1.linen.modern
+package x7c1.linen.modern.action.observer
 
 import x7c1.wheat.modern.callback.CallbackTask
 
-import scalaz.{-\/, \/-}
 import scalaz.concurrent.Task
+import scalaz.{-\/, \/-}
 
 
 object CallbackTaskRunner {

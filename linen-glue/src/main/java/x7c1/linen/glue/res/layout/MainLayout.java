@@ -16,47 +16,47 @@ import android.widget.TextView;
 public class MainLayout extends RecyclerView.ViewHolder {
 
     public final LinearLayout menuArea;
-    public final LinearLayout swipeContainer;
-    public final android.support.design.widget.CoordinatorLayout swipeLayoutLeft;
+    public final LinearLayout paneContainer;
+    public final android.support.design.widget.CoordinatorLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
-    public final android.support.v7.widget.RecyclerView sampleLeftList;
-    public final LinearLayout swipeLayoutCenter;
+    public final android.support.v7.widget.RecyclerView sourceList;
+    public final LinearLayout entryArea;
     public final android.support.v7.widget.Toolbar entryToolbar;
-    public final android.support.v7.widget.RecyclerView sampleCenterList;
-    public final LinearLayout swipeLayoutRight;
+    public final android.support.v7.widget.RecyclerView entryList;
+    public final LinearLayout entryDetailArea;
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
-    public final android.support.v7.widget.RecyclerView sampleRightList;
+    public final android.support.v7.widget.RecyclerView entryDetailList;
     public final TextView sampleText;
     public final View dummySurface;
 
     public MainLayout(
         View itemView,
         LinearLayout menuArea,
-        LinearLayout swipeContainer,
-        android.support.design.widget.CoordinatorLayout swipeLayoutLeft,
+        LinearLayout paneContainer,
+        android.support.design.widget.CoordinatorLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
-        android.support.v7.widget.RecyclerView sampleLeftList,
-        LinearLayout swipeLayoutCenter,
+        android.support.v7.widget.RecyclerView sourceList,
+        LinearLayout entryArea,
         android.support.v7.widget.Toolbar entryToolbar,
-        android.support.v7.widget.RecyclerView sampleCenterList,
-        LinearLayout swipeLayoutRight,
+        android.support.v7.widget.RecyclerView entryList,
+        LinearLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
-        android.support.v7.widget.RecyclerView sampleRightList,
+        android.support.v7.widget.RecyclerView entryDetailList,
         TextView sampleText,
         View dummySurface
     ){
         super(itemView);
         this.menuArea = menuArea;
-        this.swipeContainer = swipeContainer;
-        this.swipeLayoutLeft = swipeLayoutLeft;
+        this.paneContainer = paneContainer;
+        this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;
-        this.sampleLeftList = sampleLeftList;
-        this.swipeLayoutCenter = swipeLayoutCenter;
+        this.sourceList = sourceList;
+        this.entryArea = entryArea;
         this.entryToolbar = entryToolbar;
-        this.sampleCenterList = sampleCenterList;
-        this.swipeLayoutRight = swipeLayoutRight;
+        this.entryList = entryList;
+        this.entryDetailArea = entryDetailArea;
         this.entryDetailToolbar = entryDetailToolbar;
-        this.sampleRightList = sampleRightList;
+        this.entryDetailList = entryDetailList;
         this.sampleText = sampleText;
         this.dummySurface = dummySurface;
     }
