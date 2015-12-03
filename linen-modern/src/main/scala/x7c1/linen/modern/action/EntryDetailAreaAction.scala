@@ -10,7 +10,7 @@ class EntryDetailAreaAction(
   entryAccessor: EntryAccessor
 ) extends OnSourceSelected with OnSourceFocused
   with OnEntrySelected with OnEntryFocused
-  with OnEntryDetailSelected {
+  with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fromSource(event.source.id)
@@ -29,6 +29,10 @@ class EntryDetailAreaAction(
     _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
   } yield ()
 
+  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
+    container.entryDetailArea.updateToolbar(event.entry.entryId)
+  }
+
   private def fromSource(sourceId: Long) = for {
     Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
     entryPosition <- task { entryAccessor indexOf entryId }
@@ -39,4 +43,5 @@ class EntryDetailAreaAction(
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
     _ <- task { container.entryDetailArea.updateToolbar(entryId) }
   } yield ()
+
 }

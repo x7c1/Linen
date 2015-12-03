@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryPrefetcher, SourceAccessor}
-import x7c1.linen.modern.display.{EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.OnFinish
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -11,7 +11,8 @@ class PrefetcherAction(
   sourceAccessor: SourceAccessor,
   entryBufferUpdater: EntryBufferUpdater
 ) extends OnSourceSelected with OnSourceFocused
-  with OnEntrySelected with OnEntryFocused {
+  with OnEntrySelected with OnEntryFocused
+  with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     load(event.source.id)
@@ -19,12 +20,16 @@ class PrefetcherAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     load(event.source.id)
   }
-
   override def onEntrySelected(event: EntrySelectedEvent) = {
     load(event.entry.sourceId)
   }
-
   override def onEntryFocused(event: EntryFocusedEvent) = {
+    load(event.entry.sourceId)
+  }
+  override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
+    load(event.entry.sourceId)
+  }
+  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
     load(event.entry.sourceId)
   }
 
@@ -38,4 +43,5 @@ class PrefetcherAction(
       entryBufferUpdater.loadAndInsert(sourceId)(OnFinish.nop)
     }
   }
+
 }

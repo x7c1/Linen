@@ -8,8 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
-import x7c1.linen.modern.action.{EntryBufferUpdater, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
+import x7c1.linen.modern.action.{EntryDetailFocusedEventFactory, EntryBufferUpdater, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
@@ -72,8 +72,20 @@ class ContainerInitializer(
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
+    val getPosition = () => {
+      manager.findFirstCompletelyVisibleItemPosition() match {
+        case n if n < 0 => manager.findFirstVisibleItemPosition()
+        case n => n
+      }
+    }
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter adapter
+    layout.entryDetailList setOnTouchListener FocusDetector.createListener(
+      recyclerView = layout.entryDetailList,
+      getPosition = getPosition,
+      focusedEventFactory = new EntryDetailFocusedEventFactory(entryBuffer),
+      onFocused = new EntryDetailFocusedObserver(actions)
+    )
   }
 
   private lazy val displaySize = {

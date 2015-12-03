@@ -31,7 +31,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
       entryId = sourceId * 1000 + n,
       url = s"http://example.com/source-$sourceId/entry-$n",
       title = s"$sourceId-$n entry " + DummyString.words(10),
-      content = s"$sourceId-$n " + DummyString.words(100),
+      content = s"$sourceId-$n " + DummyString.words(200),
       createdAt = Date.dummy()
     )
   }

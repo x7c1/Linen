@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.display.{EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
@@ -12,7 +12,8 @@ class EntryAreaAction(
   entryAccessor: EntryAccessor,
   entryBufferUpdater: EntryBufferUpdater
 ) extends OnSourceSelected with OnSourceFocused
-  with OnEntrySelected with OnEntryFocused {
+  with OnEntrySelected with OnEntryFocused
+  with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     display(event.source.id)
@@ -29,6 +30,17 @@ class EntryAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = task {
     updateToolbar(event.entry.sourceId)
   }
+  override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
+    syncDisplay(event.position, event.entry.sourceId)
+  }
+  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
+    syncDisplay(event.position, event.entry.sourceId)
+  }
+
+  private def syncDisplay(position: Int, sourceId: Long) = for {
+    _ <- task of container.entryArea.fastScrollTo(position) _
+    _ <- task { updateToolbar(sourceId) }
+  } yield ()
 
   private def display(sourceId: Long) = for {
     n <- getOrCreatePosition(sourceId)

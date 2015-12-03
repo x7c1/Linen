@@ -26,6 +26,9 @@ trait OnEntryFocused {
 trait OnEntrySelected {
   def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
 }
+trait OnEntryDetailFocused {
+  def onEntryDetailFocused(event: EntryDetailFocusedEvent): CallbackTask[Unit]
+}
 trait OnEntryDetailSelected {
   def onEntryDetailSelected(event: EntryDetailSelectedEvent): CallbackTask[Unit]
 }
@@ -53,5 +56,18 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
   override def createAt(position: Int) = {
     val entry = entryAccessor get position
     EntryFocusedEvent(position, entry)
+  }
+}
+
+case class EntryDetailFocusedEvent(
+  override val position: Int,
+  entry: Entry ) extends ItemFocusedEvent
+
+class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor)
+  extends FocusedEventFactory[EntryDetailFocusedEvent]{
+
+  override def createAt(position: Int) = {
+    val entry = entryAccessor get position
+    EntryDetailFocusedEvent(position, entry)
   }
 }
