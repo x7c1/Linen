@@ -15,6 +15,7 @@ class EntryFocusedObserver(actions: Actions)
       _ <- actions.sourceArea onEntryFocused event
       _ <- actions.entryArea onEntryFocused event
       _ <- actions.detailArea onEntryFocused event
+      _ <- actions.prefetcher onEntryFocused event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

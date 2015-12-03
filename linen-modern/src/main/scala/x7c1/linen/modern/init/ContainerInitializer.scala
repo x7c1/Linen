@@ -101,7 +101,7 @@ class ContainerInitializer(
         entryBufferUpdater = entryBufferUpdater
       ),
       new EntryDetailAreaAction(container, entryBuffer),
-      new PrefetcherAction(prefetcher)
+      new PrefetcherAction(prefetcher, sourceBuffer, entryBufferUpdater)
     )
   }
   private lazy val sourceBuffer = new SourceBuffer
