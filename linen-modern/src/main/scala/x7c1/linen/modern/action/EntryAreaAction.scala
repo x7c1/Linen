@@ -1,18 +1,16 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.{EntryLoader, EntryBuffer, EntryCacher, EntryLoadedEvent, OnEntryLoadedListener, SourceAccessor}
+import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
-import x7c1.wheat.modern.callback.OnFinish
 
 class EntryAreaAction(
   container: PaneContainer,
   sourceAccessor: SourceAccessor,
-  entryBuffer: EntryBuffer,
-  entryCacher: EntryCacher,
-  onEntryLoaded: OnEntryLoadedListener
+  entryAccessor: EntryAccessor,
+  entryBufferUpdater: EntryBufferUpdater
 ) extends OnSourceSelected with OnSourceFocused
   with OnEntrySelected with OnEntryFocused {
 
@@ -33,7 +31,8 @@ class EntryAreaAction(
   }
 
   private def display(sourceId: Long) = for {
-    _ <- task of displayOrLoad(sourceId) _
+    n <- getOrCreatePosition(sourceId)
+    _ <- task of container.entryArea.fastScrollTo(n) _
     _ <- task { updateToolbar(sourceId) }
   } yield {
     Log debug s"sourceId:$sourceId"
@@ -43,31 +42,13 @@ class EntryAreaAction(
       container.entryArea updateToolbar source.title
     }
   }
-  private def displayOrLoad(sourceId: Long)(done: OnFinish) = {
-    entryBuffer firstEntryIdOf sourceId match {
+  private def getOrCreatePosition(sourceId: Long) =
+    entryAccessor firstEntryIdOf sourceId match {
       case Some(entryId) =>
-        val position = entryBuffer indexOf entryId
-        container.entryArea.fastScrollTo(position)(done)
+        task { entryAccessor indexOf entryId }
       case _ =>
-        val onLoad = createOnLoadedListener(done)
-        new EntryLoader(entryCacher, onLoad) load sourceId
+        for { event <- task of entryBufferUpdater.loadAndInsert(sourceId) _ }
+        yield event.position
     }
-  }
-  private def createOnLoadedListener(done: OnFinish) = {
-    onEntryLoaded append OnEntryLoadedListener {
-      case EntryLoadedEvent(sourceId, entries) =>
-        (for {
-          position <- task { calculateEntryPositionOf(sourceId) }
-          _ <- task of entryBuffer.insertAll(position, sourceId, entries) _
-          _ <- task of container.entryArea.fastScrollTo(position) _
-        } yield done.evaluate()).execute()
-    }
-  }
-  private def calculateEntryPositionOf(sourceId: Long): Int = {
-    val previousId = sourceAccessor.collectLastFrom(sourceId){
-      case source if entryBuffer.has(source.id) =>
-        entryBuffer.lastEntryIdOf(source.id)
-    }
-    entryBuffer positionAfter previousId.flatten
-  }
+
 }

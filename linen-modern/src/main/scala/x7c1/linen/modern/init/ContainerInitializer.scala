@@ -9,7 +9,7 @@ import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
 import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
+import x7c1.linen.modern.action.{EntryBufferUpdater, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
@@ -88,15 +88,17 @@ class ContainerInitializer(
       onSourceEntryLoaded,
       entryCacher
     )
+    val entryBufferUpdater = new EntryBufferUpdater(
+      entryCacher, entryBuffer, sourceBuffer, onSourceEntryLoaded
+    )
     new Actions(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
       new EntryAreaAction(
         container = container,
         sourceAccessor = sourceBuffer,
-        entryBuffer = entryBuffer,
-        entryCacher = entryCacher,
-        onEntryLoaded = onSourceEntryLoaded
+        entryAccessor = entryBuffer,
+        entryBufferUpdater = entryBufferUpdater
       ),
       new EntryDetailAreaAction(container, entryBuffer),
       new PrefetcherAction(prefetcher)

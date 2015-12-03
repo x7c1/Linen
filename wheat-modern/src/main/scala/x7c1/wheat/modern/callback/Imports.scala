@@ -1,5 +1,7 @@
 package x7c1.wheat.modern.callback
 
+import scala.language.implicitConversions
+
 
 object Imports {
   implicit object TaskBuilder extends TaskBuilder[OnFinish => Unit, Unit]{
@@ -16,4 +18,9 @@ object Imports {
         f(done).execute()
       }
   }
+  implicit def toTaskBuilder3[A]: TaskBuilder[(A => Unit) => Unit, A] =
+    new TaskBuilder[(A => Unit) => Unit, A]{
+      override def build(f: (A => Unit) => Unit) = CallbackTask(f)
+    }
+
 }
