@@ -57,13 +57,13 @@ public class MainActivity extends Activity {
 		initializer.setup();
 
 		final GestureDetector detector = forHorizontal(
-				this, createListener(layout.swipeContainer, getDisplaySize()));
+				this, createListener(layout.paneContainer, getDisplaySize()));
 
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				return detector.onTouchEvent(event) ||
-					layout.swipeContainer.dispatchTouchEvent(event);
+					layout.paneContainer.dispatchTouchEvent(event);
 			}
 		};
 
