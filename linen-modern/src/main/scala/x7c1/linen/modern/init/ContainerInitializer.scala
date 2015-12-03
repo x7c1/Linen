@@ -91,7 +91,13 @@ class ContainerInitializer(
     new Actions(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
-      new EntryAreaAction(container),
+      new EntryAreaAction(
+        container = container,
+        sourceAccessor = sourceBuffer,
+        entryBuffer = entryBuffer,
+        entryCacher = entryCacher,
+        onEntryLoaded = onSourceEntryLoaded
+      ),
       new EntryDetailAreaAction(container, entryBuffer),
       new PrefetcherAction(prefetcher)
     )
@@ -121,12 +127,8 @@ class ContainerInitializer(
 
   private lazy val entryArea = {
     new EntryArea(
-      entries = entryBuffer,
-      sources = sourceBuffer,
-      onEntryLoaded = onSourceEntryLoaded,
       toolbar = layout.entryToolbar,
-      tasks = ScrollerTasks(layout.sampleCenterList, 125F),
-      entryCacher = entryCacher,
+      scroller = ScrollerTasks(layout.sampleCenterList, 125F),
       getPosition = () => panePosition of layout.swipeLayoutCenter
     )
   }

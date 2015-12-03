@@ -12,7 +12,7 @@ object EntryLoader {
 
 class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
 
-  def load(sourceId: Long) =
+  def load(sourceId: Long): Unit =
     cacher.findCache(sourceId) match {
       case Some(entries) =>
         listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
@@ -38,7 +38,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
 }
 
 class EntryLoadExecutor(cacher: EntryCacher){
-  def load(sourceId: Long)(f: EntryLoadedEvent => Unit) = {
+  def load(sourceId: Long)(f: EntryLoadedEvent => Unit): Unit = {
     val listener = new OnEntryLoadedListener {
       override def onEntryLoaded(e: EntryLoadedEvent): Unit = f(e)
     }
