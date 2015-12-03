@@ -28,9 +28,14 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         UiThreadTask from recyclerView
       }
       _ <- ui { _ =>
-        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+        val current = layoutManager.findFirstCompletelyVisibleItemPosition() match {
+          case n if n < 0 =>
+            layoutManager.findFirstVisibleItemPosition()
+          case n => n
+        }
         val diff = current - position
         val space = if (diff < 0) -1 else if(diff > 0) 1 else 0
+
         layoutManager.scrollToPositionWithOffset(position + space, 0)
       }
       _ <- ui { view =>
