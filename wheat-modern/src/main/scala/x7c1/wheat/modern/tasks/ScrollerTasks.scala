@@ -3,7 +3,7 @@ package x7c1.wheat.modern.tasks
 import android.content.Context
 import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
-import android.util.{TypedValue, DisplayMetrics}
+import android.util.{DisplayMetrics, TypedValue}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish, UiThreadTask}

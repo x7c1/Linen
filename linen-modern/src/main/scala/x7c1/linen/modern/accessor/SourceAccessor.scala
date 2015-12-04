@@ -50,7 +50,7 @@ class SourceBuffer extends SourceAccessor {
     }
   }
 
-  private def createDummies = (1 to 100) map { n =>
+  private def createDummies = (1 to 300) map { n =>
     Source(
       id = n,
       url = s"http://example.com/sample-source-$n",

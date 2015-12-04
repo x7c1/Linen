@@ -13,7 +13,6 @@ import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, Entr
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
-import x7c1.wheat.modern.tasks.ScrollerTasks
 
 
 class ContainerInitializer(
@@ -142,7 +141,7 @@ class ContainerInitializer(
   private lazy val entryArea = {
     new EntryArea(
       toolbar = layout.entryToolbar,
-      scroller = ScrollerTasks(layout.entryList),
+      recyclerView = layout.entryList,
       getPosition = () => panePosition of layout.entryArea
     )
   }

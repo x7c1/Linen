@@ -2,7 +2,6 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 
@@ -46,9 +45,8 @@ class EntryAreaAction(
     n <- getOrCreatePosition(sourceId)
     _ <- task of container.entryArea.fastScrollTo(n) _
     _ <- task { updateToolbar(sourceId) }
-  } yield {
-    Log debug s"sourceId:$sourceId"
-  }
+  } yield ()
+
   private def updateToolbar(sourceId: Long): Unit = {
     sourceAccessor positionOf sourceId map sourceAccessor.get foreach { source =>
       container.entryArea updateToolbar source.title
