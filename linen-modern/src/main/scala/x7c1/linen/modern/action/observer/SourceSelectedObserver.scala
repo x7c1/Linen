@@ -15,12 +15,12 @@ class SourceSelectedObserver(actions: Actions) extends OnSourceSelectedListener 
       _ <- actions.sourceArea onSourceSelected event
       _ <- actions.container onSourceSelected event
       _ <- actions.detailArea onSourceSelected event
+      _ <- actions.prefetcher onSourceSelected event
     } yield {
       Log debug s"[ok] select source-${event.source.id}"
     }
     Seq(
-      sync,
-      actions.prefetcher onSourceSelected event
+      sync
     ) foreach runAsync { Log error _.toString }
   }
 
