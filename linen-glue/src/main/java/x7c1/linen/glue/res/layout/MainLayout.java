@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
+import android.support.design.widget.FloatingActionButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainLayout extends RecyclerView.ViewHolder {
@@ -20,7 +22,8 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.design.widget.CoordinatorLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sourceList;
-    public final LinearLayout entryArea;
+    public final android.support.design.widget.FloatingActionButton sourceScrollDown;
+    public final RelativeLayout entryArea;
     public final android.support.v7.widget.Toolbar entryToolbar;
     public final android.support.v7.widget.RecyclerView entryList;
     public final LinearLayout entryDetailArea;
@@ -36,7 +39,8 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.design.widget.CoordinatorLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sourceList,
-        LinearLayout entryArea,
+        android.support.design.widget.FloatingActionButton sourceScrollDown,
+        RelativeLayout entryArea,
         android.support.v7.widget.Toolbar entryToolbar,
         android.support.v7.widget.RecyclerView entryList,
         LinearLayout entryDetailArea,
@@ -51,6 +55,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;
         this.sourceList = sourceList;
+        this.sourceScrollDown = sourceScrollDown;
         this.entryArea = entryArea;
         this.entryToolbar = entryToolbar;
         this.entryList = entryList;

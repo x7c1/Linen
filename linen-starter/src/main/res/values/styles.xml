@@ -36,6 +36,11 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
+    <style name="FloatingActionButton">
+        <!-- see also res/values-v21 -->
+        <item name="android:layout_margin">0dp</item>
+    </style>
+
     <color name="opaque_orange">#faf0ec</color>
     <color name="opaque_blue">#ecf1ff</color>
     <color name="opaque_green">#ecfff1</color>

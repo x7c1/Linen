@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.FloatingActionButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
@@ -42,7 +44,8 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             (android.support.design.widget.CoordinatorLayout) view.findViewById(R.id.activity_main__source_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__source_list),
-            (LinearLayout) view.findViewById(R.id.activity_main__entry_area),
+            (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__source_scroll_down),
+            (RelativeLayout) view.findViewById(R.id.activity_main__entry_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__entry_list),
             (LinearLayout) view.findViewById(R.id.activity_main__entry_detail_area),
