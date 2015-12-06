@@ -13,7 +13,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class MainLayout extends RecyclerView.ViewHolder {
 
@@ -29,7 +28,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final LinearLayout entryDetailArea;
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
     public final android.support.v7.widget.RecyclerView entryDetailList;
-    public final TextView sampleText;
     public final View dummySurface;
 
     public MainLayout(
@@ -46,7 +44,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         LinearLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
         android.support.v7.widget.RecyclerView entryDetailList,
-        TextView sampleText,
         View dummySurface
     ){
         super(itemView);
@@ -62,7 +59,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.entryDetailArea = entryDetailArea;
         this.entryDetailToolbar = entryDetailToolbar;
         this.entryDetailList = entryDetailList;
-        this.sampleText = sampleText;
         this.dummySurface = dummySurface;
     }
 }
