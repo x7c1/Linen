@@ -36,7 +36,16 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
-    <style name="FloatingActionButton">
+    <style name="ToNextButton">
+        <item name="fabSize">mini</item>
+        <item name="android:src">@drawable/ic_skip_next_24dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">bottom|start</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="ToNextButton.Polyfill">
         <!-- see also res/values-v21 -->
         <item name="android:layout_margin">0dp</item>
     </style>
