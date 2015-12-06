@@ -43,7 +43,7 @@
                 />
 
             <android.support.design.widget.FloatingActionButton
-                android:id="@+id/activity_main__source_scroll_down"
+                android:id="@+id/activity_main__source_to_next"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
                 app:backgroundTint="@color/cerulean_blue"
@@ -82,6 +82,7 @@
             </LinearLayout>
 
             <android.support.design.widget.FloatingActionButton
+                android:id="@+id/activity_main__entry_to_next"
                 android:layout_alignParentBottom="true"
                 app:backgroundTint="@color/generic_viridian"
                 style="@style/ToNextButton.Polyfill"
@@ -122,7 +123,7 @@
 
     <View
         android:id="@+id/activity_main__dummy_surface"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

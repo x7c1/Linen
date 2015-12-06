@@ -8,12 +8,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryBufferUpdater, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
+import x7c1.linen.modern.action.observer.{SourceSkippedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector}
+import x7c1.linen.modern.action.{SourceSkippedEventFactory, Actions, ContainerAction, EntryAreaAction, EntryBufferUpdater, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
-
 
 class ContainerInitializer(
   activity: Activity,
@@ -46,6 +45,11 @@ class ContainerInitializer(
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       focusedEventFactory = new SourceFocusedEventFactory(sourceBuffer),
       onFocused = new SourceFocusedObserver(actions)
+    )
+    layout.sourceToNext setOnTouchListener SourceSkippedDetector.createListener(
+      context = layout.sourceToNext.getContext,
+      skippedEventFactory = new SourceSkippedEventFactory(manager, sourceBuffer),
+      onSkippedListener = new SourceSkippedObserver(actions)
     )
   }
   private def setupEntryArea() = {

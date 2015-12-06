@@ -9,6 +9,7 @@ class SourceAreaAction(
   container: PaneContainer,
   sourceAccessor: SourceAccessor
 ) extends OnSourceSelected
+  with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -26,6 +27,9 @@ class SourceAreaAction(
   }
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
     fastScrollTo(event.entry.sourceId)
+  }
+  override def onSourceSkipped(event: SourceSkippedEvent) = {
+    container.sourceArea.skipTo(event.nextPosition)
   }
   private def fastScrollTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }

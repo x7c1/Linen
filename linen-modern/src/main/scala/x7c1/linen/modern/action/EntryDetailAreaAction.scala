@@ -8,7 +8,7 @@ import x7c1.wheat.modern.callback.Imports._
 class EntryDetailAreaAction(
   container: PaneContainer,
   entryAccessor: EntryAccessor
-) extends OnSourceSelected with OnSourceFocused
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -18,6 +18,13 @@ class EntryDetailAreaAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     fromSource(event.source.id)
   }
+  override def onSourceSkipped(event: SourceSkippedEvent) = for {
+    Some(entryId) <- task { entryAccessor firstEntryIdOf event.nextSource.id }
+    entryPosition <- task { entryAccessor indexOf entryId }
+    _ <- container.entryDetailArea.skipTo(entryPosition)
+    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+  } yield ()
+
   override def onEntrySelected(event: EntrySelectedEvent) = {
     scrollAndUpdate(event.entry.entryId, event.position)
   }

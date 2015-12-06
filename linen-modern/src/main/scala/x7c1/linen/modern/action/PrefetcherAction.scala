@@ -10,7 +10,7 @@ class PrefetcherAction(
   prefetcher: EntryPrefetcher,
   sourceAccessor: SourceAccessor,
   entryBufferUpdater: EntryBufferUpdater
-) extends OnSourceSelected with OnSourceFocused
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -19,6 +19,9 @@ class PrefetcherAction(
   }
   override def onSourceFocused(event: SourceFocusedEvent) = {
     load(event.source.id)
+  }
+  override def onSourceSkipped(event: SourceSkippedEvent) = {
+    load(event.nextSource.id)
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     load(event.entry.sourceId)

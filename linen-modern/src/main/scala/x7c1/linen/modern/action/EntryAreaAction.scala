@@ -10,7 +10,7 @@ class EntryAreaAction(
   sourceAccessor: SourceAccessor,
   entryAccessor: EntryAccessor,
   entryBufferUpdater: EntryBufferUpdater
-) extends OnSourceSelected with OnSourceFocused
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -20,6 +20,12 @@ class EntryAreaAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     display(event.source.id)
   }
+  override def onSourceSkipped(event: SourceSkippedEvent) = for {
+    n <- getOrCreatePosition(event.nextSource.id)
+    _ <- container.entryArea skipTo n
+    _ <- task { updateToolbar(event.nextSource.id) }
+  } yield ()
+
   override def onEntrySelected(event: EntrySelectedEvent) = {
     for {
       _ <- task of container.entryArea.scrollTo(event.position) _
@@ -60,5 +66,4 @@ class EntryAreaAction(
         for { event <- task of entryBufferUpdater.loadAndInsert(sourceId) _ }
         yield event.position
     }
-
 }

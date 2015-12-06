@@ -21,10 +21,11 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.design.widget.CoordinatorLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sourceList;
-    public final android.support.design.widget.FloatingActionButton sourceScrollDown;
+    public final android.support.design.widget.FloatingActionButton sourceToNext;
     public final RelativeLayout entryArea;
     public final android.support.v7.widget.Toolbar entryToolbar;
     public final android.support.v7.widget.RecyclerView entryList;
+    public final android.support.design.widget.FloatingActionButton entryToNext;
     public final LinearLayout entryDetailArea;
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
     public final android.support.v7.widget.RecyclerView entryDetailList;
@@ -37,10 +38,11 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.design.widget.CoordinatorLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sourceList,
-        android.support.design.widget.FloatingActionButton sourceScrollDown,
+        android.support.design.widget.FloatingActionButton sourceToNext,
         RelativeLayout entryArea,
         android.support.v7.widget.Toolbar entryToolbar,
         android.support.v7.widget.RecyclerView entryList,
+        android.support.design.widget.FloatingActionButton entryToNext,
         LinearLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
         android.support.v7.widget.RecyclerView entryDetailList,
@@ -52,10 +54,11 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;
         this.sourceList = sourceList;
-        this.sourceScrollDown = sourceScrollDown;
+        this.sourceToNext = sourceToNext;
         this.entryArea = entryArea;
         this.entryToolbar = entryToolbar;
         this.entryList = entryList;
+        this.entryToNext = entryToNext;
         this.entryDetailArea = entryDetailArea;
         this.entryDetailToolbar = entryDetailToolbar;
         this.entryDetailList = entryDetailList;

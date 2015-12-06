@@ -23,4 +23,7 @@ class EntryArea(
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
     scroller.fastScrollTo(position)(done)
   }
+  def skipTo(position: Int): CallbackTask[Unit] = {
+    scroller skipTo position
+  }
 }

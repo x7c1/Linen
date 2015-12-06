@@ -8,7 +8,6 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish, UiThreadTask}
 
-
 object ScrollerTasks {
   def apply(recyclerView: RecyclerView): ScrollerTasks = {
     new ScrollerTasks(recyclerView, hastyTimePerInch = 125F)
@@ -67,6 +66,15 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         layoutManager startSmoothScroll scroller
       }
     } yield ()
+
+  def skipTo(position: Int): CallbackTask[Unit] = for {
+    ui <- task {
+      UiThreadTask from recyclerView
+    }
+    _ <- ui { _ =>
+      layoutManager.scrollToPositionWithOffset(position, 0)
+    }
+  } yield ()
 }
 
 class ScrollerStopEvent
