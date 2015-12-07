@@ -14,6 +14,8 @@ trait SourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 
   def collectLastFrom[A](sourceId: Long)(f: PartialFunction[Source, A]): Option[A]
+
+  def findNextId(sourceId: Long): Option[Long]
 }
 
 class SourceBuffer extends SourceAccessor {
@@ -39,7 +41,16 @@ class SourceBuffer extends SourceAccessor {
     val position = underlying.indexWhere(_.id == sourceId)
     Range(position - 1, -1, -1).view map underlying collectFirst f
   }
-  private def createDummies = (1 to 100) map { n =>
+  override def findNextId(sourceId: Long): Option[Long] = {
+    positionOf(sourceId) flatMap {
+      case position if underlying.lift(position + 1).nonEmpty =>
+        Some(underlying(position + 1).id)
+      case _ =>
+        None
+    }
+  }
+
+  private def createDummies = (1 to 300) map { n =>
     Source(
       id = n,
       url = s"http://example.com/sample-source-$n",

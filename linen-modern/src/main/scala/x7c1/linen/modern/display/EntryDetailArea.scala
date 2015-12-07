@@ -15,7 +15,7 @@ class EntryDetailArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  private val tasks = ScrollerTasks(recyclerView, 30F)
+  private val scroller = ScrollerTasks(recyclerView)
 
   def updateToolbar(entryId: Long): Unit = {
     val position = entries indexOf entryId
@@ -23,9 +23,12 @@ class EntryDetailArea(
     toolbar runUi {_ setTitle entry.title}
   }
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
-    tasks.fastScrollTo(position)(done)
+    scroller.fastScrollTo(position)(done)
   }
   def scrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
-    tasks.scrollTo(position)(done)
+    scroller.scrollTo(position)(done)
+  }
+  def skipTo(position: Int): CallbackTask[Unit] = {
+    scroller skipTo position
   }
 }

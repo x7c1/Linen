@@ -11,7 +11,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
+import android.support.design.widget.FloatingActionButton;
+import android.widget.RelativeLayout;
 
 public class MainLayout extends RecyclerView.ViewHolder {
 
@@ -20,13 +21,14 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.design.widget.CoordinatorLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sourceList;
-    public final LinearLayout entryArea;
+    public final android.support.design.widget.FloatingActionButton sourceToNext;
+    public final RelativeLayout entryArea;
     public final android.support.v7.widget.Toolbar entryToolbar;
     public final android.support.v7.widget.RecyclerView entryList;
+    public final android.support.design.widget.FloatingActionButton entryToNext;
     public final LinearLayout entryDetailArea;
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
     public final android.support.v7.widget.RecyclerView entryDetailList;
-    public final TextView sampleText;
     public final View dummySurface;
 
     public MainLayout(
@@ -36,13 +38,14 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.design.widget.CoordinatorLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sourceList,
-        LinearLayout entryArea,
+        android.support.design.widget.FloatingActionButton sourceToNext,
+        RelativeLayout entryArea,
         android.support.v7.widget.Toolbar entryToolbar,
         android.support.v7.widget.RecyclerView entryList,
+        android.support.design.widget.FloatingActionButton entryToNext,
         LinearLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
         android.support.v7.widget.RecyclerView entryDetailList,
-        TextView sampleText,
         View dummySurface
     ){
         super(itemView);
@@ -51,13 +54,14 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;
         this.sourceList = sourceList;
+        this.sourceToNext = sourceToNext;
         this.entryArea = entryArea;
         this.entryToolbar = entryToolbar;
         this.entryList = entryList;
+        this.entryToNext = entryToNext;
         this.entryDetailArea = entryDetailArea;
         this.entryDetailToolbar = entryDetailToolbar;
         this.entryDetailList = entryDetailList;
-        this.sampleText = sampleText;
         this.dummySurface = dummySurface;
     }
 }

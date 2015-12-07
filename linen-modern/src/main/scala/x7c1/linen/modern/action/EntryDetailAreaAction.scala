@@ -8,9 +8,9 @@ import x7c1.wheat.modern.callback.Imports._
 class EntryDetailAreaAction(
   container: PaneContainer,
   entryAccessor: EntryAccessor
-) extends OnSourceSelected with OnSourceFocused
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
-  with OnEntryDetailSelected {
+  with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fromSource(event.source.id)
@@ -18,6 +18,13 @@ class EntryDetailAreaAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     fromSource(event.source.id)
   }
+  override def onSourceSkipped(event: SourceSkippedEvent) = for {
+    Some(entryId) <- task { entryAccessor firstEntryIdOf event.nextSource.id }
+    entryPosition <- task { entryAccessor indexOf entryId }
+    _ <- container.entryDetailArea.skipTo(entryPosition)
+    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+  } yield ()
+
   override def onEntrySelected(event: EntrySelectedEvent) = {
     scrollAndUpdate(event.entry.entryId, event.position)
   }
@@ -29,6 +36,10 @@ class EntryDetailAreaAction(
     _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
   } yield ()
 
+  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
+    container.entryDetailArea.updateToolbar(event.entry.entryId)
+  }
+
   private def fromSource(sourceId: Long) = for {
     Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
     entryPosition <- task { entryAccessor indexOf entryId }
@@ -39,4 +50,5 @@ class EntryDetailAreaAction(
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
     _ <- task { container.entryDetailArea.updateToolbar(entryId) }
   } yield ()
+
 }

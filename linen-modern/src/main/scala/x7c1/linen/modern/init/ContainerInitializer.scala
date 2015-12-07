@@ -8,13 +8,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
+import x7c1.linen.modern.action.observer.{SourceSkippedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector}
+import x7c1.linen.modern.action.{SourceSkippedEventFactory, Actions, ContainerAction, EntryAreaAction, EntryBufferUpdater, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
-import x7c1.wheat.modern.tasks.ScrollerTasks
-
 
 class ContainerInitializer(
   activity: Activity,
@@ -48,6 +46,11 @@ class ContainerInitializer(
       focusedEventFactory = new SourceFocusedEventFactory(sourceBuffer),
       onFocused = new SourceFocusedObserver(actions)
     )
+    layout.sourceToNext setOnTouchListener SourceSkippedDetector.createListener(
+      context = layout.sourceToNext.getContext,
+      skippedEventFactory = new SourceSkippedEventFactory(manager, sourceBuffer),
+      onSkippedListener = new SourceSkippedObserver(actions)
+    )
   }
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -72,8 +75,20 @@ class ContainerInitializer(
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
+    val getPosition = () => {
+      manager.findFirstCompletelyVisibleItemPosition() match {
+        case n if n < 0 => manager.findFirstVisibleItemPosition()
+        case n => n
+      }
+    }
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter adapter
+    layout.entryDetailList setOnTouchListener FocusDetector.createListener(
+      recyclerView = layout.entryDetailList,
+      getPosition = getPosition,
+      focusedEventFactory = new EntryDetailFocusedEventFactory(entryBuffer),
+      onFocused = new EntryDetailFocusedObserver(actions)
+    )
   }
 
   private lazy val displaySize = {
@@ -88,18 +103,20 @@ class ContainerInitializer(
       onSourceEntryLoaded,
       entryCacher
     )
+    val entryBufferUpdater = new EntryBufferUpdater(
+      entryCacher, entryBuffer, sourceBuffer, onSourceEntryLoaded
+    )
     new Actions(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
       new EntryAreaAction(
         container = container,
         sourceAccessor = sourceBuffer,
-        entryBuffer = entryBuffer,
-        entryCacher = entryCacher,
-        onEntryLoaded = onSourceEntryLoaded
+        entryAccessor = entryBuffer,
+        entryBufferUpdater = entryBufferUpdater
       ),
       new EntryDetailAreaAction(container, entryBuffer),
-      new PrefetcherAction(prefetcher)
+      new PrefetcherAction(prefetcher, sourceBuffer, entryBufferUpdater)
     )
   }
   private lazy val sourceBuffer = new SourceBuffer
@@ -128,7 +145,7 @@ class ContainerInitializer(
   private lazy val entryArea = {
     new EntryArea(
       toolbar = layout.entryToolbar,
-      scroller = ScrollerTasks(layout.entryList, 125F),
+      recyclerView = layout.entryList,
       getPosition = () => panePosition of layout.entryArea
     )
   }

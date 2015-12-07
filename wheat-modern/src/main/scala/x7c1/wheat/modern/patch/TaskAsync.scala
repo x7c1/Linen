@@ -22,12 +22,18 @@ trait TaskAsync[Params, Progress, Result] {
 }
 
 object TaskAsync {
-  def run[A](delay: Int)(f: => A) = {
+  def run[A](delay: Int)(f: => A): Unit = {
     val timer = new BufferingTimer(delay)
     val task = new TaskAsync[Unit, Unit, Unit] {
       override def doInBackground(params: Unit*): Unit = f
     }
     timer touch task.execute()
+  }
+  def async[A](f: => A): Unit = {
+    val task = new TaskAsync[Unit, Unit, Unit] {
+      override def doInBackground(params: Unit*): Unit = f
+    }
+    task.execute()
   }
 }
 

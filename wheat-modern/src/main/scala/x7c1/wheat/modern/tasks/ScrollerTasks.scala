@@ -3,15 +3,14 @@ package x7c1.wheat.modern.tasks
 import android.content.Context
 import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
-import android.util.DisplayMetrics
+import android.util.{DisplayMetrics, TypedValue}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish, UiThreadTask}
 
-
 object ScrollerTasks {
-  def apply(recyclerView: RecyclerView, hastyTimePerInch: Float): ScrollerTasks = {
-    new ScrollerTasks(recyclerView, hastyTimePerInch)
+  def apply(recyclerView: RecyclerView): ScrollerTasks = {
+    new ScrollerTasks(recyclerView, hastyTimePerInch = 125F)
   }
 }
 
@@ -19,6 +18,11 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
 
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
+  }
+  private lazy val space: Int = {
+    val metrics = recyclerView.getResources.getDisplayMetrics
+    val dp = 100
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics).toInt
   }
 
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] =
@@ -28,10 +32,14 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         UiThreadTask from recyclerView
       }
       _ <- ui { _ =>
-        val current = layoutManager.findFirstCompletelyVisibleItemPosition()
+        val current = layoutManager.findFirstCompletelyVisibleItemPosition() match {
+          case n if n < 0 =>
+            layoutManager.findFirstVisibleItemPosition()
+          case n => n
+        }
         val diff = current - position
-        val space = if (diff < 0) -1 else if(diff > 0) 1 else 0
-        layoutManager.scrollToPositionWithOffset(position + space, 0)
+        val direction = if (diff < 0) 1 else if (diff > 0) -1 else 0
+        layoutManager.scrollToPositionWithOffset(position, direction * space)
       }
       _ <- ui { view =>
         val scroller = new SmoothScroller(
@@ -58,6 +66,15 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         layoutManager startSmoothScroll scroller
       }
     } yield ()
+
+  def skipTo(position: Int): CallbackTask[Unit] = for {
+    ui <- task {
+      UiThreadTask from recyclerView
+    }
+    _ <- ui { _ =>
+      layoutManager.scrollToPositionWithOffset(position, 0)
+    }
+  } yield ()
 }
 
 class ScrollerStopEvent

@@ -6,6 +6,7 @@ object OnFinish {
       override def by[B]: B => Unit = _ => f
     }
   }
+  def nop[A]: A => Unit = _ => ()
 }
 
 trait OnFinish {
