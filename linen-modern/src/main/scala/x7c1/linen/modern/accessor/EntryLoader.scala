@@ -1,6 +1,6 @@
 package x7c1.linen.modern.accessor
 
-import x7c1.linen.modern.struct.{Date, Entry}
+import x7c1.linen.modern.struct.Entry
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -25,16 +25,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
         }
     }
 
-  def createDummy(sourceId: Long) = (1 to 10) map { n =>
-    Entry(
-      sourceId = sourceId,
-      entryId = sourceId * 1000 + n,
-      url = s"http://example.com/source-$sourceId/entry-$n",
-      title = s"$sourceId-$n entry " + DummyString.words(10),
-      content = s"$sourceId-$n " + DummyString.words(200),
-      createdAt = Date.dummy()
-    )
-  }
+  def createDummy(sourceId: Long) = DummyCreator.createEntriesOf(sourceId)
 }
 
 class EntryLoadExecutor(cacher: EntryCacher){

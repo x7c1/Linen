@@ -16,8 +16,40 @@ trait EntryAccessor {
 class EntryBuffer extends EntryAccessor {
 
   override def get(position: Int): Entry = {
-    val sourceId = (position / 10) + 1
-    val n = position % 10 + 1
+    DummyCreator.createEntryAt(position)
+  }
+  override def length = {
+    DummyCreator.entryLength
+  }
+  override def indexOf(entryId: Long): Int = {
+    DummyCreator.entryIndexOf(entryId)
+  }
+  override def firstEntryIdOf(sourceId: Long): Option[Long] = {
+    DummyCreator.firstEntryIdOf(sourceId)
+  }
+
+}
+
+object DummyCreator {
+
+  def sourceLength = 300
+
+  def entryLength = sourceLength * entriesPerSource
+
+  def entriesPerSource = 10
+
+  def createEntriesOf(sourceId: Long): Seq[Entry] =
+    (1 to entriesPerSource) map { n =>
+      createEntry(sourceId, n)
+    }
+
+  def createEntryAt(position: Int): Entry = {
+    val sourceId = (position / entriesPerSource) + 1
+    val n = position % entriesPerSource + 1
+    createEntry(sourceId, n)
+  }
+
+  def createEntry(sourceId: Long, n: Int) = {
     Entry(
       sourceId = sourceId,
       entryId = sourceId * 1000 + n,
@@ -27,15 +59,14 @@ class EntryBuffer extends EntryAccessor {
       createdAt = Date.dummy()
     )
   }
-  override def length = 300 * 10
 
-  override def indexOf(entryId: Long): Int = {
+  def entryIndexOf(entryId: Long): Int = {
     val mod = entryId % 1000 - 1
     val n = entryId / 1000 - 1
-    (n * 10 + mod).toInt
-  }
-  override def firstEntryIdOf(sourceId: Long): Option[Long] = {
-    Some(sourceId * 1000 + 1)
+    (n * entriesPerSource + mod).toInt
   }
 
+  def firstEntryIdOf(sourceId: Long): Option[Long] = {
+    Some(sourceId * 1000 + 1)
+  }
 }
