@@ -3,7 +3,6 @@ package x7c1.linen.modern.action
 import x7c1.linen.modern.accessor.{EntryPrefetcher, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.patch.TaskAsync.async
 
 class PrefetcherAction(
   prefetcher: EntryPrefetcher,
@@ -34,10 +33,14 @@ class PrefetcherAction(
     load(event.entry.sourceId)
   }
 
+  /*
   private def load(sourceId: Long) = for {
     _ <- task apply async {
       prefetcher triggerBy sourceId
     }
   } yield ()
+  */
+
+  private def load(sourceId: Long) = task()
 
 }
