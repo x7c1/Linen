@@ -3,13 +3,11 @@ package x7c1.linen.modern.action
 import x7c1.linen.modern.accessor.{EntryPrefetcher, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.OnFinish
 import x7c1.wheat.modern.patch.TaskAsync.async
 
 class PrefetcherAction(
   prefetcher: EntryPrefetcher,
-  sourceAccessor: SourceAccessor,
-  entryBufferUpdater: EntryBufferUpdater
+  sourceAccessor: SourceAccessor
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
@@ -37,14 +35,9 @@ class PrefetcherAction(
   }
 
   private def load(sourceId: Long) = for {
-    _ <- task { prefetcher triggerBy sourceId }
-    _ <- task { insertAfter(sourceId) }
-  } yield ()
-
-  private def insertAfter(sourceId: Long): Unit = async {
-    sourceAccessor.findNextId(sourceId) foreach { sourceId =>
-      entryBufferUpdater.loadAndInsert(sourceId)(OnFinish.nop)
+    _ <- task apply async {
+      prefetcher triggerBy sourceId
     }
-  }
+  } yield ()
 
 }

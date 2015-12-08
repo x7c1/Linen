@@ -2,14 +2,15 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 
 class EntryAreaAction(
   container: PaneContainer,
   sourceAccessor: SourceAccessor,
-  entryAccessor: EntryAccessor,
-  entryBufferUpdater: EntryBufferUpdater
+  entryAccessor: EntryAccessor
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
@@ -21,7 +22,7 @@ class EntryAreaAction(
     display(event.source.id)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    n <- getOrCreatePosition(event.nextSource.id)
+    Some(n) <- getOrCreatePosition(event.nextSource.id)
     _ <- container.entryArea skipTo n
     _ <- task { updateToolbar(event.nextSource.id) }
   } yield ()
@@ -48,7 +49,7 @@ class EntryAreaAction(
   } yield ()
 
   private def display(sourceId: Long) = for {
-    n <- getOrCreatePosition(sourceId)
+    Some(n) <- getOrCreatePosition(sourceId)
     _ <- task of container.entryArea.fastScrollTo(n) _
     _ <- task { updateToolbar(sourceId) }
   } yield ()
@@ -58,12 +59,12 @@ class EntryAreaAction(
       container.entryArea updateToolbar source.title
     }
   }
-  private def getOrCreatePosition(sourceId: Long) =
+  private def getOrCreatePosition(sourceId: Long): CallbackTask[Option[Int]] =
     entryAccessor firstEntryIdOf sourceId match {
       case Some(entryId) =>
-        task { entryAccessor indexOf entryId }
+        task apply Some(entryAccessor indexOf entryId)
       case _ =>
-        for { event <- task of entryBufferUpdater.loadAndInsert(sourceId) _ }
-        yield event.position
+        Log warn s"no entry in source(id:$sourceId)"
+        task apply None
     }
 }

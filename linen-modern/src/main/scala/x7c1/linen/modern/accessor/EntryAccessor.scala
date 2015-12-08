@@ -1,10 +1,6 @@
 package x7c1.linen.modern.accessor
 
-import x7c1.linen.modern.struct.Entry
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
-import x7c1.wheat.modern.callback.OnFinish
+import x7c1.linen.modern.struct.{Date, Entry}
 
 trait EntryAccessor {
 
@@ -17,42 +13,29 @@ trait EntryAccessor {
   def indexOf(entryId: Long): Int
 }
 
-class EntryBuffer(entryInsertedListener: OnEntryInsertedListener) extends EntryAccessor {
+class EntryBuffer extends EntryAccessor {
 
-  private val underlying = ListBuffer[Entry]()
-
-  private val entriesMapping = mutable.Map[Long, Seq[Long]]()
-
-  override def get(position: Int): Entry = underlying(position)
-
-  override def length = underlying.length
-
-  override def indexOf(entryId: Long): Int =
-    underlying.indexWhere(_.entryId == entryId)
-
-  def positionAfter(entryId: Option[Long]) = {
-    entryId match {
-      case Some(id) => underlying.indexWhere(_.entryId == id) + 1
-      case _ => 0
-    }
+  override def get(position: Int): Entry = {
+    val sourceId = (position / 10) + 1
+    val n = position % 10 + 1
+    Entry(
+      sourceId = sourceId,
+      entryId = sourceId * 1000 + n,
+      url = s"http://example.com/source-$sourceId/entry-$n",
+      title = s"$sourceId-$n entry " * 3,
+      content = s"$sourceId-$n foo bar " * 200,
+      createdAt = Date.dummy()
+    )
   }
-  def insertAll(position: Int, sourceId: Long, entries: Seq[Entry])(done: OnFinish): Unit = {
-    val newer = entries filterNot { this has _.sourceId }
-    underlying.insertAll(position, newer)
-    entriesMapping(sourceId) = entries.map(_.entryId)
+  override def length = 300 * 10
 
-    val event = EntryInsertedEvent(position, newer.length)
-    entryInsertedListener.onInserted(event)(done)
-  }
-
-  def has(sourceId: Long): Boolean = {
-    entriesMapping.get(sourceId).exists(_.nonEmpty)
+  override def indexOf(entryId: Long): Int = {
+    val mod = entryId % 1000 - 1
+    val n = entryId / 1000 - 1
+    (n * 10 + mod).toInt
   }
   override def firstEntryIdOf(sourceId: Long): Option[Long] = {
-    entriesMapping.get(sourceId).flatMap(_.headOption)
-  }
-  def lastEntryIdOf(sourceId: Long): Option[Long] = {
-    entriesMapping.get(sourceId).flatMap(_.lastOption)
+    Some(sourceId * 1000 + 1)
   }
 
 }

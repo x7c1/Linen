@@ -98,27 +98,20 @@ class ContainerInitializer(
     size
   }
   private lazy val actions = {
-    val prefetcher = new EntryPrefetcher(
-      sourceBuffer,
-      onSourceEntryLoaded,
-      entryCacher
-    )
-    val entryBufferUpdater = new EntryBufferUpdater(
-      entryCacher, entryBuffer, sourceBuffer, onSourceEntryLoaded
-    )
+    val prefetcher = new EntryPrefetcher(sourceBuffer, entryCacher)
     new Actions(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
       new EntryAreaAction(
         container = container,
         sourceAccessor = sourceBuffer,
-        entryAccessor = entryBuffer,
-        entryBufferUpdater = entryBufferUpdater
+        entryAccessor = entryBuffer
       ),
       new EntryDetailAreaAction(container, entryBuffer),
-      new PrefetcherAction(prefetcher, sourceBuffer, entryBufferUpdater)
+      new PrefetcherAction(prefetcher, sourceBuffer)
     )
   }
+
   private lazy val sourceBuffer = new SourceBuffer
 
   private lazy val sourceStateBuffer = new SourceStateBuffer
@@ -132,15 +125,7 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.sourceArea
     )
   }
-
-  private lazy val onSourceEntryLoaded =
-    new SourceStateUpdater(sourceStateBuffer) append
-    new SourceChangedNotifier(sourceBuffer, layout.sourceList)
-
-  private lazy val entryBuffer = new EntryBuffer(
-    new InsertedEntriesNotifier(layout.entryList) append
-    new InsertedEntriesNotifier(layout.entryDetailList)
-  )
+  private lazy val entryBuffer = new EntryBuffer
 
   private lazy val entryArea = {
     new EntryArea(
