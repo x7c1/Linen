@@ -7,7 +7,6 @@ import scala.collection.mutable
 
 class EntryPrefetcher(
   sourceAccessor: SourceAccessor,
-  entryLoadedListener: OnEntryLoadedListener,
   entryCacher: EntryCacher){
 
   def triggerBy(sourceId: Long): Unit = {
@@ -35,7 +34,6 @@ class EntryPrefetcher(
     EntryLoader(entryCacher).load(sourceId){ event =>
       prefetching(sourceId) = false
       Log debug s"[done] source-$sourceId"
-      entryLoadedListener onEntryLoaded event
     }
   }
 

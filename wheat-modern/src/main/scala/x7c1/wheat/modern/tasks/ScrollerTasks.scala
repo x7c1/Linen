@@ -6,7 +6,7 @@ import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, Rec
 import android.util.{DisplayMetrics, TypedValue}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.{CallbackTask, OnFinish, UiThreadTask}
+import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 
 object ScrollerTasks {
   def apply(recyclerView: RecyclerView): ScrollerTasks = {
@@ -29,7 +29,7 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
     for {
       ui <- task {
         Log debug s"[init] position:$position"
-        UiThreadTask from recyclerView
+        UiThread via recyclerView
       }
       _ <- ui { _ =>
         val current = layoutManager.findFirstCompletelyVisibleItemPosition() match {
@@ -54,7 +54,7 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
   def scrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] =
     for {
       ui <- task {
-        UiThreadTask from recyclerView
+        UiThread via recyclerView
       }
       scroller <- task {
         new SmoothScroller(
@@ -69,7 +69,7 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
 
   def skipTo(position: Int): CallbackTask[Unit] = for {
     ui <- task {
-      UiThreadTask from recyclerView
+      UiThread via recyclerView
     }
     _ <- ui { _ =>
       layoutManager.scrollToPositionWithOffset(position, 0)

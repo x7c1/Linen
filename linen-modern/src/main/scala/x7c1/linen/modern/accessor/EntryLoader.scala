@@ -2,7 +2,7 @@ package x7c1.linen.modern.accessor
 
 import x7c1.linen.modern.struct.{Date, Entry}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.patch.TaskAsync
+import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ class EntryLoader (cacher: EntryCacher, listener: OnEntryLoadedListener){
       case Some(entries) =>
         listener.onEntryLoaded(new EntryLoadedEvent(sourceId, entries))
       case None =>
-        TaskAsync.run(delay = 500){
+        after(msec = 500){
           Log info s"[done] source-$sourceId"
           val entries = createDummy(sourceId)
           cacher.updateCache(sourceId, entries)
