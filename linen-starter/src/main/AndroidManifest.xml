@@ -8,6 +8,7 @@
         android:label="@string/app_name"
         android:name="android.support.multidex.MultiDexApplication"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -17,6 +18,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <provider
+            android:authorities="x7c1.linen.provider"
+            android:name="x7c1.linen.modern.accessor.SourceProvider"
+            android:exported="false"
+            >
+        </provider>
+
+    </application>
 </manifest>

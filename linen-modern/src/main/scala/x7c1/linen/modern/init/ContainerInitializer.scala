@@ -1,17 +1,20 @@
 package x7c1.linen.modern.init
 
 import java.lang.Math.max
+import java.util.Date
 
 import android.app.Activity
+import android.content.ContentValues
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
+import x7c1.linen.modern.accessor.{SourceProvider, EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
 import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.FocusDetector
 
 class ContainerInitializer(
@@ -26,9 +29,29 @@ class ContainerInitializer(
     updateWidth(0.9, layout.entryArea)
     updateWidth(0.95, layout.entryDetailArea)
 
+    example()
+
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
+  }
+  private def example() = {
+    val values = new ContentValues()
+    (1 to 3) foreach { n =>
+      values.put("title", s"title $n hoge-")
+      values.put("description", s"description $n fuga-" + new Date())
+      activity.getContentResolver.insert(SourceProvider.ContentUri, values)
+    }
+    val cursor = activity.getContentResolver.query(SourceProvider.ContentUri, null, null, null, null, null)
+    activity.startManagingCursor(cursor)
+
+    while(cursor.moveToNext()){
+      (0 to cursor.getColumnCount - 1) foreach { i =>
+        val column = cursor.getColumnName(i)
+        val value = cursor.getString(i)
+        Log error s"$column = $value"
+      }
+    }
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)

@@ -41,6 +41,6 @@ class PrefetcherAction(
   } yield ()
   */
 
-  private def load(sourceId: Long) = task()
+  private def load(sourceId: Long) = task(())
 
 }
