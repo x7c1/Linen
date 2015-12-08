@@ -20,7 +20,7 @@ class PaneContainer(
   def scrollTo(pane: Pane): OnFinish => Unit = done => {
     val current = view.getScrollX
     val dx = pane.displayPosition - current
-    val duration = 350
+    val duration = 300
 
     Log info s"[init] current:$current, dx:$dx"
     scroller.startScroll(current, 0, dx, 0, duration)
