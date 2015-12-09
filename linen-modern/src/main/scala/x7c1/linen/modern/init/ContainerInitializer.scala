@@ -7,7 +7,7 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, EntryProvider, SourceBuffer, SourceStateBuffer}
+import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
 import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
@@ -63,8 +63,8 @@ class ContainerInitializer(
       entryRowProvider
     )
     layout.entryList setLayoutManager manager
-    /*
     layout.entryList setAdapter adapter
+    /*
     layout.entryList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
@@ -87,8 +87,8 @@ class ContainerInitializer(
       }
     }
     layout.entryDetailList setLayoutManager manager
-    /*
     layout.entryDetailList setAdapter adapter
+    /*
     layout.entryDetailList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryDetailList,
       getPosition = getPosition,
@@ -135,10 +135,7 @@ class ContainerInitializer(
     )
   }
   private lazy val entryBuffer = {
-    val cursor = activity.getContentResolver.query(
-      EntryProvider.ContentUri, null, null, null, null, null
-    )
-    new EntryBuffer(cursor)
+    EntryBuffer.create(activity)
   }
 
   private lazy val entryArea = {

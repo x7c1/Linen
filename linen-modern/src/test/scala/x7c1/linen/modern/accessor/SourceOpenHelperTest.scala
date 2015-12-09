@@ -45,6 +45,24 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       rows map {_("description")}
     )
   }
+  @Test
+  def testQueryForEntryArea() = {
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val cursor = EntryBuffer createCursor context
+    val rows = toMaps(cursor)
+
+    /*
+    rows.map(prettyPrint).foreach(println)
+    */
+
+    val found1 = rows exists { _("title") == "5-1 entry title" }
+    assertEquals(true, found1)
+
+    val found2 = rows exists { _("title") == "3-1 entry title" }
+    assertEquals(false, found2)
+  }
 
   def showTable(tableName: String) = {
     println(s"====== tableName : $tableName")
@@ -75,5 +93,11 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       }
       pairs.toMap
     }
+  }
+  def prettyPrint(target: Map[String, String]) = {
+    target.
+      map{ case (k, v) => s"$k -> $v" }.
+      map("  " + _).
+      mkString("Map(\n", ",\n", "\n)")
   }
 }
