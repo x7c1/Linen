@@ -35,7 +35,7 @@ class SourceProvider extends ContentProvider {
     matcher
   }
 
-  private lazy val helper = new SourceOpenHelper(getContext)
+  private lazy val helper = new LinenOpenHelper(getContext)
 
   override def onCreate(): Boolean = {
     true
@@ -95,26 +95,6 @@ class SourceProvider extends ContentProvider {
   }
 }
 
-class SourceOpenHelper(context: Context)
-  extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
-
-  import x7c1.linen.modern.accessor.SourcesTable.tableName
-
-  override def onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int): Unit = {
-  }
-
-  override def onCreate(db: SQLiteDatabase): Unit = {
-    db.execSQL(
-      s"""CREATE TABLE IF NOT EXISTS $tableName (
-         |_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         |url TEXT,
-         |title TEXT,
-         |description TEXT
-         |)""".stripMargin
-    )
-  }
-}
-
 object SourcesTable {
   val tableName: String = "sources"
 }
@@ -144,7 +124,7 @@ class EntryProvider extends ContentProvider {
     matcher
   }
 
-  private lazy val helper = new EntryOpenHelper(getContext)
+  private lazy val helper = new LinenOpenHelper(getContext)
 
   override def onCreate(): Boolean = {
     true
@@ -204,17 +184,24 @@ class EntryProvider extends ContentProvider {
   }
 }
 
-class EntryOpenHelper(context: Context)
+class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
-
-  import EntriesTable.tableName
 
   override def onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int): Unit = {
   }
 
   override def onCreate(db: SQLiteDatabase): Unit = {
     db.execSQL(
-      s"""CREATE TABLE IF NOT EXISTS $tableName (
+      s"""CREATE TABLE IF NOT EXISTS sources (
+         |_id INTEGER PRIMARY KEY AUTOINCREMENT,
+         |url TEXT,
+         |title TEXT,
+         |description TEXT
+         |)""".stripMargin
+    )
+
+    db.execSQL(
+      s"""CREATE TABLE IF NOT EXISTS entries (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |source_id INTEGER,
          |url TEXT,
@@ -222,6 +209,15 @@ class EntryOpenHelper(context: Context)
          |content TEXT,
          |created_at INTEGER
          |)""".stripMargin
+    )
+
+    db.execSQL(
+      s"""CREATE TABLE IF NOT EXISTS list_source_map (
+         |list_id INTEGER,
+         |source_id INTEGER,
+         |created_at INTEGER
+         |)""".stripMargin
+
     )
   }
 }

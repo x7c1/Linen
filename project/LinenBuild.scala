@@ -54,6 +54,20 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(libraryDependencies += scalaz).
+    settings(libraryDependencies ++= Seq(
+      "com.novocode" % "junit-interface" % "0.11" % Test,
+      "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
+      "org.robolectric" % "android-all" % "5.1.1_r9-robolectric-1" % Test,
+      "junit" % "junit" % "4.12" % Test,
+      "org.robolectric" % "robolectric" % "3.0" % Test
+    )).
+    settings(
+
+      // not work?
+      // javaOptions in (Test, run) += "-Djava.awt.headless=true",
+
+      fork in Test := true
+    ).
     settings(
       unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
