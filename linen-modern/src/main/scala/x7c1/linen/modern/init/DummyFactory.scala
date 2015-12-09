@@ -97,15 +97,20 @@ object DummyFactory {
 
       val listId = 123
       val listSourceMap = new ContentValues()
-      source.put("list_id", listId: Double)
-      source.put("source_id", sourceId: Double)
+      listSourceMap.put("list_id", listId: Double)
+      listSourceMap.put("source_id", sourceId: Double)
       db.insert("list_source_map", null, listSourceMap)
 
       (1 to 3) foreach { j =>
         val entry = new ContentValues()
         entry.put("source_id", sourceId: Double)
         entry.put("title", s"$sourceId-$j entry title")
-        entry.put("description", s"$sourceId-$j entry description")
+        entry.put("content", s"$sourceId-$j entry content")
+        if (i == 3){
+          entry.put("read_state", 1: Double)
+        } else {
+          entry.put("read_state", 0: Double)// unread
+        }
         db.insert("entries", null, entry)
       }
     }

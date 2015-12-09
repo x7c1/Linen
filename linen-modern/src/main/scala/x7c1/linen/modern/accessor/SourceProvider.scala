@@ -207,6 +207,7 @@ class LinenOpenHelper(context: Context)
          |url TEXT,
          |title TEXT,
          |content TEXT,
+         |read_state INTEGER,
          |created_at INTEGER
          |)""".stripMargin
     )
