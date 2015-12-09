@@ -7,7 +7,7 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryProvider, EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceProvider, SourceStateBuffer}
+import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, EntryProvider, SourceBuffer, SourceStateBuffer}
 import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
@@ -120,10 +120,7 @@ class ContainerInitializer(
   }
 
   private lazy val sourceBuffer = {
-    val cursor = activity.getContentResolver.query(
-      SourceProvider.ContentUri, null, null, null, null, null
-    )
-    new SourceBuffer(cursor)
+    SourceBuffer.create(activity)
   }
 
   private lazy val sourceStateBuffer = new SourceStateBuffer

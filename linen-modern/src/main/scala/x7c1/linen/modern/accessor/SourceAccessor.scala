@@ -1,5 +1,6 @@
 package x7c1.linen.modern.accessor
 
+import android.content.Context
 import android.database.Cursor
 import x7c1.linen.modern.struct.Source
 
@@ -15,7 +16,7 @@ trait SourceAccessor {
 
 class SourceBuffer(cursor: Cursor) extends SourceAccessor {
 
-  private lazy val idIndex = cursor getColumnIndex "_id"
+  private lazy val idIndex = cursor getColumnIndex "source_id"
   private lazy val titleIndex = cursor getColumnIndex "title"
   private lazy val descriptionIndex = cursor getColumnIndex "description"
 
@@ -52,4 +53,37 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
     */
   }
 
+}
+
+object SourceBuffer {
+  def create(context: Context): SourceBuffer = {
+    val cursor = createCursor(context)
+    new SourceBuffer(cursor)
+  }
+
+  def createCursor(context: Context) = {
+    val helper = new LinenOpenHelper(context)
+    val db = helper.getWritableDatabase
+
+    val sql1 =
+      """SELECT * FROM list_source_map
+        | INNER JOIN sources ON list_source_map.source_id = sources._id
+        | ORDER BY sources._id DESC""".stripMargin
+
+    val sql2 =
+      """SELECT source_id FROM entries
+        | WHERE read_state = 0
+        | GROUP BY source_id """.stripMargin
+
+    val sql3 =
+      s"""SELECT
+        |   s1._id as source_id,
+        |   s1.title as title,
+        |   s1.description as description
+        | FROM ($sql1) as s1
+        | INNER JOIN ($sql2) as s2
+        | ON s1.source_id = s2.source_id""".stripMargin
+
+    db.rawQuery(sql3, Array())
+  }
 }
