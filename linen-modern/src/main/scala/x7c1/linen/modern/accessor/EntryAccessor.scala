@@ -1,5 +1,6 @@
 package x7c1.linen.modern.accessor
 
+import android.database.Cursor
 import x7c1.linen.modern.struct.{Date, Entry}
 
 trait EntryAccessor {
@@ -13,7 +14,7 @@ trait EntryAccessor {
   def indexOf(entryId: Long): Int
 }
 
-class EntryBuffer extends EntryAccessor {
+class EntryBuffer(cursor: Cursor) extends EntryAccessor {
 
   override def get(position: Int): Entry = {
     DummyCreator.createEntryAt(position)

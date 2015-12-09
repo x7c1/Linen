@@ -20,8 +20,15 @@
         </activity>
 
         <provider
-            android:authorities="x7c1.linen.provider"
+            android:authorities="x7c1.linen.provider.source"
             android:name="x7c1.linen.modern.accessor.SourceProvider"
+            android:exported="false"
+            >
+        </provider>
+
+        <provider
+            android:authorities="x7c1.linen.provider.entry"
+            android:name="x7c1.linen.modern.accessor.EntryProvider"
             android:exported="false"
             >
         </provider>

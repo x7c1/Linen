@@ -1,21 +1,19 @@
 package x7c1.linen.modern.init
 
 import java.lang.Math.max
-import java.util.Date
 
 import android.app.Activity
-import android.content.ContentValues
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{SourceProvider, EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.accessor.{EntryProvider, EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceProvider, SourceStateBuffer}
+import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.FocusDetector
+
 
 class ContainerInitializer(
   activity: Activity,
@@ -29,29 +27,11 @@ class ContainerInitializer(
     updateWidth(0.9, layout.entryArea)
     updateWidth(0.95, layout.entryDetailArea)
 
-    example()
+    DummyFactory.setup(layout, activity)
 
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
-  }
-  private def example() = {
-    val values = new ContentValues()
-    (1 to 3) foreach { n =>
-      values.put("title", s"title $n hoge-")
-      values.put("description", s"description $n fuga-" + new Date())
-      activity.getContentResolver.insert(SourceProvider.ContentUri, values)
-    }
-    val cursor = activity.getContentResolver.query(SourceProvider.ContentUri, null, null, null, null, null)
-    activity.startManagingCursor(cursor)
-
-    while(cursor.moveToNext()){
-      (0 to cursor.getColumnCount - 1) foreach { i =>
-        val column = cursor.getColumnName(i)
-        val value = cursor.getString(i)
-        Log error s"$column = $value"
-      }
-    }
   }
   private def setupSourceArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -83,6 +63,7 @@ class ContainerInitializer(
       entryRowProvider
     )
     layout.entryList setLayoutManager manager
+    /*
     layout.entryList setAdapter adapter
     layout.entryList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryList,
@@ -90,6 +71,7 @@ class ContainerInitializer(
       focusedEventFactory = new EntryFocusedEventFactory(entryBuffer),
       onFocused = new EntryFocusedObserver(actions)
     )
+    */
   }
   private def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -105,6 +87,7 @@ class ContainerInitializer(
       }
     }
     layout.entryDetailList setLayoutManager manager
+    /*
     layout.entryDetailList setAdapter adapter
     layout.entryDetailList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryDetailList,
@@ -112,6 +95,7 @@ class ContainerInitializer(
       focusedEventFactory = new EntryDetailFocusedEventFactory(entryBuffer),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
+    */
   }
 
   private lazy val displaySize = {
@@ -135,7 +119,12 @@ class ContainerInitializer(
     )
   }
 
-  private lazy val sourceBuffer = new SourceBuffer
+  private lazy val sourceBuffer = {
+    val cursor = activity.getContentResolver.query(
+      SourceProvider.ContentUri, null, null, null, null, null
+    )
+    new SourceBuffer(cursor)
+  }
 
   private lazy val sourceStateBuffer = new SourceStateBuffer
 
@@ -148,7 +137,12 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.sourceArea
     )
   }
-  private lazy val entryBuffer = new EntryBuffer
+  private lazy val entryBuffer = {
+    val cursor = activity.getContentResolver.query(
+      EntryProvider.ContentUri, null, null, null, null, null
+    )
+    new EntryBuffer(cursor)
+  }
 
   private lazy val entryArea = {
     new EntryArea(

@@ -29,10 +29,7 @@ object TaskAsync {
     new Timer().schedule(task, msec)
   }
   def async[A](f: => A): Unit = {
-    val task = new TaskAsync[Unit, Unit, Unit] {
-      override def doInBackground(params: Unit*): Unit = f
-    }
-    task.execute()
+    after(0)(f)
   }
 }
 
