@@ -32,6 +32,8 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         UiThread via recyclerView
       }
       _ <- ui { _ =>
+        recyclerView.stopScroll()
+
         val current = layoutManager.findFirstCompletelyVisibleItemPosition() match {
           case n if n < 0 =>
             layoutManager.findFirstVisibleItemPosition()
