@@ -4,7 +4,7 @@ import x7c1.linen.modern.accessor.EntryAccessor
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
-import x7c1.wheat.modern.tasks.Async.await
+import x7c1.wheat.modern.tasks.Async
 
 class EntryDetailAreaAction(
   container: PaneContainer,
@@ -16,15 +16,17 @@ class EntryDetailAreaAction(
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fromSourceArea(event.source.id)
   }
-  override def onSourceFocused(event: SourceFocusedEvent) = {
-    fromSourceArea(event.source.id)
-  }
+  override def onSourceFocused(event: SourceFocusedEvent) = for {
+    _ <- Async.await(300)
+    _ <- fromSourceArea(event.source.id)
+  } yield()
+
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
     _ <- container.entryDetailArea.skipTo(entryPosition)
+    Some(entry) <- task { entryAccessor findAt entryPosition }
     _ <- task {
-      entryAccessor findAt entryPosition map
-        (_.title) foreach container.entryDetailArea.updateToolbar
+      container.entryDetailArea updateToolbar entry.title
     }
   } yield ()
 
@@ -44,7 +46,6 @@ class EntryDetailAreaAction(
   }
 
   private def fromSourceArea(sourceId: Long) = for {
-    _ <- await(200)
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
     Some(entry) <- task { entryAccessor findAt entryPosition }
     _ <- container.entryDetailArea skipTo entryPosition

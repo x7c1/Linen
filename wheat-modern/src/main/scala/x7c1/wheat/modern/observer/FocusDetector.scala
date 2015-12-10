@@ -53,7 +53,8 @@ private class FocusedItemNotifier[A <: ItemFocusedEvent](
   override def onScrollStopped(e: ScrollStoppedEvent): Unit = {
     val position = getPosition()
     if (position > -1){
-      focusedEventFactory createAt position foreach onFocusedListener.onFocused
+      focusedEventFactory createAt
+        position foreach onFocusedListener.onFocused
     }
   }
 }

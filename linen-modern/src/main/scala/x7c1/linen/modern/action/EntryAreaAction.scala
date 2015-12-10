@@ -54,9 +54,10 @@ class EntryAreaAction(
   } yield ()
 
   private def updateToolbar(sourceId: Long): Unit = {
-    sourceAccessor positionOf sourceId map sourceAccessor.get foreach { source =>
-      container.entryArea updateToolbar source.title
-    }
+    sourceAccessor positionOf sourceId flatMap
+      sourceAccessor.findAt foreach { source =>
+        container.entryArea updateToolbar source.title
+      }
   }
   private def getOrCreatePosition(sourceId: Long): CallbackTask[Option[Int]] =
     task { entryAccessor firstEntryPositionOf sourceId }

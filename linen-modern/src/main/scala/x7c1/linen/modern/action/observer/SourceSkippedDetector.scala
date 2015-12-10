@@ -25,9 +25,7 @@ object SourceSkippedDetector {
             false
           case MotionEvent.ACTION_UP | MotionEvent.ACTION_CANCEL =>
             Log error "up"
-
-            val event = skippedEventFactory.create()
-            onSkippedListener onSkipped event
+            skippedEventFactory.create() foreach onSkippedListener.onSkipped
             true
           case _ =>
             false
@@ -74,7 +72,7 @@ trait ItemSkippedEvent {
 }
 
 trait SkippedEventFactory[A <: ItemSkippedEvent]{
-  def create(): A
+  def create(): Option[A]
 }
 
 trait OnItemSkippedListener {

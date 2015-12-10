@@ -5,7 +5,7 @@ import android.database.Cursor
 import x7c1.linen.modern.struct.Source
 
 trait SourceAccessor {
-  def get(position: Int):Source
+  def findAt(position: Int): Option[Source]
 
   def length: Int
 
@@ -20,14 +20,15 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
   private lazy val titleIndex = cursor getColumnIndex "title"
   private lazy val descriptionIndex = cursor getColumnIndex "description"
 
-  override def get(position: Int): Source = {
-    cursor moveToPosition position
-    Source(
-      id = cursor.getInt(idIndex),
-      url = "dummy",
-      title = cursor.getString(titleIndex),
-      description = cursor.getString(descriptionIndex)
-    )
+  override def findAt(position: Int) = synchronized {
+    if (cursor moveToPosition position){
+      Some apply Source(
+        id = cursor.getInt(idIndex),
+        url = "dummy",
+        title = cursor.getString(titleIndex),
+        description = cursor.getString(descriptionIndex)
+      )
+    } else None
   }
   override def length = {
     cursor.getCount
@@ -38,7 +39,7 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
   }
   override def positionOf(sourceId: Long): Option[Int] = {
     (0 to length - 1) find { n =>
-      get(n).id == sourceId
+      findAt(n).exists(_.id == sourceId)
     }
   }
 

@@ -45,9 +45,10 @@ case class SourceFocusedEvent(
 class SourceFocusedEventFactory(sourceAccessor: SourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
-  override def createAt(position: Int) = Option {
-    val source = sourceAccessor get position
-    SourceFocusedEvent(position, source)
+  override def createAt(position: Int) = {
+    sourceAccessor findAt position map { source =>
+      SourceFocusedEvent(position, source)
+    }
   }
 }
 
@@ -61,10 +62,11 @@ class SourceSkippedEventFactory(
 
   extends SkippedEventFactory[SourceSkippedEvent]{
 
-  override def create(): SourceSkippedEvent = {
+  override def create() = {
     val next = 1 + layoutManager.findFirstCompletelyVisibleItemPosition()
-    val source = sourceAccessor.get(next)
-    SourceSkippedEvent(next, source)
+    sourceAccessor findAt next map { source =>
+      SourceSkippedEvent(next, source)
+    }
   }
 }
 

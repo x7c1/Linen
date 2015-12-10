@@ -41,5 +41,3 @@ trait OnEntryDetailSelectedListener {
 case class EntryDetailSelectedEvent(position: Int, entry: Entry){
   def dump: String = s"position:$position, entry:$entry"
 }
-
-

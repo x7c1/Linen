@@ -3,7 +3,6 @@ package x7c1.linen.modern.accessor
 import android.content.Context
 import android.database.Cursor
 import x7c1.linen.modern.struct.{Date, Entry}
-import x7c1.wheat.macros.logger.Log
 
 trait EntryAccessor {
 
@@ -22,25 +21,17 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
   private lazy val contentIndex = cursor getColumnIndex "content"
   private lazy val createdAtIndex = cursor getColumnIndex "created_at"
 
-  override def findAt(position: Int) = try {
-    cursor moveToPosition position
-    Some apply Entry(
-      entryId = cursor getInt entryIdIndex,
-      sourceId = cursor getInt sourceIdIndex,
-      url = "dummy",
-      title = cursor getString titleIndex,
-      content = cursor getString contentIndex,
-      createdAt = Date.dummy()
-    )
-  } catch {
-    case e: Exception =>
-
-      /*
-        In rare case, somehow CursorWindow throws an IllegalStateException which says:
-          "Make sure the Cursor is initialized correctly before accessing data from it."
-       */
-      Log error e.getStackTrace.take(20).mkString("\n")
-      None
+  override def findAt(position: Int) = synchronized {
+    if (cursor moveToPosition position){
+      Some apply Entry(
+        entryId = cursor getInt entryIdIndex,
+        sourceId = cursor getInt sourceIdIndex,
+        url = "dummy",
+        title = cursor getString titleIndex,
+        content = cursor getString contentIndex,
+        createdAt = Date.dummy()
+      )
+    } else None
   }
 
   override def length = {

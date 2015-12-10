@@ -20,21 +20,22 @@ class SourceRowAdapter(
   }
 
   override def onBindViewHolder(holder: SourceRow, position: Int) = {
-    val source = sourceAccessor.get(position)
-    holder.title.text = source.title
-    holder.description.text = source.description
-    holder.itemView onClick { view =>
-      val event = SourceSelectedEvent(position, source)
-      sourceSelectedListener onSourceSelected event
-    }
-    holder.statePrefetched.setVisibility(View.GONE)
-    holder.stateUnloaded.setVisibility(View.GONE)
+    sourceAccessor.findAt(position) foreach { source =>
+      holder.title.text = source.title
+      holder.description.text = source.description
+      holder.itemView onClick { view =>
+        val event = SourceSelectedEvent(position, source)
+        sourceSelectedListener onSourceSelected event
+      }
+      holder.statePrefetched.setVisibility(View.GONE)
+      holder.stateUnloaded.setVisibility(View.GONE)
 
-    sourceStateAccessor.findState(source.id) match {
-      case Some(SourcePrefetched) =>
-        holder.statePrefetched.setVisibility(View.VISIBLE)
-      case _ =>
-        holder.stateUnloaded.setVisibility(View.VISIBLE)
+      sourceStateAccessor.findState(source.id) match {
+        case Some(SourcePrefetched) =>
+          holder.statePrefetched.setVisibility(View.VISIBLE)
+        case _ =>
+          holder.stateUnloaded.setVisibility(View.VISIBLE)
+      }
     }
   }
 
