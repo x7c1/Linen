@@ -37,12 +37,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       rows map {_("source_id")}
     )
     assertEquals(
-      Seq("title-5", "title-4", "title-2", "title-1"),
+      Seq("5-title", "4-title", "2-title", "1-title"),
       rows map {_("title")}
-    )
-    assertEquals(
-      Seq("description-5", "description-4", "description-2", "description-1"),
-      rows map {_("description")}
     )
   }
   @Test
@@ -70,10 +66,10 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val cursor = EntryBuffer createCounterCursor context
     val rows = toMaps(cursor)
-
     val actual = rows.map(_("count")).map(_.toInt)
     assertEquals(Seq(10,10,10,10), actual)
   }
+
   @Test
   def testCalculateSourcePosition(): Unit = {
     val context = RuntimeEnvironment.application

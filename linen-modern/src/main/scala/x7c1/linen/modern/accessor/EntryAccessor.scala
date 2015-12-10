@@ -43,7 +43,8 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
 object EntryBuffer {
   def create(context: Context): EntryBuffer = {
     val cursor = createCursor(context)
-    new EntryBuffer(cursor, createSourcePositionMap(context))
+    val map = createSourcePositionMap(context)
+    new EntryBuffer(cursor, map)
   }
 
   val sql1 =
@@ -106,6 +107,7 @@ object EntryBuffer {
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
+
     db.rawQuery(sql5, Array())
   }
 
