@@ -63,6 +63,30 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val found2 = rows exists { _("title") == "3-1 entry title" }
     assertEquals(false, found2)
   }
+  @Test
+  def testQueryToCountEntry() = {
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val cursor = EntryBuffer createCounterCursor context
+    val rows = toMaps(cursor)
+
+    val actual = rows.map(_("count")).map(_.toInt)
+    assertEquals(Seq(10,10,10,10), actual)
+  }
+  @Test
+  def testCalculateSourcePosition(): Unit = {
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val positions = EntryBuffer createSourcePositionMap context
+    assertEquals(0, positions(5))
+    assertEquals(10, positions(4))
+    assertEquals(20, positions(2))
+    assertEquals(30, positions(1))
+
+    intercept[NoSuchElementException](positions(3))
+  }
 
   def showTable(tableName: String) = {
     println(s"====== tableName : $tableName")

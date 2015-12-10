@@ -19,36 +19,34 @@ class EntryDetailAreaAction(
     fromSource(event.source.id)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    Some(entryId) <- task { entryAccessor firstEntryIdOf event.nextSource.id }
-    entryPosition <- task { entryAccessor indexOf entryId }
+    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
     _ <- container.entryDetailArea.skipTo(entryPosition)
-    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+    _ <- task { container.entryDetailArea.updateToolbar(entryPosition) }
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    scrollAndUpdate(event.entry.entryId, event.position)
+    scrollAndUpdate(event.position)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    scrollAndUpdate(event.entry.entryId, event.position)
+    scrollAndUpdate(event.position)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- task of container.entryDetailArea.scrollTo(event.position) _
-    _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
+    _ <- task { container.entryDetailArea.updateToolbar(event.position) }
   } yield ()
 
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
-    container.entryDetailArea.updateToolbar(event.entry.entryId)
+    container.entryDetailArea.updateToolbar(event.position)
   }
 
   private def fromSource(sourceId: Long) = for {
-    Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
-    entryPosition <- task { entryAccessor indexOf entryId }
-    _ <- scrollAndUpdate(entryId, entryPosition)
+    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
+    _ <- scrollAndUpdate(entryPosition)
   } yield ()
 
-  private def scrollAndUpdate(entryId: Long, entryPosition: Int) = for {
+  private def scrollAndUpdate(entryPosition: Int) = for {
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
-    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+    _ <- task { container.entryDetailArea.updateToolbar(entryPosition) }
   } yield ()
 
 }

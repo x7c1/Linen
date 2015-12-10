@@ -17,9 +17,8 @@ class EntryDetailArea(
 
   private val scroller = ScrollerTasks(recyclerView)
 
-  def updateToolbar(entryId: Long): Unit = {
-    val position = entries indexOf entryId
-    val entry = entries.get(position)
+  def updateToolbar(entryPosition: Int): Unit = {
+    val entry = entries get entryPosition
     toolbar runUi {_ setTitle entry.title}
   }
   def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {

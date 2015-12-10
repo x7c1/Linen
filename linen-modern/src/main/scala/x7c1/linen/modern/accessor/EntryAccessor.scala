@@ -10,12 +10,10 @@ trait EntryAccessor {
 
   def length: Int
 
-  def firstEntryIdOf(sourceId: Long): Option[Long]
-
-  def indexOf(entryId: Long): Int
+  def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-class EntryBuffer(cursor: Cursor) extends EntryAccessor {
+class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAccessor {
 
   private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
@@ -37,70 +35,98 @@ class EntryBuffer(cursor: Cursor) extends EntryAccessor {
   override def length = {
     cursor.getCount
   }
-  override def indexOf(entryId: Long): Int = {
-    (0 to length - 1) find { i =>
-      get(i).entryId == entryId
-    } getOrElse {
-      throw new IllegalArgumentException(s"entry($entryId) not found")
-    }
+  override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
+    positionMap.get(sourceId)
   }
-  override def firstEntryIdOf(sourceId: Long): Option[Long] = {
-    (0 to length - 1).view map get collectFirst {
-      case entry if entry.sourceId == sourceId => entry.entryId
-    }
-  }
-
 }
 
 object EntryBuffer {
   def create(context: Context): EntryBuffer = {
     val cursor = createCursor(context)
-    new EntryBuffer(cursor)
+    new EntryBuffer(cursor, createSourcePositionMap(context))
   }
+
+  val sql1 =
+    s"""SELECT * FROM list_source_map
+       | INNER JOIN sources ON list_source_map.source_id = sources._id
+       | ORDER BY sources.rating DESC""".stripMargin
+
+  val sql2 =
+    s"""SELECT source_id FROM entries
+       | WHERE read_state = 0
+       | GROUP BY source_id """.stripMargin
+
+  val sql3 =
+    s"""SELECT
+       |   s1._id as source_id,
+       |   s1.title as title,
+       |   s1.rating as rating,
+       |   s1.description as description
+       | FROM ($sql1) as s1
+       | INNER JOIN ($sql2) as s2
+       | ON s1.source_id = s2.source_id""".stripMargin
+
+  val entries =
+    s"""SELECT
+       |   _id,
+       |   source_id,
+       |   title,
+       |   content,
+       |   created_at
+       | FROM entries
+       | ORDER BY _id DESC""".stripMargin
+
+  val sql4 =
+    s"""SELECT
+       |   entries._id as entry_id,
+       |   s3.source_id as source_id,
+       |   entries.title as title,
+       |   entries.content as content,
+       |   s3.rating as rating,
+       |   entries.created_at as created_at
+       | FROM ($sql3) as s3
+       | INNER JOIN ($entries) as entries
+       | ON s3.source_id = entries.source_id
+       | ORDER BY rating DESC, source_id DESC, entry_id DESC""".stripMargin
+
   def createCursor(context: Context) = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
 
-    val sql1 =
-      """SELECT * FROM list_source_map
-        | INNER JOIN sources ON list_source_map.source_id = sources._id
-        | ORDER BY sources._id DESC""".stripMargin
-
-    val sql2 =
-      """SELECT source_id FROM entries
-        | WHERE read_state = 0
-        | GROUP BY source_id """.stripMargin
-
-    val sql3 =
-      s"""SELECT
-        |   s1._id as source_id,
-        |   s1.title as title,
-        |   s1.description as description
-        | FROM ($sql1) as s1
-        | INNER JOIN ($sql2) as s2
-        | ON s1.source_id = s2.source_id""".stripMargin
-
-    val entries =
-      s"""SELECT
-        |   _id,
-        |   source_id,
-        |   title,
-        |   content,
-        |   created_at
-        | FROM entries""".stripMargin
-
-    val sql4 =
-      s"""SELECT
-        |   entries._id as entry_id,
-        |   s3.source_id as source_id,
-        |   entries.title as title,
-        |   entries.content as content,
-        |   entries.created_at as created_at
-        | FROM ($sql3) as s3
-        | INNER JOIN ($entries) as entries
-        | ON s3.source_id = entries.source_id""".stripMargin
-
     db.rawQuery(sql4, Array())
+  }
+
+  def createCounterCursor(context: Context) = {
+    val sql5 =
+      s"""SELECT COUNT(entry_id) as count, source_id, rating
+         | FROM($sql4)
+         | GROUP BY source_id, rating
+         | ORDER BY rating DESC, source_id DESC
+       """.stripMargin
+
+    val helper = new LinenOpenHelper(context)
+    val db = helper.getWritableDatabase
+    db.rawQuery(sql5, Array())
+  }
+
+  def createSourcePositionMap(context: Context): Map[Long, Int] = {
+    val cursor = createCounterCursor(context)
+    val countIndex = cursor getColumnIndex "count"
+    val sourceIdIndex = cursor getColumnIndex "source_id"
+
+    val list = (0 to cursor.getCount - 1).map { i =>
+      cursor.moveToPosition(i)
+      cursor.getLong(sourceIdIndex) ->
+        cursor.getInt(countIndex)
+    }
+    val pairs = list.scanLeft((0L, (0, 0))){
+      case ((_, (previous, sum)), (sourceId, count)) =>
+        (sourceId, (count, previous + sum))
+    } map {
+      case (sourceId, (count, position)) =>
+        sourceId -> position
+    }
+    pairs.toMap
   }
 }
 

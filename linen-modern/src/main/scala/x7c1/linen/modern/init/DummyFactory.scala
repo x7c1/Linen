@@ -62,6 +62,7 @@ object DummyFactory {
       val source = new ContentValues()
       source.put("title", s"title-$i")
       source.put("description", s"description-$i")
+      source.put("rating", i * 10 : Double)
       val sourceId = db.insert("sources", null, source)
 
       val listId = 123

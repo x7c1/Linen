@@ -36,21 +36,11 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
 
   override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
     ???
-    /*
-    val sources = underlying.dropWhile(_.id != sourceId).tail
-    sources take count
-    */
   }
   override def positionOf(sourceId: Long): Option[Int] = {
     (0 to length - 1) find { n =>
       get(n).id == sourceId
     }
-    /*
-    underlying.indexWhere(_.id == sourceId) match {
-      case -1 => None
-      case position => Some(position)
-    }
-    */
   }
 
 }
@@ -68,7 +58,7 @@ object SourceBuffer {
     val sql1 =
       """SELECT * FROM list_source_map
         | INNER JOIN sources ON list_source_map.source_id = sources._id
-        | ORDER BY sources._id DESC""".stripMargin
+        | ORDER BY sources.rating DESC, sources._id DESC""".stripMargin
 
     val sql2 =
       """SELECT source_id FROM entries
@@ -79,10 +69,12 @@ object SourceBuffer {
       s"""SELECT
         |   s1._id as source_id,
         |   s1.title as title,
-        |   s1.description as description
+        |   s1.description as description,
+        |   s1.rating as rating
         | FROM ($sql1) as s1
         | INNER JOIN ($sql2) as s2
-        | ON s1.source_id = s2.source_id""".stripMargin
+        | ON s1.source_id = s2.source_id
+        | ORDER BY s1.rating DESC, source_id DESC""".stripMargin
 
     db.rawQuery(sql3, Array())
   }

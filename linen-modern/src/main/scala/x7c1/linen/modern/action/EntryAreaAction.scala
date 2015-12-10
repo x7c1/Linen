@@ -2,7 +2,6 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
@@ -60,11 +59,5 @@ class EntryAreaAction(
     }
   }
   private def getOrCreatePosition(sourceId: Long): CallbackTask[Option[Int]] =
-    entryAccessor firstEntryIdOf sourceId match {
-      case Some(entryId) =>
-        task apply Some(entryAccessor indexOf entryId)
-      case _ =>
-        Log warn s"no entry in source(id:$sourceId)"
-        task apply None
-    }
+    task { entryAccessor firstEntryPositionOf sourceId }
 }

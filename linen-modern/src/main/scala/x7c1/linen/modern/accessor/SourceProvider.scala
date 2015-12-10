@@ -196,7 +196,8 @@ class LinenOpenHelper(context: Context)
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |url TEXT,
          |title TEXT,
-         |description TEXT
+         |description TEXT,
+         |rating INTEGER
          |)""".stripMargin
     )
 

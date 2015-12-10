@@ -8,8 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
+import x7c1.linen.modern.action.{EntryFocusedEventFactory, EntryDetailFocusedEventFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
@@ -64,14 +64,12 @@ class ContainerInitializer(
     )
     layout.entryList setLayoutManager manager
     layout.entryList setAdapter adapter
-    /*
     layout.entryList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       focusedEventFactory = new EntryFocusedEventFactory(entryBuffer),
       onFocused = new EntryFocusedObserver(actions)
     )
-    */
   }
   private def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(activity)
@@ -88,14 +86,12 @@ class ContainerInitializer(
     }
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter adapter
-    /*
     layout.entryDetailList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryDetailList,
       getPosition = getPosition,
       focusedEventFactory = new EntryDetailFocusedEventFactory(entryBuffer),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
-    */
   }
 
   private lazy val displaySize = {
