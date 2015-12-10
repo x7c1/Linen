@@ -4,6 +4,7 @@ import x7c1.linen.modern.accessor.EntryAccessor
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
+import x7c1.wheat.modern.tasks.Async.await
 
 class EntryDetailAreaAction(
   container: PaneContainer,
@@ -13,10 +14,10 @@ class EntryDetailAreaAction(
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    fromSource(event.source.id)
+    fromSourceArea(event.source.id)
   }
   override def onSourceFocused(event: SourceFocusedEvent) = {
-    fromSource(event.source.id)
+    fromSourceArea(event.source.id)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
@@ -42,10 +43,12 @@ class EntryDetailAreaAction(
     container.entryDetailArea.updateToolbar(event.entry.title)
   }
 
-  private def fromSource(sourceId: Long) = for {
+  private def fromSourceArea(sourceId: Long) = for {
+    _ <- await(200)
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
     Some(entry) <- task { entryAccessor findAt entryPosition }
-    _ <- scrollAndUpdate(entryPosition, entry.title)
+    _ <- container.entryDetailArea skipTo entryPosition
+    _ <- task { container.entryDetailArea updateToolbar entry.title }
   } yield ()
 
   private def scrollAndUpdate(entryPosition: Int, title: String) = for {
