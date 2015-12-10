@@ -21,7 +21,7 @@ class EntryDetailRowAdapter(
   }
 
   override def onBindViewHolder(holder: EntryDetailRow, position: Int): Unit = {
-    entryAccessor get position foreach { entry =>
+    entryAccessor findAt position foreach { entry =>
       holder.title.text = entry.title
       holder.content.text = entry.content
       holder.createdAt.text = entry.createdAt.format

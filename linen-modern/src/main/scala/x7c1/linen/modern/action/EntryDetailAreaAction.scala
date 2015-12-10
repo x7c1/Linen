@@ -22,7 +22,7 @@ class EntryDetailAreaAction(
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
     _ <- container.entryDetailArea.skipTo(entryPosition)
     _ <- task {
-      entryAccessor get entryPosition map
+      entryAccessor findAt entryPosition map
         (_.title) foreach container.entryDetailArea.updateToolbar
     }
   } yield ()
@@ -44,7 +44,7 @@ class EntryDetailAreaAction(
 
   private def fromSource(sourceId: Long) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
-    Some(entry) <- task { entryAccessor get entryPosition }
+    Some(entry) <- task { entryAccessor findAt entryPosition }
     _ <- scrollAndUpdate(entryPosition, entry.title)
   } yield ()
 

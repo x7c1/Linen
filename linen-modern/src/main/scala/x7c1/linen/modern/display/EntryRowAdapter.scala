@@ -26,7 +26,7 @@ class EntryRowAdapter(
   }
   override def onBindViewHolder(holder: EntryRow, position: Int) = {
     val display = for {
-      Some(entry) <- task { entryAccessor get position }
+      Some(entry) <- task { entryAccessor findAt position }
       _ <- task {
         holder.title.text = entry.title
         holder.content.text = ""

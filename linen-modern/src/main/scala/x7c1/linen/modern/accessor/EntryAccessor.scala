@@ -7,7 +7,7 @@ import x7c1.wheat.macros.logger.Log
 
 trait EntryAccessor {
 
-  def get(position: Int): Option[Entry]
+  def findAt(position: Int): Option[Entry]
 
   def length: Int
 
@@ -22,7 +22,7 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
   private lazy val contentIndex = cursor getColumnIndex "content"
   private lazy val createdAtIndex = cursor getColumnIndex "created_at"
 
-  override def get(position: Int): Option[Entry] = try {
+  override def findAt(position: Int) = try {
     cursor moveToPosition position
     Some apply Entry(
       entryId = cursor getInt entryIdIndex,

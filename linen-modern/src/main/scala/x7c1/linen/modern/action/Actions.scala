@@ -76,7 +76,7 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
   extends FocusedEventFactory[EntryFocusedEvent] {
 
   override def createAt(position: Int) = {
-    entryAccessor get position map { entry =>
+    entryAccessor findAt position map { entry =>
       EntryFocusedEvent(position, entry)
     }
   }
@@ -90,7 +90,7 @@ class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor)
   extends FocusedEventFactory[EntryDetailFocusedEvent]{
 
   override def createAt(position: Int) = {
-    entryAccessor get position map { entry =>
+    entryAccessor findAt position map { entry =>
       EntryDetailFocusedEvent(position, entry)
     }
   }
