@@ -21,32 +21,36 @@ class EntryDetailAreaAction(
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
     _ <- container.entryDetailArea.skipTo(entryPosition)
-    _ <- task { container.entryDetailArea.updateToolbar(entryPosition) }
+    _ <- task {
+      val entry = entryAccessor get entryPosition
+      container.entryDetailArea updateToolbar entry.title
+    }
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    scrollAndUpdate(event.position)
+    scrollAndUpdate(event.position, event.entry.title)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    scrollAndUpdate(event.position)
+    scrollAndUpdate(event.position, event.entry.title)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- task of container.entryDetailArea.scrollTo(event.position) _
-    _ <- task { container.entryDetailArea.updateToolbar(event.position) }
+    _ <- task { container.entryDetailArea.updateToolbar(event.entry.title) }
   } yield ()
 
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
-    container.entryDetailArea.updateToolbar(event.position)
+    container.entryDetailArea.updateToolbar(event.entry.title)
   }
 
   private def fromSource(sourceId: Long) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
-    _ <- scrollAndUpdate(entryPosition)
+    entry <- task { entryAccessor get entryPosition }
+    _ <- scrollAndUpdate(entryPosition, entry.title)
   } yield ()
 
-  private def scrollAndUpdate(entryPosition: Int) = for {
+  private def scrollAndUpdate(entryPosition: Int, title: String) = for {
     _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
-    _ <- task { container.entryDetailArea.updateToolbar(entryPosition) }
+    _ <- task { container.entryDetailArea.updateToolbar(title) }
   } yield ()
 
 }
