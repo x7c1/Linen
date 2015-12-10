@@ -21,8 +21,7 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
   private lazy val descriptionIndex = cursor getColumnIndex "description"
 
   override def get(position: Int): Source = {
-    cursor.moveToPosition(position)
-
+    cursor moveToPosition position
     Source(
       id = cursor.getInt(idIndex),
       url = "dummy",

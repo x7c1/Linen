@@ -45,7 +45,7 @@ case class SourceFocusedEvent(
 class SourceFocusedEventFactory(sourceAccessor: SourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
-  override def createAt(position: Int) = {
+  override def createAt(position: Int) = Option {
     val source = sourceAccessor get position
     SourceFocusedEvent(position, source)
   }
@@ -76,8 +76,9 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
   extends FocusedEventFactory[EntryFocusedEvent] {
 
   override def createAt(position: Int) = {
-    val entry = entryAccessor get position
-    EntryFocusedEvent(position, entry)
+    entryAccessor get position map { entry =>
+      EntryFocusedEvent(position, entry)
+    }
   }
 }
 
@@ -89,7 +90,8 @@ class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor)
   extends FocusedEventFactory[EntryDetailFocusedEvent]{
 
   override def createAt(position: Int) = {
-    val entry = entryAccessor get position
-    EntryDetailFocusedEvent(position, entry)
+    entryAccessor get position map { entry =>
+      EntryDetailFocusedEvent(position, entry)
+    }
   }
 }

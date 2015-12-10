@@ -21,15 +21,17 @@ class EntryDetailRowAdapter(
   }
 
   override def onBindViewHolder(holder: EntryDetailRow, position: Int): Unit = {
-    val entry = entryAccessor get position
-    holder.title.text = entry.title
-    holder.content.text = entry.content
-    holder.createdAt.text = entry.createdAt.format
-    holder.itemView onClick { _ =>
-      val event = EntryDetailSelectedEvent(position, entry)
-      selectedListener onEntryDetailSelected event
+    entryAccessor get position foreach { entry =>
+      holder.title.text = entry.title
+      holder.content.text = entry.content
+      holder.createdAt.text = entry.createdAt.format
+      holder.itemView onClick { _ =>
+        val event = EntryDetailSelectedEvent(position, entry)
+        selectedListener onEntryDetailSelected event
+      }
     }
   }
+
 }
 
 trait OnEntryDetailSelectedListener {
