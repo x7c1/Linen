@@ -74,7 +74,7 @@ class ContainerInitializer(
   private def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryDetailRowAdapter(
-      entryBuffer,
+      entryFullContentBuffer,
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
@@ -89,7 +89,7 @@ class ContainerInitializer(
     layout.entryDetailList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryDetailList,
       getPosition = getPosition,
-      focusedEventFactory = new EntryDetailFocusedEventFactory(entryBuffer),
+      focusedEventFactory = new EntryDetailFocusedEventFactory(entryFullContentBuffer),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
   }
@@ -110,7 +110,7 @@ class ContainerInitializer(
         sourceAccessor = sourceBuffer,
         entryAccessor = entryBuffer
       ),
-      new EntryDetailAreaAction(container, entryBuffer),
+      new EntryDetailAreaAction(container, entryFullContentBuffer),
       new PrefetcherAction(prefetcher, sourceBuffer)
     )
   }
@@ -131,7 +131,11 @@ class ContainerInitializer(
     )
   }
   private lazy val entryBuffer = {
-    EntryBuffer.create(activity)
+    EntryBuffer.createOutline(activity)
+  }
+
+  private lazy val entryFullContentBuffer = {
+    EntryBuffer.createFullContent(activity)
   }
 
   private lazy val entryArea = {

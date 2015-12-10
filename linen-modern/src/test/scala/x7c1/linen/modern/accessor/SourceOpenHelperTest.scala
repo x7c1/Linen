@@ -46,7 +46,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val cursor = EntryBuffer createCursor context
+    val sql4 = EntryBuffer.createSql4("entries.content")
+    val cursor = EntryBuffer.createCursor(context, sql4)
     val rows = toMaps(cursor)
 
     /*
@@ -64,7 +65,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val cursor = EntryBuffer createCounterCursor context
+    val sql4 = EntryBuffer.createSql4("entries.content")
+    val cursor = EntryBuffer.createCounterCursor(context, sql4)
     val rows = toMaps(cursor)
     val actual = rows.map(_("count")).map(_.toInt)
     assertEquals(Seq(10,10,10,10), actual)
@@ -75,7 +77,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val positions = EntryBuffer createSourcePositionMap context
+    val sql4 = EntryBuffer.createSql4("entries.content")
+    val positions = EntryBuffer.createSourcePositionMap(context, sql4)
     assertEquals(0, positions(5))
     assertEquals(10, positions(4))
     assertEquals(20, positions(2))

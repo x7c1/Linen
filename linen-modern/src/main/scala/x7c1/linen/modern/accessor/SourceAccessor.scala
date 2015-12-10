@@ -67,8 +67,8 @@ object SourceBuffer {
     val sql3 =
       s"""SELECT
         |   s1._id as source_id,
-        |   s1.title as title,
-        |   s1.description as description,
+        |   substr(s1.title, 1, 100) as title,
+        |   substr(s1.description, 1, 100) as description,
         |   s1.rating as rating
         | FROM ($sql1) as s1
         | INNER JOIN ($sql2) as s2

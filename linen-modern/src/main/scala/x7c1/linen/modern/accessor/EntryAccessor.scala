@@ -39,7 +39,7 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
         In rare case, somehow CursorWindow throws an IllegalStateException which says:
           "Make sure the Cursor is initialized correctly before accessing data from it."
        */
-      Log error e.getStackTrace.mkString("\n")
+      Log error e.getStackTrace.take(20).mkString("\n")
       None
   }
 
@@ -52,9 +52,18 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
 }
 
 object EntryBuffer {
-  def create(context: Context): EntryBuffer = {
-    val cursor = createCursor(context)
-    val map = createSourcePositionMap(context)
+
+  def createOutline(context: Context): EntryBuffer = {
+    val content = createSql4("substr(entries.content, 1, 100)")
+    val cursor = createCursor(context, content)
+    val map = createSourcePositionMap(context, content)
+    new EntryBuffer(cursor, map)
+  }
+
+  def createFullContent(context: Context): EntryBuffer = {
+    val content = createSql4("entries.content")
+    val cursor = createCursor(context, content)
+    val map = createSourcePositionMap(context, content)
     new EntryBuffer(cursor, map)
   }
 
@@ -71,9 +80,9 @@ object EntryBuffer {
   val sql3 =
     s"""SELECT
        |   s1._id as source_id,
-       |   s1.title as title,
+       |   substr(s1.title, 1, 100) as title,
        |   s1.rating as rating,
-       |   s1.description as description
+       |   substr(s1.description, 1, 100) as description
        | FROM ($sql1) as s1
        | INNER JOIN ($sql2) as s2
        | ON s1.source_id = s2.source_id""".stripMargin
@@ -88,12 +97,12 @@ object EntryBuffer {
        | FROM entries
        | ORDER BY _id DESC""".stripMargin
 
-  val sql4 =
+  def createSql4(content: String) =
     s"""SELECT
        |   entries._id as entry_id,
        |   s3.source_id as source_id,
        |   entries.title as title,
-       |   entries.content as content,
+       |   $content as content,
        |   s3.rating as rating,
        |   entries.created_at as created_at
        | FROM ($sql3) as s3
@@ -101,14 +110,14 @@ object EntryBuffer {
        | ON s3.source_id = entries.source_id
        | ORDER BY rating DESC, source_id DESC, entry_id DESC""".stripMargin
 
-  def createCursor(context: Context) = {
+  def createCursor(context: Context, sql4: String) = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
 
     db.rawQuery(sql4, Array())
   }
 
-  def createCounterCursor(context: Context) = {
+  def createCounterCursor(context: Context, sql4: String) = {
     val sql5 =
       s"""SELECT COUNT(entry_id) as count, source_id, rating
          | FROM($sql4)
@@ -122,8 +131,8 @@ object EntryBuffer {
     db.rawQuery(sql5, Array())
   }
 
-  def createSourcePositionMap(context: Context): Map[Long, Int] = {
-    val cursor = createCounterCursor(context)
+  def createSourcePositionMap(context: Context, sql4: String): Map[Long, Int] = {
+    val cursor = createCounterCursor(context, sql4)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
 
