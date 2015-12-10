@@ -201,7 +201,14 @@ class LinenOpenHelper(context: Context)
          |created_at INTEGER
          |)""".stripMargin
     )
-
+    db.execSQL(
+      s"""CREATE INDEX sources_created_at ON sources (
+         |created_at)""".stripMargin
+    )
+    db.execSQL(
+      s"""CREATE INDEX sources_rating ON sources (
+         |rating,created_at)""".stripMargin
+    )
     db.execSQL(
       s"""CREATE TABLE IF NOT EXISTS entries (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -213,6 +220,14 @@ class LinenOpenHelper(context: Context)
          |created_at INTEGER
          |)""".stripMargin
     )
+    db.execSQL(
+      s"""CREATE INDEX entries_source_id ON entries (
+         |source_id)""".stripMargin
+    )
+    db.execSQL(
+      s"""CREATE INDEX entries_created_at ON entries (
+         |created_at)""".stripMargin
+    )
 
     db.execSQL(
       s"""CREATE TABLE IF NOT EXISTS list_source_map (
@@ -220,8 +235,16 @@ class LinenOpenHelper(context: Context)
          |source_id INTEGER,
          |created_at INTEGER
          |)""".stripMargin
-
     )
+    db.execSQL(
+      s"""CREATE INDEX list_source_id ON list_source_map (
+         |list_id, source_id)""".stripMargin
+    )
+    db.execSQL(
+      s"""CREATE INDEX list_source_sid ON list_source_map (
+         |source_id)""".stripMargin
+    )
+
   }
 }
 
