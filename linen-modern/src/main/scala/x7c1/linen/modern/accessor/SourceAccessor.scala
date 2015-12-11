@@ -5,11 +5,10 @@ import android.database.Cursor
 import x7c1.linen.modern.struct.Source
 
 trait SourceAccessor {
+
   def findAt(position: Int): Option[Source]
 
   def length: Int
-
-  def takeAfter(sourceId: Long, count: Int): Seq[Source]
 
   def positionOf(sourceId: Long): Option[Int]
 }
@@ -32,10 +31,6 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
   }
   override def length = {
     cursor.getCount
-  }
-
-  override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
-    ???
   }
   override def positionOf(sourceId: Long): Option[Int] = {
     (0 to length - 1) find { n =>
