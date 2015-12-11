@@ -19,7 +19,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
 
     public final LinearLayout menuArea;
     public final Button createDummies;
-    public final Button showAllEntries;
     public final Button initDummies;
     public final LinearLayout paneContainer;
     public final android.support.design.widget.CoordinatorLayout sourceArea;
@@ -39,7 +38,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         View itemView,
         LinearLayout menuArea,
         Button createDummies,
-        Button showAllEntries,
         Button initDummies,
         LinearLayout paneContainer,
         android.support.design.widget.CoordinatorLayout sourceArea,
@@ -58,7 +56,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         super(itemView);
         this.menuArea = menuArea;
         this.createDummies = createDummies;
-        this.showAllEntries = showAllEntries;
         this.initDummies = initDummies;
         this.paneContainer = paneContainer;
         this.sourceArea = sourceArea;

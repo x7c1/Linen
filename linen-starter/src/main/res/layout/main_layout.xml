@@ -42,13 +42,6 @@
             />
 
         <Button
-            android:id="@+id/main_layout__show_all_entries"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="dump entries"
-            />
-
-        <Button
             android:id="@+id/main_layout__init_dummies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

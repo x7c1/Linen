@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{EntryProvider, LinenOpenHelper}
+import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -17,22 +17,6 @@ object DummyFactory {
         createDummies(activity)(500)
         layout.createDummies runUi { _ =>
           Toast.makeText(activity, "dummies inserted", Toast.LENGTH_SHORT).show()
-        }
-      }
-    }
-    layout.showAllEntries onClick { _ =>
-      async {
-        val cursor = activity.getContentResolver.query(
-          EntryProvider.ContentUri, null, null, null, null, null)
-
-        activity.startManagingCursor(cursor)
-
-        while(cursor.moveToNext()){
-          (0 to cursor.getColumnCount - 1) foreach { i =>
-            val column = cursor getColumnName i
-            val value = cursor getString i
-            Log error s"$column = $value"
-          }
         }
       }
     }

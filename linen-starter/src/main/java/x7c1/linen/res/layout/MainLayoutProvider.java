@@ -41,7 +41,6 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             view,
             (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
             (Button) view.findViewById(R.id.main_layout__create_dummies),
-            (Button) view.findViewById(R.id.main_layout__show_all_entries),
             (Button) view.findViewById(R.id.main_layout__init_dummies),
             (LinearLayout) view.findViewById(R.id.activity_main__pane_container),
             (android.support.design.widget.CoordinatorLayout) view.findViewById(R.id.activity_main__source_area),
