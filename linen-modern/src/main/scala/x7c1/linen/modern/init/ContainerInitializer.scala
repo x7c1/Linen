@@ -144,8 +144,6 @@ class ContainerInitializer(
 
   private lazy val entryDetailArea =
     new EntryDetailArea(
-      sources = sourceBuffer,
-      entries = entryBuffer,
       toolbar = layout.entryDetailToolbar,
       recyclerView = layout.entryDetailList,
       getPosition = () => panePosition of layout.entryDetailArea
