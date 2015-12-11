@@ -1,5 +1,6 @@
 package x7c1.linen.modern.accessor
 
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
@@ -13,7 +14,7 @@ trait EntryAccessor[A <: Entry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-private class EntryBuffer[A <: Entry](
+private class EntryAccessorImpl[A <: Entry](
   factory: EntryFactory[A],
   cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAccessor[A] {
 
@@ -75,24 +76,26 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
   }
 }
 
-object EntryBuffer {
+object EntryAccessor {
 
-  def createOutline(db: SQLiteDatabase): EntryAccessor[EntryOutline] = {
+  def forEntryOutline(context: Context): EntryAccessor[EntryOutline] = {
+    val db = new LinenOpenHelper(context).getReadableDatabase
     val content = createSql4("substr(entries.content, 1, 100)")
     val cursor = createCursor(db, content)
     val map = createSourcePositionMap(db, content)
     val factory = new EntryOutlineFactory(cursor)
 
-    new EntryBuffer(factory, cursor, map)
+    new EntryAccessorImpl(factory, cursor, map)
   }
 
-  def createFullContent(db: SQLiteDatabase): EntryAccessor[EntryDetail] = {
+  def forEntryDetail(context: Context): EntryAccessor[EntryDetail] = {
+    val db = new LinenOpenHelper(context).getReadableDatabase
     val content = createSql4("entries.content")
     val cursor = createCursor(db, content)
     val map = createSourcePositionMap(db, content)
     val factory = new EntryDetailFactory(cursor)
 
-    new EntryBuffer(factory, cursor, map)
+    new EntryAccessorImpl(factory, cursor, map)
   }
 
   val sql1 =

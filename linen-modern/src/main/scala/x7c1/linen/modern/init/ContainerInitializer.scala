@@ -7,7 +7,7 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryBuffer, LinenOpenHelper, SourceAccessor, SourceBuffer}
+import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
@@ -50,16 +50,12 @@ class ContainerInitializer(
 
   private def createAccessors = {
 
-    val db1 = new LinenOpenHelper(activity).getReadableDatabase
-    val db2 = new LinenOpenHelper(activity).getReadableDatabase
-    val db3 = new LinenOpenHelper(activity).getReadableDatabase
-
     // todo: db.close
 
     new Accessors(
-      source = SourceBuffer.create(db1),
-      entryOutline = EntryBuffer.createOutline(db2),
-      entryDetail = EntryBuffer.createFullContent(db3)
+      source = SourceAccessor create activity,
+      entryOutline = EntryAccessor forEntryOutline activity,
+      entryDetail = EntryAccessor forEntryDetail activity
     )
   }
 

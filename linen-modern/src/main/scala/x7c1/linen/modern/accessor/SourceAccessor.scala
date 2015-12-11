@@ -1,5 +1,6 @@
 package x7c1.linen.modern.accessor
 
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.Source
@@ -13,7 +14,7 @@ trait SourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
-class SourceBuffer(cursor: Cursor) extends SourceAccessor {
+private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
   private lazy val idIndex = cursor getColumnIndex "source_id"
   private lazy val titleIndex = cursor getColumnIndex "title"
@@ -40,10 +41,11 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
 
 }
 
-object SourceBuffer {
-  def create(db: SQLiteDatabase): SourceBuffer = {
+object SourceAccessor {
+  def create(context: Context): SourceAccessor = {
+    val db = new LinenOpenHelper(context).getReadableDatabase
     val cursor = createCursor(db)
-    new SourceBuffer(cursor)
+    new SourceAccessorImpl(cursor)
   }
 
   def createCursor(db: SQLiteDatabase) = {
