@@ -4,7 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.action.observer.{ItemSkippedEvent, SkippedEventFactory}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{Entry, Source}
+import x7c1.linen.modern.struct.{EntryOutline, EntryDetail, Entry, Source}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent}
 
@@ -71,9 +71,9 @@ class SourceSkippedEventFactory(
 
 case class EntryFocusedEvent(
   override val position: Int,
-  entry: Entry) extends ItemFocusedEvent
+  entry: EntryOutline) extends ItemFocusedEvent
 
-class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
+class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   extends FocusedEventFactory[EntryFocusedEvent] {
 
   override def createAt(position: Int) = {
@@ -85,9 +85,9 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
 
 case class EntryDetailFocusedEvent(
   override val position: Int,
-  entry: Entry ) extends ItemFocusedEvent
+  entry: EntryDetail ) extends ItemFocusedEvent
 
-class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor)
+class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor[EntryDetail])
   extends FocusedEventFactory[EntryDetailFocusedEvent]{
 
   override def createAt(position: Int) = {

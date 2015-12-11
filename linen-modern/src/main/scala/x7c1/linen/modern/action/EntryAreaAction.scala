@@ -2,6 +2,7 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
@@ -9,7 +10,7 @@ import x7c1.wheat.modern.callback.Imports._
 class EntryAreaAction(
   container: PaneContainer,
   sourceAccessor: SourceAccessor,
-  entryAccessor: EntryAccessor
+  entryAccessor: EntryAccessor[EntryOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {

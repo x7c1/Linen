@@ -7,10 +7,11 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryBuffer, SourceBuffer}
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryBuffer, SourceBuffer}
 import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
 
@@ -123,11 +124,11 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.sourceArea
     )
   }
-  private lazy val entryBuffer = {
+  private lazy val entryBuffer: EntryAccessor[EntryOutline] = {
     EntryBuffer.createOutline(activity)
   }
 
-  private lazy val entryFullContentBuffer = {
+  private lazy val entryFullContentBuffer: EntryAccessor[EntryDetail] = {
     EntryBuffer.createFullContent(activity)
   }
 

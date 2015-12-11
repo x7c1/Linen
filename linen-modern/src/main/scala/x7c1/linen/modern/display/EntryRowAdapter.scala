@@ -5,16 +5,16 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{View, ViewGroup}
 import x7c1.linen.glue.res.layout.EntryRow
 import x7c1.linen.modern.accessor.EntryAccessor
-import x7c1.linen.modern.struct.Entry
+import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.tasks.UiThread.via
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.Async.await
+import x7c1.wheat.modern.tasks.UiThread.via
 
 
 class EntryRowAdapter(
-  entryAccessor: EntryAccessor,
+  entryAccessor: EntryAccessor[EntryOutline],
   entrySelectedListener: OnEntrySelectedListener,
   provider: ViewHolderProvider[EntryRow]) extends Adapter[EntryRow] {
 
@@ -28,7 +28,7 @@ class EntryRowAdapter(
     val display = for {
       Some(entry) <- task { entryAccessor findAt position }
       _ <- task {
-        holder.title.text = entry.title
+        holder.title.text = entry.shortTitle
         holder.content.text = ""
         holder.createdAt.text = ""
         holder.itemView onClick { _ =>
@@ -44,7 +44,7 @@ class EntryRowAdapter(
       )
       _ <- via(holder.itemView){ _ =>
         animator.start()
-        holder.content.text = entry.content
+        holder.content.text = entry.shortContent
         holder.createdAt.text = entry.createdAt.format
       }
     } yield ()
@@ -62,6 +62,6 @@ trait OnEntrySelectedListener {
   def onEntrySelected(event: EntrySelectedEvent): Unit
 }
 
-case class EntrySelectedEvent(position: Int, entry: Entry){
+case class EntrySelectedEvent(position: Int, entry: EntryOutline){
   def dump: String = s"entryId:${entry.entryId}, position:$position"
 }

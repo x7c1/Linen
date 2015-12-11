@@ -2,35 +2,24 @@ package x7c1.linen.modern.accessor
 
 import android.content.Context
 import android.database.Cursor
-import x7c1.linen.modern.struct.{Date, Entry}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Date, Entry}
 
-trait EntryAccessor {
+trait EntryAccessor[A <: Entry]{
 
-  def findAt(position: Int): Option[Entry]
+  def findAt(position: Int): Option[A]
 
   def length: Int
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAccessor {
-
-  private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
-  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
-  private lazy val contentIndex = cursor getColumnIndex "content"
-  private lazy val createdAtIndex = cursor getColumnIndex "created_at"
+private class EntryBuffer[A <: Entry](
+  factory: EntryFactory[A],
+  cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAccessor[A] {
 
   override def findAt(position: Int) = synchronized {
     if (cursor moveToPosition position){
-      Some apply Entry(
-        entryId = cursor getInt entryIdIndex,
-        sourceId = cursor getInt sourceIdIndex,
-        url = "dummy",
-        title = cursor getString titleIndex,
-        content = cursor getString contentIndex,
-        createdAt = Date.dummy()
-      )
+      Some apply factory.createEntry()
     } else None
   }
 
@@ -42,20 +31,66 @@ class EntryBuffer(cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAcce
   }
 }
 
+trait EntryFactory[A <: Entry]{
+  def createEntry(): A
+}
+
+class EntryOutlineFactory(cursor: Cursor) extends EntryFactory[EntryOutline] {
+
+  private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
+  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
+  private lazy val titleIndex = cursor getColumnIndex "title"
+  private lazy val contentIndex = cursor getColumnIndex "content"
+  private lazy val createdAtIndex = cursor getColumnIndex "created_at"
+
+  override def createEntry(): EntryOutline = {
+    EntryOutline(
+      entryId = cursor getInt entryIdIndex,
+      sourceId = cursor getInt sourceIdIndex,
+      url = "dummy",
+      shortTitle = cursor getString titleIndex,
+      shortContent = cursor getString contentIndex,
+      createdAt = Date.dummy()
+    )
+  }
+}
+
+class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
+
+  private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
+  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
+  private lazy val titleIndex = cursor getColumnIndex "title"
+  private lazy val contentIndex = cursor getColumnIndex "content"
+  private lazy val createdAtIndex = cursor getColumnIndex "created_at"
+
+  override def createEntry(): EntryDetail = {
+    EntryDetail(
+      entryId = cursor getInt entryIdIndex,
+      sourceId = cursor getInt sourceIdIndex,
+      url = "dummy",
+      fullTitle = cursor getString titleIndex,
+      fullContent = cursor getString contentIndex,
+      createdAt = Date.dummy()
+    )
+  }
+}
+
 object EntryBuffer {
 
-  def createOutline(context: Context): EntryBuffer = {
+  def createOutline(context: Context): EntryAccessor[EntryOutline] = {
     val content = createSql4("substr(entries.content, 1, 100)")
     val cursor = createCursor(context, content)
     val map = createSourcePositionMap(context, content)
-    new EntryBuffer(cursor, map)
+    val factory = new EntryOutlineFactory(cursor)
+    new EntryBuffer(factory, cursor, map)
   }
 
-  def createFullContent(context: Context): EntryBuffer = {
+  def createFullContent(context: Context): EntryAccessor[EntryDetail] = {
     val content = createSql4("entries.content")
     val cursor = createCursor(context, content)
     val map = createSourcePositionMap(context, content)
-    new EntryBuffer(cursor, map)
+    val factory = new EntryDetailFactory(cursor)
+    new EntryBuffer(factory, cursor, map)
   }
 
   val sql1 =
