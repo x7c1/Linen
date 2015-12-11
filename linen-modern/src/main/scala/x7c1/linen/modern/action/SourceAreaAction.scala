@@ -1,12 +1,12 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.SourceAccessor
-import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 
 class SourceAreaAction(
-  container: PaneContainer,
+  sourceArea: SourceArea,
   sourceAccessor: SourceAccessor
 ) extends OnSourceSelected
   with OnSourceSkipped
@@ -14,7 +14,7 @@ class SourceAreaAction(
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    task of container.sourceArea.scrollTo(event.position) _
+    task of sourceArea.scrollTo(event.position) _
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     fastScrollTo(event.entry.sourceId)
@@ -29,10 +29,10 @@ class SourceAreaAction(
     fastScrollTo(event.entry.sourceId)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = {
-    container.sourceArea.skipTo(event.nextPosition)
+    sourceArea skipTo event.nextPosition
   }
   private def fastScrollTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }
-    _ <- task of container.sourceArea.fastScrollTo(position) _
+    _ <- task of sourceArea.fastScrollTo(position) _
   } yield {}
 }

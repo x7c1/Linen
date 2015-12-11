@@ -9,11 +9,7 @@ trait Pane {
   def displayPosition: Int
 }
 
-class PaneContainer(
-  view: ViewGroup,
-  val sourceArea: SourceArea,
-  val entryArea: EntryArea,
-  val entryDetailArea: EntryDetailArea ) {
+class PaneContainer(view: ViewGroup) {
 
   private lazy val scroller = new Scroller(view.getContext)
 

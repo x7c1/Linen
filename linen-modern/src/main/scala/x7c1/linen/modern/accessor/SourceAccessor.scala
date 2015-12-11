@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.Source
 
 trait SourceAccessor {
@@ -41,15 +41,12 @@ class SourceBuffer(cursor: Cursor) extends SourceAccessor {
 }
 
 object SourceBuffer {
-  def create(context: Context): SourceBuffer = {
-    val cursor = createCursor(context)
+  def create(db: SQLiteDatabase): SourceBuffer = {
+    val cursor = createCursor(db)
     new SourceBuffer(cursor)
   }
 
-  def createCursor(context: Context) = {
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
+  def createCursor(db: SQLiteDatabase) = {
     val sql1 =
       """SELECT * FROM list_source_map
         | INNER JOIN sources ON list_source_map.source_id = sources._id

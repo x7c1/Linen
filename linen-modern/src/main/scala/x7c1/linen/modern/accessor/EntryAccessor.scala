@@ -1,8 +1,8 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
 import android.database.Cursor
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Date, Entry}
+import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
 
 trait EntryAccessor[A <: Entry]{
 
@@ -77,19 +77,21 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
 
 object EntryBuffer {
 
-  def createOutline(context: Context): EntryAccessor[EntryOutline] = {
+  def createOutline(db: SQLiteDatabase): EntryAccessor[EntryOutline] = {
     val content = createSql4("substr(entries.content, 1, 100)")
-    val cursor = createCursor(context, content)
-    val map = createSourcePositionMap(context, content)
+    val cursor = createCursor(db, content)
+    val map = createSourcePositionMap(db, content)
     val factory = new EntryOutlineFactory(cursor)
+
     new EntryBuffer(factory, cursor, map)
   }
 
-  def createFullContent(context: Context): EntryAccessor[EntryDetail] = {
+  def createFullContent(db: SQLiteDatabase): EntryAccessor[EntryDetail] = {
     val content = createSql4("entries.content")
-    val cursor = createCursor(context, content)
-    val map = createSourcePositionMap(context, content)
+    val cursor = createCursor(db, content)
+    val map = createSourcePositionMap(db, content)
     val factory = new EntryDetailFactory(cursor)
+
     new EntryBuffer(factory, cursor, map)
   }
 
@@ -136,14 +138,11 @@ object EntryBuffer {
        | ON s3.source_id = entries.source_id
        | ORDER BY rating DESC, source_id DESC, entry_id DESC""".stripMargin
 
-  def createCursor(context: Context, sql4: String) = {
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
+  def createCursor(db: SQLiteDatabase, sql4: String) = {
     db.rawQuery(sql4, Array())
   }
 
-  def createCounterCursor(context: Context, sql4: String) = {
+  def createCounterCursor(db: SQLiteDatabase, sql4: String) = {
     val sql5 =
       s"""SELECT COUNT(entry_id) as count, source_id, rating
          | FROM($sql4)
@@ -151,14 +150,11 @@ object EntryBuffer {
          | ORDER BY rating DESC, source_id DESC
        """.stripMargin
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
     db.rawQuery(sql5, Array())
   }
 
-  def createSourcePositionMap(context: Context, sql4: String): Map[Long, Int] = {
-    val cursor = createCounterCursor(context, sql4)
+  def createSourcePositionMap(db: SQLiteDatabase, sql4: String): Map[Long, Int] = {
+    val cursor = createCounterCursor(db, sql4)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
 

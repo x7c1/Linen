@@ -4,7 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.action.observer.{ItemSkippedEvent, SkippedEventFactory}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{EntryOutline, EntryDetail, Entry, Source}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent}
 
