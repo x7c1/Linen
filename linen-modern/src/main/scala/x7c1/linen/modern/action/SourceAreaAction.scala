@@ -3,7 +3,6 @@ package x7c1.linen.modern.action
 import x7c1.linen.modern.accessor.SourceAccessor
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.Imports._
 
 class SourceAreaAction(
   sourceArea: SourceArea,
@@ -14,7 +13,7 @@ class SourceAreaAction(
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    task of sourceArea.scrollTo(event.position) _
+    sourceArea scrollTo event.position
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     fastScrollTo(event.entry.sourceId)
@@ -33,6 +32,6 @@ class SourceAreaAction(
   }
   private def fastScrollTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }
-    _ <- task of sourceArea.fastScrollTo(position) _
+    _ <- sourceArea fastScrollTo position
   } yield {}
 }

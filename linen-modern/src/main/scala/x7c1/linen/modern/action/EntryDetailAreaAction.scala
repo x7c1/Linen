@@ -4,7 +4,6 @@ import x7c1.linen.modern.accessor.EntryAccessor
 import x7c1.linen.modern.display.{EntryDetailArea, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.EntryDetail
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.tasks.Async.await
 
 class EntryDetailAreaAction(
@@ -41,7 +40,7 @@ class EntryDetailAreaAction(
     scrollAndUpdate(event.position, event.entry.shortTitle)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
-    _ <- task of entryDetailArea.scrollTo(event.position) _
+    _ <- entryDetailArea scrollTo event.position
     _ <- task { entryDetailArea updateToolbar event.entry.fullTitle }
   } yield ()
 
@@ -57,7 +56,7 @@ class EntryDetailAreaAction(
   } yield ()
 
   private def scrollAndUpdate(entryPosition: Int, title: String) = for {
-    _ <- task of entryDetailArea.fastScrollTo(entryPosition) _
+    _ <- entryDetailArea fastScrollTo entryPosition
     _ <- task { entryDetailArea updateToolbar title }
   } yield ()
 

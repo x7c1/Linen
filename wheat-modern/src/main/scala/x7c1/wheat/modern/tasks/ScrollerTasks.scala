@@ -7,6 +7,7 @@ import android.util.{DisplayMetrics, TypedValue}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
+import x7c1.wheat.modern.callback.Imports._
 
 object ScrollerTasks {
   def apply(recyclerView: RecyclerView): ScrollerTasks = {
@@ -25,8 +26,8 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics).toInt
   }
 
-  def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] =
-    for {
+  def fastScrollTo(position: Int): CallbackTask[Unit] = task of {
+    (done: OnFinish) => for {
       ui <- task {
         Log debug s"[init] position:$position"
         UiThread via recyclerView
@@ -52,22 +53,24 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
         layoutManager startSmoothScroll scroller
       }
     } yield ()
+  }
 
-  def scrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] =
-    for {
+  def scrollTo(position: Int): CallbackTask[Unit] = task of {
+    (done: OnFinish) => for {
       ui <- task {
         UiThread via recyclerView
       }
       scroller <- task {
         new SmoothScroller(
           recyclerView.getContext, timePerInch = 45F, layoutManager,
-          done.by[ScrollerStopEvent] )
+          done.by[ScrollerStopEvent])
       }
       _ <- ui { _ =>
         scroller setTargetPosition position
         layoutManager startSmoothScroll scroller
       }
     } yield ()
+  }
 
   def skipTo(position: Int): CallbackTask[Unit] = for {
     ui <- task {

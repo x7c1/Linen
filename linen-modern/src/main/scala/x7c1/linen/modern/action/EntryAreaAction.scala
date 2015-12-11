@@ -5,7 +5,6 @@ import x7c1.linen.modern.display.{EntryArea, EntryDetailSelectedEvent, EntrySele
 import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.Imports._
 
 class EntryAreaAction(
   entryArea: EntryArea,
@@ -29,7 +28,7 @@ class EntryAreaAction(
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
     for {
-      _ <- task of entryArea.scrollTo(event.position) _
+      _ <- entryArea scrollTo event.position
       _ <- task { updateToolbar(event.entry.sourceId) }
     } yield ()
   }
@@ -44,13 +43,13 @@ class EntryAreaAction(
   }
 
   private def syncDisplay(position: Int, sourceId: Long) = for {
-    _ <- task of entryArea.fastScrollTo(position) _
+    _ <- entryArea fastScrollTo position
     _ <- task { updateToolbar(sourceId) }
   } yield ()
 
   private def display(sourceId: Long) = for {
     Some(n) <- getOrCreatePosition(sourceId)
-    _ <- task of entryArea.fastScrollTo(n) _
+    _ <- entryArea fastScrollTo n
     _ <- task { updateToolbar(sourceId) }
   } yield ()
 

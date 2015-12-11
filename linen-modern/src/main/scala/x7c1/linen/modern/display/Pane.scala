@@ -3,10 +3,23 @@ package x7c1.linen.modern.display
 import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.OnFinish
+import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
+import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
   def displayPosition: Int
+
+  protected def scrollerTasks: ScrollerTasks
+
+  def fastScrollTo(position: Int): CallbackTask[Unit] = {
+    scrollerTasks fastScrollTo position
+  }
+  def scrollTo(position: Int): CallbackTask[Unit] = {
+    scrollerTasks scrollTo position
+  }
+  def skipTo(position: Int): CallbackTask[Unit] = {
+    scrollerTasks skipTo position
+  }
 }
 
 class PaneContainer(view: ViewGroup) {
