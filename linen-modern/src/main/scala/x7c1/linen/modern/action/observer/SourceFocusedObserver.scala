@@ -14,7 +14,6 @@ class SourceFocusedObserver(actions: Actions)
     val sync = for {
       _ <- actions.entryArea onSourceFocused event
       _ <- actions.detailArea onSourceFocused event
-      - <- actions.prefetcher onSourceFocused event
     } yield {
       Log debug s"[ok] focus on source.id:${event.source.id}"
     }

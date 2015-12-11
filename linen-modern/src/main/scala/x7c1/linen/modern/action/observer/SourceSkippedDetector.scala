@@ -85,7 +85,6 @@ class SourceSkippedObserver(actions: Actions) extends OnItemSkippedListener {
       _ <- actions.sourceArea onSourceSkipped event
       _ <- actions.entryArea onSourceSkipped event
       _ <- actions.detailArea onSourceSkipped event
-      _ <- actions.prefetcher onSourceSkipped event
     } yield ()
 
     Seq(sync) foreach CallbackTaskRunner.runAsync { Log error _.toString }

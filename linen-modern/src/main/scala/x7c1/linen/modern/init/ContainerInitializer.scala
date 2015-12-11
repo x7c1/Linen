@@ -7,9 +7,9 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryBuffer, EntryCacher, EntryPrefetcher, SourceBuffer, SourceStateBuffer}
-import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
-import x7c1.linen.modern.action.{EntryFocusedEventFactory, EntryDetailFocusedEventFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, PrefetcherAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.accessor.{EntryBuffer, SourceBuffer, SourceStateBuffer}
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.FocusDetector
@@ -101,7 +101,6 @@ class ContainerInitializer(
     size
   }
   private lazy val actions = {
-    val prefetcher = new EntryPrefetcher(sourceBuffer, entryCacher)
     new Actions(
       new ContainerAction(container),
       new SourceAreaAction(container, sourceBuffer),
@@ -110,8 +109,7 @@ class ContainerInitializer(
         sourceAccessor = sourceBuffer,
         entryAccessor = entryBuffer
       ),
-      new EntryDetailAreaAction(container, entryFullContentBuffer),
-      new PrefetcherAction(prefetcher, sourceBuffer)
+      new EntryDetailAreaAction(container, entryFullContentBuffer)
     )
   }
 
@@ -120,8 +118,6 @@ class ContainerInitializer(
   }
 
   private lazy val sourceStateBuffer = new SourceStateBuffer
-
-  private lazy val entryCacher = new EntryCacher
 
   private lazy val sourceArea = {
     new SourceArea(

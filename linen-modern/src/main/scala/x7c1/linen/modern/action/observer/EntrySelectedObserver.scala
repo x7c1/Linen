@@ -14,7 +14,6 @@ class EntrySelectedObserver(actions: Actions) extends OnEntrySelectedListener {
       _ <- actions.entryArea onEntrySelected event
       _ <- actions.container onEntrySelected event
       _ <- actions.sourceArea onEntrySelected event
-      _ <- actions.prefetcher onEntrySelected event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

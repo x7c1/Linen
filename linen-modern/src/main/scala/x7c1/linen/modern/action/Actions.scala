@@ -12,8 +12,7 @@ class Actions (
   val container: ContainerAction,
   val sourceArea: SourceAreaAction,
   val entryArea: EntryAreaAction,
-  val detailArea: EntryDetailAreaAction,
-  val prefetcher: PrefetcherAction
+  val detailArea: EntryDetailAreaAction
 )
 
 trait OnSourceSelected {

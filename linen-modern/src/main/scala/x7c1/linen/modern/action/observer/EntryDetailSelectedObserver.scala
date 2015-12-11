@@ -18,7 +18,6 @@ class EntryDetailSelectedObserver(actions: Actions)
       _ <- actions.detailArea onEntryDetailSelected event
       _ <- actions.entryArea onEntryDetailSelected event
       _ <- actions.sourceArea onEntryDetailSelected event
-      _ <- actions.prefetcher onEntryDetailSelected event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }
@@ -35,7 +34,6 @@ class EntryDetailFocusedObserver(actions: Actions)
       _ <- actions.detailArea onEntryDetailFocused event
       _ <- actions.entryArea onEntryDetailFocused event
       _ <- actions.sourceArea onEntryDetailFocused event
-      _ <- actions.prefetcher onEntryDetailFocused event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }
