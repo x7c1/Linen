@@ -58,7 +58,7 @@ class ContainerInitializer(
   private def setupEntryArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryRowAdapter(
-      entryBuffer,
+      entryOutlineAccessor,
       new EntrySelectedObserver(actions),
       entryRowProvider
     )
@@ -67,14 +67,14 @@ class ContainerInitializer(
     layout.entryList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryList,
       getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      focusedEventFactory = new EntryFocusedEventFactory(entryBuffer),
+      focusedEventFactory = new EntryFocusedEventFactory(entryOutlineAccessor),
       onFocused = new EntryFocusedObserver(actions)
     )
   }
   private def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(activity)
     val adapter = new EntryDetailRowAdapter(
-      entryFullContentBuffer,
+      entryDetailAccessor,
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
@@ -89,7 +89,7 @@ class ContainerInitializer(
     layout.entryDetailList setOnTouchListener FocusDetector.createListener(
       recyclerView = layout.entryDetailList,
       getPosition = getPosition,
-      focusedEventFactory = new EntryDetailFocusedEventFactory(entryFullContentBuffer),
+      focusedEventFactory = new EntryDetailFocusedEventFactory(entryDetailAccessor),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
   }
@@ -107,9 +107,9 @@ class ContainerInitializer(
       new EntryAreaAction(
         container = container,
         sourceAccessor = sourceBuffer,
-        entryAccessor = entryBuffer
+        entryAccessor = entryOutlineAccessor
       ),
-      new EntryDetailAreaAction(container, entryFullContentBuffer)
+      new EntryDetailAreaAction(container, entryDetailAccessor)
     )
   }
 
@@ -124,11 +124,11 @@ class ContainerInitializer(
       getPosition = () => panePosition of layout.sourceArea
     )
   }
-  private lazy val entryBuffer: EntryAccessor[EntryOutline] = {
+  private lazy val entryOutlineAccessor: EntryAccessor[EntryOutline] = {
     EntryBuffer.createOutline(activity)
   }
 
-  private lazy val entryFullContentBuffer: EntryAccessor[EntryDetail] = {
+  private lazy val entryDetailAccessor: EntryAccessor[EntryDetail] = {
     EntryBuffer.createFullContent(activity)
   }
 
