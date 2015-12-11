@@ -34,9 +34,7 @@ public class SourceRowProvider implements ViewHolderProvider<SourceRow> {
         return new SourceRow(
             view,
             (TextView) view.findViewById(R.id.source_row__title),
-            (TextView) view.findViewById(R.id.source_row__description),
-            (View) view.findViewById(R.id.source_row__state_unloaded),
-            (View) view.findViewById(R.id.source_row__state_prefetched)
+            (TextView) view.findViewById(R.id.source_row__description)
         );
     }
 }
