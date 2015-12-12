@@ -4,10 +4,9 @@ import android.content.Context
 import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.{DisplayMetrics, TypedValue}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.callback.Imports._
+import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 
 object ScrollerTasks {
   def apply(recyclerView: RecyclerView): ScrollerTasks = {
@@ -29,7 +28,6 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
   def fastScrollTo(position: Int): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
       ui <- task {
-        Log debug s"[init] position:$position"
         UiThread via recyclerView
       }
       _ <- ui { _ =>
@@ -47,7 +45,7 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
       _ <- ui { view =>
         val scroller = new SmoothScroller(
           view.getContext, timePerInch = hastyTimePerInch, layoutManager,
-          done.by[ScrollerStopEvent]
+          done.unwrap
         )
         scroller setTargetPosition position
         layoutManager startSmoothScroll scroller
@@ -63,7 +61,8 @@ class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float
       scroller <- task {
         new SmoothScroller(
           recyclerView.getContext, timePerInch = 45F, layoutManager,
-          done.by[ScrollerStopEvent])
+          done.unwrap
+        )
       }
       _ <- ui { _ =>
         scroller setTargetPosition position
@@ -97,10 +96,8 @@ class SmoothScroller(
     LinearSmoothScroller.SNAP_TO_START
   }
   override def onStart() = {
-    Log debug s"[init] $timePerInch"
   }
   override def onStop(): Unit = {
-    Log debug s"[done] $timePerInch"
     onFinish(new ScrollerStopEvent)
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
