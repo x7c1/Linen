@@ -11,7 +11,12 @@ class EntryDetailArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  override protected val scrollerTasks = ScrollerTasks(recyclerView)
+  override protected val scrollerTasks =
+    ScrollerTasks(
+      recyclerView,
+      flowSpaceDip = 100,
+      flowTimePerInch = 125F
+    )
 
   def updateToolbar(title: String): Unit = {
     toolbar runUi {_ setTitle title}

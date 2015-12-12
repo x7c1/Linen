@@ -16,22 +16,23 @@ class SourceAreaAction(
     sourceArea scrollTo event.position
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    fastScrollTo(event.entry.sourceId)
+    skipTo(event.entry.sourceId)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    fastScrollTo(event.entry.sourceId)
+    skipTo(event.entry.sourceId)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
-    fastScrollTo(event.entry.sourceId)
+    skipTo(event.entry.sourceId)
   }
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
-    fastScrollTo(event.entry.sourceId)
+    skipTo(event.entry.sourceId)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = {
     sourceArea skipTo event.nextPosition
   }
-  private def fastScrollTo(sourceId: Long) = for {
+  private def skipTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }
-    _ <- sourceArea fastScrollTo position
-  } yield {}
+    _ <- sourceArea skipTo position
+  } yield ()
+
 }

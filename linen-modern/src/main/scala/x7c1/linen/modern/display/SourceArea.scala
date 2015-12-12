@@ -12,5 +12,10 @@ class SourceArea(
 
   override lazy val displayPosition: Int = getPosition()
 
-  override protected val scrollerTasks = ScrollerTasks(recyclerView)
+  override protected val scrollerTasks =
+    ScrollerTasks(
+      recyclerView,
+      flowSpaceDip = 30,
+      flowTimePerInch = 300F
+    )
 }

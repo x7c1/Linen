@@ -9,20 +9,24 @@ import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 
 object ScrollerTasks {
-  def apply(recyclerView: RecyclerView): ScrollerTasks = {
-    new ScrollerTasks(recyclerView, hastyTimePerInch = 125F)
+  def apply(
+    recyclerView: RecyclerView,
+    flowTimePerInch: Float,
+    flowSpaceDip: Int): ScrollerTasks = {
+
+    new ScrollerTasks(recyclerView, flowSpaceDip, flowTimePerInch)
   }
 }
 
-class ScrollerTasks private (recyclerView: RecyclerView, hastyTimePerInch: Float) {
+class ScrollerTasks private (
+  recyclerView: RecyclerView, flowSpaceDip: Int, hastyTimePerInch: Float) {
 
   private lazy val layoutManager = {
     recyclerView.getLayoutManager.asInstanceOf[LinearLayoutManager]
   }
   private lazy val space: Int = {
     val metrics = recyclerView.getResources.getDisplayMetrics
-    val dp = 100
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics).toInt
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, flowSpaceDip, metrics).toInt
   }
 
   def fastScrollTo(position: Int): CallbackTask[Unit] = task of {
