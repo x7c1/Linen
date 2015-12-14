@@ -1,54 +1,63 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.EntryAccessor
-import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryDetailArea, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.struct.EntryDetail
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.Imports._
+import x7c1.wheat.modern.tasks.Async.await
 
 class EntryDetailAreaAction(
-  container: PaneContainer,
-  entryAccessor: EntryAccessor
+  entryDetailArea: EntryDetailArea,
+  entryAccessor: EntryAccessor[EntryDetail]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
-  override def onSourceSelected(event: SourceSelectedEvent) = {
-    fromSource(event.source.id)
-  }
-  override def onSourceFocused(event: SourceFocusedEvent) = {
-    fromSource(event.source.id)
-  }
+  override def onSourceSelected(event: SourceSelectedEvent) = for {
+    _ <- await(0)
+    _ <- fromSourceArea(event.source.id)
+  } yield ()
+
+  override def onSourceFocused(event: SourceFocusedEvent) = for {
+    _ <- await(300)
+    _ <- fromSourceArea(event.source.id)
+  } yield()
+
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    Some(entryId) <- task { entryAccessor firstEntryIdOf event.nextSource.id }
-    entryPosition <- task { entryAccessor indexOf entryId }
-    _ <- container.entryDetailArea.skipTo(entryPosition)
-    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+    _ <- await(300)
+    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
+    _ <- entryDetailArea skipTo entryPosition
+    Some(entry) <- task { entryAccessor findAt entryPosition }
+    _ <- task {
+      entryDetailArea updateToolbar entry.fullTitle
+    }
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    scrollAndUpdate(event.entry.entryId, event.position)
+    scrollAndUpdate(event.position, event.entry.shortTitle)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    scrollAndUpdate(event.entry.entryId, event.position)
+    scrollAndUpdate(event.position, event.entry.shortTitle)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
-    _ <- task of container.entryDetailArea.scrollTo(event.position) _
-    _ <- task { container.entryDetailArea.updateToolbar(event.entry.entryId) }
+    _ <- entryDetailArea scrollTo event.position
+    _ <- task { entryDetailArea updateToolbar event.entry.fullTitle }
   } yield ()
 
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
-    container.entryDetailArea.updateToolbar(event.entry.entryId)
+    entryDetailArea.updateToolbar(event.entry.fullTitle)
   }
 
-  private def fromSource(sourceId: Long) = for {
-    Some(entryId) <- task { entryAccessor firstEntryIdOf sourceId }
-    entryPosition <- task { entryAccessor indexOf entryId }
-    _ <- scrollAndUpdate(entryId, entryPosition)
+  private def fromSourceArea(sourceId: Long) = for {
+    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
+    Some(entry) <- task { entryAccessor findAt entryPosition }
+    _ <- entryDetailArea skipTo entryPosition
+    _ <- task { entryDetailArea updateToolbar entry.fullTitle }
   } yield ()
 
-  private def scrollAndUpdate(entryId: Long, entryPosition: Int) = for {
-    _ <- task of container.entryDetailArea.fastScrollTo(entryPosition) _
-    _ <- task { container.entryDetailArea.updateToolbar(entryId) }
+  private def scrollAndUpdate(entryPosition: Int, title: String) = for {
+    _ <- entryDetailArea fastScrollTo entryPosition
+    _ <- task { entryDetailArea updateToolbar title }
   } yield ()
 
 }

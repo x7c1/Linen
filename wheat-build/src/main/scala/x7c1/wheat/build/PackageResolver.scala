@@ -2,6 +2,7 @@ package x7c1.wheat.build
 
 object PackageResolver {
   def toPackage(tag: String) = tag match {
+    case "Button" => "android.widget.Button"
     case "LinearLayout" => "android.widget.LinearLayout"
     case "ListView" => "android.widget.ListView"
     case "RelativeLayout" => "android.widget.RelativeLayout"

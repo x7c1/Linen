@@ -15,7 +15,10 @@
         android:textSize="18sp"
         android:layout_alignParentTop="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
     <TextView
         android:id="@+id/source_row__description"
@@ -23,26 +26,9 @@
         android:layout_marginTop="3dp"
         android:layout_below="@+id/source_row__title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <View
-        android:id="@+id/source_row__state_unloaded"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_width="5dp"
-        android:layout_height="fill_parent"
-        android:minHeight="30dp"
-        android:background="@color/light_gray"
-        />
-
-    <View
-        android:id="@+id/source_row__state_prefetched"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_width="5dp"
-        android:layout_height="fill_parent"
-        android:minHeight="30dp"
-        android:background="@color/opaque_blue"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
         />
 
 </RelativeLayout>

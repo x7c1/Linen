@@ -22,8 +22,14 @@ class RichView[A <: View](view: A){
   )
 
   def runUi[B](f: A => B): Unit = {
-    view post new Runnable {
-      override def run(): Unit = f(view)
-    }
+    view post runnable(f)
+  }
+
+  def runAfter[B](msec: Long)(f: A => B): Unit = {
+    view.postDelayed(runnable(f), msec)
+  }
+
+  private def runnable[B](f: A => B) = new Runnable {
+    override def run(): Unit = f(view)
   }
 }

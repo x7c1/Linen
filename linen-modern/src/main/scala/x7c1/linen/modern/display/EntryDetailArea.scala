@@ -1,34 +1,24 @@
 package x7c1.linen.modern.display
 
 import android.support.v7.widget.{RecyclerView, Toolbar}
-import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 class EntryDetailArea(
-  sources: SourceAccessor,
-  entries: EntryAccessor,
   toolbar: Toolbar,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()
 
-  private val scroller = ScrollerTasks(recyclerView)
+  override protected val scrollerTasks =
+    ScrollerTasks(
+      recyclerView,
+      flowSpaceDip = 100,
+      flowTimePerInch = 125F
+    )
 
-  def updateToolbar(entryId: Long): Unit = {
-    val position = entries indexOf entryId
-    val entry = entries.get(position)
-    toolbar runUi {_ setTitle entry.title}
-  }
-  def fastScrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
-    scroller.fastScrollTo(position)(done)
-  }
-  def scrollTo(position: Int)(done: OnFinish): CallbackTask[Unit] = {
-    scroller.scrollTo(position)(done)
-  }
-  def skipTo(position: Int): CallbackTask[Unit] = {
-    scroller skipTo position
+  def updateToolbar(title: String): Unit = {
+    toolbar runUi {_ setTitle title}
   }
 }

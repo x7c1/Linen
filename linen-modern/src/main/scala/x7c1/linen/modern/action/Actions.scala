@@ -4,7 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.action.observer.{ItemSkippedEvent, SkippedEventFactory}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{Entry, Source}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent}
 
@@ -12,8 +12,7 @@ class Actions (
   val container: ContainerAction,
   val sourceArea: SourceAreaAction,
   val entryArea: EntryAreaAction,
-  val detailArea: EntryDetailAreaAction,
-  val prefetcher: PrefetcherAction
+  val detailArea: EntryDetailAreaAction
 )
 
 trait OnSourceSelected {
@@ -46,8 +45,9 @@ class SourceFocusedEventFactory(sourceAccessor: SourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
-    val source = sourceAccessor get position
-    SourceFocusedEvent(position, source)
+    sourceAccessor findAt position map { source =>
+      SourceFocusedEvent(position, source)
+    }
   }
 }
 
@@ -61,35 +61,38 @@ class SourceSkippedEventFactory(
 
   extends SkippedEventFactory[SourceSkippedEvent]{
 
-  override def create(): SourceSkippedEvent = {
+  override def create() = {
     val next = 1 + layoutManager.findFirstCompletelyVisibleItemPosition()
-    val source = sourceAccessor.get(next)
-    SourceSkippedEvent(next, source)
+    sourceAccessor findAt next map { source =>
+      SourceSkippedEvent(next, source)
+    }
   }
 }
 
 case class EntryFocusedEvent(
   override val position: Int,
-  entry: Entry) extends ItemFocusedEvent
+  entry: EntryOutline) extends ItemFocusedEvent
 
-class EntryFocusedEventFactory(entryAccessor: EntryAccessor)
+class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   extends FocusedEventFactory[EntryFocusedEvent] {
 
   override def createAt(position: Int) = {
-    val entry = entryAccessor get position
-    EntryFocusedEvent(position, entry)
+    entryAccessor findAt position map { entry =>
+      EntryFocusedEvent(position, entry)
+    }
   }
 }
 
 case class EntryDetailFocusedEvent(
   override val position: Int,
-  entry: Entry ) extends ItemFocusedEvent
+  entry: EntryDetail ) extends ItemFocusedEvent
 
-class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor)
+class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor[EntryDetail])
   extends FocusedEventFactory[EntryDetailFocusedEvent]{
 
   override def createAt(position: Int) = {
-    val entry = entryAccessor get position
-    EntryDetailFocusedEvent(position, entry)
+    entryAccessor findAt position map { entry =>
+      EntryDetailFocusedEvent(position, entry)
+    }
   }
 }

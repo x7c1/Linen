@@ -1,61 +1,75 @@
 package x7c1.linen.modern.accessor
 
+import android.content.Context
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.Source
 
-import scala.collection.mutable.ListBuffer
-
 trait SourceAccessor {
-  def get(position: Int):Source
+
+  def findAt(position: Int): Option[Source]
 
   def length: Int
 
-  def takeAfter(sourceId: Long, count: Int): Seq[Source]
-
   def positionOf(sourceId: Long): Option[Int]
-
-  def collectLastFrom[A](sourceId: Long)(f: PartialFunction[Source, A]): Option[A]
-
-  def findNextId(sourceId: Long): Option[Long]
 }
 
-class SourceBuffer extends SourceAccessor {
+private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
-  private lazy val underlying: ListBuffer[Source] = ListBuffer(createDummies:_*)
+  private lazy val idIndex = cursor getColumnIndex "source_id"
+  private lazy val titleIndex = cursor getColumnIndex "title"
+  private lazy val descriptionIndex = cursor getColumnIndex "description"
 
-  override def get(position: Int): Source = {
-    underlying(position)
+  override def findAt(position: Int) = synchronized {
+    if (cursor moveToPosition position){
+      Some apply Source(
+        id = cursor.getInt(idIndex),
+        url = "dummy",
+        title = cursor.getString(titleIndex),
+        description = cursor.getString(descriptionIndex)
+      )
+    } else None
   }
-  override def length = underlying.length
-
-  override def takeAfter(sourceId: Long, count: Int): Seq[Source] = {
-    val sources = underlying.dropWhile(_.id != sourceId).tail
-    sources take count
+  override def length = {
+    cursor.getCount
   }
   override def positionOf(sourceId: Long): Option[Int] = {
-    underlying.indexWhere(_.id == sourceId) match {
-      case -1 => None
-      case position => Some(position)
-    }
-  }
-  override def collectLastFrom[A](sourceId: Long)(f: PartialFunction[Source, A]): Option[A] = {
-    val position = underlying.indexWhere(_.id == sourceId)
-    Range(position - 1, -1, -1).view map underlying collectFirst f
-  }
-  override def findNextId(sourceId: Long): Option[Long] = {
-    positionOf(sourceId) flatMap {
-      case position if underlying.lift(position + 1).nonEmpty =>
-        Some(underlying(position + 1).id)
-      case _ =>
-        None
+    (0 to length - 1) find { n =>
+      findAt(n).exists(_.id == sourceId)
     }
   }
 
-  private def createDummies = (1 to 300) map { n =>
-    Source(
-      id = n,
-      url = s"http://example.com/sample-source-$n",
-      title = s"$n source title",
-      description = s"$n source description" )
+}
+
+object SourceAccessor {
+  def create(context: Context): SourceAccessor = {
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val cursor = createCursor(db)
+    new SourceAccessorImpl(cursor)
   }
 
+  def createCursor(db: SQLiteDatabase) = {
+    val sql1 =
+      """SELECT * FROM list_source_map
+        | INNER JOIN sources ON list_source_map.source_id = sources._id
+        | ORDER BY sources.rating DESC, sources._id DESC""".stripMargin
+
+    val sql2 =
+      """SELECT source_id FROM entries
+        | WHERE read_state = 0
+        | GROUP BY source_id """.stripMargin
+
+    val sql3 =
+      s"""SELECT
+        |   s1._id as source_id,
+        |   substr(s1.title, 1, 100) as title,
+        |   substr(s1.description, 1, 100) as description,
+        |   s1.rating as rating
+        | FROM ($sql1) as s1
+        | INNER JOIN ($sql2) as s2
+        | ON s1.source_id = s2.source_id
+        | ORDER BY s1.rating DESC, source_id DESC""".stripMargin
+
+    db.rawQuery(sql3, Array())
+  }
 }

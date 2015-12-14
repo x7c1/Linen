@@ -1,9 +1,9 @@
 package x7c1.linen.modern.display
 
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.{View, ViewGroup}
+import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.SourceRow
-import x7c1.linen.modern.accessor.{SourceAccessor, SourcePrefetched, SourceStateAccessor}
+import x7c1.linen.modern.accessor.SourceAccessor
 import x7c1.linen.modern.struct.Source
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
@@ -11,7 +11,6 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class SourceRowAdapter(
   sourceAccessor: SourceAccessor,
-  sourceStateAccessor: SourceStateAccessor,
   sourceSelectedListener: OnSourceSelectedListener,
   viewHolderProvider: ViewHolderProvider[SourceRow]) extends Adapter[SourceRow]{
 
@@ -20,21 +19,13 @@ class SourceRowAdapter(
   }
 
   override def onBindViewHolder(holder: SourceRow, position: Int) = {
-    val source = sourceAccessor.get(position)
-    holder.title.text = source.title
-    holder.description.text = source.description
-    holder.itemView onClick { view =>
-      val event = SourceSelectedEvent(position, source)
-      sourceSelectedListener onSourceSelected event
-    }
-    holder.statePrefetched.setVisibility(View.GONE)
-    holder.stateUnloaded.setVisibility(View.GONE)
-
-    sourceStateAccessor.findState(source.id) match {
-      case Some(SourcePrefetched) =>
-        holder.statePrefetched.setVisibility(View.VISIBLE)
-      case _ =>
-        holder.stateUnloaded.setVisibility(View.VISIBLE)
+    sourceAccessor.findAt(position) foreach { source =>
+      holder.title.text = source.title
+      holder.description.text = source.description
+      holder.itemView onClick { view =>
+        val event = SourceSelectedEvent(position, source)
+        sourceSelectedListener onSourceSelected event
+      }
     }
   }
 

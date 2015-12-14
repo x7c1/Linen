@@ -3,7 +3,7 @@ package x7c1.linen.modern.action.observer
 import android.content.Context
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
-import x7c1.linen.modern.action.{Actions, SourceSkippedEvent}
+import x7c1.linen.modern.action.SourceSkippedEvent
 import x7c1.wheat.macros.logger.Log
 
 object SourceSkippedDetector {
@@ -25,9 +25,7 @@ object SourceSkippedDetector {
             false
           case MotionEvent.ACTION_UP | MotionEvent.ACTION_CANCEL =>
             Log error "up"
-
-            val event = skippedEventFactory.create()
-            onSkippedListener onSkipped event
+            skippedEventFactory.create() foreach onSkippedListener.onSkipped
             true
           case _ =>
             false
@@ -74,22 +72,9 @@ trait ItemSkippedEvent {
 }
 
 trait SkippedEventFactory[A <: ItemSkippedEvent]{
-  def create(): A
+  def create(): Option[A]
 }
 
 trait OnItemSkippedListener {
   def onSkipped(event: SourceSkippedEvent): Unit
-}
-
-class SourceSkippedObserver(actions: Actions) extends OnItemSkippedListener {
-  override def onSkipped(event: SourceSkippedEvent) = {
-    val sync = for {
-      _ <- actions.sourceArea onSourceSkipped event
-      _ <- actions.entryArea onSourceSkipped event
-      _ <- actions.detailArea onSourceSkipped event
-      _ <- actions.prefetcher onSourceSkipped event
-    } yield ()
-
-    Seq(sync) foreach CallbackTaskRunner.runAsync { Log error _.toString }
-  }
 }

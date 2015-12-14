@@ -1,15 +1,15 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, PaneContainer, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.struct.EntryOutline
+import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.Imports._
 
 class EntryAreaAction(
-  container: PaneContainer,
+  entryArea: EntryArea,
   sourceAccessor: SourceAccessor,
-  entryAccessor: EntryAccessor,
-  entryBufferUpdater: EntryBufferUpdater
+  entryAccessor: EntryAccessor[EntryOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
@@ -21,14 +21,14 @@ class EntryAreaAction(
     display(event.source.id)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    n <- getOrCreatePosition(event.nextSource.id)
-    _ <- container.entryArea skipTo n
+    Some(n) <- findEntryPosition(event.nextSource.id)
+    _ <- entryArea skipTo n
     _ <- task { updateToolbar(event.nextSource.id) }
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
     for {
-      _ <- task of container.entryArea.scrollTo(event.position) _
+      _ <- entryArea scrollTo event.position
       _ <- task { updateToolbar(event.entry.sourceId) }
     } yield ()
   }
@@ -43,27 +43,22 @@ class EntryAreaAction(
   }
 
   private def syncDisplay(position: Int, sourceId: Long) = for {
-    _ <- task of container.entryArea.fastScrollTo(position) _
+    _ <- entryArea fastScrollTo position
     _ <- task { updateToolbar(sourceId) }
   } yield ()
 
   private def display(sourceId: Long) = for {
-    n <- getOrCreatePosition(sourceId)
-    _ <- task of container.entryArea.fastScrollTo(n) _
+    Some(n) <- findEntryPosition(sourceId)
+    _ <- entryArea fastScrollTo n
     _ <- task { updateToolbar(sourceId) }
   } yield ()
 
   private def updateToolbar(sourceId: Long): Unit = {
-    sourceAccessor positionOf sourceId map sourceAccessor.get foreach { source =>
-      container.entryArea updateToolbar source.title
-    }
+    sourceAccessor positionOf sourceId flatMap
+      sourceAccessor.findAt foreach { source =>
+        entryArea updateToolbar source.title
+      }
   }
-  private def getOrCreatePosition(sourceId: Long) =
-    entryAccessor firstEntryIdOf sourceId match {
-      case Some(entryId) =>
-        task { entryAccessor indexOf entryId }
-      case _ =>
-        for { event <- task of entryBufferUpdater.loadAndInsert(sourceId) _ }
-        yield event.position
-    }
+  private def findEntryPosition(sourceId: Long): CallbackTask[Option[Int]] =
+    task { entryAccessor firstEntryPositionOf sourceId }
 }

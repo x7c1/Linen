@@ -67,6 +67,16 @@ public class MainActivity extends Activity {
 			}
 		};
 
+		/*
+		View.OnTouchListener listener = new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return detector.onTouchEvent(event);
+			}
+		};
+		layout.itemView.findViewById(R.id.activity_main__entry_list).setOnTouchListener(listener);
+		*/
+
 		layout.dummySurface.setLongClickable(true);
 		layout.dummySurface.setOnTouchListener(listener);
 	}
