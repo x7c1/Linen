@@ -21,7 +21,7 @@ class EntryAreaAction(
     display(event.source.id)
   }
   override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    Some(n) <- getOrCreatePosition(event.nextSource.id)
+    Some(n) <- findEntryPosition(event.nextSource.id)
     _ <- entryArea skipTo n
     _ <- task { updateToolbar(event.nextSource.id) }
   } yield ()
@@ -48,7 +48,7 @@ class EntryAreaAction(
   } yield ()
 
   private def display(sourceId: Long) = for {
-    Some(n) <- getOrCreatePosition(sourceId)
+    Some(n) <- findEntryPosition(sourceId)
     _ <- entryArea fastScrollTo n
     _ <- task { updateToolbar(sourceId) }
   } yield ()
@@ -59,6 +59,6 @@ class EntryAreaAction(
         entryArea updateToolbar source.title
       }
   }
-  private def getOrCreatePosition(sourceId: Long): CallbackTask[Option[Int]] =
+  private def findEntryPosition(sourceId: Long): CallbackTask[Option[Int]] =
     task { entryAccessor firstEntryPositionOf sourceId }
 }
