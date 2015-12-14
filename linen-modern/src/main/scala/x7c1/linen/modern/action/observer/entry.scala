@@ -11,9 +11,9 @@ class EntryFocusedObserver(actions: Actions)
 
   override def onFocused(event: EntryFocusedEvent): Unit = {
     val sync = for {
-      _ <- actions.sourceArea onEntryFocused event
-      _ <- actions.entryArea onEntryFocused event
       _ <- actions.detailArea onEntryFocused event
+      _ <- actions.entryArea onEntryFocused event
+      _ <- actions.sourceArea onEntryFocused event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }
