@@ -12,45 +12,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.CoordinatorLayout
+        <RelativeLayout
             android:id="@+id/activity_main__source_area"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/opaque_blue"
             >
-            <android.support.design.widget.AppBarLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/activity_main__source_toolbar"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/activity_main__source_toolbar"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/actionBarSize"
+                        android:background="@color/cerulean_blue"
+                        style="@style/AppToolbar"
+                        />
+
+                </android.support.design.widget.AppBarLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/activity_main__source_list"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize"
-                    android:background="@color/cerulean_blue"
-                    app:layout_scrollFlags="scroll|enterAlways"
-                    style="@style/AppToolbar"
+                    android:layout_height="fill_parent"
                     />
 
-            </android.support.design.widget.AppBarLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__source_list"
-                android:layout_below="@+id/activity_main__source_toolbar"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                />
+            </LinearLayout>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/activity_main__source_to_next"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="16dp"
+                android:layout_alignParentBottom="true"
                 app:backgroundTint="@color/cerulean_blue"
-                style="@style/ToNextButton"
+                style="@style/ToNextButton.Polyfill"
                 />
 
-        </android.support.design.widget.CoordinatorLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/activity_main__entry_area"
