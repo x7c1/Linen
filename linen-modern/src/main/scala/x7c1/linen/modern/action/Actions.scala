@@ -4,7 +4,7 @@ import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipDoneEvent, SkipDoneEventFactory}
+import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 
 class Actions (
   val container: ContainerAction,
@@ -22,8 +22,8 @@ trait OnSourceFocused {
 trait OnSourceSkipped{
   def onSourceSkipped(event: SourceSkippedEvent): CallbackTask[Unit]
 }
-trait OnSourceSkipDone {
-  def onSourceSkipDone(event: SourceSkipDone): CallbackTask[Unit]
+trait OnSourceSkipStopped {
+  def onSourceSkipStopped(event: SourceSkipStopped): CallbackTask[Unit]
 }
 trait OnEntryFocused {
   def onEntryFocused(event: EntryFocusedEvent): CallbackTask[Unit]
@@ -34,8 +34,8 @@ trait OnEntrySelected {
 trait OnEntrySkipped {
   def onEntrySkipped(event: EntrySkippedEvent): CallbackTask[Unit]
 }
-trait OnEntrySkipDone {
-  def onEntrySkipDone(event: EntrySkipDone): CallbackTask[Unit]
+trait OnEntrySkipStopped {
+  def onEntrySkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
 }
 trait OnEntryDetailFocused {
   def onEntryDetailFocused(event: EntryDetailFocusedEvent): CallbackTask[Unit]
@@ -46,8 +46,8 @@ trait OnEntryDetailSelected {
 trait OnEntryDetailSkipped {
   def onEntryDetailSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
 }
-trait OnEntryDetailSkipDone {
-  def onEntryDetailSkipDone(event: EntrySkipDone): CallbackTask[Unit]
+trait OnEntryDetailSkipStopped {
+  def onEntryDetailSkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
 }
 
 case class SourceFocusedEvent(
@@ -78,16 +78,16 @@ class SourceSkippedEventFactory(sourceAccessor: SourceAccessor)
   }
 }
 
-case class SourceSkipDone(
+case class SourceSkipStopped(
   override val currentPosition: Int,
-  currentSource: Source ) extends SkipDoneEvent
+  currentSource: Source ) extends SkipStoppedEvent
 
-class SourceSkipDoneFactory(sourceAccessor: SourceAccessor)
-  extends SkipDoneEventFactory[SourceSkipDone]{
+class SourceSkipStoppedFactory(sourceAccessor: SourceAccessor)
+  extends SkipStoppedEventFactory[SourceSkipStopped]{
 
   override def createAt(current: Int) = {
     sourceAccessor findAt current map { source =>
-      SourceSkipDone(current, source)
+      SourceSkipStopped(current, source)
     }
   }
 }
@@ -120,16 +120,16 @@ class EntrySkippedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   }
 }
 
-case class EntrySkipDone(
+case class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: EntryOutline ) extends SkipDoneEvent
+  currentEntry: EntryOutline ) extends SkipStoppedEvent
 
-class EntrySkipDoneFactory(entryAccessor: EntryAccessor[EntryOutline])
-  extends SkipDoneEventFactory[EntrySkipDone]{
+class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[EntryOutline])
+  extends SkipStoppedEventFactory[EntrySkipStopped]{
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      EntrySkipDone(position, entry)
+      EntrySkipStopped(position, entry)
     }
   }
 }

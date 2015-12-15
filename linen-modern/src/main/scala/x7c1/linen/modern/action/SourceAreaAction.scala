@@ -9,8 +9,8 @@ class SourceAreaAction(
   sourceArea: SourceArea,
   sourceAccessor: SourceAccessor
 ) extends OnSourceSelected with OnSourceSkipped
-  with OnEntrySelected with OnEntryFocused with OnEntrySkipDone
-  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipDone {
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipStopped
+  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     sourceArea scrollTo event.position
@@ -26,7 +26,7 @@ class SourceAreaAction(
     _ <- skipTo(event.entry.sourceId)
   } yield ()
 
-  override def onEntrySkipDone(event: EntrySkipDone) = for {
+  override def onEntrySkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
     _ <- skipTo(event.currentEntry.sourceId)
   } yield ()
@@ -39,7 +39,7 @@ class SourceAreaAction(
     _ <- skipTo(event.entry.sourceId)
   } yield()
 
-  override def onEntryDetailSkipDone(event: EntrySkipDone) = for {
+  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
     _ <- skipTo(event.currentEntry.sourceId)
   } yield ()

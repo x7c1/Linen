@@ -1,10 +1,10 @@
 package x7c1.linen.modern.action.observer
 
-import x7c1.linen.modern.action.{EntrySkipDone, EntrySkippedEvent, Actions, EntryFocusedEvent}
+import x7c1.linen.modern.action.{EntrySkipStopped, EntrySkippedEvent, Actions, EntryFocusedEvent}
 import x7c1.linen.modern.action.observer.CallbackTaskRunner.runAsync
 import x7c1.linen.modern.display.{EntrySelectedEvent, OnEntrySelectedListener}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.observer.{OnSkipDoneListener, OnItemSkippedListener, OnItemFocusedListener}
+import x7c1.wheat.modern.observer.{OnSkipStoppedListener, OnItemSkippedListener, OnItemFocusedListener}
 
 class EntryFocusedObserver(actions: Actions)
   extends OnItemFocusedListener[EntryFocusedEvent] {
@@ -45,13 +45,13 @@ class EntrySkippedObserver(actions: Actions)
   }
 }
 
-class EntrySkipDoneObserver(actions: Actions)
-  extends OnSkipDoneListener[EntrySkipDone]{
+class EntrySkipStoppedObserver(actions: Actions)
+  extends OnSkipStoppedListener[EntrySkipStopped]{
 
-  override def onSkipDone(event: EntrySkipDone) = {
+  override def onSkipStopped(event: EntrySkipStopped) = {
     val sync = for {
-      _ <- actions.detailArea onEntrySkipDone event
-      _ <- actions.sourceArea onEntrySkipDone event
+      _ <- actions.detailArea onEntrySkipStopped event
+      _ <- actions.sourceArea onEntrySkipStopped event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

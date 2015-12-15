@@ -8,8 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{EntryDetailSkipDoneObserver, EntryDetailSkippedObserver, EntrySkipDoneObserver, EntrySkippedObserver, SourceSkipDoneObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{EntrySkipDoneFactory, EntrySkippedEventFactory, SourceSkipDoneFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.action.observer.{EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver, EntrySkipStoppedObserver, EntrySkippedObserver, SourceSkipStoppedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedObserver}
+import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, SourceSkipStoppedFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -77,9 +77,9 @@ class ContainerInitializer(
       context = layout.sourceToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new SourceSkippedEventFactory(accessors.source),
-      skipDoneEventFactory = new SourceSkipDoneFactory(accessors.source),
+      skipDoneEventFactory = new SourceSkipStoppedFactory(accessors.source),
       onSkippedListener = new SourceSkippedObserver(actions),
-      onSkipDoneListener = new SourceSkipDoneObserver(actions)
+      onSkipDoneListener = new SourceSkipStoppedObserver(actions)
     )
   }
   private def setupEntryArea(actions: Actions, accessors: Accessors) = {
@@ -100,9 +100,9 @@ class ContainerInitializer(
       context = activity,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
-      skipDoneEventFactory = new EntrySkipDoneFactory(accessors.entryOutline),
+      skipDoneEventFactory = new EntrySkipStoppedFactory(accessors.entryOutline),
       onSkippedListener = new EntrySkippedObserver(actions),
-      onSkipDoneListener = new EntrySkipDoneObserver(actions)
+      onSkipDoneListener = new EntrySkipStoppedObserver(actions)
     )
   }
   private def setupEntryDetailArea(actions: Actions, accessors: Accessors) = {
@@ -129,9 +129,9 @@ class ContainerInitializer(
       context = activity,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
-      skipDoneEventFactory = new EntrySkipDoneFactory(accessors.entryOutline),
+      skipDoneEventFactory = new EntrySkipStoppedFactory(accessors.entryOutline),
       onSkippedListener = new EntryDetailSkippedObserver(actions),
-      onSkipDoneListener = new EntryDetailSkipDoneObserver(actions)
+      onSkipDoneListener = new EntryDetailSkipStoppedObserver(actions)
     )
   }
 

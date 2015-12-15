@@ -10,9 +10,9 @@ class EntryAreaAction(
   entryArea: EntryArea,
   sourceAccessor: SourceAccessor,
   entryAccessor: EntryAccessor[EntryOutline]
-) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
   with OnEntrySelected with OnEntryFocused with OnEntrySkipped
-  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipDone {
+  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fastScrollTo(event.source.id)
@@ -20,7 +20,7 @@ class EntryAreaAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     fastScrollTo(event.source.id)
   }
-  override def onSourceSkipDone(event: SourceSkipDone) = for {
+  override def onSourceSkipStopped(event: SourceSkipStopped) = for {
     Some(n) <- findEntryPosition(event.currentSource.id)
     _ <- skipTo(n, event.currentSource.id)
   } yield ()
@@ -43,7 +43,7 @@ class EntryAreaAction(
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
     fastScrollTo(event.position, event.entry.sourceId)
   }
-  override def onEntryDetailSkipDone(event: EntrySkipDone) = {
+  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = {
     skipTo(event.currentPosition, event.currentEntry.sourceId)
   }
   private def fastScrollTo(position: Int, sourceId: Long) = for {

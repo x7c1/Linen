@@ -10,13 +10,13 @@ import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
 
 object SkipDetector {
-  def createListener[A <: ItemSkippedEvent, B <: SkipDoneEvent](
+  def createListener[A <: ItemSkippedEvent, B <: SkipStoppedEvent](
     context: Context,
     positionFinder: SkipPositionFinder,
     skippedEventFactory: ItemSkippedEventFactory[A],
-    skipDoneEventFactory: SkipDoneEventFactory[B],
+    skipDoneEventFactory: SkipStoppedEventFactory[B],
     onSkippedListener: OnItemSkippedListener[A],
-    onSkipDoneListener: OnSkipDoneListener[B]): OnTouchListener = {
+    onSkipDoneListener: OnSkipStoppedListener[B]): OnTouchListener = {
 
     /*
     val detector = new GestureDetector(
@@ -67,12 +67,12 @@ object SkipDetector {
                 done <- skipDoneEventFactory createAt next
               } yield {
                 onSkippedListener onSkipped skipped
-                onSkipDoneListener onSkipDone done
+                onSkipDoneListener onSkipStopped done
               } else for {
                 current <- positionFinder.findCurrent
                 done <- skipDoneEventFactory createAt current
               } yield {
-                onSkipDoneListener onSkipDone done
+                onSkipDoneListener onSkipStopped done
               }
             }
             true
@@ -119,21 +119,21 @@ trait ItemSkippedEvent {
   require(nextPosition > -1, "must be non negative")
   def nextPosition: Int
 }
-trait SkipDoneEvent {
+trait SkipStoppedEvent {
   require(currentPosition > -1, "must be non negative")
   def currentPosition: Int
 }
 trait ItemSkippedEventFactory[A <: ItemSkippedEvent]{
   def createAt(nextPosition: Int): Option[A]
 }
-trait SkipDoneEventFactory[A <: SkipDoneEvent]{
+trait SkipStoppedEventFactory[A <: SkipStoppedEvent]{
   def createAt(donePosition: Int): Option[A]
 }
 trait OnItemSkippedListener[A <: ItemSkippedEvent] {
   def onSkipped(event: A): Unit
 }
-trait OnSkipDoneListener[A <: SkipDoneEvent]{
-  def onSkipDone(event: A): Unit
+trait OnSkipStoppedListener[A <: SkipStoppedEvent]{
+  def onSkipStopped(event: A): Unit
 }
 
 trait SkipPositionFinder {

@@ -9,8 +9,8 @@ import x7c1.wheat.modern.tasks.Async.await
 class EntryDetailAreaAction(
   entryDetailArea: EntryDetailArea,
   entryAccessor: EntryAccessor[EntryDetail]
-) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
-  with OnEntrySelected with OnEntryFocused with OnEntrySkipDone
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipStopped
   with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = for {
@@ -23,7 +23,7 @@ class EntryDetailAreaAction(
     _ <- skipTo(event.source.id)
   } yield()
 
-  override def onSourceSkipDone(event: SourceSkipDone) = for {
+  override def onSourceSkipStopped(event: SourceSkipStopped) = for {
     _ <- await(300)
     Some(entryPosition) <- task {
       entryAccessor firstEntryPositionOf event.currentSource.id
@@ -40,7 +40,7 @@ class EntryDetailAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = {
     fastScrollTo(event.position, event.entry.shortTitle)
   }
-  override def onEntrySkipDone(event: EntrySkipDone) = {
+  override def onEntrySkipStopped(event: EntrySkipStopped) = {
     skipTo(event.currentPosition, event.currentEntry.shortTitle)
   }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
