@@ -10,7 +10,7 @@ class EntryAreaAction(
   entryArea: EntryArea,
   sourceAccessor: SourceAccessor,
   entryAccessor: EntryAccessor[EntryOutline]
-) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -20,10 +20,10 @@ class EntryAreaAction(
   override def onSourceFocused(event: SourceFocusedEvent) = {
     display(event.source.id)
   }
-  override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    Some(n) <- findEntryPosition(event.nextSource.id)
-    _ <- entryArea skipTo n
-    _ <- task { updateToolbar(event.nextSource.id) }
+  override def onSourceSkipDone(event: SourceSkipDone) = for {
+    Some(n) <- findEntryPosition(event.currentSource.id)
+    _ <- entryArea fastScrollTo n
+    _ <- task { updateToolbar(event.currentSource.id) }
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
@@ -61,4 +61,5 @@ class EntryAreaAction(
   }
   private def findEntryPosition(sourceId: Long): CallbackTask[Option[Int]] =
     task { entryAccessor firstEntryPositionOf sourceId }
+
 }

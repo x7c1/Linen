@@ -1,6 +1,6 @@
 package x7c1.linen.modern.action.observer
 
-import x7c1.linen.modern.action.{SourceSkippedEvent, Actions, SourceFocusedEvent}
+import x7c1.linen.modern.action.{SourceSkipDone, SourceSkippedEvent, Actions, SourceFocusedEvent}
 import x7c1.linen.modern.action.observer.CallbackTaskRunner.runAsync
 import x7c1.linen.modern.display.{OnSourceSelectedListener, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
@@ -36,13 +36,25 @@ class SourceSelectedObserver(actions: Actions)
 }
 
 class SourceSkippedObserver(actions: Actions)
-  extends OnItemSkippedListener {
+  extends OnItemSkippedListener[SourceSkippedEvent] {
 
   override def onSkipped(event: SourceSkippedEvent): Unit = {
     val sync = for {
       _ <- actions.sourceArea onSourceSkipped event
-      _ <- actions.entryArea onSourceSkipped event
-      _ <- actions.detailArea onSourceSkipped event
+    } yield ()
+
+    Seq(sync) foreach runAsync { Log error _.toString }
+  }
+}
+
+class SourceSkipDoneObserver(actions: Actions)
+  extends OnSkipDoneListener[SourceSkipDone] {
+
+  override def onSkipDone(event: SourceSkipDone): Unit = {
+    Log error "init"
+    val sync = for {
+      _ <- actions.entryArea onSourceSkipDone event
+      _ <- actions.detailArea onSourceSkipDone event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

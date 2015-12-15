@@ -9,7 +9,7 @@ import x7c1.wheat.modern.tasks.Async.await
 class EntryDetailAreaAction(
   entryDetailArea: EntryDetailArea,
   entryAccessor: EntryAccessor[EntryDetail]
-) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
   with OnEntrySelected with OnEntryFocused
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
@@ -23,11 +23,15 @@ class EntryDetailAreaAction(
     _ <- fromSourceArea(event.source.id)
   } yield()
 
-  override def onSourceSkipped(event: SourceSkippedEvent) = for {
+  override def onSourceSkipDone(event: SourceSkipDone) = for {
     _ <- await(300)
-    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf event.nextSource.id }
+    Some(entryPosition) <- task {
+      entryAccessor firstEntryPositionOf event.currentSource.id
+    }
     _ <- entryDetailArea skipTo entryPosition
-    Some(entry) <- task { entryAccessor findAt entryPosition }
+    Some(entry) <- task {
+      entryAccessor findAt entryPosition
+    }
     _ <- task {
       entryDetailArea updateToolbar entry.fullTitle
     }

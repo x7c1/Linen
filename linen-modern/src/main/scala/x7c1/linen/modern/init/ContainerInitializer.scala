@@ -8,8 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.action.observer.{SourceSkipDoneObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedDetector, SourceSkippedObserver}
+import x7c1.linen.modern.action.{SourceSkipDoneFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -75,8 +75,19 @@ class ContainerInitializer(
     )
     layout.sourceToNext setOnTouchListener SourceSkippedDetector.createListener(
       context = layout.sourceToNext.getContext,
-      skippedEventFactory = new SourceSkippedEventFactory(manager, accessors.source),
-      onSkippedListener = new SourceSkippedObserver(actions)
+      getCurrentPosition = () => {
+        manager.findFirstCompletelyVisibleItemPosition() match {
+          case x if x < 0 => None
+          case x => Some(x)
+        }
+      },
+      getNextPosition = () => Some {
+        manager.findFirstCompletelyVisibleItemPosition() + 1
+      },
+      skippedEventFactory = new SourceSkippedEventFactory(accessors.source),
+      skipDoneEventFactory = new SourceSkipDoneFactory(accessors.source),
+      onSkippedListener = new SourceSkippedObserver(actions),
+      onSkipDoneListener = new SourceSkipDoneObserver(actions)
     )
   }
   private def setupEntryArea(actions: Actions, accessors: Accessors) = {
