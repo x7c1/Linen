@@ -8,9 +8,8 @@ import x7c1.wheat.modern.tasks.Async.await
 class SourceAreaAction(
   sourceArea: SourceArea,
   sourceAccessor: SourceAccessor
-) extends OnSourceSelected
-  with OnSourceSkipped
-  with OnEntrySelected with OnEntryFocused
+) extends OnSourceSelected with OnSourceSkipped
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipDone
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
@@ -22,6 +21,11 @@ class SourceAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = for {
     _ <- await(300)
     _ <- skipTo(event.entry.sourceId)
+  } yield ()
+
+  override def onEntrySkipDone(event: EntrySkipDone) = for {
+    _ <- await(300)
+    _ <- skipTo(event.currentEntry.sourceId)
   } yield ()
 
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {

@@ -1,9 +1,8 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.SkipDoneEventFactory
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
+import x7c1.linen.modern.struct.{Entry, EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{SkipDoneEventFactory, ItemSkippedEventFactory, SkipDoneEvent, ItemSkippedEvent, FocusedEventFactory, ItemFocusedEvent}
 
@@ -31,6 +30,12 @@ trait OnEntryFocused {
 }
 trait OnEntrySelected {
   def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
+}
+trait OnEntrySkipped {
+  def onEntrySkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+}
+trait OnEntrySkipDone {
+  def onEntrySkipDone(event: EntrySkipDone): CallbackTask[Unit]
 }
 trait OnEntryDetailFocused {
   def onEntryDetailFocused(event: EntryDetailFocusedEvent): CallbackTask[Unit]
@@ -91,6 +96,34 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
       EntryFocusedEvent(position, entry)
+    }
+  }
+}
+
+case class EntrySkippedEvent(
+  override val nextPosition: Int,
+  nextEntry: Entry ) extends ItemSkippedEvent
+
+class EntrySkippedEventFactory(entryAccessor: EntryAccessor[Entry])
+  extends ItemSkippedEventFactory[EntrySkippedEvent]{
+
+  override def createAt(nextPosition: Int) = {
+    entryAccessor findAt nextPosition map { entry =>
+      EntrySkippedEvent(nextPosition, entry)
+    }
+  }
+}
+
+case class EntrySkipDone(
+  override val currentPosition: Int,
+  currentEntry: EntryOutline ) extends SkipDoneEvent
+
+class EntrySkipDoneFactory(entryAccessor: EntryAccessor[EntryOutline])
+  extends SkipDoneEventFactory[EntrySkipDone]{
+
+  override def createAt(position: Int) = {
+    entryAccessor findAt position map { entry =>
+      EntrySkipDone(position, entry)
     }
   }
 }

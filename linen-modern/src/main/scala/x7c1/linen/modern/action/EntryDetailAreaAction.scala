@@ -10,7 +10,7 @@ class EntryDetailAreaAction(
   entryDetailArea: EntryDetailArea,
   entryAccessor: EntryAccessor[EntryDetail]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
-  with OnEntrySelected with OnEntryFocused
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipDone
   with OnEntryDetailSelected with OnEntryDetailFocused {
 
   override def onSourceSelected(event: SourceSelectedEvent) = for {
@@ -43,6 +43,9 @@ class EntryDetailAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = {
     scrollAndUpdate(event.position, event.entry.shortTitle)
   }
+  override def onEntrySkipDone(event: EntrySkipDone) = {
+    scrollAndUpdate(event.currentPosition, event.currentEntry.shortTitle)
+  }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- entryDetailArea scrollTo event.position
     _ <- task { entryDetailArea updateToolbar event.entry.fullTitle }
@@ -63,5 +66,4 @@ class EntryDetailAreaAction(
     _ <- entryDetailArea fastScrollTo entryPosition
     _ <- task { entryDetailArea updateToolbar title }
   } yield ()
-
 }
