@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
 
-trait EntryAccessor[A <: Entry]{
+trait EntryAccessor[+A <: Entry]{
 
   def findAt(position: Int): Option[A]
 

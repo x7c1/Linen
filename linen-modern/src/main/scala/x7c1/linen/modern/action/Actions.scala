@@ -1,12 +1,10 @@
 package x7c1.linen.modern.action
 
-import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{ItemSkippedEvent, SkippedEventFactory}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent}
+import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 
 class Actions (
   val container: ContainerAction,
@@ -24,17 +22,32 @@ trait OnSourceFocused {
 trait OnSourceSkipped{
   def onSourceSkipped(event: SourceSkippedEvent): CallbackTask[Unit]
 }
+trait OnSourceSkipStopped {
+  def onSourceSkipStopped(event: SourceSkipStopped): CallbackTask[Unit]
+}
 trait OnEntryFocused {
   def onEntryFocused(event: EntryFocusedEvent): CallbackTask[Unit]
 }
 trait OnEntrySelected {
   def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
 }
+trait OnEntrySkipped {
+  def onEntrySkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+}
+trait OnEntrySkipStopped {
+  def onEntrySkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
+}
 trait OnEntryDetailFocused {
   def onEntryDetailFocused(event: EntryDetailFocusedEvent): CallbackTask[Unit]
 }
 trait OnEntryDetailSelected {
   def onEntryDetailSelected(event: EntryDetailSelectedEvent): CallbackTask[Unit]
+}
+trait OnEntryDetailSkipped {
+  def onEntryDetailSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+}
+trait OnEntryDetailSkipStopped {
+  def onEntryDetailSkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
 }
 
 case class SourceFocusedEvent(
@@ -55,16 +68,26 @@ case class SourceSkippedEvent(
   override val nextPosition: Int,
   nextSource: Source ) extends ItemSkippedEvent
 
-class SourceSkippedEventFactory(
-  layoutManager: LinearLayoutManager,
-  sourceAccessor: SourceAccessor)
+class SourceSkippedEventFactory(sourceAccessor: SourceAccessor)
+  extends ItemSkippedEventFactory[SourceSkippedEvent]{
 
-  extends SkippedEventFactory[SourceSkippedEvent]{
-
-  override def create() = {
-    val next = 1 + layoutManager.findFirstCompletelyVisibleItemPosition()
+  override def createAt(next: Int) = {
     sourceAccessor findAt next map { source =>
       SourceSkippedEvent(next, source)
+    }
+  }
+}
+
+case class SourceSkipStopped(
+  override val currentPosition: Int,
+  currentSource: Source ) extends SkipStoppedEvent
+
+class SourceSkipStoppedFactory(sourceAccessor: SourceAccessor)
+  extends SkipStoppedEventFactory[SourceSkipStopped]{
+
+  override def createAt(current: Int) = {
+    sourceAccessor findAt current map { source =>
+      SourceSkipStopped(current, source)
     }
   }
 }
@@ -79,6 +102,34 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
       EntryFocusedEvent(position, entry)
+    }
+  }
+}
+
+case class EntrySkippedEvent(
+  override val nextPosition: Int,
+  nextEntry: EntryOutline ) extends ItemSkippedEvent
+
+class EntrySkippedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
+  extends ItemSkippedEventFactory[EntrySkippedEvent]{
+
+  override def createAt(nextPosition: Int) = {
+    entryAccessor findAt nextPosition map { entry =>
+      EntrySkippedEvent(nextPosition, entry)
+    }
+  }
+}
+
+case class EntrySkipStopped(
+  override val currentPosition: Int,
+  currentEntry: EntryOutline ) extends SkipStoppedEvent
+
+class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[EntryOutline])
+  extends SkipStoppedEventFactory[EntrySkipStopped]{
+
+  override def createAt(position: Int) = {
+    entryAccessor findAt position map { entry =>
+      EntrySkipStopped(position, entry)
     }
   }
 }

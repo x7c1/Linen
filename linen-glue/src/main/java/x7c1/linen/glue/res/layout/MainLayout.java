@@ -10,10 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Button;
-import android.support.design.widget.CoordinatorLayout;
+import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
-import android.widget.RelativeLayout;
 
 public class MainLayout extends RecyclerView.ViewHolder {
 
@@ -21,7 +20,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final Button createDummies;
     public final Button initDummies;
     public final LinearLayout paneContainer;
-    public final android.support.design.widget.CoordinatorLayout sourceArea;
+    public final RelativeLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
     public final android.support.v7.widget.RecyclerView sourceList;
     public final android.support.design.widget.FloatingActionButton sourceToNext;
@@ -29,9 +28,10 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.v7.widget.Toolbar entryToolbar;
     public final android.support.v7.widget.RecyclerView entryList;
     public final android.support.design.widget.FloatingActionButton entryToNext;
-    public final LinearLayout entryDetailArea;
+    public final RelativeLayout entryDetailArea;
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
     public final android.support.v7.widget.RecyclerView entryDetailList;
+    public final android.support.design.widget.FloatingActionButton detailToNext;
     public final View dummySurface;
 
     public MainLayout(
@@ -40,7 +40,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         Button createDummies,
         Button initDummies,
         LinearLayout paneContainer,
-        android.support.design.widget.CoordinatorLayout sourceArea,
+        RelativeLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
         android.support.v7.widget.RecyclerView sourceList,
         android.support.design.widget.FloatingActionButton sourceToNext,
@@ -48,9 +48,10 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.v7.widget.Toolbar entryToolbar,
         android.support.v7.widget.RecyclerView entryList,
         android.support.design.widget.FloatingActionButton entryToNext,
-        LinearLayout entryDetailArea,
+        RelativeLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
         android.support.v7.widget.RecyclerView entryDetailList,
+        android.support.design.widget.FloatingActionButton detailToNext,
         View dummySurface
     ){
         super(itemView);
@@ -69,6 +70,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.entryDetailArea = entryDetailArea;
         this.entryDetailToolbar = entryDetailToolbar;
         this.entryDetailList = entryDetailList;
+        this.detailToNext = detailToNext;
         this.dummySurface = dummySurface;
     }
 }

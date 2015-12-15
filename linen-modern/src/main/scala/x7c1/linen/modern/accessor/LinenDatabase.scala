@@ -47,7 +47,7 @@ class LinenOpenHelper(context: Context)
     )
     db.execSQL(
       s"""CREATE INDEX entries_source_id ON entries (
-         |source_id)""".stripMargin
+         |source_id, created_at)""".stripMargin
     )
     db.execSQL(
       s"""CREATE INDEX entries_created_at ON entries (

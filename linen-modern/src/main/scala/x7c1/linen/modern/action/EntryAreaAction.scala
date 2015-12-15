@@ -10,55 +10,65 @@ class EntryAreaAction(
   entryArea: EntryArea,
   sourceAccessor: SourceAccessor,
   entryAccessor: EntryAccessor[EntryOutline]
-) extends OnSourceSelected with OnSourceFocused with OnSourceSkipped
-  with OnEntrySelected with OnEntryFocused
-  with OnEntryDetailSelected with OnEntryDetailFocused {
+) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipped
+  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    display(event.source.id)
+    fastScrollTo(event.source.id)
   }
   override def onSourceFocused(event: SourceFocusedEvent) = {
-    display(event.source.id)
+    fastScrollTo(event.source.id)
   }
-  override def onSourceSkipped(event: SourceSkippedEvent) = for {
-    Some(n) <- findEntryPosition(event.nextSource.id)
-    _ <- entryArea skipTo n
-    _ <- task { updateToolbar(event.nextSource.id) }
+  override def onSourceSkipStopped(event: SourceSkipStopped) = for {
+    Some(n) <- findEntryPosition(event.currentSource.id)
+    _ <- skipTo(n, event.currentSource.id)
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
     for {
       _ <- entryArea scrollTo event.position
-      _ <- task { updateToolbar(event.entry.sourceId) }
+      _ <- updateToolbar(event.entry.sourceId)
     } yield ()
   }
-  override def onEntryFocused(event: EntryFocusedEvent) = task {
+  override def onEntryFocused(event: EntryFocusedEvent) = {
     updateToolbar(event.entry.sourceId)
   }
+  override def onEntrySkipped(event: EntrySkippedEvent) = {
+    skipTo(event.nextPosition, event.nextEntry.sourceId)
+  }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
-    syncDisplay(event.position, event.entry.sourceId)
+    fastScrollTo(event.position, event.entry.sourceId)
   }
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
-    syncDisplay(event.position, event.entry.sourceId)
+    fastScrollTo(event.position, event.entry.sourceId)
   }
-
-  private def syncDisplay(position: Int, sourceId: Long) = for {
+  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = {
+    skipTo(event.currentPosition, event.currentEntry.sourceId)
+  }
+  private def fastScrollTo(position: Int, sourceId: Long) = for {
     _ <- entryArea fastScrollTo position
-    _ <- task { updateToolbar(sourceId) }
+    _ <- updateToolbar(sourceId)
   } yield ()
 
-  private def display(sourceId: Long) = for {
+  private def skipTo(position: Int, sourceId: Long) = for {
+    _ <- entryArea skipTo position
+    _ <- updateToolbar(sourceId)
+  } yield ()
+
+  private def fastScrollTo(sourceId: Long): CallbackTask[Unit] = for {
     Some(n) <- findEntryPosition(sourceId)
-    _ <- entryArea fastScrollTo n
-    _ <- task { updateToolbar(sourceId) }
+    _ <- fastScrollTo(n, sourceId)
   } yield ()
 
-  private def updateToolbar(sourceId: Long): Unit = {
+  private def updateToolbar(sourceId: Long) = task {
     sourceAccessor positionOf sourceId flatMap
       sourceAccessor.findAt foreach { source =>
         entryArea updateToolbar source.title
       }
   }
-  private def findEntryPosition(sourceId: Long): CallbackTask[Option[Int]] =
-    task { entryAccessor firstEntryPositionOf sourceId }
+  private def findEntryPosition(sourceId: Long) = task {
+    entryAccessor firstEntryPositionOf sourceId
+  }
+
 }

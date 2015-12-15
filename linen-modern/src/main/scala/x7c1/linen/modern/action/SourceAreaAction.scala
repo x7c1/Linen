@@ -8,13 +8,15 @@ import x7c1.wheat.modern.tasks.Async.await
 class SourceAreaAction(
   sourceArea: SourceArea,
   sourceAccessor: SourceAccessor
-) extends OnSourceSelected
-  with OnSourceSkipped
-  with OnEntrySelected with OnEntryFocused
-  with OnEntryDetailSelected with OnEntryDetailFocused {
+) extends OnSourceSelected with OnSourceSkipped
+  with OnEntrySelected with OnEntryFocused with OnEntrySkipStopped
+  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     sourceArea scrollTo event.position
+  }
+  override def onSourceSkipped(event: SourceSkippedEvent) = {
+    sourceArea skipTo event.nextPosition
   }
   override def onEntrySelected(event: EntrySelectedEvent) = {
     skipTo(event.entry.sourceId)
@@ -22,6 +24,11 @@ class SourceAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = for {
     _ <- await(300)
     _ <- skipTo(event.entry.sourceId)
+  } yield ()
+
+  override def onEntrySkipStopped(event: EntrySkipStopped) = for {
+    _ <- await(300)
+    _ <- skipTo(event.currentEntry.sourceId)
   } yield ()
 
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
@@ -32,12 +39,13 @@ class SourceAreaAction(
     _ <- skipTo(event.entry.sourceId)
   } yield()
 
-  override def onSourceSkipped(event: SourceSkippedEvent) = {
-    sourceArea skipTo event.nextPosition
-  }
+  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = for {
+    _ <- await(300)
+    _ <- skipTo(event.currentEntry.sourceId)
+  } yield ()
+
   private def skipTo(sourceId: Long) = for {
     Some(position) <- task { sourceAccessor positionOf sourceId }
     _ <- sourceArea skipTo position
   } yield ()
-
 }
