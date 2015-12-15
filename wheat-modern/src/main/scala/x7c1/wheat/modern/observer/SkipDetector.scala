@@ -1,18 +1,18 @@
 package x7c1.wheat.modern.observer
 
-import java.lang.Math.min
+import java.lang.Math.{max, min}
 import java.lang.System.currentTimeMillis
 import java.util.{Timer, TimerTask}
 
 import android.content.Context
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
 
 object SkipDetector {
   def createListener[A <: ItemSkippedEvent, B <: SkipDoneEvent](
     context: Context,
-    getCurrentPosition: () => Option[Int],
-    getNextPosition: () => Option[Int],
+    positionFinder: SkipPositionFinder,
     skippedEventFactory: ItemSkippedEventFactory[A],
     skipDoneEventFactory: SkipDoneEventFactory[B],
     onSkippedListener: OnItemSkippedListener[A],
@@ -28,15 +28,17 @@ object SkipDetector {
     new OnTouchListener {
 
       val timer = new Timer()
+
       val maxInterval = 1500L
+      val minInterval = 100L
+      var interval = 500L
 
       var task: Option[TimerTask] = None
       var previous: Option[Long] = None
-      var interval = 500L
 
       private def createTimerTask = new TimerTask {
         override def run(): Unit = for {
-          next <- getNextPosition()
+          next <- positionFinder.findNext
           event <- skippedEventFactory createAt next
         } yield {
           onSkippedListener onSkipped event
@@ -47,7 +49,10 @@ object SkipDetector {
           case MotionEvent.ACTION_DOWN =>
             task = Some(createTimerTask)
             previous foreach { msec =>
-              interval = min(maxInterval, currentTimeMillis() - msec)
+              interval = min(
+                maxInterval,
+                max(minInterval, currentTimeMillis() - msec)
+              )
             }
             previous = Some(currentTimeMillis())
             task foreach { timer.schedule(_, interval, interval) }
@@ -57,14 +62,14 @@ object SkipDetector {
             previous foreach { msec =>
               val elapsed = currentTimeMillis() - msec
               if (elapsed < interval) for {
-                next <- getNextPosition()
+                next <- positionFinder.findNext
                 skipped <- skippedEventFactory createAt next
                 done <- skipDoneEventFactory createAt next
               } yield {
                 onSkippedListener onSkipped skipped
                 onSkipDoneListener onSkipDone done
               } else for {
-                current <- getCurrentPosition()
+                current <- positionFinder.findCurrent
                 done <- skipDoneEventFactory createAt current
               } yield {
                 onSkipDoneListener onSkipDone done
@@ -129,4 +134,24 @@ trait OnItemSkippedListener[A <: ItemSkippedEvent] {
 }
 trait OnSkipDoneListener[A <: SkipDoneEvent]{
   def onSkipDone(event: A): Unit
+}
+
+trait SkipPositionFinder {
+  def findCurrent: Option[Int]
+  def findNext: Option[Int]
+}
+
+object SkipPositionFinder {
+  def createBy(manager: LinearLayoutManager): SkipPositionFinder =
+    new SkipPositionFinder {
+      override def findCurrent =
+        manager.findFirstVisibleItemPosition() match {
+          case x if x < 0 => None
+          case x => Some(x)
+        }
+
+      override def findNext = Some {
+        manager.findFirstVisibleItemPosition() + 1
+      }
+    }
 }

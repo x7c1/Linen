@@ -14,7 +14,7 @@ import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdap
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.observer.{SkipDetector, FocusDetector}
+import x7c1.wheat.modern.observer.{SkipPositionFinder, SkipDetector, FocusDetector}
 import x7c1.wheat.modern.tasks.Async.await
 import x7c1.wheat.modern.tasks.UiThread
 
@@ -75,15 +75,7 @@ class ContainerInitializer(
     )
     layout.sourceToNext setOnTouchListener SkipDetector.createListener(
       context = layout.sourceToNext.getContext,
-      getCurrentPosition = () => {
-        manager.findFirstCompletelyVisibleItemPosition() match {
-          case x if x < 0 => None
-          case x => Some(x)
-        }
-      },
-      getNextPosition = () => Some {
-        manager.findFirstCompletelyVisibleItemPosition() + 1
-      },
+      positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new SourceSkippedEventFactory(accessors.source),
       skipDoneEventFactory = new SourceSkipDoneFactory(accessors.source),
       onSkippedListener = new SourceSkippedObserver(actions),
@@ -106,15 +98,7 @@ class ContainerInitializer(
     )
     layout.entryToNext setOnTouchListener SkipDetector.createListener(
       context = activity,
-      getCurrentPosition = () => {
-        manager.findFirstCompletelyVisibleItemPosition() match {
-          case x if x < 0 => None
-          case x => Some(x)
-        }
-      },
-      getNextPosition = () => Some {
-        manager.findFirstCompletelyVisibleItemPosition() + 1
-      },
+      positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
       skipDoneEventFactory = new EntrySkipDoneFactory(accessors.entryOutline),
       onSkippedListener = new EntrySkippedObserver(actions),
