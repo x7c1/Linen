@@ -43,9 +43,11 @@ class EntryDetailAreaAction(
   override def onEntryFocused(event: EntryFocusedEvent) = {
     scrollAndUpdate(event.position, event.entry.shortTitle)
   }
-  override def onEntrySkipDone(event: EntrySkipDone) = {
-    scrollAndUpdate(event.currentPosition, event.currentEntry.shortTitle)
-  }
+  override def onEntrySkipDone(event: EntrySkipDone) = for {
+    _ <- entryDetailArea skipTo event.currentPosition
+    _ <- task { entryDetailArea updateToolbar event.currentEntry.shortTitle }
+  } yield ()
+
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- entryDetailArea scrollTo event.position
     _ <- task { entryDetailArea updateToolbar event.entry.fullTitle }

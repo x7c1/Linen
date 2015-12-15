@@ -22,7 +22,7 @@ class EntryAreaAction(
   }
   override def onSourceSkipDone(event: SourceSkipDone) = for {
     Some(n) <- findEntryPosition(event.currentSource.id)
-    _ <- entryArea fastScrollTo n
+    _ <- entryArea skipTo n
     _ <- task { updateToolbar(event.currentSource.id) }
   } yield ()
 
