@@ -1,4 +1,4 @@
-package x7c1.linen.modern.action.observer
+package x7c1.wheat.modern.observer
 
 import java.lang.Math.min
 import java.lang.System.currentTimeMillis
@@ -8,7 +8,7 @@ import android.content.Context
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View}
 
-object SourceSkippedDetector {
+object SkipDetector {
   def createListener[A <: ItemSkippedEvent, B <: SkipDoneEvent](
     context: Context,
     getCurrentPosition: () => Option[Int],

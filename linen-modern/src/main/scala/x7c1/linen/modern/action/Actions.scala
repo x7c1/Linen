@@ -1,11 +1,11 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{ItemSkippedEvent, ItemSkippedEventFactory, SkipDoneEvent, SkipDoneEventFactory}
+import x7c1.linen.modern.action.observer.SkipDoneEventFactory
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent}
+import x7c1.wheat.modern.observer.{SkipDoneEventFactory, ItemSkippedEventFactory, SkipDoneEvent, ItemSkippedEvent, FocusedEventFactory, ItemFocusedEvent}
 
 class Actions (
   val container: ContainerAction,
