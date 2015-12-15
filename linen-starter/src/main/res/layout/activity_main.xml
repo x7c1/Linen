@@ -30,9 +30,6 @@
 
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/activity_main__source_toolbar"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="?attr/actionBarSize"
                         android:background="@color/cerulean_blue"
                         style="@style/AppToolbar"
                         />
@@ -74,9 +71,6 @@
 
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/activity_main__entry_toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="?attr/actionBarSize"
                         android:background="@color/generic_viridian"
                         style="@style/AppToolbar"
                         />
@@ -117,9 +111,6 @@
 
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/activity_main__entry_detail_toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="?attr/actionBarSize"
                         android:background="@color/kakiiro"
                         style="@style/AppToolbar"
                         />
