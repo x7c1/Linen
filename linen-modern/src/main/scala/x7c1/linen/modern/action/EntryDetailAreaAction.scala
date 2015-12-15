@@ -14,7 +14,6 @@ class EntryDetailAreaAction(
   with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = for {
-    _ <- await(300)
     _ <- skipTo(event.source.id)
   } yield ()
 
