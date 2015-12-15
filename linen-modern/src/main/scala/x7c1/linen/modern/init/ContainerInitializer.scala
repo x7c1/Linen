@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{EntrySkipDoneObserver, EntrySkippedObserver, SourceSkipDoneObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedObserver}
+import x7c1.linen.modern.action.observer.{EntryDetailSkipDoneObserver, EntryDetailSkippedObserver, EntrySkipDoneObserver, EntrySkippedObserver, SourceSkipDoneObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{EntrySkipDoneFactory, EntrySkippedEventFactory, SourceSkipDoneFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
@@ -124,6 +124,14 @@ class ContainerInitializer(
       getPosition = getPosition,
       focusedEventFactory = new EntryDetailFocusedEventFactory(accessors.entryDetail),
       onFocused = new EntryDetailFocusedObserver(actions)
+    )
+    layout.detailToNext setOnTouchListener SkipDetector.createListener(
+      context = activity,
+      positionFinder = SkipPositionFinder createBy manager,
+      skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
+      skipDoneEventFactory = new EntrySkipDoneFactory(accessors.entryOutline),
+      onSkippedListener = new EntryDetailSkippedObserver(actions),
+      onSkipDoneListener = new EntryDetailSkipDoneObserver(actions)
     )
   }
 

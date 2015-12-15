@@ -12,7 +12,7 @@ class EntryAreaAction(
   entryAccessor: EntryAccessor[EntryOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipDone
   with OnEntrySelected with OnEntryFocused with OnEntrySkipped
-  with OnEntryDetailSelected with OnEntryDetailFocused {
+  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipDone {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     display(event.source.id)
@@ -46,6 +46,10 @@ class EntryAreaAction(
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
     syncDisplay(event.position, event.entry.sourceId)
   }
+  override def onEntryDetailSkipDone(event: EntrySkipDone) = for {
+    _ <- entryArea skipTo event.currentPosition
+    _ <- task { updateToolbar(event.currentEntry.sourceId) }
+  } yield ()
 
   private def syncDisplay(position: Int, sourceId: Long) = for {
     _ <- entryArea fastScrollTo position

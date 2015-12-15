@@ -43,6 +43,12 @@ trait OnEntryDetailFocused {
 trait OnEntryDetailSelected {
   def onEntryDetailSelected(event: EntryDetailSelectedEvent): CallbackTask[Unit]
 }
+trait OnEntryDetailSkipped {
+  def onEntryDetailSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+}
+trait OnEntryDetailSkipDone {
+  def onEntryDetailSkipDone(event: EntrySkipDone): CallbackTask[Unit]
+}
 
 case class SourceFocusedEvent(
   override val position: Int,

@@ -50,9 +50,10 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__entry_list),
             (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__entry_to_next),
-            (LinearLayout) view.findViewById(R.id.activity_main__entry_detail_area),
+            (RelativeLayout) view.findViewById(R.id.activity_main__entry_detail_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_detail_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__entry_detail_list),
+            (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__detail_to_next),
             (View) view.findViewById(R.id.activity_main__dummy_surface)
         );
     }
