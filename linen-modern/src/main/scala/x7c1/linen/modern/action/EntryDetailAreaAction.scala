@@ -14,13 +14,13 @@ class EntryDetailAreaAction(
   with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = for {
-    _ <- await(0)
-    _ <- fromSourceArea(event.source.id)
+    _ <- await(300)
+    _ <- skipTo(event.source.id)
   } yield ()
 
   override def onSourceFocused(event: SourceFocusedEvent) = for {
     _ <- await(300)
-    _ <- fromSourceArea(event.source.id)
+    _ <- skipTo(event.source.id)
   } yield()
 
   override def onSourceSkipDone(event: SourceSkipDone) = for {
@@ -28,26 +28,21 @@ class EntryDetailAreaAction(
     Some(entryPosition) <- task {
       entryAccessor firstEntryPositionOf event.currentSource.id
     }
-    _ <- entryDetailArea skipTo entryPosition
     Some(entry) <- task {
       entryAccessor findAt entryPosition
     }
-    _ <- task {
-      entryDetailArea updateToolbar entry.fullTitle
-    }
+    _ <- skipTo(entryPosition, entry.fullTitle)
   } yield ()
 
   override def onEntrySelected(event: EntrySelectedEvent) = {
-    scrollAndUpdate(event.position, event.entry.shortTitle)
+    fastScrollTo(event.position, event.entry.shortTitle)
   }
   override def onEntryFocused(event: EntryFocusedEvent) = {
-    scrollAndUpdate(event.position, event.entry.shortTitle)
+    fastScrollTo(event.position, event.entry.shortTitle)
   }
-  override def onEntrySkipDone(event: EntrySkipDone) = for {
-    _ <- entryDetailArea skipTo event.currentPosition
-    _ <- task { entryDetailArea updateToolbar event.currentEntry.shortTitle }
-  } yield ()
-
+  override def onEntrySkipDone(event: EntrySkipDone) = {
+    skipTo(event.currentPosition, event.currentEntry.shortTitle)
+  }
   override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = for {
     _ <- entryDetailArea scrollTo event.position
     _ <- task { entryDetailArea updateToolbar event.entry.fullTitle }
@@ -56,21 +51,23 @@ class EntryDetailAreaAction(
   override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = task {
     entryDetailArea.updateToolbar(event.entry.fullTitle)
   }
+  override def onEntryDetailSkipped(event: EntrySkippedEvent) = {
+    skipTo(event.nextPosition, event.nextEntry.shortTitle)
+  }
 
-  override def onEntryDetailSkipped(event: EntrySkippedEvent) = for {
-    _ <- entryDetailArea skipTo event.nextPosition
-    Some(entry) <- task { entryAccessor findAt event.nextPosition }
-    _ <- task { entryDetailArea updateToolbar entry.fullTitle }
+  private def skipTo(position: Int, title: String) = for {
+    _ <- entryDetailArea skipTo position
+    _ <- task { entryDetailArea updateToolbar title }
   } yield ()
 
-  private def fromSourceArea(sourceId: Long) = for {
+  private def skipTo(sourceId: Long) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
     Some(entry) <- task { entryAccessor findAt entryPosition }
     _ <- entryDetailArea skipTo entryPosition
     _ <- task { entryDetailArea updateToolbar entry.fullTitle }
   } yield ()
 
-  private def scrollAndUpdate(entryPosition: Int, title: String) = for {
+  private def fastScrollTo(entryPosition: Int, title: String) = for {
     _ <- entryDetailArea fastScrollTo entryPosition
     _ <- task { entryDetailArea updateToolbar title }
   } yield ()

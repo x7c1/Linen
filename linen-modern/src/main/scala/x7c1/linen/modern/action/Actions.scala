@@ -2,9 +2,9 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{Entry, EntryDetail, EntryOutline, Source}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.observer.{SkipDoneEventFactory, ItemSkippedEventFactory, SkipDoneEvent, ItemSkippedEvent, FocusedEventFactory, ItemFocusedEvent}
+import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipDoneEvent, SkipDoneEventFactory}
 
 class Actions (
   val container: ContainerAction,
@@ -108,9 +108,9 @@ class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
 
 case class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: Entry ) extends ItemSkippedEvent
+  nextEntry: EntryOutline ) extends ItemSkippedEvent
 
-class EntrySkippedEventFactory(entryAccessor: EntryAccessor[Entry])
+class EntrySkippedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
   extends ItemSkippedEventFactory[EntrySkippedEvent]{
 
   override def createAt(nextPosition: Int) = {
