@@ -36,8 +36,8 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS sources (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |url TEXT,
-         |title TEXT,
-         |description TEXT,
+         |title TEXT NOT NULL,
+         |description TEXT NOT NULL,
          |created_at INTEGER
          |)""".stripMargin
     )
@@ -45,13 +45,22 @@ class LinenOpenHelper(context: Context)
       s"""CREATE INDEX sources_created_at ON sources (
          |created_at)""".stripMargin
     )
-    /*
     db.execSQL(
-      s"""CREATE INDEX sources_rating ON sources (
-         |rating,created_at)""".stripMargin
+      s"""CREATE TABLE IF NOT EXISTS source_ratings (
+         |source_id INTEGER NOT NULL,
+         |owner_account_id INTEGER NOT NULL,
+         |rating INTEGER NOT NULL,
+         |created_at INTEGER,
+         |UNIQUE(owner_account_id, source_id),
+         |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
+         |FOREIGN KEY(owner_account_id) REFERENCES accounts(_id) ON DELETE CASCADE
+         |)""".stripMargin
     )
     db.execSQL(
-    */
+      s"""CREATE INDEX source_ratings_id ON source_ratings (
+         |owner_account_id, rating, source_id)""".stripMargin
+    )
+    db.execSQL(
       s"""CREATE TABLE IF NOT EXISTS entries (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |source_id INTEGER,
@@ -82,9 +91,10 @@ class LinenOpenHelper(context: Context)
     )
     db.execSQL(
       s"""CREATE TABLE IF NOT EXISTS list_source_map (
-         |list_id INTEGER,
-         |source_id INTEGER,
+         |list_id INTEGER NOT NULL,
+         |source_id INTEGER NOT NULL,
          |created_at INTEGER,
+         |UNIQUE(list_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(list_id) REFERENCES lists(_id) ON DELETE CASCADE
          |)""".stripMargin
@@ -100,12 +110,12 @@ class LinenOpenHelper(context: Context)
     db.execSQL(
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
          |source_id INTEGER NOT NULL,
-         |last_entry_id INTEGER,
+         |start_entry_id INTEGER,
          |account_id INTEGER NOT NULL,
-         |rating INTEGER NOT NULL,
          |created_at INTEGER,
+         |UNIQUE(source_id, account_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(last_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
+         |FOREIGN KEY(start_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )

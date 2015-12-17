@@ -4,5 +4,6 @@ case class Source(
   id: Long,
   url: String,
   title: String,
-  description: String
+  description: String,
+  startEntryId: Option[Long]
 )

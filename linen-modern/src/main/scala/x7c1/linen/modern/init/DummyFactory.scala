@@ -76,15 +76,27 @@ object DummyFactory {
 
       val status1 = new ContentValues()
       status1.put("source_id", sourceId: Double)
-      status1.put("rating", sourceId: Double)
+//      status1.put("rating", sourceId: Double)
       status1.put("account_id", accountId1: Double)
       db.insert("source_statuses", null, status1)
 
+      val rating1 = new ContentValues()
+      rating1.put("source_id", sourceId: Double)
+      rating1.put("owner_account_id", accountId1: Double)
+      rating1.put("rating", sourceId: Double)
+      db.insert("source_ratings", null, rating1)
+
       val status2 = new ContentValues()
       status2.put("source_id", sourceId: Double)
-      status2.put("rating", sourceId: Double)
+//      status2.put("rating", sourceId: Double)
       status2.put("account_id", accountId2: Double)
       db.insert("source_statuses", null, status2)
+
+      val rating2 = new ContentValues()
+      rating2.put("source_id", sourceId: Double)
+      rating2.put("owner_account_id", accountId2: Double)
+      rating2.put("rating", sourceId: Double)
+      db.insert("source_ratings", null, rating2)
 
       val listSourceMap = new ContentValues()
       listSourceMap.put("list_id", listId: Double)
@@ -103,14 +115,14 @@ object DummyFactory {
 
         if (i == 3){
           val status1 = new ContentValues()
-          status1.put("last_entry_id", entryId: Double)
+          status1.put("start_entry_id", entryId: Double)
           db.update(
             "source_statuses", status1,
             "source_id = ? AND account_id = ?",
             Array(sourceId.toString, accountId1.toString)
           )
           val status2 = new ContentValues()
-          status2.put("last_entry_id", entryId: Double)
+          status2.put("start_entry_id", entryId: Double)
           db.update(
             "source_statuses", status2,
             "source_id = ? AND account_id = ?",
@@ -119,7 +131,7 @@ object DummyFactory {
         }
         if (i == 4){
           val status2 = new ContentValues()
-          status2.put("last_entry_id", entryId: Double)
+          status2.put("start_entry_id", entryId: Double)
           db.update(
             "source_statuses", status2,
             "source_id = ? AND account_id = ?",
