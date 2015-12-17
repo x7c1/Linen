@@ -82,8 +82,7 @@ object SourceAccessor {
       """SELECT
         |  s1.source_id,
         |  s1.list_id,
-        |  s2.start_entry_id,
-        |  s2.account_id
+        |  s2.start_entry_id
         |FROM list_source_map AS s1
         |LEFT JOIN source_statuses AS s2 ON s1.source_id = s2.source_id
         |WHERE s1.list_id = ? AND s2.account_id = ?
