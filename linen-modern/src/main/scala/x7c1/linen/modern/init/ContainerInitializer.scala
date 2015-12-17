@@ -8,13 +8,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver, EntrySkipStoppedObserver, EntrySkippedObserver, SourceSkipStoppedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryFocusedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, SourceSkipStoppedFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
+import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.observer.{SkipPositionFinder, SkipDetector, FocusDetector}
+import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 import x7c1.wheat.modern.tasks.Async.await
 import x7c1.wheat.modern.tasks.UiThread
 
@@ -36,8 +37,8 @@ class ContainerInitializer(
     init.execute()
   }
   private def init = for {
-    _ <- await(0)
-    accessors <- task apply createAccessors
+    _ <- await(500)
+    Right(accessors) <- task apply createAccessors
     actions <- task {
       createActions(accessors)
     }
@@ -52,11 +53,15 @@ class ContainerInitializer(
 
     // todo: db.close
 
-    new Accessors(
+    try Right apply new Accessors(
       source = SourceAccessor create activity,
       entryOutline = EntryAccessor forEntryOutline activity,
       entryDetail = EntryAccessor forEntryDetail activity
-    )
+    ) catch {
+      case e: Throwable =>
+        Log error e.getStackTrace.take(20).mkString("\n")
+        Left(e)
+    }
   }
 
   private def setupSourceArea(actions: Actions, accessors: Accessors) = {

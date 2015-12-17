@@ -2,8 +2,8 @@ package x7c1.linen.modern.accessor
 
 import android.database.Cursor
 import org.junit.Assert.assertEquals
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.{Assert, Test}
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
@@ -32,8 +32,13 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val cursor3 = SourceAccessor createCursor db
+    val listId = SourceAccessor.findFirstListId(db)
+    val accountId = SourceAccessor.findFirstAccountId(db)
+    val cursor3 = SourceAccessor.createCursor(db, listId, accountId)
     val rows = toMaps(cursor3)
+
+    rows.map(prettyPrint) foreach println
+
     assertEquals(
       Seq("5", "4", "2", "1"),
       rows map {_("source_id")}
