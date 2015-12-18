@@ -4,6 +4,8 @@ import android.content.Context
 import android.database.Cursor
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
 
+import scala.annotation.tailrec
+
 trait EntryAccessor[+A <: Entry]{
 
   def findAt(position: Int): Option[A]
@@ -13,7 +15,45 @@ trait EntryAccessor[+A <: Entry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-private class EntryAccessorImpl[A <: Entry](
+class EntryAccessorHolder[A <: Entry](
+  accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
+
+  override def findAt(position: Int): Option[A] = {
+    @tailrec
+    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[(EntryAccessor[A], Int)] =
+      accessors match {
+        case x +: xs => x.length + prev match {
+          case sum if sum > position => Some(x -> prev)
+          case sum => loop(xs, sum)
+        }
+        case Seq() => None
+      }
+
+    loop(accessors, 0) flatMap { case (accessor, prev) =>
+      accessor.findAt(position - prev)
+    }
+  }
+
+  override def length: Int = {
+    accessors.foldLeft(0){ _ + _.length }
+  }
+
+  override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
+    @tailrec
+    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[Int] =
+      accessors match {
+        case x +: xs => x.firstEntryPositionOf(sourceId) match {
+          case Some(s) => Some(prev + s)
+          case None => loop(xs, x.length + prev)
+        }
+        case Seq() => None
+      }
+
+    loop(accessors, 0)
+  }
+}
+
+class EntryAccessorImpl[A <: Entry](
   factory: EntryFactory[A],
   cursor: Cursor,
   positions: Map[Long, Int]) extends EntryAccessor[A] {

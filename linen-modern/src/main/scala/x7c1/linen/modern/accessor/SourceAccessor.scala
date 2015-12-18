@@ -14,6 +14,19 @@ trait SourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
+class SourceAccessorHolder(accessor: SourceAccessor) extends SourceAccessor {
+
+  override def findAt(position: Int): Option[Source] = {
+    accessor findAt position
+  }
+  override def positionOf(sourceId: Long): Option[Int] = {
+    accessor positionOf sourceId
+  }
+  override def length: Int = {
+    accessor.length
+  }
+}
+
 private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
   private lazy val idIndex = cursor getColumnIndex "source_id"

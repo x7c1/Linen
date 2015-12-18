@@ -7,17 +7,14 @@ import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSkippedObserver, EntryDetailSkipStoppedObserver, EntryFocusedObserver, EntrySkippedObserver, EntrySkipStoppedObserver, EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{EntryDetailFocusedEventFactory, EntryFocusedEventFactory, EntrySkippedEventFactory, EntrySkipStoppedFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{EntryDetailRowAdapter, EntryRowAdapter, EntryArea, EntryDetailArea, PaneContainer, SourceArea, SourceRowAdapter}
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorHolder, SourceAccessor, SourceAccessorHolder}
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver, EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
-import x7c1.wheat.modern.tasks.Async.await
-import x7c1.wheat.modern.tasks.UiThread
 
 
 class ContainerInitializer(
@@ -32,46 +29,31 @@ class ContainerInitializer(
     updateWidth(0.9, layout.entryArea)
     updateWidth(0.95, layout.entryDetailArea)
 
+    // todo: db.close
+
     DummyFactory.setup(layout, activity)
 
     init.execute()
   }
   private def init = for {
-    _ <- await(500)
-    Right(accessors) <- task apply setupAccessors
+    loader <- task {
+      new AccessorLoader(activity, layout)
+    }
+    accessors <- task apply new Accessors(
+      source = new SourceAccessorHolder(loader.forSource),
+      entryOutline = new EntryAccessorHolder[EntryOutline](loader.forOutline),
+      entryDetail = new EntryAccessorHolder[EntryDetail](loader.forDetail)
+    )
     actions <- task {
       createActions(accessors)
     }
-    _ <- UiThread.via(layout.itemView){ _ =>
+    _ <- task {
       setupSourceArea(actions, accessors)
       setupEntryArea(actions, accessors)
       setupEntryDetailArea(actions, accessors)
+      loader.startLoading()
     }
   } yield ()
-
-  private def setupAccessors = {
-
-    // todo: db.close
-
-    try {
-      val sourceAccessor = SourceAccessor create activity
-      val sourceIds = (0 to sourceAccessor.length - 1).
-        map(sourceAccessor.findAt).flatMap(_.map(_.id))
-
-      val positions = EntryAccessor.createPositionMap(activity, sourceIds)
-
-      Right apply new Accessors(
-        source = sourceAccessor,
-        entryOutline = EntryAccessor.forEntryOutline(activity, sourceIds, positions),
-        entryDetail = EntryAccessor.forEntryDetail(activity, sourceIds, positions)
-      )
-    } catch {
-      case e: Throwable =>
-        Log error e.getStackTrace.take(20).mkString("\n")
-        Left(e)
-    }
-
-  }
 
   private def setupSourceArea(actions: Actions, accessors: Accessors) = {
     val manager = new LinearLayoutManager(activity)
@@ -225,3 +207,5 @@ private class PanePosition(children: Seq[View], displayWidth: Int){
     }
   }
 }
+
+

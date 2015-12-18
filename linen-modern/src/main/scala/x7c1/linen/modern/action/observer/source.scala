@@ -51,7 +51,6 @@ class SourceSkipStoppedObserver(actions: Actions)
   extends OnSkipStoppedListener[SourceSkipStopped] {
 
   override def onSkipStopped(event: SourceSkipStopped): Unit = {
-    Log error "init"
     val sync = for {
       _ <- actions.entryArea onSourceSkipStopped event
       _ <- actions.detailArea onSourceSkipStopped event
