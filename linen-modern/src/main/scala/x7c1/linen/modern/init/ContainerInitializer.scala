@@ -38,7 +38,7 @@ class ContainerInitializer(
   }
   private def init = for {
     _ <- await(500)
-    Right(accessors) <- task apply createAccessors
+    Right(accessors) <- task apply setupAccessors
     actions <- task {
       createActions(accessors)
     }
@@ -49,16 +49,21 @@ class ContainerInitializer(
     }
   } yield ()
 
-  private def createAccessors = {
+  private def setupAccessors = {
 
     // todo: db.close
 
     try {
       val sourceAccessor = SourceAccessor create activity
+      val sourceIds = (0 to sourceAccessor.length - 1).
+        map(sourceAccessor.findAt).flatMap(_.map(_.id))
+
+      val positions = EntryAccessor.createPositionMap(activity, sourceIds)
+
       Right apply new Accessors(
         source = sourceAccessor,
-        entryOutline = EntryAccessor.forEntryOutline(activity, sourceAccessor),
-        entryDetail = EntryAccessor.forEntryDetail(activity, sourceAccessor)
+        entryOutline = EntryAccessor.forEntryOutline(activity, sourceIds, positions),
+        entryDetail = EntryAccessor.forEntryDetail(activity, sourceIds, positions)
       )
     } catch {
       case e: Throwable =>

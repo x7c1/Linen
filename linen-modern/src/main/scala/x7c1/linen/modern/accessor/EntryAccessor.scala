@@ -15,7 +15,8 @@ trait EntryAccessor[+A <: Entry]{
 
 private class EntryAccessorImpl[A <: Entry](
   factory: EntryFactory[A],
-  cursor: Cursor ) extends EntryAccessor[A] {
+  cursor: Cursor,
+  positions: Map[Long, Int]) extends EntryAccessor[A] {
 
   override def findAt(position: Int) = synchronized {
     if (cursor moveToPosition position){
@@ -26,9 +27,7 @@ private class EntryAccessorImpl[A <: Entry](
     cursor.getCount
   }
   override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
-    (0 to length - 1).view.map(findAt).zipWithIndex.collectFirst {
-      case (Some(entry), n) if entry.sourceId == sourceId => n
-    }
+    positions.get(sourceId)
   }
 }
 
@@ -79,24 +78,20 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
 object EntryAccessor {
 
   def forEntryOutline(
-    context: Context, accessor: SourceAccessor): EntryAccessor[EntryOutline] = {
-
-    val sources = (0 to accessor.length - 1).map(accessor.findAt)
-    val sourceIds = sources.flatMap(_.map(_.id))
+    context: Context, sourceIds: Seq[Long],
+    positionMap: Map[Long, Int]): EntryAccessor[EntryOutline] = {
 
     val cursor = createOutlineCursor(context, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
-    new EntryAccessorImpl(factory, cursor)
+    new EntryAccessorImpl(factory, cursor, positionMap)
   }
   def forEntryDetail(
-    context: Context, accessor: SourceAccessor): EntryAccessor[EntryDetail] = {
-
-    val sources = (0 to accessor.length - 1).map(accessor.findAt)
-    val sourceIds = sources.flatMap(_.map(_.id))
+    context: Context, sourceIds: Seq[Long],
+    positionMap: Map[Long, Int]): EntryAccessor[EntryDetail] = {
 
     val cursor = createDetailCursor(context, sourceIds)
     val factory = new EntryDetailFactory(cursor)
-    new EntryAccessorImpl(factory, cursor)
+    new EntryAccessorImpl(factory, cursor, positionMap)
   }
 
   def createOutlineCursor(context: Context, sourceIds: Seq[Long]) = {
@@ -123,5 +118,40 @@ object EntryAccessor {
 
     val db = new LinenOpenHelper(context).getReadableDatabase
     db.rawQuery(union, sourceIds.map(_.toString).toArray)
+  }
+  def createPositionCursor(context: Context, sourceIds: Seq[Long]) = {
+    val count =
+      s"""SELECT
+         |  _id AS entry_id,
+         |  source_id
+         |FROM entries
+         |WHERE source_id = ?
+         |LIMIT 20""".stripMargin
+
+    val sql = s"SELECT source_id, COUNT(entry_id) AS count FROM ($count) AS c1"
+    val union = sourceIds.
+      map(_ => s"SELECT * FROM ($sql) AS tmp").
+      mkString(" UNION ALL ")
+
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    db.rawQuery(union, sourceIds.map(_.toString).toArray)
+  }
+  def createPositionMap(context: Context, sourceIds: Seq[Long]): Map[Long, Int] = {
+    val cursor = createPositionCursor(context, sourceIds)
+    val countIndex = cursor getColumnIndex "count"
+    val sourceIdIndex = cursor getColumnIndex "source_id"
+    val list = (0 to cursor.getCount - 1).view map { i =>
+      cursor moveToPosition i
+      cursor.getLong(sourceIdIndex) -> cursor.getInt(countIndex)
+    }
+    val pairs = list.scanLeft(0L -> (0, 0)){
+      case ((_, (previous, sum)), (sourceId, count)) =>
+        sourceId -> (count, previous + sum)
+    } map {
+      case (sourceId, (count, position)) =>
+        sourceId -> position
+    }
+    cursor.close()
+    pairs.toMap
   }
 }
