@@ -8,9 +8,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea, SourceRowAdapter}
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSkippedObserver, EntryDetailSkipStoppedObserver, EntryFocusedObserver, EntrySkippedObserver, EntrySkipStoppedObserver, EntryDetailSelectedObserver, EntrySelectedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
+import x7c1.linen.modern.action.{EntryDetailFocusedEventFactory, EntryFocusedEventFactory, EntrySkippedEventFactory, EntrySkipStoppedFactory, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.display.{EntryDetailRowAdapter, EntryRowAdapter, EntryArea, EntryDetailArea, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -53,15 +53,19 @@ class ContainerInitializer(
 
     // todo: db.close
 
-    try Right apply new Accessors(
-      source = SourceAccessor create activity,
-      entryOutline = EntryAccessor forEntryOutline activity,
-      entryDetail = EntryAccessor forEntryDetail activity
-    ) catch {
+    try {
+      val sourceAccessor = SourceAccessor create activity
+      Right apply new Accessors(
+        source = sourceAccessor,
+        entryOutline = EntryAccessor.forEntryOutline(activity, sourceAccessor),
+        entryDetail = EntryAccessor.forEntryDetail(activity, sourceAccessor)
+      )
+    } catch {
       case e: Throwable =>
         Log error e.getStackTrace.take(20).mkString("\n")
         Left(e)
     }
+
   }
 
   private def setupSourceArea(actions: Actions, accessors: Accessors) = {

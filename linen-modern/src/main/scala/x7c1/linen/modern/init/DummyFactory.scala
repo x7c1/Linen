@@ -76,7 +76,6 @@ object DummyFactory {
 
       val status1 = new ContentValues()
       status1.put("source_id", sourceId: Double)
-//      status1.put("rating", sourceId: Double)
       status1.put("account_id", accountId1: Double)
       db.insert("source_statuses", null, status1)
 
@@ -88,7 +87,6 @@ object DummyFactory {
 
       val status2 = new ContentValues()
       status2.put("source_id", sourceId: Double)
-//      status2.put("rating", sourceId: Double)
       status2.put("account_id", accountId2: Double)
       db.insert("source_statuses", null, status2)
 

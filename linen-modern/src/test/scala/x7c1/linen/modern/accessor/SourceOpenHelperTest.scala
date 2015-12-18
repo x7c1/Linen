@@ -50,39 +50,31 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   }
   @Test
   def testQueryForEntryArea() = {
+
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val cursor = EntryAccessor.createCursor(db, sql4)
-    val rows = toMaps(cursor)
-
     /*
-    rows.map(prettyPrint).foreach(println)
+    val accessor0 = SourceAccessor.create(context)
+    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
+    val sourceIds = sources.flatMap(_.map(_.id))
+    val cursor = EntryAccessor.createOutlineCursor(context, sourceIds)
+    val rows = toMaps(cursor)
+    rows.map(prettyPrint) foreach println
     */
 
-    val found1 = rows exists { _("title") == "5-1 entry title" }
-    assertEquals(true, found1)
+    val sourceAccessor = SourceAccessor.create(context)
+    val accessor = EntryAccessor.forEntryOutline(context, sourceAccessor)
+    val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
-    val found2 = rows exists { _("title") == "3-1 entry title" }
-    assertEquals(false, found2)
-  }
   @Test
   def testQueryToCountEntry() = {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
+    assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
+    assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val cursor = EntryAccessor.createCounterCursor(db, sql4)
-    val rows = toMaps(cursor)
-    val actual = rows.map(_("count")).map(_.toInt)
-    assertEquals(Seq(10,10,10,10), actual)
+    assertEquals(Seq(5,4,2,1), entries.map(_.sourceId).distinct)
   }
 
   @Test

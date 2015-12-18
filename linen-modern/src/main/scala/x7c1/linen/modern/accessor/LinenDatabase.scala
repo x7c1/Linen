@@ -20,32 +20,30 @@ class LinenOpenHelper(context: Context)
   }
 
   override def onCreate(db: SQLiteDatabase): Unit = {
-    db.execSQL(
+    val accounts = Seq(
       s"""CREATE TABLE IF NOT EXISTS accounts (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |nickname TEXT,
          |biography TEXT,
          |created_at INTEGER
-         |)""".stripMargin
-    )
-    db.execSQL(
+         |)""".stripMargin,
+
       s"""CREATE INDEX accounts_created_at ON accounts (
          |created_at)""".stripMargin
     )
-    db.execSQL(
+    val sources = Seq(
       s"""CREATE TABLE IF NOT EXISTS sources (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |url TEXT,
          |title TEXT NOT NULL,
          |description TEXT NOT NULL,
          |created_at INTEGER
-         |)""".stripMargin
-    )
-    db.execSQL(
+         |)""".stripMargin,
+
       s"""CREATE INDEX sources_created_at ON sources (
          |created_at)""".stripMargin
     )
-    db.execSQL(
+    val sourceRatings = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_ratings (
          |source_id INTEGER NOT NULL,
          |owner_account_id INTEGER NOT NULL,
@@ -54,13 +52,12 @@ class LinenOpenHelper(context: Context)
          |UNIQUE(owner_account_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(owner_account_id) REFERENCES accounts(_id) ON DELETE CASCADE
-         |)""".stripMargin
-    )
-    db.execSQL(
+         |)""".stripMargin,
+
       s"""CREATE INDEX source_ratings_id ON source_ratings (
          |owner_account_id, rating, source_id)""".stripMargin
     )
-    db.execSQL(
+    val entries = Seq(
       s"""CREATE TABLE IF NOT EXISTS entries (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |source_id INTEGER,
@@ -69,17 +66,18 @@ class LinenOpenHelper(context: Context)
          |content TEXT,
          |created_at INTEGER,
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE
-         |)""".stripMargin
-    )
-    db.execSQL(
+         |)""".stripMargin,
+
+      s"""CREATE INDEX entries_source ON entries (
+         |source_id, _id)""".stripMargin,
+
       s"""CREATE INDEX entries_source_created_at ON entries (
-         |source_id, created_at)""".stripMargin
-    )
-    db.execSQL(
+         |source_id, created_at)""".stripMargin,
+
       s"""CREATE INDEX entries_created_at ON entries (
          |created_at)""".stripMargin
     )
-    db.execSQL(
+    val lists = Seq(
       s"""CREATE TABLE IF NOT EXISTS lists (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |account_id INTEGER,
@@ -89,7 +87,7 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
-    db.execSQL(
+    val listSourceMap = Seq(
       s"""CREATE TABLE IF NOT EXISTS list_source_map (
          |list_id INTEGER NOT NULL,
          |source_id INTEGER NOT NULL,
@@ -99,15 +97,7 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(list_id) REFERENCES lists(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
-    db.execSQL(
-      s"""CREATE INDEX list_source_created_at ON list_source_map (
-         |list_id, created_at)""".stripMargin
-    )
-    db.execSQL(
-      s"""CREATE INDEX list_source_sid ON list_source_map (
-         |source_id)""".stripMargin
-    )
-    db.execSQL(
+    val sourceStatuses = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
          |source_id INTEGER NOT NULL,
          |start_entry_id INTEGER,
@@ -119,6 +109,15 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
+    Seq(
+      accounts,
+      sources,
+      sourceRatings,
+      entries,
+      lists,
+      listSourceMap,
+      sourceStatuses
+    ).flatten foreach db.execSQL
 
   }
 }

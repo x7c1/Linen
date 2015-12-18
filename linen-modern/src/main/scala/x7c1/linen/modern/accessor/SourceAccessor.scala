@@ -123,9 +123,7 @@ object SourceAccessor {
         |ORDER BY p1.rating DESC, p1.source_id DESC
        """.stripMargin
 
-
     db.rawQuery(sql5,
       Array(listId.toString, accountId.toString, accountId.toString))
-
   }
 }
