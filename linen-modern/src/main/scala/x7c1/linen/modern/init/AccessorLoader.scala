@@ -5,8 +5,8 @@ import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.patch.TaskAsync.async
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.patch.TaskAsync.async
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.SyncVar
@@ -44,14 +44,25 @@ class AccessorLoader(context: Context, layout: MainLayout){
   }
   def startLoading() = async( try {
     val accessor = SourceAccessor create context
-    val sourceIds = (0 to accessor.length - 1).take(100).
+    val sourceIds = (0 to accessor.length - 1).
       map(accessor.findAt).flatMap(_.map(_.id))
 
     sourceAccessor.take()
     sourceAccessor put Some(accessor)
 
-    currentSourceLength.take()
-    currentSourceLength put sourceIds.length
+    update(sourceIds)
+
+  } catch {
+    case e: Throwable =>
+      Log error (e.getMessage +: e.getStackTrace.take(30) mkString "\n")
+  })
+
+  private def update(remainingSourceIds: Seq[Long], first: Boolean = true): Unit = {
+
+    val (sourceIds, remains) = remainingSourceIds.splitAt(100)
+
+    val current = currentSourceLength.take()
+    currentSourceLength put (current + sourceIds.length)
 
     val positions = EntryAccessor.createPositionMap(context, sourceIds)
     val outlines = EntryAccessor.forEntryOutline(context, sourceIds, positions)
@@ -71,12 +82,18 @@ class AccessorLoader(context: Context, layout: MainLayout){
           Inconsistency detected. Invalid view holder adapter positionViewHolder
       */
 
-      layout.sourceList.getAdapter.notifyDataSetChanged()
-      layout.entryList.getAdapter.notifyDataSetChanged()
-      layout.entryDetailList.getAdapter.notifyDataSetChanged()
+      if (first) {
+        layout.sourceList.getAdapter.notifyDataSetChanged()
+        layout.entryList.getAdapter.notifyDataSetChanged()
+        layout.entryDetailList.getAdapter.notifyDataSetChanged()
+      }
+
+      Log error s"[done] ${sourceIds.length}"
+
+      if (remains.nonEmpty) {
+        update(remains, first = false)
+      }
     }
-  } catch {
-    case e: Throwable =>
-      Log error (e.getMessage +: e.getStackTrace.take(30) mkString "\n")
-  })
+
+  }
 }

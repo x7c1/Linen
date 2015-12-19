@@ -13,9 +13,9 @@ import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, Entr
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
-
+import x7c1.wheat.modern.decorator.Imports._
 
 class ContainerInitializer(
   activity: Activity,
@@ -33,27 +33,23 @@ class ContainerInitializer(
 
     DummyFactory.setup(layout, activity)
 
-    init.execute()
+    init()
   }
-  private def init = for {
-    loader <- task {
-      new AccessorLoader(activity, layout)
-    }
-    accessors <- task apply new Accessors(
+  private def init() = {
+    val loader = new AccessorLoader(activity, layout)
+    val accessors = new Accessors(
       source = new SourceAccessorHolder(loader.forSource),
       entryOutline = new EntryAccessorHolder[EntryOutline](loader.forOutline),
       entryDetail = new EntryAccessorHolder[EntryDetail](loader.forDetail)
     )
-    actions <- task {
-      createActions(accessors)
-    }
-    _ <- task {
-      setupSourceArea(actions, accessors)
-      setupEntryArea(actions, accessors)
-      setupEntryDetailArea(actions, accessors)
-      loader.startLoading()
-    }
-  } yield ()
+    val actions = createActions(accessors)
+
+    setupSourceArea(actions, accessors)
+    setupEntryArea(actions, accessors)
+    setupEntryDetailArea(actions, accessors)
+
+    loader.startLoading()
+  }
 
   private def setupSourceArea(actions: Actions, accessors: Accessors) = {
     val manager = new LinearLayoutManager(activity)
