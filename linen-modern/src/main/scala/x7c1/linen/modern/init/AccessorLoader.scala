@@ -5,8 +5,10 @@ import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.patch.TaskAsync.async
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.patch.TaskAsync.{after, async}
+import x7c1.wheat.modern.tasks.Async.await
+import x7c1.wheat.modern.tasks.UiThread.via
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.SyncVar
@@ -50,14 +52,14 @@ class AccessorLoader(context: Context, layout: MainLayout){
     sourceAccessor.take()
     sourceAccessor put Some(accessor)
 
-    update(sourceIds)
+    update(sourceIds, first = true)
 
   } catch {
     case e: Throwable =>
       Log error (e.getMessage +: e.getStackTrace.take(30) mkString "\n")
   })
 
-  private def update(remainingSourceIds: Seq[Long], first: Boolean = true): Unit = {
+  private def update(remainingSourceIds: Seq[Long], first: Boolean = false): Unit = {
 
     val (sourceIds, remains) = remainingSourceIds.splitAt(100)
 
@@ -71,9 +73,9 @@ class AccessorLoader(context: Context, layout: MainLayout){
     val details = EntryAccessor.forEntryDetail(context, sourceIds, positions)
     detailAccessors += details
 
-    layout.sourceList runUi { _ =>
-
+    def notify() = {
       /*
+      2015-12-20:
       it should be written like:
         layout.sourceList.getAdapter.notifyItemRangeInserted(0, sourceIds.length)
 
@@ -81,19 +83,27 @@ class AccessorLoader(context: Context, layout: MainLayout){
         java.lang.IndexOutOfBoundsException:
           Inconsistency detected. Invalid view holder adapter positionViewHolder
       */
-
-      if (first) {
-        layout.sourceList.getAdapter.notifyDataSetChanged()
-        layout.entryList.getAdapter.notifyDataSetChanged()
-        layout.entryDetailList.getAdapter.notifyDataSetChanged()
-      }
-
-      Log error s"[done] ${sourceIds.length}"
-
-      if (remains.nonEmpty) {
-        update(remains, first = false)
-      }
+      layout.sourceList.getAdapter.notifyDataSetChanged()
+      layout.entryList.getAdapter.notifyDataSetChanged()
+      layout.entryDetailList.getAdapter.notifyDataSetChanged()
+      Log info "[done]"
     }
 
+    val loop =
+      if (first) for {
+        _ <- via(layout.itemView){ _ => notify() }
+        _ <- await(0) if remains.nonEmpty
+        _ <- task { update(remains) }
+      } yield () else for {
+        _ <- task {
+          if (remains.nonEmpty) after(msec = 50) {
+            update(remains)
+          } else {
+            Log info "[done]"
+          }
+        }
+      } yield ()
+
+    loop.execute()
   }
 }

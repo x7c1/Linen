@@ -63,7 +63,7 @@ class EntryAccessorImpl[A <: Entry](
       Some apply factory.createEntry()
     } else None
   }
-  override def length = {
+  override lazy val length = {
     cursor.getCount
   }
   override def firstEntryPositionOf(sourceId: Long): Option[Int] = {

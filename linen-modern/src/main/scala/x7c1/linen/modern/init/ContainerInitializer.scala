@@ -13,9 +13,7 @@ import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, Entr
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
-import x7c1.wheat.modern.decorator.Imports._
 
 class ContainerInitializer(
   activity: Activity,
