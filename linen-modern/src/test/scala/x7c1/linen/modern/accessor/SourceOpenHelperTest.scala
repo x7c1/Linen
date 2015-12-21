@@ -14,18 +14,6 @@ import x7c1.linen.modern.init.DummyFactory
 class SourceOpenHelperTest extends JUnitSuiteLike {
 
   @Test
-  def testSample() = {
-    val context = RuntimeEnvironment.application
-    DummyFactory.createDummies(context)(5)
-
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val cursor = db.rawQuery("SELECT * FROM sources LIMIT ?", Array("2"))
-    Assert.assertEquals(2, cursor.getCount)
-  }
-
-  @Test
   def testQueryForSourceArea() = {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
@@ -37,7 +25,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val cursor3 = SourceAccessor.createCursor(db, listId, accountId)
     val rows = toMaps(cursor3)
 
-    rows.map(prettyPrint) foreach println
+    //rows.map(prettyPrint) foreach println
 
     assertEquals(
       Seq("5", "4", "2", "1"),
@@ -71,10 +59,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
-  @Test
-  def testQueryToCountEntry() = {
-    val context = RuntimeEnvironment.application
-    DummyFactory.createDummies(context)(5)
     assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
     assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
 
