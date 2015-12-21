@@ -63,8 +63,12 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     rows.map(prettyPrint) foreach println
     */
 
-    val sourceAccessor = SourceAccessor.create(context)
-    val accessor = EntryAccessor.forEntryOutline(context, sourceAccessor)
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val sourceAccessor = SourceAccessor.create(db)
+    val sourceIds = (0 to sourceAccessor.length - 1).map(sourceAccessor.findAt).flatMap(_.map(_.id))
+    val positions = EntryAccessor.createPositionMap(db, sourceIds)
+
+    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
   @Test
@@ -76,23 +80,18 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     assertEquals(Seq(5,4,2,1), entries.map(_.sourceId).distinct)
   }
-
   @Test
-  def testCalculateSourcePosition(): Unit = {
+  def testQueryToCountEntry() = {
     val context = RuntimeEnvironment.application
+    val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val positions = EntryAccessor.createSourcePositionMap(db, sql4)
-    assertEquals(0, positions(5))
-    assertEquals(10, positions(4))
-    assertEquals(20, positions(2))
-    assertEquals(30, positions(1))
-
-    intercept[NoSuchElementException](positions(3))
+    val accessor0 = SourceAccessor.create(db)
+    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
+    val sourceIds = sources.flatMap(_.map(_.id))
+    val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
+    val rows = toMaps(cursor)
+    rows.map(prettyPrint) foreach println
   }
 
   def showTable(tableName: String) = {

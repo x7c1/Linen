@@ -2,7 +2,7 @@ package x7c1.linen.modern.init
 
 import android.content.Context
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
+import x7c1.linen.modern.accessor.{LinenOpenHelper, EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
@@ -44,8 +44,11 @@ class AccessorLoader(context: Context, layout: MainLayout){
   private lazy val detailAccessors = {
     ListBuffer[EntryAccessor[EntryDetail]]()
   }
+  private lazy val database = {
+    new LinenOpenHelper(context).getReadableDatabase
+  }
   def startLoading() = async( try {
-    val accessor = SourceAccessor create context
+    val accessor = SourceAccessor create database
     val sourceIds = (0 to accessor.length - 1).
       map(accessor.findAt).flatMap(_.map(_.id))
 
@@ -66,11 +69,11 @@ class AccessorLoader(context: Context, layout: MainLayout){
     val current = currentSourceLength.take()
     currentSourceLength put (current + sourceIds.length)
 
-    val positions = EntryAccessor.createPositionMap(context, sourceIds)
-    val outlines = EntryAccessor.forEntryOutline(context, sourceIds, positions)
+    val positions = EntryAccessor.createPositionMap(database, sourceIds)
+    val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
     outlineAccessors += outlines
 
-    val details = EntryAccessor.forEntryDetail(context, sourceIds, positions)
+    val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
     detailAccessors += details
 
     def notify() = {

@@ -1,6 +1,5 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.Source
@@ -63,8 +62,7 @@ private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 }
 
 object SourceAccessor {
-  def create(context: Context): SourceAccessor = {
-    val db = new LinenOpenHelper(context).getReadableDatabase
+  def create(db: SQLiteDatabase): SourceAccessor = {
     val listId = findFirstListId(db)
     val accountId = findFirstAccountId(db)
     val cursor = createCursor(db, listId, accountId)

@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
 
 import scala.annotation.tailrec
@@ -118,29 +118,29 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
 object EntryAccessor {
 
   def forEntryOutline(
-    context: Context, sourceIds: Seq[Long],
+    db: SQLiteDatabase, sourceIds: Seq[Long],
     positionMap: Map[Long, Int]): EntryAccessor[EntryOutline] = {
 
-    val cursor = createOutlineCursor(context, sourceIds)
+    val cursor = createOutlineCursor(db, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
     new EntryAccessorImpl(factory, cursor, positionMap)
   }
   def forEntryDetail(
-    context: Context, sourceIds: Seq[Long],
+    db: SQLiteDatabase, sourceIds: Seq[Long],
     positionMap: Map[Long, Int]): EntryAccessor[EntryDetail] = {
 
-    val cursor = createDetailCursor(context, sourceIds)
+    val cursor = createDetailCursor(db, sourceIds)
     val factory = new EntryDetailFactory(cursor)
     new EntryAccessorImpl(factory, cursor, positionMap)
   }
 
-  def createOutlineCursor(context: Context, sourceIds: Seq[Long]) = {
-    createCursor(context, sourceIds, "substr(content, 1, 75) AS content")
+  def createOutlineCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    createCursor(db, sourceIds, "substr(content, 1, 75) AS content")
   }
-  def createDetailCursor(context: Context, sourceIds: Seq[Long]) = {
-    createCursor(context, sourceIds, "content")
+  def createDetailCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    createCursor(db, sourceIds, "content")
   }
-  def createCursor(context: Context, sourceIds: Seq[Long], content: String) = {
+  def createCursor(db: SQLiteDatabase, sourceIds: Seq[Long], content: String) = {
     val sql =
       s"""SELECT
         |  _id AS entry_id,
@@ -156,10 +156,9 @@ object EntryAccessor {
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    val db = new LinenOpenHelper(context).getReadableDatabase
     db.rawQuery(union, sourceIds.map(_.toString).toArray)
   }
-  def createPositionCursor(context: Context, sourceIds: Seq[Long]) = {
+  def createPositionCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
     val count =
       s"""SELECT
          |  _id AS entry_id,
@@ -173,11 +172,10 @@ object EntryAccessor {
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    val db = new LinenOpenHelper(context).getReadableDatabase
     db.rawQuery(union, sourceIds.map(_.toString).toArray)
   }
-  def createPositionMap(context: Context, sourceIds: Seq[Long]): Map[Long, Int] = {
-    val cursor = createPositionCursor(context, sourceIds)
+  def createPositionMap(db: SQLiteDatabase, sourceIds: Seq[Long]): Map[Long, Int] = {
+    val cursor = createPositionCursor(db, sourceIds)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
     val list = (0 to cursor.getCount - 1).view map { i =>
