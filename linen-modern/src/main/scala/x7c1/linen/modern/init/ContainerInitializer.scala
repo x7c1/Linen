@@ -4,135 +4,60 @@ import java.lang.Math.max
 
 import android.app.Activity
 import android.graphics.Point
-import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorHolder, SourceAccessor, SourceAccessorHolder}
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver, EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver, SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, EntryDetailFocusedEventFactory, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory, SourceAreaAction, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntryDetailRowAdapter, EntryRowAdapter, PaneContainer, SourceArea, SourceRowAdapter}
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorHolder, LinenOpenHelper, SourceAccessor, SourceAccessorHolder}
+import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 class ContainerInitializer(
   activity: Activity,
-  layout: MainLayout,
-  sourceRowProvider: ViewHolderProvider[SourceRow],
-  entryRowProvider: ViewHolderProvider[EntryRow],
-  entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]) {
+  override val layout: MainLayout,
+  override val sourceRowProvider: ViewHolderProvider[SourceRow],
+  override val entryRowProvider: ViewHolderProvider[EntryRow],
+  override val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
+) extends SourceAreaInitializer
+  with EntryAreaInitializer
+  with EntryDetailAreaInitializer {
 
   def setup(): Unit = {
     updateWidth(0.85, layout.sourceArea)
     updateWidth(0.9, layout.entryArea)
     updateWidth(0.95, layout.entryDetailArea)
 
-    // todo: db.close
-
     DummyFactory.setup(layout, activity)
 
-    init()
+    setupSourceArea()
+    setupEntryArea()
+    setupEntryDetailArea()
+
+    loader.startLoading()
   }
-  private def init() = {
-    val loader = new AccessorLoader(activity, layout)
-    val accessors = new Accessors(
+  def close(): Unit = {
+    database.close()
+  }
+  private lazy val database = {
+    new LinenOpenHelper(activity).getReadableDatabase
+  }
+  private lazy val loader = {
+    new AccessorLoader(database, layout)
+  }
+  override lazy val accessors = {
+    new Accessors(
       source = new SourceAccessorHolder(loader.forSource),
       entryOutline = new EntryAccessorHolder[EntryOutline](loader.forOutline),
       entryDetail = new EntryAccessorHolder[EntryDetail](loader.forDetail)
     )
-    val actions = createActions(accessors)
-
-    setupSourceArea(actions, accessors)
-    setupEntryArea(actions, accessors)
-    setupEntryDetailArea(actions, accessors)
-
-    loader.startLoading()
   }
-
-  private def setupSourceArea(actions: Actions, accessors: Accessors) = {
-    val manager = new LinearLayoutManager(activity)
-    layout.sourceList setLayoutManager manager
-    layout.sourceList setAdapter new SourceRowAdapter(
-      accessors.source,
-      new SourceSelectedObserver(actions),
-      sourceRowProvider
-    )
-    layout.sourceList setOnTouchListener FocusDetector.createListener(
-      recyclerView = layout.sourceList,
-      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
-      onFocused = new SourceFocusedObserver(actions)
-    )
-    layout.sourceToNext setOnTouchListener SkipDetector.createListener(
-      context = layout.sourceToNext.getContext,
-      positionFinder = SkipPositionFinder createBy manager,
-      skippedEventFactory = new SourceSkippedEventFactory(accessors.source),
-      skipDoneEventFactory = new SourceSkipStoppedFactory(accessors.source),
-      onSkippedListener = new SourceSkippedObserver(actions),
-      onSkipDoneListener = new SourceSkipStoppedObserver(actions)
-    )
-  }
-  private def setupEntryArea(actions: Actions, accessors: Accessors) = {
-    val manager = new LinearLayoutManager(activity)
-    layout.entryList setLayoutManager manager
-    layout.entryList setAdapter new EntryRowAdapter(
-      accessors.entryOutline,
-      new EntrySelectedObserver(actions),
-      entryRowProvider
-    )
-    layout.entryList setOnTouchListener FocusDetector.createListener(
-      recyclerView = layout.entryList,
-      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
-      focusedEventFactory = new EntryFocusedEventFactory(accessors.entryOutline),
-      onFocused = new EntryFocusedObserver(actions)
-    )
-    layout.entryToNext setOnTouchListener SkipDetector.createListener(
-      context = activity,
-      positionFinder = SkipPositionFinder createBy manager,
-      skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
-      skipDoneEventFactory = new EntrySkipStoppedFactory(accessors.entryOutline),
-      onSkippedListener = new EntrySkippedObserver(actions),
-      onSkipDoneListener = new EntrySkipStoppedObserver(actions)
-    )
-  }
-  private def setupEntryDetailArea(actions: Actions, accessors: Accessors) = {
-    val manager = new LinearLayoutManager(activity)
-    val getPosition = () => {
-      manager.findFirstCompletelyVisibleItemPosition() match {
-        case n if n < 0 => manager.findFirstVisibleItemPosition()
-        case n => n
-      }
-    }
-    layout.entryDetailList setLayoutManager manager
-    layout.entryDetailList setAdapter new EntryDetailRowAdapter(
-      accessors.entryDetail,
-      new EntryDetailSelectedObserver(actions),
-      entryDetailRowProvider
-    )
-    layout.entryDetailList setOnTouchListener FocusDetector.createListener(
-      recyclerView = layout.entryDetailList,
-      getPosition = getPosition,
-      focusedEventFactory = new EntryDetailFocusedEventFactory(accessors.entryDetail),
-      onFocused = new EntryDetailFocusedObserver(actions)
-    )
-    layout.detailToNext setOnTouchListener SkipDetector.createListener(
-      context = activity,
-      positionFinder = SkipPositionFinder createBy manager,
-      skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
-      skipDoneEventFactory = new EntrySkipStoppedFactory(accessors.entryOutline),
-      onSkippedListener = new EntryDetailSkippedObserver(actions),
-      onSkipDoneListener = new EntryDetailSkipStoppedObserver(actions)
-    )
-  }
-
   private lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay
     val size = new Point
     display getSize size
     size
   }
-
-  private def createActions(accessors: Accessors) = {
+  override lazy val actions = {
     val panePosition = {
       val length = layout.paneContainer.getChildCount
       val children = 0 to (length - 1) map layout.paneContainer.getChildAt
@@ -168,7 +93,6 @@ class ContainerInitializer(
       new EntryDetailAreaAction(entryDetailArea, accessors.entryDetail)
     )
   }
-
   private def updateWidth(ratio: Double, view: View): Unit = {
     val params = view.getLayoutParams
     params.width = (ratio * displaySize.x).toInt
@@ -201,5 +125,3 @@ private class PanePosition(children: Seq[View], displayWidth: Int){
     }
   }
 }
-
-

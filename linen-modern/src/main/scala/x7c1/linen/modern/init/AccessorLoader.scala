@@ -1,8 +1,8 @@
 package x7c1.linen.modern.init
 
-import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{LinenOpenHelper, EntryAccessor, SourceAccessor}
+import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
@@ -13,7 +13,7 @@ import x7c1.wheat.modern.tasks.UiThread.via
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.SyncVar
 
-class AccessorLoader(context: Context, layout: MainLayout){
+class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
   lazy val forOutline: Seq[EntryAccessor[EntryOutline]] = outlineAccessors
 
@@ -44,9 +44,7 @@ class AccessorLoader(context: Context, layout: MainLayout){
   private lazy val detailAccessors = {
     ListBuffer[EntryAccessor[EntryDetail]]()
   }
-  private lazy val database = {
-    new LinenOpenHelper(context).getReadableDatabase
-  }
+
   def startLoading() = async( try {
     val accessor = SourceAccessor create database
     val sourceIds = (0 to accessor.length - 1).
