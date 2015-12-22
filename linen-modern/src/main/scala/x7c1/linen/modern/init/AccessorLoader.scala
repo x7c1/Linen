@@ -2,7 +2,7 @@ package x7c1.linen.modern.init
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
@@ -11,38 +11,33 @@ import x7c1.wheat.modern.tasks.Async.await
 import x7c1.wheat.modern.tasks.UiThread.via
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.SyncVar
 
 class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
-  lazy val forOutline: Seq[EntryAccessor[EntryOutline]] = outlineAccessors
+  private var currentSourceLength: Option[Int] = None
 
-  lazy val forDetail: Seq[EntryAccessor[EntryDetail]] = detailAccessors
+  private var sourceAccessor: Option[SourceAccessor] = None
 
-  lazy val forSource: SourceAccessor = new SourceAccessor {
-    override def findAt(position: Int): Option[Source] = {
-      sourceAccessor.get.flatMap(_.findAt(position))
+  private lazy val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
+
+  private lazy val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
+
+  def createSourceAccessor: SourceAccessor =
+    new SourceAccessor {
+      override def findAt(position: Int): Option[Source] = {
+        sourceAccessor.flatMap(_.findAt(position))
+      }
+      override def positionOf(sourceId: Long): Option[Int] = {
+        sourceAccessor.flatMap(_.positionOf(sourceId))
+      }
+      override def length: Int = currentSourceLength getOrElse 0
     }
-    override def positionOf(sourceId: Long): Option[Int] = {
-      sourceAccessor.get.flatMap(_.positionOf(sourceId))
-    }
-    override def length: Int = currentSourceLength.get
+
+  def createOutlineAccessor: EntryAccessor[EntryOutline] = {
+    new EntryAccessorBinder(outlineAccessors)
   }
-  private lazy val currentSourceLength: SyncVar[Int] = {
-    val value = new SyncVar[Int]()
-    value put 0
-    value
-  }
-  private lazy val sourceAccessor: SyncVar[Option[SourceAccessor]] = {
-    val value = new SyncVar[Option[SourceAccessor]]()
-    value put None
-    value
-  }
-  private lazy val outlineAccessors = {
-    ListBuffer[EntryAccessor[EntryOutline]]()
-  }
-  private lazy val detailAccessors = {
-    ListBuffer[EntryAccessor[EntryDetail]]()
+  def createDetailAccessor: EntryAccessor[EntryDetail] = {
+    new EntryAccessorBinder(detailAccessors)
   }
 
   def startLoading() = async( try {
@@ -50,8 +45,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
     val sourceIds = (0 to accessor.length - 1).
       map(accessor.findAt).flatMap(_.map(_.id))
 
-    sourceAccessor.take()
-    sourceAccessor put Some(accessor)
+    sourceAccessor = Some(accessor)
 
     update(sourceIds, first = true)
 
@@ -63,9 +57,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   private def update(remainingSourceIds: Seq[Long], first: Boolean = false): Unit = {
 
     val (sourceIds, remains) = remainingSourceIds.splitAt(50)
-
-    val current = currentSourceLength.take()
-    currentSourceLength put (current + sourceIds.length)
+    currentSourceLength = currentSourceLength.map(_ + sourceIds.length)
 
     val positions = EntryAccessor.createPositionMap(database, sourceIds)
     val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)

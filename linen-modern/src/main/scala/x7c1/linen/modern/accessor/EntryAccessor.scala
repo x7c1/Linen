@@ -15,7 +15,7 @@ trait EntryAccessor[+A <: Entry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-class EntryAccessorHolder[A <: Entry](
+class EntryAccessorBinder[A <: Entry](
   accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
 
   override def findAt(position: Int): Option[A] = {

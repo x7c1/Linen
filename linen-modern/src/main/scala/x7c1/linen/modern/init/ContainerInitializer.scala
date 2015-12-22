@@ -6,7 +6,7 @@ import android.app.Activity
 import android.graphics.Point
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorHolder, LinenOpenHelper, SourceAccessor, SourceAccessorHolder}
+import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, SourceAccessor}
 import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
@@ -46,9 +46,9 @@ class ContainerInitializer(
   }
   override lazy val accessors = {
     new Accessors(
-      source = new SourceAccessorHolder(loader.forSource),
-      entryOutline = new EntryAccessorHolder[EntryOutline](loader.forOutline),
-      entryDetail = new EntryAccessorHolder[EntryDetail](loader.forDetail)
+      source = loader.createSourceAccessor,
+      entryOutline = loader.createOutlineAccessor,
+      entryDetail = loader.createDetailAccessor
     )
   }
   private lazy val displaySize: Point = {
