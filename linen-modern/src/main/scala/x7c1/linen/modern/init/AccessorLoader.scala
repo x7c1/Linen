@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.SyncVar
 import scala.concurrent.duration.DurationInt
-import scala.util.{Try, Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
@@ -79,6 +79,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   def close(): Unit = {
     currentSchedule foreach { _.cancel() }
     system stop actor
+    system.shutdown()
   }
   private def loadSources(sourceIds: Seq[Long]) = {
     (actor ? LoadSources(sourceIds)).mapTo[Either[Throwable, Seq[Long]]]
@@ -98,14 +99,12 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
     case Success(Left(e : IllegalStateException)) =>
 
       /*
-      java.lang.IllegalStateException:
-        attempt to re-open an already-closed object:
+        known exceptions
+        - attempt to re-open an already-closed object:
           SQLiteDatabase: /data/user/0/x7c1.linen/databases/linen-db
-
-      exception above is thrown
-        after close() is called when actor#loadSources remains proceeding
+        - Cannot perform this operation because the connection pool has been closed.
       */
-      Log warn e.toString
+      Log info e.toString
 
     case Success(Left(e)) => Log error formatError(e)
     case Failure(e) => Log error formatError(e)
