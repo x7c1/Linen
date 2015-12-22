@@ -54,6 +54,7 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(libraryDependencies += scalaz).
+    settings(libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.14").
     settings(libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % Test,
       "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
