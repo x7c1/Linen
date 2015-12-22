@@ -22,9 +22,8 @@ trait EntryAreaInitializer {
       new EntrySelectedObserver(actions),
       entryRowProvider
     )
-    layout.entryList setOnTouchListener FocusDetector.createListener(
+    layout.entryList setOnTouchListener FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,
-      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       focusedEventFactory = new EntryFocusedEventFactory(accessors.entryOutline),
       onFocused = new EntryFocusedObserver(actions)
     )

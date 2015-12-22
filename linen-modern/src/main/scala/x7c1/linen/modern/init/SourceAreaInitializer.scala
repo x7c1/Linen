@@ -22,9 +22,8 @@ trait SourceAreaInitializer {
       new SourceSelectedObserver(actions),
       sourceRowProvider
     )
-    layout.sourceList setOnTouchListener FocusDetector.createListener(
+    layout.sourceList setOnTouchListener FocusDetector.forLinearLayoutManager(
       recyclerView = layout.sourceList,
-      getPosition = () => manager.findFirstCompletelyVisibleItemPosition(),
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
       onFocused = new SourceFocusedObserver(actions)
     )

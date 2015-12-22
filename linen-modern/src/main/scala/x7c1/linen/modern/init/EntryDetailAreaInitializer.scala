@@ -16,21 +16,14 @@ trait EntryDetailAreaInitializer {
 
   def setupEntryDetailArea() = {
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
-    val getPosition = () => {
-      manager.findFirstCompletelyVisibleItemPosition() match {
-        case n if n < 0 => manager.findFirstVisibleItemPosition()
-        case n => n
-      }
-    }
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter new EntryDetailRowAdapter(
       accessors.entryDetail,
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
-    layout.entryDetailList setOnTouchListener FocusDetector.createListener(
+    layout.entryDetailList setOnTouchListener FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,
-      getPosition = getPosition,
       focusedEventFactory = new EntryDetailFocusedEventFactory(accessors.entryDetail),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
