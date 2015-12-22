@@ -18,9 +18,9 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
   private var sourceAccessor: Option[SourceAccessor] = None
 
-  private lazy val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
+  private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
 
-  private lazy val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
+  private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
 
   def createSourceAccessor: SourceAccessor =
     new SourceAccessor {
