@@ -62,7 +62,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
   private def update(remainingSourceIds: Seq[Long], first: Boolean = false): Unit = {
 
-    val (sourceIds, remains) = remainingSourceIds.splitAt(100)
+    val (sourceIds, remains) = remainingSourceIds.splitAt(50)
 
     val current = currentSourceLength.take()
     currentSourceLength put (current + sourceIds.length)
