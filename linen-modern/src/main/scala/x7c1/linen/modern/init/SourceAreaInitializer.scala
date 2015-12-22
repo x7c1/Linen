@@ -14,7 +14,7 @@ trait SourceAreaInitializer {
   def actions: Actions
   def sourceRowProvider: ViewHolderProvider[SourceRow]
 
-  def setupSourceArea() = {
+  def setupSourceArea(): Unit = {
     val manager = new LinearLayoutManager(layout.sourceList.getContext)
     layout.sourceList setLayoutManager manager
     layout.sourceList setAdapter new SourceRowAdapter(

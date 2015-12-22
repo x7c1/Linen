@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 
 class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
-  private var currentSourceLength: Option[Int] = None
+  private var currentSourceLength: Int = 0
 
   private var sourceAccessor: Option[SourceAccessor] = None
 
@@ -30,7 +30,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
       override def positionOf(sourceId: Long): Option[Int] = {
         sourceAccessor.flatMap(_.positionOf(sourceId))
       }
-      override def length: Int = currentSourceLength getOrElse 0
+      override def length: Int = currentSourceLength
     }
 
   def createOutlineAccessor: EntryAccessor[EntryOutline] = {
@@ -46,9 +46,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
       map(accessor.findAt).flatMap(_.map(_.id))
 
     sourceAccessor = Some(accessor)
-
     update(sourceIds, first = true)
-
   } catch {
     case e: Throwable =>
       Log error (e.getMessage +: e.getStackTrace.take(30) mkString "\n")
@@ -57,7 +55,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   private def update(remainingSourceIds: Seq[Long], first: Boolean = false): Unit = {
 
     val (sourceIds, remains) = remainingSourceIds.splitAt(50)
-    currentSourceLength = currentSourceLength.map(_ + sourceIds.length)
+    currentSourceLength += sourceIds.length
 
     val positions = EntryAccessor.createPositionMap(database, sourceIds)
     val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)

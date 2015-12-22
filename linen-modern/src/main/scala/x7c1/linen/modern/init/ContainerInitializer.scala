@@ -7,8 +7,6 @@ import android.graphics.Point
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, SourceAccessor}
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
@@ -18,7 +16,8 @@ class ContainerInitializer(
   override val sourceRowProvider: ViewHolderProvider[SourceRow],
   override val entryRowProvider: ViewHolderProvider[EntryRow],
   override val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
-) extends SourceAreaInitializer
+) extends ActionsInitializer
+  with SourceAreaInitializer
   with EntryAreaInitializer
   with EntryDetailAreaInitializer {
 
@@ -38,60 +37,24 @@ class ContainerInitializer(
   def close(): Unit = {
     database.close()
   }
-  private lazy val database = {
+  private lazy val database =
     new LinenOpenHelper(activity).getReadableDatabase
-  }
-  private lazy val loader = {
+
+  private lazy val loader =
     new AccessorLoader(database, layout)
-  }
-  override lazy val accessors = {
-    new Accessors(
-      source = loader.createSourceAccessor,
-      entryOutline = loader.createOutlineAccessor,
-      entryDetail = loader.createDetailAccessor
-    )
-  }
-  private lazy val displaySize: Point = {
+
+  override lazy val accessors = new Accessors(
+    source = loader.createSourceAccessor,
+    entryOutline = loader.createOutlineAccessor,
+    entryDetail = loader.createDetailAccessor
+  )
+  override lazy val actions = setupActions()
+
+  override lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay
     val size = new Point
     display getSize size
     size
-  }
-  override lazy val actions = {
-    val panePosition = {
-      val length = layout.paneContainer.getChildCount
-      val children = 0 to (length - 1) map layout.paneContainer.getChildAt
-      new PanePosition(children, displaySize.x)
-    }
-    val sourceArea = new SourceArea(
-      sources = accessors.source,
-      recyclerView = layout.sourceList,
-      getPosition = () => panePosition of layout.sourceArea
-    )
-    val entryArea = new EntryArea(
-      toolbar = layout.entryToolbar,
-      recyclerView = layout.entryList,
-      getPosition = () => panePosition of layout.entryArea
-    )
-    val entryDetailArea = new EntryDetailArea(
-      toolbar = layout.entryDetailToolbar,
-      recyclerView = layout.entryDetailList,
-      getPosition = () => panePosition of layout.entryDetailArea
-    )
-    new Actions(
-      new ContainerAction(
-        container = new PaneContainer(layout.paneContainer),
-        entryArea,
-        entryDetailArea
-      ),
-      new SourceAreaAction(sourceArea, accessors.source),
-      new EntryAreaAction(
-        entryArea = entryArea,
-        sourceAccessor = accessors.source,
-        entryAccessor = accessors.entryOutline
-      ),
-      new EntryDetailAreaAction(entryDetailArea, accessors.entryDetail)
-    )
   }
   private def updateWidth(ratio: Double, view: View): Unit = {
     val params = view.getLayoutParams
@@ -125,3 +88,4 @@ private class PanePosition(children: Seq[View], displayWidth: Int){
     }
   }
 }
+

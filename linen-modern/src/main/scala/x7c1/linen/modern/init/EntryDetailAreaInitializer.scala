@@ -14,7 +14,7 @@ trait EntryDetailAreaInitializer {
   def actions: Actions
   def entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
 
-  def setupEntryDetailArea() = {
+  def setupEntryDetailArea(): Unit = {
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter new EntryDetailRowAdapter(
@@ -35,6 +35,5 @@ trait EntryDetailAreaInitializer {
       onSkippedListener = new EntryDetailSkippedObserver(actions),
       onSkipDoneListener = new EntryDetailSkipStoppedObserver(actions)
     )
-
   }
 }

@@ -14,7 +14,7 @@ trait EntryAreaInitializer {
   def actions: Actions
   def entryRowProvider: ViewHolderProvider[EntryRow]
 
-  def setupEntryArea() = {
+  def setupEntryArea(): Unit = {
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
     layout.entryList setAdapter new EntryRowAdapter(
