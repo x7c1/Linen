@@ -1,8 +1,7 @@
 package x7c1.linen.modern.init
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorSystem, Cancellable, Props}
 import akka.pattern.ask
-import akka.pattern.after
 import akka.util.Timeout
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
@@ -11,11 +10,11 @@ import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
-import scala.concurrent.duration.DurationInt
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{Future, SyncVar}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import scala.concurrent.SyncVar
+import scala.concurrent.duration.DurationInt
+import scala.util.{Try, Failure, Success}
 
 class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
@@ -46,8 +45,9 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   )
   private implicit val timeout = {
     import scala.concurrent.duration.DurationInt
-    Timeout(5.seconds)
+    Timeout(3.seconds)
   }
+  private var currentSchedule: Option[Cancellable] = None
 
   def createSourceAccessor: SourceAccessor =
     new SourceAccessor {
@@ -66,7 +66,7 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   def createDetailAccessor: EntryAccessor[EntryDetail] =
     new EntryAccessorBinder(detailAccessors)
 
-  def startLoading() = {
+  def startLoading(): Unit = {
     val first = for {
       sourceIds <- (actor ? StartLoading).mapTo[Seq[Long]]
       remaining <- loadSources(sourceIds)
@@ -74,26 +74,45 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
     } yield {
       remaining
     }
-    first flatMap loadMore onComplete {
-      case Success(ids) =>
-        Log info "[done] " + ids
-      case Failure(e) =>
-        Log error "[failed] " +
-          (e.getMessage +: e.getStackTrace.take(30) mkString "\n")
-    }
+    first onComplete loadNext
+  }
+  def close(): Unit = {
+    currentSchedule foreach { _.cancel() }
+    system stop actor
   }
   private def loadSources(sourceIds: Seq[Long]) = {
-    (actor ? LoadSources(sourceIds)).mapTo[Seq[Long]]
+    (actor ? LoadSources(sourceIds)).mapTo[Either[Throwable, Seq[Long]]]
   }
-  private def loadMore(remaining: Seq[Long]): Future[Seq[Long]] = {
+  private def loadMore(remaining: Seq[Long]): Unit = {
     Log info s"[init] remaining(${remaining.length})"
     remaining match {
-      case Seq() => Future successful Seq()
-      case _ => for {
-        ids <- loadSources(remaining)
-        remaining <- after(50.milliseconds, system.scheduler)(loadMore(ids))
-      } yield remaining
+      case Seq() => Log info "[done]"
+      case _ =>
+        currentSchedule = Some apply system.scheduler.scheduleOnce(50.milliseconds){
+          loadSources(remaining) onComplete loadNext
+        }
     }
+  }
+  private def loadNext: Try[Either[Throwable, Seq[Long]]] => Unit = {
+    case Success(Right(ids)) => loadMore(ids)
+    case Success(Left(e : IllegalStateException)) =>
+
+      /*
+      java.lang.IllegalStateException:
+        attempt to re-open an already-closed object:
+          SQLiteDatabase: /data/user/0/x7c1.linen/databases/linen-db
+
+      exception above is thrown
+        after close() is called when actor#loadSources remains proceeding
+      */
+      Log warn e.toString
+
+    case Success(Left(e)) => Log error formatError(e)
+    case Failure(e) => Log error formatError(e)
+  }
+  private def formatError(e: Throwable) = {
+    "[failed] " +
+      (e.toString +: e.getStackTrace.take(30) mkString "\n")
   }
 
 }
@@ -121,7 +140,7 @@ class AccessorLoaderActor(
 
     sender() ! sourceIds
   }
-  private def loadSources(remainingSourceIds: Seq[Long]) = {
+  private def loadSources(remainingSourceIds: Seq[Long]) = try {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
     val current = currentSourceLength.take()
     currentSourceLength put (current + sourceIds.length)
@@ -133,8 +152,11 @@ class AccessorLoaderActor(
     val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
     detailAccessors += details
 
-    sender() ! remains
+    sender() ! Right(remains)
+  } catch {
+    case e: Throwable => sender() ! Left(e)
   }
+
   private def notifyChanged() = layout.itemView runUi { _ =>
 
     /*

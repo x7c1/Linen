@@ -35,6 +35,7 @@ class ContainerInitializer(
     loader.startLoading()
   }
   def close(): Unit = {
+    loader.close()
     database.close()
   }
   private lazy val database =
