@@ -1,6 +1,6 @@
 package x7c1.wheat.modern.observer
 
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import android.view.GestureDetector.OnGestureListener
 import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
@@ -23,6 +23,29 @@ object FocusDetector {
         detector onTouchEvent event
       }
     }
+  }
+  def forLinearLayoutManager[A <: ItemFocusedEvent](
+    recyclerView: RecyclerView,
+    focusedEventFactory: FocusedEventFactory[A],
+    onFocused: OnItemFocusedListener[A]): OnTouchListener = {
+
+    val layoutManager = recyclerView.getLayoutManager match {
+      case x: LinearLayoutManager => x
+      case _ =>
+        throw new IllegalArgumentException("invalid type of LayoutManager")
+    }
+    val getPosition = () => {
+      layoutManager.findFirstCompletelyVisibleItemPosition() match {
+        case n if n < 0 => layoutManager.findFirstVisibleItemPosition()
+        case n => n
+      }
+    }
+    createListener(
+      recyclerView,
+      getPosition,
+      focusedEventFactory,
+      onFocused
+    )
   }
 }
 

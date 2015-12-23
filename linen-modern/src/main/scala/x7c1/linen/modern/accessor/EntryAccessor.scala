@@ -1,9 +1,10 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
+
+import scala.annotation.tailrec
 
 trait EntryAccessor[+A <: Entry]{
 
@@ -14,21 +15,59 @@ trait EntryAccessor[+A <: Entry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-private class EntryAccessorImpl[A <: Entry](
+class EntryAccessorBinder[A <: Entry](
+  accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
+
+  override def findAt(position: Int): Option[A] = {
+    @tailrec
+    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[(EntryAccessor[A], Int)] =
+      accessors match {
+        case x +: xs => x.length + prev match {
+          case sum if sum > position => Some(x -> prev)
+          case sum => loop(xs, sum)
+        }
+        case Seq() => None
+      }
+
+    loop(accessors, 0) flatMap { case (accessor, prev) =>
+      accessor.findAt(position - prev)
+    }
+  }
+
+  override def length: Int = {
+    accessors.foldLeft(0){ _ + _.length }
+  }
+
+  override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
+    @tailrec
+    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[Int] =
+      accessors match {
+        case x +: xs => x.firstEntryPositionOf(sourceId) match {
+          case Some(s) => Some(prev + s)
+          case None => loop(xs, x.length + prev)
+        }
+        case Seq() => None
+      }
+
+    loop(accessors, 0)
+  }
+}
+
+class EntryAccessorImpl[A <: Entry](
   factory: EntryFactory[A],
-  cursor: Cursor, positionMap: Map[Long, Int]) extends EntryAccessor[A] {
+  cursor: Cursor,
+  positions: Map[Long, Int]) extends EntryAccessor[A] {
 
   override def findAt(position: Int) = synchronized {
     if (cursor moveToPosition position){
       Some apply factory.createEntry()
     } else None
   }
-
-  override def length = {
+  override lazy val length = {
     cursor.getCount
   }
   override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
-    positionMap.get(sourceId)
+    positions.get(sourceId)
   }
 }
 
@@ -78,101 +117,79 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
 
 object EntryAccessor {
 
-  def forEntryOutline(context: Context): EntryAccessor[EntryOutline] = {
-    val db = new LinenOpenHelper(context).getReadableDatabase
-    val content = createSql4("substr(entries.content, 1, 100)")
-    val cursor = createCursor(db, content)
-    val map = createSourcePositionMap(db, content)
+  def forEntryOutline(
+    db: SQLiteDatabase, sourceIds: Seq[Long],
+    positionMap: Map[Long, Int]): EntryAccessor[EntryOutline] = {
+
+    val cursor = createOutlineCursor(db, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
-
-    new EntryAccessorImpl(factory, cursor, map)
+    new EntryAccessorImpl(factory, cursor, positionMap)
   }
+  def forEntryDetail(
+    db: SQLiteDatabase, sourceIds: Seq[Long],
+    positionMap: Map[Long, Int]): EntryAccessor[EntryDetail] = {
 
-  def forEntryDetail(context: Context): EntryAccessor[EntryDetail] = {
-    val db = new LinenOpenHelper(context).getReadableDatabase
-    val content = createSql4("entries.content")
-    val cursor = createCursor(db, content)
-    val map = createSourcePositionMap(db, content)
+    val cursor = createDetailCursor(db, sourceIds)
     val factory = new EntryDetailFactory(cursor)
-
-    new EntryAccessorImpl(factory, cursor, map)
+    new EntryAccessorImpl(factory, cursor, positionMap)
   }
 
-  val sql1 =
-    s"""SELECT * FROM list_source_map
-       | INNER JOIN sources ON list_source_map.source_id = sources._id
-       | ORDER BY sources.rating DESC""".stripMargin
-
-  val sql2 =
-    s"""SELECT source_id FROM entries
-       | WHERE read_state = 0
-       | GROUP BY source_id """.stripMargin
-
-  val sql3 =
-    s"""SELECT
-       |   s1._id as source_id,
-       |   substr(s1.title, 1, 100) as title,
-       |   s1.rating as rating,
-       |   substr(s1.description, 1, 100) as description
-       | FROM ($sql1) as s1
-       | INNER JOIN ($sql2) as s2
-       | ON s1.source_id = s2.source_id""".stripMargin
-
-  val entries =
-    s"""SELECT
-       |   _id,
-       |   source_id,
-       |   title,
-       |   content,
-       |   created_at
-       | FROM entries
-       | ORDER BY _id DESC""".stripMargin
-
-  def createSql4(content: String) =
-    s"""SELECT
-       |   entries._id as entry_id,
-       |   s3.source_id as source_id,
-       |   entries.title as title,
-       |   $content as content,
-       |   s3.rating as rating,
-       |   entries.created_at as created_at
-       | FROM ($sql3) as s3
-       | INNER JOIN ($entries) as entries
-       | ON s3.source_id = entries.source_id
-       | ORDER BY rating DESC, source_id DESC, entry_id DESC""".stripMargin
-
-  def createCursor(db: SQLiteDatabase, sql4: String) = {
-    db.rawQuery(sql4, Array())
+  def createOutlineCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    createCursor(db, sourceIds, "substr(content, 1, 75) AS content")
   }
-
-  def createCounterCursor(db: SQLiteDatabase, sql4: String) = {
-    val sql5 =
-      s"""SELECT COUNT(entry_id) as count, source_id, rating
-         | FROM($sql4)
-         | GROUP BY source_id, rating
-         | ORDER BY rating DESC, source_id DESC
-       """.stripMargin
-
-    db.rawQuery(sql5, Array())
+  def createDetailCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    createCursor(db, sourceIds, "content")
   }
+  def createCursor(db: SQLiteDatabase, sourceIds: Seq[Long], content: String) = {
+    val sql =
+      s"""SELECT
+        |  _id AS entry_id,
+        |  source_id,
+        |  title,
+        |  $content,
+        |  created_at
+        |FROM entries
+        |WHERE source_id = ?
+        |ORDER BY entry_id DESC LIMIT 20""".stripMargin
 
-  def createSourcePositionMap(db: SQLiteDatabase, sql4: String): Map[Long, Int] = {
-    val cursor = createCounterCursor(db, sql4)
+    val union = sourceIds.
+      map(_ => s"SELECT * FROM ($sql) AS tmp").
+      mkString(" UNION ALL ")
+
+    db.rawQuery(union, sourceIds.map(_.toString).toArray)
+  }
+  def createPositionCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    val count =
+      s"""SELECT
+         |  _id AS entry_id,
+         |  source_id
+         |FROM entries
+         |WHERE source_id = ?
+         |LIMIT 20""".stripMargin
+
+    val sql = s"SELECT source_id, COUNT(entry_id) AS count FROM ($count) AS c1"
+    val union = sourceIds.
+      map(_ => s"SELECT * FROM ($sql) AS tmp").
+      mkString(" UNION ALL ")
+
+    db.rawQuery(union, sourceIds.map(_.toString).toArray)
+  }
+  def createPositionMap(db: SQLiteDatabase, sourceIds: Seq[Long]): Map[Long, Int] = {
+    val cursor = createPositionCursor(db, sourceIds)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
-
-    val list = (0 to cursor.getCount - 1).map { i =>
-      cursor.moveToPosition(i)
-      cursor.getLong(sourceIdIndex) ->
-        cursor.getInt(countIndex)
+    val list = (0 to cursor.getCount - 1).view map { i =>
+      cursor moveToPosition i
+      cursor.getLong(sourceIdIndex) -> cursor.getInt(countIndex)
     }
-    val pairs = list.scanLeft((0L, (0, 0))){
+    val pairs = list.scanLeft(0L -> (0, 0)){
       case ((_, (previous, sum)), (sourceId, count)) =>
-        (sourceId, (count, previous + sum))
+        sourceId -> (count, previous + sum)
     } map {
       case (sourceId, (count, position)) =>
         sourceId -> position
     }
+    cursor.close()
     pairs.toMap
   }
 }

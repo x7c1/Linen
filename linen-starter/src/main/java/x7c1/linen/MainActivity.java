@@ -24,6 +24,8 @@ import static x7c1.linen.PaneScroller.createListener;
 
 public class MainActivity extends Activity {
 
+	private ContainerInitializer initializer = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,7 +49,7 @@ public class MainActivity extends Activity {
 
 		setContentView(layout.itemView);
 
-		ContainerInitializer initializer = new ContainerInitializer(
+		this.initializer = new ContainerInitializer(
 			this,
 			layout,
 			new SourceRowProvider(this),
@@ -79,6 +81,12 @@ public class MainActivity extends Activity {
 
 		layout.dummySurface.setLongClickable(true);
 		layout.dummySurface.setOnTouchListener(listener);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		initializer.close();
 	}
 
 	private Point getDisplaySize(){

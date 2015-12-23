@@ -29,14 +29,73 @@ object DummyFactory {
   def createDummies(context: Context)(n: Int) = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
+
+    val accountId1 = {
+      val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1", Array())
+      if (cursor.getCount > 0){
+        cursor.moveToFirst()
+        val idIndex = cursor getColumnIndex "_id"
+        cursor getInt idIndex
+      } else {
+        val item = new ContentValues()
+        item.put("nickname", s"sample-user-1")
+        db.insert("accounts", null, item)
+      }
+    }
+    val accountId2 = {
+      val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1 OFFSET 1", Array())
+      if (cursor.getCount > 0){
+        cursor.moveToFirst()
+        val idIndex = cursor getColumnIndex "_id"
+        cursor getInt idIndex
+      } else {
+        val item = new ContentValues()
+        item.put("nickname", s"sample-user-2")
+        db.insert("accounts", null, item)
+      }
+    }
+    val listId = {
+      val cursor = db.rawQuery("SELECT * FROM lists ORDER BY _id LIMIT 1", Array())
+      if (cursor.getCount > 0){
+        cursor.moveToFirst()
+        val idIndex = cursor getColumnIndex "_id"
+        cursor getInt idIndex
+      } else {
+        val item = new ContentValues()
+        item.put("name", s"sample list name")
+        item.put("description", s"sample list description")
+        item.put("account_id", accountId1: Double)
+        db.insert("lists", null, item)
+      }
+    }
     (1 to n) foreach { i =>
       val source = new ContentValues()
       source.put("title", s"$i-title")
       source.put("description", s"description-$i " + words(1,15))
-      source.put("rating", i * 10 : Double)
       val sourceId = db.insert("sources", null, source)
 
-      val listId = 123
+      val status1 = new ContentValues()
+      status1.put("source_id", sourceId: Double)
+      status1.put("account_id", accountId1: Double)
+      db.insert("source_statuses", null, status1)
+
+      val rating1 = new ContentValues()
+      rating1.put("source_id", sourceId: Double)
+      rating1.put("owner_account_id", accountId1: Double)
+      rating1.put("rating", sourceId: Double)
+      db.insert("source_ratings", null, rating1)
+
+      val status2 = new ContentValues()
+      status2.put("source_id", sourceId: Double)
+      status2.put("account_id", accountId2: Double)
+      db.insert("source_statuses", null, status2)
+
+      val rating2 = new ContentValues()
+      rating2.put("source_id", sourceId: Double)
+      rating2.put("owner_account_id", accountId2: Double)
+      rating2.put("rating", sourceId: Double)
+      db.insert("source_ratings", null, rating2)
+
       val listSourceMap = new ContentValues()
       listSourceMap.put("list_id", listId: Double)
       listSourceMap.put("source_id", sourceId: Double)
@@ -50,12 +109,34 @@ object DummyFactory {
         entry.put("source_id", sourceId: Double)
         entry.put("title", s"$sourceId-$j entry title")
         entry.put("content", s"$sourceId-$j entry content " + words(100,500))
+        val entryId = db.insert("entries", null, entry)
+
         if (i == 3){
-          entry.put("read_state", 1: Double)
-        } else {
-          entry.put("read_state", 0: Double)// unread
+          val status1 = new ContentValues()
+          status1.put("start_entry_id", entryId: Double)
+          db.update(
+            "source_statuses", status1,
+            "source_id = ? AND account_id = ?",
+            Array(sourceId.toString, accountId1.toString)
+          )
+          val status2 = new ContentValues()
+          status2.put("start_entry_id", entryId: Double)
+          db.update(
+            "source_statuses", status2,
+            "source_id = ? AND account_id = ?",
+            Array(sourceId.toString, accountId2.toString)
+          )
         }
-        db.insert("entries", null, entry)
+        if (i == 4){
+          val status2 = new ContentValues()
+          status2.put("start_entry_id", entryId: Double)
+          db.update(
+            "source_statuses", status2,
+            "source_id = ? AND account_id = ?",
+            Array(sourceId.toString, accountId2.toString)
+          )
+        }
+
       }
     }
   }

@@ -2,8 +2,8 @@ package x7c1.linen.modern.accessor
 
 import android.database.Cursor
 import org.junit.Assert.assertEquals
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.{Assert, Test}
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
@@ -14,26 +14,19 @@ import x7c1.linen.modern.init.DummyFactory
 class SourceOpenHelperTest extends JUnitSuiteLike {
 
   @Test
-  def testSample() = {
-    val context = RuntimeEnvironment.application
-    DummyFactory.createDummies(context)(5)
-
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val cursor = db.rawQuery("SELECT * FROM sources LIMIT ?", Array("2"))
-    Assert.assertEquals(2, cursor.getCount)
-  }
-
-  @Test
   def testQueryForSourceArea() = {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val cursor3 = SourceAccessor createCursor db
+    val listId = SourceAccessor.findFirstListId(db)
+    val accountId = SourceAccessor.findFirstAccountId(db)
+    val cursor3 = SourceAccessor.createCursor(db, listId, accountId)
     val rows = toMaps(cursor3)
+
+    //rows.map(prettyPrint) foreach println
+
     assertEquals(
       Seq("5", "4", "2", "1"),
       rows map {_("source_id")}
@@ -45,57 +38,44 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   }
   @Test
   def testQueryForEntryArea() = {
+
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val cursor = EntryAccessor.createCursor(db, sql4)
-    val rows = toMaps(cursor)
-
     /*
-    rows.map(prettyPrint).foreach(println)
+    val accessor0 = SourceAccessor.create(context)
+    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
+    val sourceIds = sources.flatMap(_.map(_.id))
+    val cursor = EntryAccessor.createOutlineCursor(context, sourceIds)
+    val rows = toMaps(cursor)
+    rows.map(prettyPrint) foreach println
     */
 
-    val found1 = rows exists { _("title") == "5-1 entry title" }
-    assertEquals(true, found1)
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val sourceAccessor = SourceAccessor.create(db)
+    val sourceIds = (0 to sourceAccessor.length - 1).map(sourceAccessor.findAt).flatMap(_.map(_.id))
+    val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
-    val found2 = rows exists { _("title") == "3-1 entry title" }
-    assertEquals(false, found2)
+    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+    val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
+
+    assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
+    assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
+
+    assertEquals(Seq(5,4,2,1), entries.map(_.sourceId).distinct)
   }
   @Test
   def testQueryToCountEntry() = {
     val context = RuntimeEnvironment.application
+    val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val cursor = EntryAccessor.createCounterCursor(db, sql4)
+    val accessor0 = SourceAccessor.create(db)
+    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
+    val sourceIds = sources.flatMap(_.map(_.id))
+    val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
     val rows = toMaps(cursor)
-    val actual = rows.map(_("count")).map(_.toInt)
-    assertEquals(Seq(10,10,10,10), actual)
-  }
-
-  @Test
-  def testCalculateSourcePosition(): Unit = {
-    val context = RuntimeEnvironment.application
-    DummyFactory.createDummies(context)(5)
-
-    val helper = new LinenOpenHelper(context)
-    val db = helper.getWritableDatabase
-
-    val sql4 = EntryAccessor.createSql4("entries.content")
-    val positions = EntryAccessor.createSourcePositionMap(db, sql4)
-    assertEquals(0, positions(5))
-    assertEquals(10, positions(4))
-    assertEquals(20, positions(2))
-    assertEquals(30, positions(1))
-
-    intercept[NoSuchElementException](positions(3))
+    rows.map(prettyPrint) foreach println
   }
 
   def showTable(tableName: String) = {
