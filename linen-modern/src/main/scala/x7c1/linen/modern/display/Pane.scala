@@ -1,12 +1,17 @@
 package x7c1.linen.modern.display
 
-import android.view.ViewGroup
+import java.lang.Math.max
+
+import android.content.Context
+import android.view.GestureDetector.OnGestureListener
+import android.view.{View, GestureDetector, MotionEvent, ViewGroup}
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
-import x7c1.wheat.modern.tasks.ScrollerTasks
 import x7c1.wheat.modern.callback.Imports._
+import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
+import x7c1.wheat.modern.observer.AppendableOnTouch
+import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
   def displayPosition: Int
@@ -26,6 +31,10 @@ trait Pane {
 
 class PaneContainer(view: ViewGroup) {
   private lazy val scroller = new Scroller(view.getContext)
+
+  def scrollBy(x: Int) = {
+    view.scrollBy(max(x, -view.getScrollX), 0)
+  }
 
   def scrollTo(pane: Pane): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
@@ -55,4 +64,81 @@ class PaneContainer(view: ViewGroup) {
       }
     }
   }
+}
+
+case class PaneFlungEvent (
+  from: PaneLabel,
+  original1: Option[MotionEvent],
+  original2: MotionEvent,
+  distanceX: Float,
+  distanceY: Float
+)
+
+trait OnPaneFlungListener {
+  def onPaneFlung(event: PaneFlungEvent): Boolean
+}
+
+object PaneFlingDetector {
+  def createListener(
+    context: Context, from: PaneLabel, onFlung: PaneFlungEvent => Boolean) = {
+
+    new OnTouchToScrollPane(context, from, onFlung)
+  }
+}
+
+class OnTouchToScrollPane(
+  context: Context,
+  from: PaneLabel,
+  onFlung: PaneFlungEvent => Boolean) extends AppendableOnTouch {
+
+  val detector = new GestureDetector(
+    context,
+    new Filter
+  )
+
+  def updateCurrentPosition(e: MotionEvent) = {
+    previousDistanceX = Some(e.getRawX)
+  }
+
+  override def onTouch(v: View, event: MotionEvent): Boolean = {
+    detector onTouchEvent event
+  }
+
+  private var previousDistanceX = Some(0F)
+
+  private class Filter extends OnGestureListener {
+
+    override def onSingleTapUp(e: MotionEvent): Boolean = {
+      false
+    }
+    override def onFling(
+      e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
+
+      false
+    }
+    override def onShowPress(e: MotionEvent): Unit = {}
+
+    override def onLongPress(e: MotionEvent): Unit = {}
+
+    override def onScroll(
+      e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
+
+      previousDistanceX foreach { prev =>
+        val x = prev - e2.getRawX
+        onFlung apply PaneFlungEvent(from, Option(e1), e2, x, distanceY)
+      }
+      Log error s"${e2.getRawX}"
+      previousDistanceX = Some(e2.getRawX)
+
+      true
+    }
+    override def onDown(e: MotionEvent): Boolean = {
+      Log error s"${e.getRawX}"
+
+      previousDistanceX = Some(e.getRawX)
+
+      false
+    }
+  }
+
 }

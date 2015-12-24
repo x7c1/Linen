@@ -34,6 +34,7 @@ trait ActionsInitializer {
     new Actions(
       new ContainerAction(
         container = new PaneContainer(layout.paneContainer),
+        sourceArea,
         entryArea,
         entryDetailArea
       ),

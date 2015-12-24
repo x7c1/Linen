@@ -64,8 +64,9 @@ public class MainActivity extends Activity {
 		View.OnTouchListener listener = new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				return detector.onTouchEvent(event) ||
-					layout.paneContainer.dispatchTouchEvent(event);
+				return layout.paneContainer.dispatchTouchEvent(event);
+//				return detector.onTouchEvent(event) ||
+//					layout.paneContainer.dispatchTouchEvent(event);
 			}
 		};
 

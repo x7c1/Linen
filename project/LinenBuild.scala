@@ -154,7 +154,7 @@ trait LinenSettings {
       case path if ignore(path) => MergeStrategy.discard
       case path =>
         if (!(path startsWith "x7c1")){
-          sLog.value info s"[$path] may be duplicate between linen-pickle and linen-modern"
+          sLog.value info s"may be duplicate between linen-pickle and linen-modern : $path"
         }
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
