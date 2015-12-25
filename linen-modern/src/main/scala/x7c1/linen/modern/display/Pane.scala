@@ -36,6 +36,7 @@ class PaneContainer(view: ViewGroup) {
   private lazy val scroller = new Scroller(view.getContext)
 
   def scrollBy(x: Int): Unit = {
+    scroller forceFinished true
     view.scrollBy(max(x, -view.getScrollX), 0)
   }
 
