@@ -1,6 +1,6 @@
 package x7c1.linen.modern.display
 
-import java.lang.Math.{abs, max}
+import java.lang.Math.{min, abs, max}
 
 import android.content.Context
 import android.util.TypedValue
@@ -32,12 +32,20 @@ trait Pane {
   }
 }
 
-class PaneContainer(view: ViewGroup) {
+class PaneContainer(view: ViewGroup, displayWidth: Int) {
   private lazy val scroller = new Scroller(view.getContext)
 
+  private lazy val width = {
+    val length = view.getChildCount
+    val children = 0 to (length - 1) map view.getChildAt
+    children.foldLeft(0){_ + _.getWidth} - displayWidth
+  }
   def scrollBy(x: Int): Unit = {
     scroller forceFinished true
-    view.scrollBy(max(x, -view.getScrollX), 0)
+
+    val current = view.getScrollX
+    val diff = min(width - current, max(x, -current))
+    view.scrollBy(diff, 0)
   }
 
   def scrollTo(pane: Pane): CallbackTask[Unit] = task of {

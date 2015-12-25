@@ -33,7 +33,7 @@ trait ActionsInitializer {
     )
     new Actions(
       new ContainerAction(
-        container = new PaneContainer(layout.paneContainer),
+        container = new PaneContainer(layout.paneContainer, displaySize.x),
         sourceArea,
         entryArea,
         entryDetailArea
