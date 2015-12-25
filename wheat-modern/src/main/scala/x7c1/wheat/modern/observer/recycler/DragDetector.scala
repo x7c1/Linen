@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
+import x7c1.wheat.macros.logger.Log
 
 
 class DragDetector[A <: DragStoppedEvent](
@@ -20,14 +21,20 @@ class DragDetector[A <: DragStoppedEvent](
   private val detector = new GestureDetector(context, new HorizontalFilter)
   private var previous: Option[Float] = None
   private var direction: Option[DragDirection] = None
+  private var startPosition: Option[Float] = None
   private val listenerToScroll = new OnTouchToScroll
 
   override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
     e.getAction match {
-      case MotionEvent.ACTION_UP => direction foreach { dir =>
-        val event = stoppedEventFactory.createEvent(dir)
-        onDragStopped(event)
-      }
+      case MotionEvent.ACTION_UP =>
+        for {
+          dir <- direction
+          start <- startPosition
+          distance = start - e.getRawX
+          event = stoppedEventFactory.createEvent(distance, dir)
+        } yield {
+          onDragStopped(event)
+        }
       case _ => listenerToScroll.onTouch(rv, e)
     }
     if (!(previous contains e.getRawX)){
@@ -51,15 +58,17 @@ class DragDetector[A <: DragStoppedEvent](
     override def onScroll(
       e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
 
-      val isHorizontal = abs(distanceX) > abs(distanceY)
+      Log error s"$distanceX, $distanceY"
+      val isHorizontal = abs(distanceX) > abs(2 * distanceY)
       if (isHorizontal){
         horizontalCount += 1
       }
-      val accepted = horizontalCount > 5
+      val accepted = horizontalCount > 0
       accepted
     }
     override def onDown(e: MotionEvent): Boolean = {
       horizontalCount = 0
+      startPosition = Some(e.getRawX)
       false
     }
   }
@@ -86,6 +95,6 @@ trait DragStoppedEvent {
   def direction: DragDirection
 }
 trait DragStoppedEventFactory[A <: DragStoppedEvent]{
-  def createEvent(direction: DragDirection): A
+  def createEvent(distance: Float, direction: DragDirection): A
 }
 

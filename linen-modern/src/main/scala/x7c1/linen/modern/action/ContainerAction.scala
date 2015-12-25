@@ -24,14 +24,20 @@ class ContainerAction(
     Log info s"$event"
     import x7c1.linen.modern.display.PaneLabel._
 
-    val pane = (event.from, event.direction) match {
-      case (SourceArea, Next) => entryArea
-      case (SourceArea, Previous) => sourceArea
-      case (EntryArea, Next) => entryDetailArea
-      case (EntryArea, Previous) => sourceArea
-      case (EntryDetailArea, Next) => entryDetailArea
-      case (EntryDetailArea, Previous) => entryArea
-    }
+    val pane =
+      if (event.near) event.from match {
+        case SourceArea => sourceArea
+        case EntryArea => entryArea
+        case EntryDetailArea => entryDetailArea
+      } else (event.from, event.direction) match {
+        case (SourceArea, Next) => entryArea
+        case (SourceArea, Previous) => sourceArea
+        case (EntryArea, Next) => entryDetailArea
+        case (EntryArea, Previous) => sourceArea
+        case (EntryDetailArea, Next) => entryDetailArea
+        case (EntryDetailArea, Previous) => entryArea
+      }
+
     container.scrollTo(pane).execute()
   }
 }

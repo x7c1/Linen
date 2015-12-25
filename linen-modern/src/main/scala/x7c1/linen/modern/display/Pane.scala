@@ -1,8 +1,10 @@
 package x7c1.linen.modern.display
 
-import java.lang.Math.max
+import java.lang.Math.{abs, max}
 
 import android.content.Context
+import android.util.TypedValue
+import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Scroller
@@ -67,15 +69,20 @@ class PaneContainer(view: ViewGroup) {
   }
 }
 
-case class PaneDragStoppedEvent (
-  from: PaneLabel,
-  override val direction: DragDirection ) extends DragStoppedEvent
+class PaneDragStoppedEvent (
+  val from: PaneLabel,
+  distance: Float,
+  thresholdPixel: Int,
+  override val direction: DragDirection ) extends DragStoppedEvent {
 
-class PaneDragStoppedEventFactory(from: PaneLabel)
+  def near = abs(distance) < thresholdPixel
+}
+
+class PaneDragStoppedEventFactory(from: PaneLabel, thresholdPixel: Int)
   extends DragStoppedEventFactory[PaneDragStoppedEvent] {
 
-  override def createEvent(direction: DragDirection) = {
-    PaneDragStoppedEvent(from, direction)
+  override def createEvent(distance: Float, direction: DragDirection) = {
+    new PaneDragStoppedEvent(from, distance, thresholdPixel, direction)
   }
 }
 
@@ -86,9 +93,14 @@ object PaneDragDetector {
     actions: Actions,
     onTouch: OnTouchListener): DragDetector[PaneDragStoppedEvent] = {
 
+    val threshold = {
+      val dp = 50
+      val metrics = context.getResources.getDisplayMetrics
+      TypedValue.applyDimension(COMPLEX_UNIT_DIP, dp, metrics)
+    }
     new DragDetector(
       context = context,
-      stoppedEventFactory = new PaneDragStoppedEventFactory(label),
+      stoppedEventFactory = new PaneDragStoppedEventFactory(label, threshold.toInt),
       onTouch = onTouch,
       onDrag = actions.container.onPaneDragging,
       onDragStopped = actions.container.onPaneDragStopped
