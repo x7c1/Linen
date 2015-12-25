@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.observer
 
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
-import android.view.GestureDetector.OnGestureListener
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.{GestureDetector, MotionEvent}
 
 object FocusDetector {
@@ -78,27 +78,12 @@ private class FocusedItemNotifier[A <: ItemFocusedEvent](
 }
 
 private class GestureFilter(
-  observer: TouchScrollObserver ) extends OnGestureListener {
-
-  override def onSingleTapUp(e: MotionEvent): Boolean = {
-    false
-  }
-  override def onFling(
-    e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
-
-    false
-  }
-  override def onShowPress(e: MotionEvent): Unit = {}
-
-  override def onLongPress(e: MotionEvent): Unit = {}
+  observer: TouchScrollObserver ) extends SimpleOnGestureListener {
 
   override def onScroll(
     e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
 
     observer.touch()
-    false
-  }
-  override def onDown(e: MotionEvent): Boolean = {
     false
   }
 }

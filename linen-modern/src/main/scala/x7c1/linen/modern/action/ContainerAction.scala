@@ -16,12 +16,11 @@ class ContainerAction(
   override def onEntrySelected(event: EntrySelectedEvent) = {
     container scrollTo entryDetailArea
   }
-  def onPaneDragging(event: PaneDragEvent): Boolean = {
+  def onPaneDragging(event: PaneDragEvent): Unit = {
     container.scrollBy(event.distanceX.toInt)
-    true
   }
   def onPaneDragStopped(event: PaneDragStoppedEvent): Unit = {
-    Log error s"$event"
+    Log info s"$event"
 
     if (event.direction < 0)
       container.scrollTo(entryArea).execute()

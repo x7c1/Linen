@@ -2,11 +2,11 @@ package x7c1.linen.modern.init
 
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryRow, MainLayout}
-import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, EntryFocusedEventFactory, Actions}
-import x7c1.linen.modern.action.observer.{EntrySkipStoppedObserver, EntrySkippedObserver, EntryFocusedObserver, EntrySelectedObserver}
-import x7c1.linen.modern.display.{PaneLabel, PaneFlingDetector, EntryRowAdapter}
+import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver}
+import x7c1.linen.modern.action.{Actions, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
+import x7c1.linen.modern.display.EntryRowAdapter
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.observer.{SkipPositionFinder, SkipDetector, FocusDetector}
+import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait EntryAreaInitializer {
   def layout: MainLayout

@@ -4,12 +4,12 @@ import java.lang.Math.abs
 
 import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
-import android.view.GestureDetector.OnGestureListener
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.{GestureDetector, MotionEvent}
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{PaneDragStoppedEvent, PaneFlingDetector, PaneLabel, SourceRowAdapter}
+import x7c1.linen.modern.display.{OnTouchToScrollPane, PaneDragStoppedEvent, PaneLabel, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
@@ -33,10 +33,9 @@ trait SourceAreaInitializer {
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
       onFocused = new SourceFocusedObserver(actions)
     )
-    val forDragging = PaneFlingDetector.createListener(
-      context = layout.sourceList.getContext,
+    val forDrag = new OnTouchToScrollPane(
       from = PaneLabel.SourceArea,
-      onFlung = actions.container.onPaneDragging
+      onDrag = actions.container.onPaneDragging
     )
     layout.sourceList.addOnItemTouchListener(new SimpleOnItemTouchListener{
       val detector = new GestureDetector(
@@ -44,6 +43,7 @@ trait SourceAreaInitializer {
         new PaneScrollFilter
       )
       var previous: Option[Float] = None
+
       var direction: Option[Int] = None
 
       override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
@@ -51,21 +51,16 @@ trait SourceAreaInitializer {
 
         e.getAction match {
           case MotionEvent.ACTION_UP =>
-            direction map { dir =>
-              PaneDragStoppedEvent(PaneLabel.SourceArea, dir, e)
-            } foreach {
-              actions.container.onPaneDragStopped
+            direction foreach { dir =>
+              val event = PaneDragStoppedEvent(PaneLabel.SourceArea, dir)
+              actions.container onPaneDragStopped event
             }
           case _ =>
-            forDragging.onTouch(rv, e)
+            forDrag.onTouch(rv, e)
         }
-        if (previous.contains(e.getRawX)){
-          Log info s"keep"
-        } else {
-          Log info s"updated"
+        if (!(previous contains e.getRawX)){
           direction = previous map (e.getRawX - _) map { x =>
-            if (x > 0) 1
-            else -1
+            if (x > 0) 1 else -1
           }
           previous = Some(e.getRawX)
         }
@@ -76,10 +71,10 @@ trait SourceAreaInitializer {
 
         val isHorizontal = detector.onTouchEvent(e)
         if (isHorizontal){
-          forDragging.onTouch(rv, e)
+          forDrag.onTouch(rv, e)
         } else {
           forFocus.onTouch(rv, e)
-          forDragging.updateCurrentPosition(e)
+          forDrag.updateCurrentPosition(e.getRawX)
         }
         isHorizontal
       }
@@ -96,20 +91,9 @@ trait SourceAreaInitializer {
   }
 }
 
-private class PaneScrollFilter extends OnGestureListener {
-  override def onSingleTapUp(e: MotionEvent): Boolean = {
-    false
-  }
-  override def onFling(
-    e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
+private class PaneScrollFilter extends SimpleOnGestureListener {
 
-    false
-  }
-  override def onShowPress(e: MotionEvent): Unit = {}
-
-  override def onLongPress(e: MotionEvent): Unit = {}
-
-  var horizontalCount = 0
+  private var horizontalCount = 0
 
   override def onScroll(
     e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
@@ -122,8 +106,6 @@ private class PaneScrollFilter extends OnGestureListener {
     accepted
   }
   override def onDown(e: MotionEvent): Boolean = {
-    Log info s"${e.getX}"
-
     horizontalCount = 0
     false
   }

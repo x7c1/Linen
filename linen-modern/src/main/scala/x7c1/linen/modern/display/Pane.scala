@@ -2,9 +2,7 @@ package x7c1.linen.modern.display
 
 import java.lang.Math.max
 
-import android.content.Context
-import android.view.GestureDetector.OnGestureListener
-import android.view.{View, GestureDetector, MotionEvent, ViewGroup}
+import android.view.{MotionEvent, View, ViewGroup}
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
@@ -32,7 +30,7 @@ trait Pane {
 class PaneContainer(view: ViewGroup) {
   private lazy val scroller = new Scroller(view.getContext)
 
-  def scrollBy(x: Int) = {
+  def scrollBy(x: Int): Unit = {
     view.scrollBy(max(x, -view.getScrollX), 0)
   }
 
@@ -68,77 +66,30 @@ class PaneContainer(view: ViewGroup) {
 
 case class PaneDragEvent (
   from: PaneLabel,
-  original1: Option[MotionEvent],
-  original2: MotionEvent,
-  distanceX: Float,
-  distanceY: Float
+  distanceX: Float
 )
 case class PaneDragStoppedEvent (
   from: PaneLabel,
-  direction: Int,
-  original: MotionEvent
+  direction: Int
 )
 
-object PaneFlingDetector {
-  def createListener(
-    context: Context, from: PaneLabel, onFlung: PaneDragEvent => Boolean) = {
-
-    new OnTouchToScrollPane(context, from, onFlung)
-  }
-}
-
 class OnTouchToScrollPane(
-  context: Context,
   from: PaneLabel,
-  onDrag: PaneDragEvent => Boolean) extends AppendableOnTouch {
+  onDrag: PaneDragEvent => Unit) extends AppendableOnTouch {
 
-  val detector = new GestureDetector(
-    context,
-    new Filter
-  )
+  private var previousPosition = Some(0F)
 
-  def updateCurrentPosition(e: MotionEvent) = {
-    previousDistanceX = Some(e.getRawX)
+  def updateCurrentPosition(x: Float) = {
+    previousPosition = Some(x)
   }
 
   override def onTouch(v: View, event: MotionEvent): Boolean = {
-    detector onTouchEvent event
-  }
-
-  private var previousDistanceX = Some(0F)
-
-  private class Filter extends OnGestureListener {
-
-    override def onSingleTapUp(e: MotionEvent): Boolean = {
-      false
+    previousPosition foreach { x =>
+      val diff = x - event.getRawX
+      onDrag apply PaneDragEvent(from, diff)
     }
-    override def onFling(
-      e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
-
-      false
-    }
-    override def onShowPress(e: MotionEvent): Unit = {}
-
-    override def onLongPress(e: MotionEvent): Unit = {}
-
-    override def onScroll(
-      e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
-
-      previousDistanceX foreach { prev =>
-        val x = prev - e2.getRawX
-        onDrag apply PaneDragEvent(from, Option(e1), e2, x, distanceY)
-      }
-      previousDistanceX = Some(e2.getRawX)
-
-      true
-    }
-    override def onDown(e: MotionEvent): Boolean = {
-      Log error s"${e.getRawX}"
-
-      previousDistanceX = Some(e.getRawX)
-
-      false
-    }
+    previousPosition = Some(event.getRawX)
+    true
   }
 
 }
