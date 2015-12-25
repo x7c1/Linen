@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
-import x7c1.wheat.macros.logger.Log
 
 
 class DragDetector[A <: DragStoppedEvent](
@@ -24,8 +23,6 @@ class DragDetector[A <: DragStoppedEvent](
   private val listenerToScroll = new OnTouchToScroll
 
   override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
-    Log info s"${e.getRawX}, $previous !!!"
-
     e.getAction match {
       case MotionEvent.ACTION_UP => direction foreach { dir =>
         val event = stoppedEventFactory.createEvent(dir)
@@ -39,8 +36,6 @@ class DragDetector[A <: DragStoppedEvent](
     }
   }
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
-    Log info s"$e"
-
     val isHorizontal = detector onTouchEvent e
     if (isHorizontal){
       listenerToScroll.onTouch(rv, e)
@@ -60,7 +55,7 @@ class DragDetector[A <: DragStoppedEvent](
       if (isHorizontal){
         horizontalCount += 1
       }
-      val accepted = horizontalCount > 2
+      val accepted = horizontalCount > 5
       accepted
     }
     override def onDown(e: MotionEvent): Boolean = {

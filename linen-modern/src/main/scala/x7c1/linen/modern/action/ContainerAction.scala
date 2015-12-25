@@ -1,8 +1,8 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.display.{PaneDragStoppedEvent, EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, SourceArea, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneDragStoppedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.observer.recycler.{DragEvent, Previous, Next}
+import x7c1.wheat.modern.observer.recycler.{DragEvent, Next, Previous}
 
 class ContainerAction(
   container: PaneContainer,
@@ -22,12 +22,16 @@ class ContainerAction(
   }
   def onPaneDragStopped(event: PaneDragStoppedEvent): Unit = {
     Log info s"$event"
+    import x7c1.linen.modern.display.PaneLabel._
 
-    event.direction match {
-      case Next =>
-        container.scrollTo(entryArea).execute()
-      case Previous =>
-        container.scrollTo(sourceArea).execute()
+    val pane = (event.from, event.direction) match {
+      case (SourceArea, Next) => entryArea
+      case (SourceArea, Previous) => sourceArea
+      case (EntryArea, Next) => entryDetailArea
+      case (EntryArea, Previous) => sourceArea
+      case (EntryDetailArea, Next) => entryDetailArea
+      case (EntryDetailArea, Previous) => entryArea
     }
+    container.scrollTo(pane).execute()
   }
 }

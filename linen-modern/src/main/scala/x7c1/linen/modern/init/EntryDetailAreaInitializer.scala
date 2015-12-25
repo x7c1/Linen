@@ -2,11 +2,11 @@ package x7c1.linen.modern.init
 
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryDetailRow, MainLayout}
-import x7c1.linen.modern.action.{Actions, EntrySkipStoppedFactory, EntrySkippedEventFactory, EntryDetailFocusedEventFactory}
-import x7c1.linen.modern.action.observer.{EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSelectedObserver}
-import x7c1.linen.modern.display.EntryDetailRowAdapter
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver}
+import x7c1.linen.modern.action.{Actions, EntryDetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
+import x7c1.linen.modern.display.{PaneLabel, PaneDragDetector, EntryDetailRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.observer.{SkipPositionFinder, SkipDetector, FocusDetector}
+import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait EntryDetailAreaInitializer {
   def layout: MainLayout
@@ -22,10 +22,16 @@ trait EntryDetailAreaInitializer {
       new EntryDetailSelectedObserver(actions),
       entryDetailRowProvider
     )
-    layout.entryDetailList setOnTouchListener FocusDetector.forLinearLayoutManager(
+    val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,
       focusedEventFactory = new EntryDetailFocusedEventFactory(accessors.entryDetail),
       onFocused = new EntryDetailFocusedObserver(actions)
+    )
+    layout.entryDetailList addOnItemTouchListener PaneDragDetector.create(
+      context = layout.entryDetailList.getContext,
+      label = PaneLabel.EntryDetailArea,
+      actions = actions,
+      onTouch = forFocus
     )
     layout.detailToNext setOnTouchListener SkipDetector.createListener(
       context = layout.detailToNext.getContext,

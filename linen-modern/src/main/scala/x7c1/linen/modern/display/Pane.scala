@@ -2,13 +2,16 @@ package x7c1.linen.modern.display
 
 import java.lang.Math.max
 
+import android.content.Context
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Scroller
+import x7c1.linen.modern.action.Actions
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
-import x7c1.wheat.modern.observer.recycler.{DragDirection, DragStoppedEvent, DragStoppedEventFactory}
+import x7c1.wheat.modern.observer.recycler.{DragDetector, DragDirection, DragStoppedEvent, DragStoppedEventFactory}
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
@@ -73,5 +76,22 @@ class PaneDragStoppedEventFactory(from: PaneLabel)
 
   override def createEvent(direction: DragDirection) = {
     PaneDragStoppedEvent(from, direction)
+  }
+}
+
+object PaneDragDetector {
+  def create(
+    context: Context,
+    label: PaneLabel,
+    actions: Actions,
+    onTouch: OnTouchListener): DragDetector[PaneDragStoppedEvent] = {
+
+    new DragDetector(
+      context = context,
+      stoppedEventFactory = new PaneDragStoppedEventFactory(label),
+      onTouch = onTouch,
+      onDrag = actions.container.onPaneDragging,
+      onDragStopped = actions.container.onPaneDragStopped
+    )
   }
 }
