@@ -9,7 +9,7 @@ import android.view.{GestureDetector, MotionEvent}
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{PaneFlingDetector, PaneLabel, SourceRowAdapter}
+import x7c1.linen.modern.display.{PaneDragStoppedEvent, PaneFlingDetector, PaneLabel, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
@@ -33,32 +33,53 @@ trait SourceAreaInitializer {
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
       onFocused = new SourceFocusedObserver(actions)
     )
-    val forFling = PaneFlingDetector.createListener(
+    val forDragging = PaneFlingDetector.createListener(
       context = layout.sourceList.getContext,
       from = PaneLabel.SourceArea,
-      onFlung = actions.container.onPaneFlung
+      onFlung = actions.container.onPaneDragging
     )
     layout.sourceList.addOnItemTouchListener(new SimpleOnItemTouchListener{
-      val listener = forFling append forFocus
-
       val detector = new GestureDetector(
         layout.sourceList.getContext,
         new PaneScrollFilter
       )
-      override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
-        Log info s"$e"
+      var previous: Option[Float] = None
+      var direction: Option[Int] = None
 
-        forFling.onTouch(rv, e)
+      override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
+        Log info s"${e.getRawX}, $previous"
+
+        e.getAction match {
+          case MotionEvent.ACTION_UP =>
+            direction map { dir =>
+              PaneDragStoppedEvent(PaneLabel.SourceArea, dir, e)
+            } foreach {
+              actions.container.onPaneDragStopped
+            }
+          case _ =>
+            forDragging.onTouch(rv, e)
+        }
+        if (previous.contains(e.getRawX)){
+          Log info s"keep"
+        } else {
+          Log info s"updated"
+          direction = previous map (e.getRawX - _) map { x =>
+            if (x > 0) 1
+            else -1
+          }
+          previous = Some(e.getRawX)
+        }
+
       }
       override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
         Log info s"$e"
 
         val isHorizontal = detector.onTouchEvent(e)
         if (isHorizontal){
-          forFling.onTouch(rv, e)
+          forDragging.onTouch(rv, e)
         } else {
           forFocus.onTouch(rv, e)
-          forFling.updateCurrentPosition(e)
+          forDragging.updateCurrentPosition(e)
         }
         isHorizontal
       }
@@ -97,8 +118,7 @@ private class PaneScrollFilter extends OnGestureListener {
     if (isHorizontal){
       horizontalCount += 1
     }
-    val accepted = horizontalCount > 3
-    Log error s"horizontal ? $accepted ($distanceX, $distanceY)"
+    val accepted = horizontalCount > 2
     accepted
   }
   override def onDown(e: MotionEvent): Boolean = {

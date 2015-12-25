@@ -1,13 +1,14 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneFlungEvent, SourceArea, SourceSelectedEvent}
+import x7c1.linen.modern.display.{PaneDragStoppedEvent, EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneDragEvent, SourceArea, SourceSelectedEvent}
+import x7c1.wheat.macros.logger.Log
 
 class ContainerAction(
   container: PaneContainer,
   sourceArea: SourceArea,
   entryArea: EntryArea,
   entryDetailArea: EntryDetailArea )
-  extends OnPaneFlung with OnSourceSelected with OnEntrySelected {
+  extends OnSourceSelected with OnEntrySelected {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     container scrollTo entryArea
@@ -15,8 +16,16 @@ class ContainerAction(
   override def onEntrySelected(event: EntrySelectedEvent) = {
     container scrollTo entryDetailArea
   }
-  override def onPaneFlung(event: PaneFlungEvent): Boolean = {
-    container.scrollBy((1.2 * event.distanceX).toInt)
+  def onPaneDragging(event: PaneDragEvent): Boolean = {
+    container.scrollBy(event.distanceX.toInt)
     true
+  }
+  def onPaneDragStopped(event: PaneDragStoppedEvent): Unit = {
+    Log error s"$event"
+
+    if (event.direction < 0)
+      container.scrollTo(entryArea).execute()
+    else
+      container.scrollTo(sourceArea).execute()
   }
 }

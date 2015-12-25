@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
-import x7c1.linen.modern.display.{PaneFlungEvent, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
@@ -12,9 +12,6 @@ class Actions (
   val entryArea: EntryAreaAction,
   val detailArea: EntryDetailAreaAction
 )
-trait OnPaneFlung {
-  def onPaneFlung(event: PaneFlungEvent): Boolean
-}
 trait OnSourceSelected {
   def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit]
 }

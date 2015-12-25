@@ -41,7 +41,7 @@ class PaneContainer(view: ViewGroup) {
       _ <- task {
         val current = view.getScrollX
         val dx = pane.displayPosition - current
-        val duration = 300
+        val duration = 500
 
         Log info s"[init] current:$current, dx:$dx"
         scroller.startScroll(current, 0, dx, 0, duration)
@@ -66,21 +66,22 @@ class PaneContainer(view: ViewGroup) {
   }
 }
 
-case class PaneFlungEvent (
+case class PaneDragEvent (
   from: PaneLabel,
   original1: Option[MotionEvent],
   original2: MotionEvent,
   distanceX: Float,
   distanceY: Float
 )
-
-trait OnPaneFlungListener {
-  def onPaneFlung(event: PaneFlungEvent): Boolean
-}
+case class PaneDragStoppedEvent (
+  from: PaneLabel,
+  direction: Int,
+  original: MotionEvent
+)
 
 object PaneFlingDetector {
   def createListener(
-    context: Context, from: PaneLabel, onFlung: PaneFlungEvent => Boolean) = {
+    context: Context, from: PaneLabel, onFlung: PaneDragEvent => Boolean) = {
 
     new OnTouchToScrollPane(context, from, onFlung)
   }
@@ -89,7 +90,7 @@ object PaneFlingDetector {
 class OnTouchToScrollPane(
   context: Context,
   from: PaneLabel,
-  onFlung: PaneFlungEvent => Boolean) extends AppendableOnTouch {
+  onDrag: PaneDragEvent => Boolean) extends AppendableOnTouch {
 
   val detector = new GestureDetector(
     context,
@@ -125,9 +126,8 @@ class OnTouchToScrollPane(
 
       previousDistanceX foreach { prev =>
         val x = prev - e2.getRawX
-        onFlung apply PaneFlungEvent(from, Option(e1), e2, x, distanceY)
+        onDrag apply PaneDragEvent(from, Option(e1), e2, x, distanceY)
       }
-      Log error s"${e2.getRawX}"
       previousDistanceX = Some(e2.getRawX)
 
       true
