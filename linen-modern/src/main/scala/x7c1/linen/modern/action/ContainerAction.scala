@@ -1,7 +1,6 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneDragStoppedEvent, SourceArea, SourceSelectedEvent}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.recycler.{DragEvent, Next, Previous}
 
 class ContainerAction(
@@ -21,9 +20,7 @@ class ContainerAction(
     container.scrollBy(- event.distance.toInt)
   }
   def onPaneDragStopped(event: PaneDragStoppedEvent): Unit = {
-    Log info s"$event"
     import x7c1.linen.modern.display.PaneLabel._
-
     val pane =
       if (event.near) event.from match {
         case SourceArea => sourceArea

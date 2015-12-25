@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
-import x7c1.wheat.macros.logger.Log
 
 
 class DragDetector[A <: DragStoppedEvent](
@@ -58,7 +57,6 @@ class DragDetector[A <: DragStoppedEvent](
     override def onScroll(
       e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
 
-      Log error s"$distanceX, $distanceY"
       val isHorizontal = abs(distanceX) > abs(2 * distanceY)
       if (isHorizontal){
         horizontalCount += 1
