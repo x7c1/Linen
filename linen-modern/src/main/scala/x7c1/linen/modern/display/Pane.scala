@@ -2,13 +2,13 @@ package x7c1.linen.modern.display
 
 import java.lang.Math.max
 
-import android.view.{MotionEvent, View, ViewGroup}
+import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
-import x7c1.wheat.modern.observer.AppendableOnTouch
+import x7c1.wheat.modern.observer.recycler.{DragDirection, DragStoppedEvent, DragStoppedEventFactory}
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
@@ -64,32 +64,14 @@ class PaneContainer(view: ViewGroup) {
   }
 }
 
-case class PaneDragEvent (
-  from: PaneLabel,
-  distanceX: Float
-)
 case class PaneDragStoppedEvent (
   from: PaneLabel,
-  direction: Int
-)
+  override val direction: DragDirection ) extends DragStoppedEvent
 
-class OnTouchToScrollPane(
-  from: PaneLabel,
-  onDrag: PaneDragEvent => Unit) extends AppendableOnTouch {
+class PaneDragStoppedEventFactory(from: PaneLabel)
+  extends DragStoppedEventFactory[PaneDragStoppedEvent] {
 
-  private var previousPosition = Some(0F)
-
-  def updateCurrentPosition(x: Float) = {
-    previousPosition = Some(x)
+  override def createEvent(direction: DragDirection) = {
+    PaneDragStoppedEvent(from, direction)
   }
-
-  override def onTouch(v: View, event: MotionEvent): Boolean = {
-    previousPosition foreach { x =>
-      val diff = x - event.getRawX
-      onDrag apply PaneDragEvent(from, diff)
-    }
-    previousPosition = Some(event.getRawX)
-    true
-  }
-
 }

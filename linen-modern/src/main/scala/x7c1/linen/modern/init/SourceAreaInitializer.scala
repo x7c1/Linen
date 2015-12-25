@@ -2,16 +2,15 @@ package x7c1.linen.modern.init
 
 import java.lang.Math.abs
 
-import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener
-import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
+import android.support.v7.widget.LinearLayoutManager
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.{GestureDetector, MotionEvent}
+import android.view.MotionEvent
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{OnTouchToScrollPane, PaneDragStoppedEvent, PaneLabel, SourceRowAdapter}
+import x7c1.linen.modern.display.{PaneDragStoppedEventFactory, PaneLabel, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.observer.recycler.DragDetector
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait SourceAreaInitializer {
@@ -33,53 +32,13 @@ trait SourceAreaInitializer {
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
       onFocused = new SourceFocusedObserver(actions)
     )
-    val forDrag = new OnTouchToScrollPane(
-      from = PaneLabel.SourceArea,
-      onDrag = actions.container.onPaneDragging
+    layout.sourceList addOnItemTouchListener new DragDetector(
+      context = layout.sourceList.getContext,
+      stoppedEventFactory = new PaneDragStoppedEventFactory(PaneLabel.SourceArea),
+      onTouch = forFocus,
+      onDrag = actions.container.onPaneDragging,
+      onDragStopped = actions.container.onPaneDragStopped
     )
-    layout.sourceList.addOnItemTouchListener(new SimpleOnItemTouchListener{
-      val detector = new GestureDetector(
-        layout.sourceList.getContext,
-        new PaneScrollFilter
-      )
-      var previous: Option[Float] = None
-
-      var direction: Option[Int] = None
-
-      override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
-        Log info s"${e.getRawX}, $previous"
-
-        e.getAction match {
-          case MotionEvent.ACTION_UP =>
-            direction foreach { dir =>
-              val event = PaneDragStoppedEvent(PaneLabel.SourceArea, dir)
-              actions.container onPaneDragStopped event
-            }
-          case _ =>
-            forDrag.onTouch(rv, e)
-        }
-        if (!(previous contains e.getRawX)){
-          direction = previous map (e.getRawX - _) map { x =>
-            if (x > 0) 1 else -1
-          }
-          previous = Some(e.getRawX)
-        }
-
-      }
-      override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
-        Log info s"$e"
-
-        val isHorizontal = detector.onTouchEvent(e)
-        if (isHorizontal){
-          forDrag.onTouch(rv, e)
-        } else {
-          forFocus.onTouch(rv, e)
-          forDrag.updateCurrentPosition(e.getRawX)
-        }
-        isHorizontal
-      }
-    })
-
     layout.sourceToNext setOnTouchListener SkipDetector.createListener(
       context = layout.sourceToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
