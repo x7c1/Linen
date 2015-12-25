@@ -1,14 +1,10 @@
 package x7c1.linen;
 
 import android.app.Activity;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Display;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 
 import x7c1.linen.glue.res.layout.MainLayout;
@@ -17,9 +13,6 @@ import x7c1.linen.res.layout.EntryDetailRowProvider;
 import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
-
-import static x7c1.linen.FlingDetector.forHorizontal;
-import static x7c1.linen.PaneScroller.createListener;
 
 
 public class MainActivity extends Activity {
@@ -57,31 +50,6 @@ public class MainActivity extends Activity {
 			new EntryDetailRowProvider(this)
 		);
 		initializer.setup();
-
-		final GestureDetector detector = forHorizontal(
-				this, createListener(layout.paneContainer, getDisplaySize()));
-
-		View.OnTouchListener listener = new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return layout.paneContainer.dispatchTouchEvent(event);
-//				return detector.onTouchEvent(event) ||
-//					layout.paneContainer.dispatchTouchEvent(event);
-			}
-		};
-
-		/*
-		View.OnTouchListener listener = new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return detector.onTouchEvent(event);
-			}
-		};
-		layout.itemView.findViewById(R.id.activity_main__entry_list).setOnTouchListener(listener);
-		*/
-
-		layout.dummySurface.setLongClickable(true);
-		layout.dummySurface.setOnTouchListener(listener);
 	}
 
 	@Override
@@ -89,12 +57,4 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		initializer.close();
 	}
-
-	private Point getDisplaySize(){
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		return size;
-	}
-
 }

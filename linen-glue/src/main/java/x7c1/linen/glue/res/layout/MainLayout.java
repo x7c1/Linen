@@ -32,7 +32,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.v7.widget.Toolbar entryDetailToolbar;
     public final android.support.v7.widget.RecyclerView entryDetailList;
     public final android.support.design.widget.FloatingActionButton detailToNext;
-    public final View dummySurface;
 
     public MainLayout(
         View itemView,
@@ -51,8 +50,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
         RelativeLayout entryDetailArea,
         android.support.v7.widget.Toolbar entryDetailToolbar,
         android.support.v7.widget.RecyclerView entryDetailList,
-        android.support.design.widget.FloatingActionButton detailToNext,
-        View dummySurface
+        android.support.design.widget.FloatingActionButton detailToNext
     ){
         super(itemView);
         this.menuArea = menuArea;
@@ -71,6 +69,5 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.entryDetailToolbar = entryDetailToolbar;
         this.entryDetailList = entryDetailList;
         this.detailToNext = detailToNext;
-        this.dummySurface = dummySurface;
     }
 }
