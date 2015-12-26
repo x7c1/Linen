@@ -1,6 +1,6 @@
 package x7c1.linen.modern.display
 
-import java.lang.Math.{min, abs, max}
+import java.lang.Math.{abs, max, min}
 
 import android.content.Context
 import android.util.TypedValue
@@ -9,11 +9,10 @@ import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Scroller
 import x7c1.linen.modern.action.Actions
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
-import x7c1.wheat.modern.observer.recycler.{DragDetector, DragDirection, DragStoppedEvent, DragStoppedEventFactory}
+import x7c1.wheat.modern.observer.recycler.{HorizontalDragDetector, DragDirection, DragStoppedEvent, DragStoppedEventFactory}
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
@@ -55,15 +54,12 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
         val dx = pane.displayPosition - current
         val duration = 500
 
-        Log info s"[init] current:$current, dx:$dx"
         scroller.startScroll(current, 0, dx, 0, duration)
-
         view post new ContainerScroller(done)
       }
     } yield ()
   }
   private class ContainerScroller(done: OnFinish) extends Runnable {
-
     override def run(): Unit = {
       val more = scroller.computeScrollOffset()
       val current = scroller.getCurrX
@@ -71,7 +67,6 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
         view.scrollTo(current, 0)
         view.post(this)
       } else {
-        Log info s"[done] current:$current"
         done.evaluate()
       }
     }
@@ -100,14 +95,14 @@ object PaneDragDetector {
     context: Context,
     label: PaneLabel,
     actions: Actions,
-    onTouch: OnTouchListener): DragDetector[PaneDragStoppedEvent] = {
+    onTouch: OnTouchListener): HorizontalDragDetector[PaneDragStoppedEvent] = {
 
     val threshold = {
       val dp = 50
       val metrics = context.getResources.getDisplayMetrics
       TypedValue.applyDimension(COMPLEX_UNIT_DIP, dp, metrics)
     }
-    new DragDetector(
+    new HorizontalDragDetector(
       context = context,
       stoppedEventFactory = new PaneDragStoppedEventFactory(label, threshold.toInt),
       onTouch = onTouch,

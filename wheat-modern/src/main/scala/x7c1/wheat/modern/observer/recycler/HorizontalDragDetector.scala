@@ -10,7 +10,7 @@ import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
 
 
-class DragDetector[A <: DragStoppedEvent](
+class HorizontalDragDetector[A <: DragStoppedEvent](
   context: Context,
   stoppedEventFactory: DragStoppedEventFactory[A],
   onTouch: OnTouchListener,
@@ -18,10 +18,11 @@ class DragDetector[A <: DragStoppedEvent](
   onDragStopped: A => Unit) extends SimpleOnItemTouchListener{
 
   private val detector = new GestureDetector(context, new HorizontalFilter)
+  private val listenerToDrag = new OnTouchToDrag
+
   private var previous: Option[Float] = None
   private var direction: Option[DragDirection] = None
   private var startPosition: Option[Float] = None
-  private val listenerToScroll = new OnTouchToScroll
 
   override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
     e.getAction match {
@@ -34,7 +35,7 @@ class DragDetector[A <: DragStoppedEvent](
         } yield {
           onDragStopped(event)
         }
-      case _ => listenerToScroll.onTouch(rv, e)
+      case _ => listenerToDrag.onTouch(rv, e)
     }
     if (!(previous contains e.getRawX)){
       direction = previous map (e.getRawX - _) flatMap DragDirection.create
@@ -44,15 +45,16 @@ class DragDetector[A <: DragStoppedEvent](
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
     val isHorizontal = detector onTouchEvent e
     if (isHorizontal){
-      listenerToScroll.onTouch(rv, e)
+      listenerToDrag.onTouch(rv, e)
     } else {
       onTouch.onTouch(rv, e)
-      listenerToScroll updateCurrentPosition e.getRawX
+      listenerToDrag updateCurrentPosition e.getRawX
     }
     isHorizontal
   }
   private class HorizontalFilter extends SimpleOnGestureListener {
     private var horizontalCount = 0
+    private var verticalCount = 0
 
     override def onScroll(
       e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
@@ -60,17 +62,20 @@ class DragDetector[A <: DragStoppedEvent](
       val isHorizontal = abs(distanceX) > abs(2 * distanceY)
       if (isHorizontal){
         horizontalCount += 1
+      } else {
+        verticalCount += 1
       }
-      val accepted = horizontalCount > 0
+      val accepted = horizontalCount > 0 && verticalCount < 3
       accepted
     }
     override def onDown(e: MotionEvent): Boolean = {
       horizontalCount = 0
+      verticalCount = 0
       startPosition = Some(e.getRawX)
       false
     }
   }
-  private class OnTouchToScroll extends OnTouchListener {
+  private class OnTouchToDrag extends OnTouchListener {
     private var currentPosition = Some(0F)
 
     def updateCurrentPosition(x: Float) = {
