@@ -42,7 +42,7 @@ class ContainerInitializer(
     new LinenOpenHelper(activity).getReadableDatabase
 
   private lazy val loader =
-    new AccessorLoader(database, layout)
+    new AccessorLoader(database, layout, activity.getLoaderManager)
 
   override lazy val accessors = new Accessors(
     source = loader.createSourceAccessor,

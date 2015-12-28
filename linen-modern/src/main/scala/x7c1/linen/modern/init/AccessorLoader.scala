@@ -1,11 +1,13 @@
 package x7c1.linen.modern.init
 
+import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable.ListBuffer
@@ -13,7 +15,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, SyncVar}
 import scala.util.{Failure, Success, Try}
 
-class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
+class AccessorLoader(
+  database: SQLiteDatabase,
+  layout: MainLayout,
+  loaderManager: LoaderManager ){
 
   private lazy val sourceAccessor = {
     val x = new SyncVar[Option[SourceAccessor]]
@@ -28,6 +33,8 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
 
   private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
+
+  private val factory = new FiniteLoaderFactory(layout.itemView.context, loaderManager)
 
   def createSourceAccessor: SourceAccessor =
     new SourceAccessor {
@@ -58,14 +65,9 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
   }
 
   def close(): Unit = {
-    /*
-    currentSchedule foreach { _.cancel() }
-    system stop actor
-    system.shutdown()
-    */
+    factory.close()
   }
-
-  private def startLoadingSources() = Future {
+  private def startLoadingSources() = factory asFuture {
     val accessor = SourceAccessor create database
     sourceAccessor.take()
     sourceAccessor put Some(accessor)
@@ -75,27 +77,23 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
 
     sourceIds
   }
-  private def loadSourceEntries(remainingSourceIds: Seq[Long]) = Future {
-    try {
-      val (sourceIds, remains) = remainingSourceIds splitAt 50
-      val current = currentSourceLength.take()
-      currentSourceLength put (current + sourceIds.length)
+  private def loadSourceEntries(remainingSourceIds: Seq[Long]) = factory asFuture {
+    val (sourceIds, remains) = remainingSourceIds splitAt 50
+    val current = currentSourceLength.take()
+    currentSourceLength put (current + sourceIds.length)
 
-      val positions = EntryAccessor.createPositionMap(database, sourceIds)
-      val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
-      outlineAccessors += outlines
+    val positions = EntryAccessor.createPositionMap(database, sourceIds)
+    val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
+    outlineAccessors += outlines
 
-      val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
-      detailAccessors += details
+    val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
+    detailAccessors += details
 
-      Right(remains)
-    } catch {
-      case e: Throwable => Left(e)
-    }
+    remains
   }
-  private def loadNext: Try[Either[Throwable, Seq[Long]]] => Unit = {
-    case Success(Right(ids)) => loadMore(ids)
-    case Success(Left(e : IllegalStateException)) =>
+  private def loadNext: Try[Seq[Long]] => Unit = {
+    case Success(ids) => loadMore(ids)
+    case Failure(e : IllegalStateException) =>
 
       /*
         known exceptions
@@ -105,22 +103,15 @@ class AccessorLoader(database: SQLiteDatabase, layout: MainLayout){
       */
       Log info e.toString
 
-    case Success(Left(e)) => Log error formatError(e)
     case Failure(e) => Log error formatError(e)
   }
   private def loadMore(remaining: Seq[Long]): Unit = {
     Log info s"[init] remaining(${remaining.length})"
     remaining match {
       case Seq() => Log info "[done]"
-      case _ =>
-        /*
-        currentSchedule = Some apply system.scheduler.scheduleOnce(50.milliseconds){
-          loadSources(remaining) onComplete loadNext
-        }
-        */
-        after(msec = 50){
-          loadSourceEntries(remaining) onComplete loadNext
-        }
+      case _ => after(msec = 500){
+        loadSourceEntries(remaining) onComplete loadNext
+      }
     }
   }
   private def notifyChanged() = layout.itemView runUi { _ =>
