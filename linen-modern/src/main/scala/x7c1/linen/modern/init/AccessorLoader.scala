@@ -57,6 +57,13 @@ class AccessorLoader(
 
   def close(): Unit = {
     factory.close()
+
+    synchronized {
+      currentSourceLength = 0
+      sourceAccessor = None
+      outlineAccessors.clear()
+      detailAccessors.clear()
+    }
   }
   private def startLoadingSources() = factory asFuture {
     val accessor = SourceAccessor create database
