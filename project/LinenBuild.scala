@@ -134,7 +134,6 @@ trait LinenSettings {
       (androidSdk / "extras/android/support/design/libs") +++
       (androidSdk / "platforms/android-23")
     }
-    (dirs * "*.jar").classpath.foreach(println)
     (dirs * "*.jar").classpath
   }
 

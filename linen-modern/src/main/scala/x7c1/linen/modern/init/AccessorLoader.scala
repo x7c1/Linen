@@ -12,7 +12,7 @@ import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, SyncVar}
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 class AccessorLoader(
@@ -20,31 +20,22 @@ class AccessorLoader(
   layout: MainLayout,
   loaderManager: LoaderManager ){
 
-  private lazy val sourceAccessor = {
-    val x = new SyncVar[Option[SourceAccessor]]
-    x put None
-    x
-  }
-  private lazy val currentSourceLength = {
-    val x = new SyncVar[Int]
-    x put 0
-    x
-  }
   private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
-
   private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
-
   private val factory = new FiniteLoaderFactory(layout.itemView.context, loaderManager)
+
+  private var sourceAccessor: Option[SourceAccessor] = None
+  private var currentSourceLength: Int = 0
 
   def createSourceAccessor: SourceAccessor =
     new SourceAccessor {
       override def findAt(position: Int): Option[Source] = {
-        sourceAccessor.get.flatMap(_ findAt position)
+        sourceAccessor.flatMap(_ findAt position)
       }
       override def positionOf(sourceId: Long): Option[Int] = {
-        sourceAccessor.get.flatMap(_ positionOf sourceId)
+        sourceAccessor.flatMap(_ positionOf sourceId)
       }
-      override def length: Int = currentSourceLength.get
+      override def length: Int = currentSourceLength
     }
 
   def createOutlineAccessor: EntryAccessor[EntryOutline] =
@@ -69,8 +60,7 @@ class AccessorLoader(
   }
   private def startLoadingSources() = factory asFuture {
     val accessor = SourceAccessor create database
-    sourceAccessor.take()
-    sourceAccessor put Some(accessor)
+    sourceAccessor = Some(accessor)
 
     val sourceIds = (0 to accessor.length - 1).
       map(accessor.findAt).flatMap(_.map(_.id))
@@ -79,8 +69,7 @@ class AccessorLoader(
   }
   private def loadSourceEntries(remainingSourceIds: Seq[Long]) = factory asFuture {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
-    val current = currentSourceLength.take()
-    currentSourceLength put (current + sourceIds.length)
+    currentSourceLength += sourceIds.length
 
     val positions = EntryAccessor.createPositionMap(database, sourceIds)
     val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
@@ -109,7 +98,7 @@ class AccessorLoader(
     Log info s"[init] remaining(${remaining.length})"
     remaining match {
       case Seq() => Log info "[done]"
-      case _ => after(msec = 500){
+      case _ => after(msec = 50){
         loadSourceEntries(remaining) onComplete loadNext
       }
     }
