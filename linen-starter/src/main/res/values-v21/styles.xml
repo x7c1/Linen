@@ -2,6 +2,7 @@
 
     <style name="AppTheme.Polyfill">
         <item name="android:statusBarColor">@color/prussian_blue</item>
+        <item name="android:navigationBarColor">@color/prussian_blue</item>
 
         <!-- e.g. header in recent app -->
         <item name="colorPrimary">@color/toolbar_background</item>
