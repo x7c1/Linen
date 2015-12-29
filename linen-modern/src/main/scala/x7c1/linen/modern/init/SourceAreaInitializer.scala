@@ -15,12 +15,12 @@ trait SourceAreaInitializer {
   def actions: Actions
   def sourceRowProvider: ViewHolderProvider[SourceRow]
   def displaySize: Point
-  def paneMargin: Int
+  def widthWithMargin: Int
 
   def setupSourceArea(): Unit = {
     layout.sourceArea setLayoutParams {
       val params = layout.sourceArea.getLayoutParams
-      params.width = displaySize.x - paneMargin
+      params.width = widthWithMargin
       params
     }
     val manager = new LinearLayoutManager(layout.sourceList.getContext)

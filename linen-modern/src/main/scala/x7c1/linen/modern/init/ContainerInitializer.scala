@@ -46,14 +46,14 @@ class ContainerInitializer(
   )
   override lazy val actions = setupActions()
 
-  override lazy val paneMargin: Int = {
+  override lazy val widthWithMargin: Int = {
     val dipToPixel = (dip: Int) => {
       val metrics = activity.getResources.getDisplayMetrics
       TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
     }
     val radius = 20
     val margin = 10
-    dipToPixel(margin + radius)
+    displaySize.x - dipToPixel(margin + radius)
   }
   override lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay
