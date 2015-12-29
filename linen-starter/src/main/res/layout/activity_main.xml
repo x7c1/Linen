@@ -10,7 +10,6 @@
         android:id="@+id/activity_main__source_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/opaque_blue"
         >
 
         <LinearLayout
@@ -24,7 +23,6 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/activity_main__source_toolbar"
-                    android:background="@color/toolbar_background"
                     style="@style/AppToolbar"
                     />
 
@@ -32,8 +30,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__source_list"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                style="@style/AppItemList"
                 />
 
         </LinearLayout>
@@ -43,18 +40,13 @@
             style="@style/AppToolbarBottom"
             >
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="sample text"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textAlignment="textEnd"
+                android:text="sample text1"
+                style="@style/AppBottomText"
                 />
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/activity_main__source_to_next"
-            android:layout_alignParentBottom="true"
-            app:backgroundTint="@color/to_next_button_background"
             style="@style/ToNextButton.Polyfill"
             />
 
@@ -64,7 +56,6 @@
         android:id="@+id/activity_main__entry_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/opaque_green"
         >
 
         <LinearLayout
@@ -78,7 +69,6 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/activity_main__entry_toolbar"
-                    android:background="@color/toolbar_background"
                     style="@style/AppToolbar"
                     />
 
@@ -86,8 +76,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__entry_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                style="@style/AppItemList"
                 />
 
         </LinearLayout>
@@ -97,18 +86,13 @@
             style="@style/AppToolbarBottom"
             >
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="sample text"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textAlignment="textEnd"
+                android:text="sample text2"
+                style="@style/AppBottomText"
                 />
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/activity_main__entry_to_next"
-            android:layout_alignParentBottom="true"
-            app:backgroundTint="@color/to_next_button_background"
             style="@style/ToNextButton.Polyfill"
             />
 
@@ -118,7 +102,6 @@
         android:id="@+id/activity_main__entry_detail_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/opaque_orange"
         >
         <LinearLayout
             android:orientation="vertical"
@@ -131,23 +114,29 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/activity_main__entry_detail_toolbar"
-                    android:background="@color/kakiiro"
                     style="@style/AppToolbar"
                     />
-
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_main__entry_detail_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
+                style="@style/AppItemList"
+                />
         </LinearLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/activity_main__detail_bottom_bar"
+            style="@style/AppToolbarBottom"
+            >
+            <TextView
+                android:text="sample text3"
+                style="@style/AppBottomText"
+                android:layout_marginEnd="16dp"
+                />
+        </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/activity_main__detail_to_next"
-            android:layout_alignParentBottom="true"
-            app:backgroundTint="@color/kakiiro"
             style="@style/ToNextButton.Polyfill"
             />
 
