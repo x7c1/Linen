@@ -24,7 +24,7 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/activity_main__source_toolbar"
-                    android:background="@color/cerulean_blue"
+                    android:background="@color/toolbar_background"
                     style="@style/AppToolbar"
                     />
 
@@ -38,10 +38,23 @@
 
         </LinearLayout>
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/activity_main__source_bottom_bar"
+            style="@style/AppToolbarBottom"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="sample text"
+                android:textColor="@android:color/secondary_text_dark"
+                android:textAlignment="textEnd"
+                />
+        </android.support.v7.widget.Toolbar>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/activity_main__source_to_next"
             android:layout_alignParentBottom="true"
-            app:backgroundTint="@color/cerulean_blue"
+            app:backgroundTint="@color/to_next_button_background"
             style="@style/ToNextButton.Polyfill"
             />
 
@@ -65,7 +78,7 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/activity_main__entry_toolbar"
-                    android:background="@color/generic_viridian"
+                    android:background="@color/toolbar_background"
                     style="@style/AppToolbar"
                     />
 
@@ -79,10 +92,23 @@
 
         </LinearLayout>
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/activity_main__entry_bottom_bar"
+            style="@style/AppToolbarBottom"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="sample text"
+                android:textColor="@android:color/secondary_text_dark"
+                android:textAlignment="textEnd"
+                />
+        </android.support.v7.widget.Toolbar>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/activity_main__entry_to_next"
             android:layout_alignParentBottom="true"
-            app:backgroundTint="@color/generic_viridian"
+            app:backgroundTint="@color/to_next_button_background"
             style="@style/ToNextButton.Polyfill"
             />
 

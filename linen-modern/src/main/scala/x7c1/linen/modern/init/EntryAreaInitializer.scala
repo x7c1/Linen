@@ -1,5 +1,6 @@
 package x7c1.linen.modern.init
 
+import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryRow, MainLayout}
 import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver}
@@ -14,7 +15,15 @@ trait EntryAreaInitializer {
   def actions: Actions
   def entryRowProvider: ViewHolderProvider[EntryRow]
 
+  def displaySize: Point
+  def dipToPixel(dip: Int): Int
+
   def setupEntryArea(): Unit = {
+    layout.entryArea setLayoutParams {
+      val params = layout.entryArea.getLayoutParams
+      params.width = displaySize.x - dipToPixel(16 + 24)
+      params
+    }
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
     layout.entryList setAdapter new EntryRowAdapter(

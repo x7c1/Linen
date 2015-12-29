@@ -4,6 +4,8 @@ import java.lang.Math.max
 
 import android.app.Activity
 import android.graphics.Point
+import android.util.TypedValue
+import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.View
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, SourceAccessor}
@@ -22,9 +24,7 @@ class ContainerInitializer(
   with EntryDetailAreaInitializer {
 
   def setup(): Unit = {
-    updateWidth(0.85, layout.sourceArea)
-    updateWidth(0.9, layout.entryArea)
-    updateWidth(0.95, layout.entryDetailArea)
+    updateWidth(1.0, layout.entryDetailArea)
 
     DummyFactory.setup(layout, activity)
 
@@ -56,6 +56,10 @@ class ContainerInitializer(
     val size = new Point
     display getSize size
     size
+  }
+  override def dipToPixel(dip: Int) = {
+    val metrics = activity.getResources.getDisplayMetrics
+    TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
   }
   private def updateWidth(ratio: Double, view: View): Unit = {
     val params = view.getLayoutParams

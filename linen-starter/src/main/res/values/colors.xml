@@ -4,7 +4,16 @@
     <color name="cardinal">#C41E3A</color>
     <color name="carnelian">#B31B1B</color>
     <color name="cerulean_blue">#2A52BE</color>
+
+
+    <color name="dark_imperial_blue">#00416A</color>
+    <color name="dark_midnight_blue">#003366</color>
+
+    <color name="denim">#1560BD</color>
     <color name="generic_viridian">#007F66</color>
+
+    <color name="lapis_lazuli">#26619C</color>
+
     <color name="orange_crayola">#FF7538</color>
     <color name="persimmon">#EC5800</color>
     <color name="pumpkin">#FF7518</color>

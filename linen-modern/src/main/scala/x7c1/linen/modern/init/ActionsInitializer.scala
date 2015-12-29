@@ -19,12 +19,14 @@ trait ActionsInitializer {
     val sourceArea = new SourceArea(
       sources = accessors.source,
       recyclerView = layout.sourceList,
-      getPosition = () => panePosition of layout.sourceArea
+      getPosition = () => 0
     )
     val entryArea = new EntryArea(
       toolbar = layout.entryToolbar,
       recyclerView = layout.entryList,
-      getPosition = () => panePosition of layout.entryArea
+      getPosition = () => {
+        layout.sourceArea.getWidth
+      }
     )
     val entryDetailArea = new EntryDetailArea(
       toolbar = layout.entryDetailToolbar,

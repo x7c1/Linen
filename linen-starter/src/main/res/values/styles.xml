@@ -13,6 +13,17 @@
         <item name="android:minHeight">?attr/actionBarSize</item>
     </style>
 
+    <style name="AppToolbarBottom">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">38dp</item>
+        <item name="android:background">@color/toolbar_background</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
+    <!--<item name="titleTextColor">@android:color/secondary_text_dark</item>-->
+    <!--<item name="android:textAlignment">textEnd</item>-->
+    <!--<item name="android:layout_marginRight">8dp</item>-->
+
     <style name="AppCardView">
         <item name="cardBackgroundColor">@android:color/white</item>
         <item name="cardCornerRadius">0dp</item>
@@ -40,18 +51,21 @@
     </style>
 
     <style name="ToNextButton">
-        <item name="fabSize">normal</item>
+        <item name="fabSize">mini</item>
         <item name="android:src">@drawable/ic_skip_next_24dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">bottom|start</item>
         <item name="android:clickable">true</item>
     </style>
 
     <style name="ToNextButton.Polyfill">
         <!-- see also res/values-v21 -->
-        <item name="android:layout_margin">0dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
     </style>
+
+    <color name="toolbar_background">@color/dark_imperial_blue</color>
+    <color name="to_next_button_background">@color/lapis_lazuli</color>
 
     <color name="opaque_orange">#faf0ec</color>
     <color name="opaque_blue">#ecf1ff</color>
