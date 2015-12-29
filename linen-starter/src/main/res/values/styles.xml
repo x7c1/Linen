@@ -6,6 +6,13 @@
         <item name="colorControlNormal">@color/transparent_white</item>
     </style>
 
+    <style name="AppTheme.Polyfill">
+    </style>
+
+    <style name="WindowTitleBackground">
+        <item name="android:background">@color/cardinal</item>
+    </style>
+
     <style name="AppItemList">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -31,7 +38,7 @@
     <style name="AppBottomText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@android:color/secondary_text_dark</item>
+        <item name="android:textColor">@color/transparent_white</item>
         <item name="android:textAlignment">textEnd</item>
     </style>
 

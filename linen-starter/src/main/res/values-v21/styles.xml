@@ -1,5 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <style name="AppTheme.Polyfill">
+        <item name="android:statusBarColor">@color/space_cadet</item>
+
+        <!-- e.g. header in recent app -->
+        <item name="colorPrimary">@color/toolbar_background</item>
+    </style>
+
     <style name="ToNextButton.Polyfill">
         <item name="android:layout_margin">18dp</item>
     </style>

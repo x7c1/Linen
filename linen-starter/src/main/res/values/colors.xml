@@ -4,22 +4,21 @@
     <color name="cardinal">#C41E3A</color>
     <color name="carnelian">#B31B1B</color>
     <color name="cerulean_blue">#2A52BE</color>
-
-
     <color name="dark_imperial_blue">#00416A</color>
     <color name="dark_midnight_blue">#003366</color>
-
     <color name="denim">#1560BD</color>
     <color name="generic_viridian">#007F66</color>
-
     <color name="lapis_lazuli">#26619C</color>
-
     <color name="orange_crayola">#FF7538</color>
     <color name="persimmon">#EC5800</color>
     <color name="pumpkin">#FF7518</color>
     <color name="saddle_brown">#8B4513</color>
     <color name="sienna">#882D17</color>
+
+    <color name="space_cadet">#1D2951</color>
     <color name="spanish_orange">#E86100</color>
+
+    <!-- traditional Japanese colors -->
 
     <color name="kakiiro">#ed6d3d</color><!-- 柿色 -->
     <color name="niiro">#e45e32</color><!-- 丹色 -->
