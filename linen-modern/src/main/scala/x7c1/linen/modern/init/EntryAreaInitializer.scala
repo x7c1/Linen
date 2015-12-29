@@ -16,12 +16,12 @@ trait EntryAreaInitializer {
   def entryRowProvider: ViewHolderProvider[EntryRow]
 
   def displaySize: Point
-  def dipToPixel(dip: Int): Int
+  def paneMargin: Int
 
   def setupEntryArea(): Unit = {
     layout.entryArea setLayoutParams {
       val params = layout.entryArea.getLayoutParams
-      params.width = displaySize.x - dipToPixel(16 + 24)
+      params.width = displaySize.x - paneMargin
       params
     }
     val manager = new LinearLayoutManager(layout.entryList.getContext)

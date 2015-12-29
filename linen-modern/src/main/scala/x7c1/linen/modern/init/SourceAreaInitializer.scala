@@ -14,16 +14,13 @@ trait SourceAreaInitializer {
   def accessors: Accessors
   def actions: Actions
   def sourceRowProvider: ViewHolderProvider[SourceRow]
-
   def displaySize: Point
-  def dipToPixel(dip: Int): Int
+  def paneMargin: Int
 
   def setupSourceArea(): Unit = {
     layout.sourceArea setLayoutParams {
-      val radius = 20
-      val margin = 18
       val params = layout.sourceArea.getLayoutParams
-      params.width = displaySize.x - dipToPixel(margin + radius)
+      params.width = displaySize.x - paneMargin
       params
     }
     val manager = new LinearLayoutManager(layout.sourceList.getContext)

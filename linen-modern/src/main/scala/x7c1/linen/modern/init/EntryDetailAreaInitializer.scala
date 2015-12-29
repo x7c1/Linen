@@ -1,5 +1,6 @@
 package x7c1.linen.modern.init
 
+import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryDetailRow, MainLayout}
 import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver}
@@ -13,8 +14,14 @@ trait EntryDetailAreaInitializer {
   def accessors: Accessors
   def actions: Actions
   def entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
+  def displaySize: Point
 
   def setupEntryDetailArea(): Unit = {
+    layout.entryDetailArea setLayoutParams {
+      val params = layout.entryDetailArea.getLayoutParams
+      params.width = displaySize.x
+      params
+    }
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter new EntryDetailRowAdapter(
