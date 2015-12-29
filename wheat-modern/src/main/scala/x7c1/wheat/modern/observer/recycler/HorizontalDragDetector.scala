@@ -20,26 +20,20 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
   private val detector = new GestureDetector(context, new HorizontalFilter)
   private val listenerToDrag = new OnTouchToDrag
 
-  private var previous: Option[Float] = None
-  private var direction: Option[DragDirection] = None
   private var startPosition: Option[Float] = None
 
   override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
     e.getAction match {
       case MotionEvent.ACTION_UP =>
         for {
-          dir <- direction
           start <- startPosition
-          distance = start - e.getRawX
+          distance = e.getRawX - start
+          dir <- DragDirection create distance
           event = stoppedEventFactory.createEvent(distance, dir)
         } yield {
           onDragStopped(event)
         }
       case _ => listenerToDrag.onTouch(rv, e)
-    }
-    if (!(previous contains e.getRawX)){
-      direction = previous map (e.getRawX - _) flatMap DragDirection.create
-      previous = Some(e.getRawX)
     }
   }
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
