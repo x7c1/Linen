@@ -96,6 +96,7 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
 case class DragEvent(distance: Float)
 
 trait DragStoppedEvent {
+  def distance: Float
   def direction: DragDirection
 }
 trait DragStoppedEventFactory[A <: DragStoppedEvent]{

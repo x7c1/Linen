@@ -74,10 +74,10 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
 }
 
 class PaneDragStoppedEvent (
+  override val distance: Float,
+  override val direction: DragDirection,
   val from: PaneLabel,
-  distance: Float,
-  thresholdPixel: Int,
-  override val direction: DragDirection ) extends DragStoppedEvent {
+  thresholdPixel: Int ) extends DragStoppedEvent {
 
   private def back = {
     val dir = DragDirection create distance
@@ -92,7 +92,7 @@ class PaneDragStoppedEventFactory(from: PaneLabel, thresholdPixel: Int)
   extends DragStoppedEventFactory[PaneDragStoppedEvent] {
 
   override def createEvent(distance: Float, direction: DragDirection) = {
-    new PaneDragStoppedEvent(from, distance, thresholdPixel, direction)
+    new PaneDragStoppedEvent(distance, direction, from, thresholdPixel)
   }
 }
 
