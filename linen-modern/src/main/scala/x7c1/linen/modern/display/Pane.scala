@@ -79,7 +79,13 @@ class PaneDragStoppedEvent (
   thresholdPixel: Int,
   override val direction: DragDirection ) extends DragStoppedEvent {
 
-  def near = abs(distance) < thresholdPixel
+  private def back = {
+    val dir = DragDirection create distance
+    !(dir contains direction)
+  }
+  private def near = abs(distance) < thresholdPixel
+
+  def rejected = back || near
 }
 
 class PaneDragStoppedEventFactory(from: PaneLabel, thresholdPixel: Int)

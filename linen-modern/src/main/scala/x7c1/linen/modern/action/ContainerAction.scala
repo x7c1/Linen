@@ -22,7 +22,7 @@ class ContainerAction(
   def onPaneDragStopped(event: PaneDragStoppedEvent): Unit = {
     import x7c1.linen.modern.display.PaneLabel._
     val pane =
-      if (event.near) event.from match {
+      if (event.rejected) event.from match {
         case SourceArea => sourceArea
         case EntryArea => entryArea
         case EntryDetailArea => entryDetailArea
