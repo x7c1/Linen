@@ -12,7 +12,6 @@ class Actions (
   val entryArea: EntryAreaAction,
   val detailArea: EntryDetailAreaAction
 )
-
 trait OnSourceSelected {
   def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit]
 }

@@ -1,10 +1,11 @@
 package x7c1.linen.modern.init
 
+import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.SourceRowAdapter
+import x7c1.linen.modern.display.{PaneDragDetector, PaneLabel, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -13,8 +14,15 @@ trait SourceAreaInitializer {
   def accessors: Accessors
   def actions: Actions
   def sourceRowProvider: ViewHolderProvider[SourceRow]
+  def displaySize: Point
+  def widthWithMargin: Int
 
   def setupSourceArea(): Unit = {
+    layout.sourceArea setLayoutParams {
+      val params = layout.sourceArea.getLayoutParams
+      params.width = widthWithMargin
+      params
+    }
     val manager = new LinearLayoutManager(layout.sourceList.getContext)
     layout.sourceList setLayoutManager manager
     layout.sourceList setAdapter new SourceRowAdapter(
@@ -22,10 +30,16 @@ trait SourceAreaInitializer {
       new SourceSelectedObserver(actions),
       sourceRowProvider
     )
-    layout.sourceList setOnTouchListener FocusDetector.forLinearLayoutManager(
+    val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.sourceList,
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),
       onFocused = new SourceFocusedObserver(actions)
+    )
+    layout.sourceList addOnItemTouchListener PaneDragDetector.create(
+      context = layout.sourceList.getContext,
+      label = PaneLabel.SourceArea,
+      actions = actions,
+      onTouch = forFocus
     )
     layout.sourceToNext setOnTouchListener SkipDetector.createListener(
       context = layout.sourceToNext.getContext,

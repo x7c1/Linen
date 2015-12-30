@@ -1,10 +1,10 @@
 package x7c1.linen.modern.action.observer
 
-import x7c1.linen.modern.action.{SourceSkipStopped, SourceSkippedEvent, Actions, SourceFocusedEvent}
 import x7c1.linen.modern.action.observer.CallbackTaskRunner.runAsync
+import x7c1.linen.modern.action.{Actions, SourceFocusedEvent, SourceSkipStopped, SourceSkippedEvent}
 import x7c1.linen.modern.display.{OnSourceSelectedListener, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.observer.{OnSkipStoppedListener, OnItemSkippedListener, OnItemFocusedListener}
+import x7c1.wheat.modern.observer.{OnItemFocusedListener, OnItemSkippedListener, OnSkipStoppedListener}
 
 
 class SourceFocusedObserver(actions: Actions)
@@ -59,3 +59,4 @@ class SourceSkipStoppedObserver(actions: Actions)
     Seq(sync) foreach runAsync { Log error _.toString }
   }
 }
+

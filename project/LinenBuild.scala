@@ -21,7 +21,6 @@ object LinenBuild extends Build with LinenSettings {
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
   lazy val scalaz = "org.scalaz" %% "scalaz-concurrent" % "7.1.5"
-
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath)
@@ -54,7 +53,6 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(libraryDependencies += scalaz).
-    settings(libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.14").
     settings(libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % Test,
       "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
@@ -148,6 +146,9 @@ trait LinenSettings {
     Def.setting {
       case path if ignore(path) => MergeStrategy.discard
       case path =>
+        if (!(path startsWith "x7c1")){
+          sLog.value info s"may be duplicate between linen-pickle and linen-modern : $path"
+        }
         val original = (assemblyMergeStrategy in assembly).value
         original(path)
     }

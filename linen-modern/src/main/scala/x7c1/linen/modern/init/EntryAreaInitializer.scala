@@ -1,12 +1,13 @@
 package x7c1.linen.modern.init
 
+import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryRow, MainLayout}
-import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, EntryFocusedEventFactory, Actions}
-import x7c1.linen.modern.action.observer.{EntrySkipStoppedObserver, EntrySkippedObserver, EntryFocusedObserver, EntrySelectedObserver}
-import x7c1.linen.modern.display.EntryRowAdapter
+import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver}
+import x7c1.linen.modern.action.{Actions, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
+import x7c1.linen.modern.display.{PaneLabel, PaneDragDetector, EntryRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.observer.{SkipPositionFinder, SkipDetector, FocusDetector}
+import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait EntryAreaInitializer {
   def layout: MainLayout
@@ -14,7 +15,15 @@ trait EntryAreaInitializer {
   def actions: Actions
   def entryRowProvider: ViewHolderProvider[EntryRow]
 
+  def displaySize: Point
+  def widthWithMargin: Int
+
   def setupEntryArea(): Unit = {
+    layout.entryArea setLayoutParams {
+      val params = layout.entryArea.getLayoutParams
+      params.width = widthWithMargin
+      params
+    }
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
     layout.entryList setAdapter new EntryRowAdapter(
@@ -22,10 +31,16 @@ trait EntryAreaInitializer {
       new EntrySelectedObserver(actions),
       entryRowProvider
     )
-    layout.entryList setOnTouchListener FocusDetector.forLinearLayoutManager(
+    val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,
       focusedEventFactory = new EntryFocusedEventFactory(accessors.entryOutline),
       onFocused = new EntryFocusedObserver(actions)
+    )
+    layout.entryList addOnItemTouchListener PaneDragDetector.create(
+      context = layout.entryList.getContext,
+      label = PaneLabel.EntryArea,
+      actions = actions,
+      onTouch = forFocus
     )
     layout.entryToNext setOnTouchListener SkipDetector.createListener(
       context = layout.entryToNext.getContext,

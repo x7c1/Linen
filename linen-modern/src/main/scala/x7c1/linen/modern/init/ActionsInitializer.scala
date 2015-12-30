@@ -11,29 +11,29 @@ trait ActionsInitializer {
   def displaySize: Point
 
   def setupActions(): Actions = {
-    val panePosition = {
-      val length = layout.paneContainer.getChildCount
-      val children = 0 to (length - 1) map layout.paneContainer.getChildAt
-      new PanePosition(children, displaySize.x)
-    }
     val sourceArea = new SourceArea(
       sources = accessors.source,
       recyclerView = layout.sourceList,
-      getPosition = () => panePosition of layout.sourceArea
+      getPosition = () => 0
     )
     val entryArea = new EntryArea(
       toolbar = layout.entryToolbar,
       recyclerView = layout.entryList,
-      getPosition = () => panePosition of layout.entryArea
+      getPosition = () => {
+        layout.sourceArea.getWidth
+      }
     )
     val entryDetailArea = new EntryDetailArea(
       toolbar = layout.entryDetailToolbar,
       recyclerView = layout.entryDetailList,
-      getPosition = () => panePosition of layout.entryDetailArea
+      getPosition = () => {
+        layout.sourceArea.getWidth + layout.entryArea.getWidth
+      }
     )
     new Actions(
       new ContainerAction(
-        container = new PaneContainer(layout.paneContainer),
+        container = new PaneContainer(layout.paneContainer, displaySize.x),
+        sourceArea,
         entryArea,
         entryDetailArea
       ),

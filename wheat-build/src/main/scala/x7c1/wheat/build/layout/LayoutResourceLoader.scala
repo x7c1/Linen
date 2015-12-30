@@ -19,7 +19,7 @@ class LayoutElementsLoader(dir: File, fileName: String) extends ResourceElements
     val xml = XML loadFile file
     val namespace = "http://schemas.android.com/apk/res/android"
 
-    val elements = xml.descendant map { node =>
+    val elements = xml.descendant_or_self map { node =>
       node -> node.attribute(namespace, "id").flatMap(_.headOption)
     } collect {
       case (node, Some(attr)) =>

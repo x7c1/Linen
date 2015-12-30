@@ -1,16 +1,15 @@
 package x7c1.wheat.modern.observer
 
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
-import android.view.GestureDetector.OnGestureListener
-import android.view.View.OnTouchListener
-import android.view.{GestureDetector, MotionEvent, View}
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.{GestureDetector, MotionEvent}
 
 object FocusDetector {
   def createListener[A <: ItemFocusedEvent](
     recyclerView: RecyclerView,
     getPosition: () => Int,
     focusedEventFactory: FocusedEventFactory[A],
-    onFocused: OnItemFocusedListener[A]): OnTouchListener = {
+    onFocused: OnItemFocusedListener[A]): AppendableOnTouch = {
 
     val notifier = new FocusedItemNotifier(getPosition, focusedEventFactory, onFocused)
     val observer = new VerticalTouchScrollObserver(recyclerView, notifier)
@@ -18,16 +17,12 @@ object FocusDetector {
       recyclerView.getContext,
       new GestureFilter(observer)
     )
-    new OnTouchListener {
-      override def onTouch(v: View, event: MotionEvent): Boolean = {
-        detector onTouchEvent event
-      }
-    }
+    AppendableOnTouch((_, e) => detector onTouchEvent e)
   }
   def forLinearLayoutManager[A <: ItemFocusedEvent](
     recyclerView: RecyclerView,
     focusedEventFactory: FocusedEventFactory[A],
-    onFocused: OnItemFocusedListener[A]): OnTouchListener = {
+    onFocused: OnItemFocusedListener[A]): AppendableOnTouch = {
 
     val layoutManager = recyclerView.getLayoutManager match {
       case x: LinearLayoutManager => x
@@ -83,27 +78,12 @@ private class FocusedItemNotifier[A <: ItemFocusedEvent](
 }
 
 private class GestureFilter(
-  observer: TouchScrollObserver ) extends OnGestureListener {
-
-  override def onSingleTapUp(e: MotionEvent): Boolean = {
-    false
-  }
-  override def onFling(
-    e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
-
-    false
-  }
-  override def onShowPress(e: MotionEvent): Unit = {}
-
-  override def onLongPress(e: MotionEvent): Unit = {}
+  observer: TouchScrollObserver ) extends SimpleOnGestureListener {
 
   override def onScroll(
     e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
 
     observer.touch()
-    false
-  }
-  override def onDown(e: MotionEvent): Boolean = {
     false
   }
 }
