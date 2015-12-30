@@ -9,6 +9,10 @@ class ResourceNameParserTest extends FlatSpecLike with Matchers {
      val Right(prefix) = ResourceNameParser.readPrefix("abcd_ef_ghi.xml")
      prefix.ofClass shouldBe "AbcdEfGhi"
      prefix.ofKey shouldBe "abcd_ef_ghi__"
+
+     val Right(prefix2) = ResourceNameParser.readPrefix("xyz__abcd__ef.xml")
+     prefix2.ofClass shouldBe "XyzAbcdEf"
+     prefix2.ofKey shouldBe "xyz__abcd__ef__"
    }
 
   it can "read file name with number" in {
@@ -24,9 +28,6 @@ class ResourceNameParserTest extends FlatSpecLike with Matchers {
   it should "fail to invalid file name" in {
      val Left(e0) = ResourceNameParser.readPrefix("0xyz_abcd_ef_ghi.xml")
      e0 shouldBe a[WheatParserError]
-
-     val Left(e1) = ResourceNameParser.readPrefix("xyz__abcd__ef.xml")
-     e1 shouldBe a[WheatParserError]
 
      val Left(e2) = ResourceNameParser.readPrefix("xyz_0abcd.xml")
      e2 shouldBe a[WheatParserError]

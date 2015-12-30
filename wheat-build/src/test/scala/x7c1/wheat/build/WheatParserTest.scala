@@ -8,6 +8,9 @@ class WheatParserTest extends FlatSpecLike with Matchers {
   it can "convert snake to camel" in {
     val Right(camel) = WheatParser.camelize("abcd_ef_ghi")
     camel shouldBe "AbcdEfGhi"
+
+    val Right(camel2) = WheatParser.camelize("abcd_ef__ghi_jk")
+    camel2 shouldBe "AbcdEfGhiJk"
   }
 
   it can "camelize strings except for head string" in {

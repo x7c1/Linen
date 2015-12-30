@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Button;
+import android.support.v7.widget.RecyclerView;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.FloatingActionButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
@@ -41,18 +41,22 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
             (Button) view.findViewById(R.id.main_layout__create_dummies),
             (Button) view.findViewById(R.id.main_layout__init_dummies),
+            (android.support.v7.widget.RecyclerView) view.findViewById(R.id.main_layout__menu_list),
             (LinearLayout) view.findViewById(R.id.activity_main__pane_container),
             (RelativeLayout) view.findViewById(R.id.activity_main__source_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__source_list),
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_bottom_bar),
             (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__source_to_next),
             (RelativeLayout) view.findViewById(R.id.activity_main__entry_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__entry_list),
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_bottom_bar),
             (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__entry_to_next),
             (RelativeLayout) view.findViewById(R.id.activity_main__entry_detail_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__entry_detail_toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.activity_main__entry_detail_list),
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__detail_bottom_bar),
             (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.activity_main__detail_to_next)
         );
     }

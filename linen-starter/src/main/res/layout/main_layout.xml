@@ -48,5 +48,10 @@
             android:text="init dummies"
             />
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_layout__menu_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

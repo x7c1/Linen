@@ -4,7 +4,7 @@ import android.app.Activity
 import android.graphics.Point
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
-import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, SourceRow}
+import x7c1.linen.glue.res.layout.{MenuRowItem, MenuRowLabel, EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -12,10 +12,13 @@ import x7c1.wheat.ancient.resource.ViewHolderProvider
 class ContainerInitializer(
   activity: Activity,
   override val layout: MainLayout,
+  override val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
+  override val menuItemProvider: ViewHolderProvider[MenuRowItem],
   override val sourceRowProvider: ViewHolderProvider[SourceRow],
   override val entryRowProvider: ViewHolderProvider[EntryRow],
   override val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
 ) extends ActionsInitializer
+  with DrawerMenuInitializer
   with SourceAreaInitializer
   with EntryAreaInitializer
   with EntryDetailAreaInitializer {
@@ -23,6 +26,7 @@ class ContainerInitializer(
   def setup(): Unit = {
     DummyFactory.setup(layout, activity)
 
+    setupDrawerMenu()
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
