@@ -27,9 +27,6 @@ object WheatParser {
   }
 
   def camelize(string: String): Either[WheatParserError, String] = {
-    val f = (a: String, b: Seq[String]) => {
-      a.capitalize + b.map(_.capitalize).mkString
-    }
     val p1 = (identifier ~ (token('_') ~> identifier).*) map {
       case (a, b) => a.capitalize + b.map(_.capitalize).mkString
     }
