@@ -30,9 +30,12 @@ object WheatParser {
     val f = (a: String, b: Seq[String]) => {
       a.capitalize + b.map(_.capitalize).mkString
     }
-    val p1 = (identifier ~ (token('_') ~> identifier).*) map f.tupled
-    val parser = (p1 ~ (token("__") ~> p1).*) map f.tupled
-
+    val p1 = (identifier ~ (token('_') ~> identifier).*) map {
+      case (a, b) => a.capitalize + b.map(_.capitalize).mkString
+    }
+    val parser = (p1 ~ (token("__") ~> p1).?) map {
+      case (a, b) => a.capitalize + b.map(_.capitalize).mkString
+    }
     parse(string, parser).left.map(WheatParserError)
   }
 
