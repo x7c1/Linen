@@ -27,7 +27,7 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
 
   override def onTouchEvent(rv: RecyclerView, e: MotionEvent): Unit = {
     e.getAction match {
-      case MotionEvent.ACTION_UP =>
+      case MotionEvent.ACTION_UP | MotionEvent.ACTION_CANCEL =>
         for {
           dir <- direction
           start <- startPosition
@@ -36,7 +36,9 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
         } yield {
           onDragStopped(event)
         }
-      case _ => listenerToDrag.onTouch(rv, e)
+      case _ if direction.nonEmpty =>
+        listenerToDrag.onTouch(rv, e)
+      case _ =>
     }
     if (!(previous contains e.getRawX)){
       direction = previous map (e.getRawX - _) flatMap DragDirection.create
@@ -45,11 +47,13 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
   }
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
     val isHorizontal = detector onTouchEvent e
-    if (isHorizontal){
-      listenerToDrag.onTouch(rv, e)
-    } else {
-      onTouch.onTouch(rv, e)
-      listenerToDrag updateCurrentPosition e.getRawX
+    isHorizontal match {
+      case false =>
+        onTouch.onTouch(rv, e)
+        listenerToDrag updateCurrentPosition e.getRawX
+      case _ if direction.nonEmpty =>
+        listenerToDrag.onTouch(rv, e)
+      case _ =>
     }
     isHorizontal
   }
