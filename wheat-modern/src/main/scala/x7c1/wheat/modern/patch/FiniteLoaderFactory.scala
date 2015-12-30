@@ -7,13 +7,12 @@ import android.os.Bundle
 
 import scala.concurrent.{Promise, Future}
 
-class FiniteLoaderFactory(context: Context, loaderManager: LoaderManager) {
+class FiniteLoaderFactory(
+  context: Context, loaderManager: LoaderManager, startLoaderId: Int) {
 
   private var currentLoaderId: Option[Int] = None
 
-  def close(): Unit = synchronized {
-    currentLoaderId map loaderManager.getLoader foreach (_.cancelLoad())
-    currentLoaderId map (0 to _) foreach (_ foreach loaderManager.destroyLoader)
+  def close(): Unit = {
     currentLoaderId = None
   }
 
@@ -25,7 +24,7 @@ class FiniteLoaderFactory(context: Context, loaderManager: LoaderManager) {
   }
 
   private def nextLoaderId() = synchronized {
-    val current = currentLoaderId getOrElse -1
+    val current = currentLoaderId getOrElse (startLoaderId - 1)
     val next = current + 1
     currentLoaderId = Some(next)
     next

@@ -22,8 +22,11 @@ class AccessorLoader(
 
   private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
   private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
-  private val factory = new FiniteLoaderFactory(layout.itemView.context, loaderManager)
-
+  private val factory = new FiniteLoaderFactory(
+    context = layout.itemView.context,
+    loaderManager = loaderManager,
+    startLoaderId = 0
+  )
   private var sourceAccessor: Option[SourceAccessor] = None
   private var currentSourceLength: Int = 0
 
