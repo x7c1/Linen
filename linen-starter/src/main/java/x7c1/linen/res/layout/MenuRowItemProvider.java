@@ -24,6 +24,11 @@ public class MenuRowItemProvider implements ViewHolderProvider<MenuRowItem> {
     }
 
     @Override
+    public int layoutId(){
+        return R.layout.menu_row__item;
+    }
+
+    @Override
     public MenuRowItem inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }

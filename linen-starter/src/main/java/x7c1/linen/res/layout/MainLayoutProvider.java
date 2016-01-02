@@ -29,6 +29,11 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
     }
 
     @Override
+    public int layoutId(){
+        return R.layout.main_layout;
+    }
+
+    @Override
     public MainLayout inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }

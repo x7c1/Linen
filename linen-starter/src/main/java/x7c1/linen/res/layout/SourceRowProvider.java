@@ -24,6 +24,11 @@ public class SourceRowProvider implements ViewHolderProvider<SourceRow> {
     }
 
     @Override
+    public int layoutId(){
+        return R.layout.source_row;
+    }
+
+    @Override
     public SourceRow inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }

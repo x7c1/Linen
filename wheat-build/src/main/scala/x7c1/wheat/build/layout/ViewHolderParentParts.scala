@@ -18,7 +18,7 @@ class ViewHolderParentPartsFactory (packages: WheatPackages)
 private class ViewHolderParentPartsImpl(packages: WheatPackages, layout: ParsedResource)
   extends ViewHolderParentParts with Indent {
 
-  override def declarePackage: String = s"package ${packages.glueLayout}"
+  override def declarePackage: String = s"package ${packages.glueLayout};"
 
   override def imports: String = {
     val x0 = Seq(

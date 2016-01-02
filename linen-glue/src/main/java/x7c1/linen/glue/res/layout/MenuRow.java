@@ -4,7 +4,7 @@
  * Do not modify this file -- YOUR CHANGES WILL BE ERASED!
  */
 
-package x7c1.linen.glue.res.layout
+package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

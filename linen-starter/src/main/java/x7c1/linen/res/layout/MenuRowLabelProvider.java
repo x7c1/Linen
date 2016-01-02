@@ -24,6 +24,11 @@ public class MenuRowLabelProvider implements ViewHolderProvider<MenuRowLabel> {
     }
 
     @Override
+    public int layoutId(){
+        return R.layout.menu_row__label;
+    }
+
+    @Override
     public MenuRowLabel inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }

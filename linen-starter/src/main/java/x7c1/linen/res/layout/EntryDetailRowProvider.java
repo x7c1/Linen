@@ -24,6 +24,11 @@ public class EntryDetailRowProvider implements ViewHolderProvider<EntryDetailRow
     }
 
     @Override
+    public int layoutId(){
+        return R.layout.entry_detail_row;
+    }
+
+    @Override
     public EntryDetailRow inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
