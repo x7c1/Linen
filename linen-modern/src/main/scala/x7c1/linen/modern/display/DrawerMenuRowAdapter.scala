@@ -9,8 +9,13 @@ class DrawerMenuRowAdapter(
   menuLabelProvider: ViewHolderProvider[MenuRowLabel],
   menuItemProvider: ViewHolderProvider[MenuRowItem] ) extends Adapter[MenuRow]{
 
+  private lazy val providers = new ViewHolderProviders[MenuRow](
+    menuLabelProvider,
+    menuItemProvider
+  )
+
   override def getItemCount: Int = {
-    10
+    50
   }
 
   override def onBindViewHolder(row: MenuRow, position: Int): Unit = {
@@ -24,17 +29,21 @@ class DrawerMenuRowAdapter(
 
   override def getItemViewType(position: Int): Int = {
     if (position % 2 == 0){
-      111
+      menuLabelProvider.layoutId
     } else {
-      222
+      menuItemProvider.layoutId
     }
   }
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuRow = {
-    val provider = viewType match {
-      case 111 => menuLabelProvider
-      case 222 => menuItemProvider
-    }
+    val provider = providers find viewType
     provider inflateOn parent
   }
+}
+
+private class ViewHolderProviders[A](providers: ViewHolderProvider[_ <: A]*){
+  def find(viewType: Int): ViewHolderProvider[_ <: A] =
+    providers find (_.layoutId == viewType) getOrElse {
+      throw new IllegalArgumentException(s"unknown viewType: $viewType")
+    }
 }
