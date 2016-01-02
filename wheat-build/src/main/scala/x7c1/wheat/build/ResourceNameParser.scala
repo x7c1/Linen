@@ -1,6 +1,6 @@
 package x7c1.wheat.build
 
-import x7c1.wheat.build.WheatParser.camelize
+import sbt.complete.Parser
 
 
 object ResourceNameParser {
@@ -10,10 +10,27 @@ object ResourceNameParser {
     parse(name, parserToPrefix).left.map(WheatParserError).joinRight
   }
 
-  private def parserToPrefix =
-    any.+.string <~ token(".xml") map {
-      prefix => camelize(prefix).right map {
-        camel => ResourcePrefix(prefix, camel, prefix + "__")
-      }
+  def identifier = WheatParser.identifier
+
+  def parserToPrefix: Parser[Either[WheatParserError, ResourcePrefix]] = {
+    val wordsParser = identifier ~ (token('_') ~> identifier).* map {
+      case (x, xs) => Words(x +: xs)
     }
+    any.*.string <~ token(".xml") map { raw =>
+      val p = (wordsParser <~ token("__")).? ~ wordsParser map {
+        case (parent, words) =>
+          val parentName = parent map (_.camelize)
+          ResourcePrefix(
+            raw = raw,
+            ofClass = (parentName getOrElse "") + words.camelize,
+            ofKey = raw + "__",
+            parentClassName = parentName
+          )
+      }
+      parse(raw, p).left map WheatParserError
+    }
+  }
+  private case class Words(values: Seq[String]){
+    def camelize = values.map(_.capitalize).mkString
+  }
 }
