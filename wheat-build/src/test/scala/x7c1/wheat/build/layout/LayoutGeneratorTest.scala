@@ -52,4 +52,29 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
     x2.label shouldBe "sourceToolbar"
     x2.tag shouldBe "android.support.v7.widget.Toolbar"
   }
+
+  behavior of classOf[ViewHolderSourcesFactory].getSimpleName
+
+  it can "generate files around ViewHolder" in {
+    val Right(layout) = loader load "main_layout.xml"
+    val sources = new ViewHolderSourcesFactory(locations).createFrom(layout)
+
+    val Some(source1) = sources.find(_.file.getName.endsWith("MainLayoutProvider.java"))
+    source1.code should
+      include("class MainLayoutProvider implements ViewHolderProvider<MainLayout>")
+    source1.code should
+      include("public MainLayout inflate(ViewGroup parent, boolean attachToRoot)")
+
+    val Some(source2) = sources.find(_.file.getName.endsWith("MainLayout.java"))
+    source2.code should
+      include("class MainLayout extends RecyclerView.ViewHolder")
+  }
+
+  it can "generate parent ViewHolder" in {
+    val Right(layout) = loader load "menu_row__item.xml"
+    val sources = new ViewHolderSourcesFactory(locations).createFrom(layout)
+    val Some(source) = sources.find(_.file.getName.endsWith("MenuRow.java"))
+    source.code should include("public class MenuRow extends RecyclerView.ViewHolder")
+  }
+
 }
