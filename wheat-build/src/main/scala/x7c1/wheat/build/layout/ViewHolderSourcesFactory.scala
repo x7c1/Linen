@@ -6,17 +6,26 @@ class ViewHolderSourcesFactory(locations: LayoutLocations) extends JavaSourcesFa
   override def createFrom(resource: ParsedResource) = {
     val holderSourceFactory = new JavaSourceFactory(
       targetDir = locations.layoutDst,
-      classSuffix = "",
+      className = resource.prefix.ofClass,
       template = x7c1.wheat.build.txt.viewHolder.apply,
       partsFactory = new ViewHolderPartsFactory(locations.packages)
     )
     val providerSourceFactory = new JavaSourceFactory(
       targetDir = locations.providerDst,
-      classSuffix = "Provider",
+      className = resource.prefix.ofClass + "Provider",
       template = x7c1.wheat.build.txt.viewHolderProvider.apply,
       partsFactory = new ViewHolderProviderPartsFactory(locations.packages)
     )
-    val factories = Seq(
+    val forParent = resource.prefix.parentClassName match {
+      case Some(parentClassName) => Seq apply new JavaSourceFactory(
+        targetDir = locations.layoutDst,
+        className = parentClassName,
+        template = x7c1.wheat.build.txt.viewHolderParent.apply,
+        partsFactory = new ViewHolderParentPartsFactory(locations.packages)
+      )
+      case None => Seq()
+    }
+    val factories = forParent ++ Seq(
       holderSourceFactory,
       providerSourceFactory
     )
