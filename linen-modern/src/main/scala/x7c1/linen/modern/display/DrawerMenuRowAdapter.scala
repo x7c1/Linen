@@ -28,7 +28,7 @@ class DrawerMenuRowAdapter(
   }
 
   override def getItemViewType(position: Int): Int = {
-    if (position % 2 == 0){
+    if (position % 5 == 0){
       menuLabelProvider.layoutId
     } else {
       menuItemProvider.layoutId

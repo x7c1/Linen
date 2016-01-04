@@ -22,18 +22,6 @@
         android:clickable="true"
         >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="menu1"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="menu2"
-            />
-
         <Button
             android:id="@+id/main_layout__create_dummies"
             android:layout_width="wrap_content"
