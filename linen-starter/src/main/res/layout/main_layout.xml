@@ -6,21 +6,24 @@
     android:layout_gravity="end"
     >
 
-    <!--
-    android:fitsSystemWindows="true"
-    android:background="@color/light_gray"
-    -->
     <include layout="@layout/activity_main"/>
 
     <LinearLayout
         android:id="@+id/main_layout__menu_area"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:background="@android:color/white"
         android:orientation="vertical"
         android:clickable="true"
         >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_layout__menu_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
 
         <Button
             android:id="@+id/main_layout__create_dummies"
@@ -35,11 +38,6 @@
             android:layout_height="wrap_content"
             android:text="init dummies"
             />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/main_layout__menu_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

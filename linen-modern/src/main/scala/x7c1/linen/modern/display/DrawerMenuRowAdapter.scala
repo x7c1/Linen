@@ -18,11 +18,12 @@ class DrawerMenuRowAdapter(
 
   private val boxes = MenuItemsBoxes(Seq(
     MenuItemsBox(MenuLabel("Unread lists", menuLabelProvider.layoutId), Seq(
-      MenuItem("(empty)", menuItemProvider.layoutId)
+      MenuItem("(all articles browsed)", menuItemProvider.layoutId)
     )),
     MenuItemsBox(MenuLabel("Settings", menuLabelProvider.layoutId), Seq(
       MenuItem("Lists", menuItemProvider.layoutId),
-      MenuItem("Sources", menuItemProvider.layoutId)
+      MenuItem("Sources", menuItemProvider.layoutId),
+      MenuItem("Crawler schedule", menuItemProvider.layoutId)
     ))
   ))
 
@@ -32,11 +33,11 @@ class DrawerMenuRowAdapter(
     row match {
       case holder: MenuRowItem =>
         boxes findItemAt position foreach { case (x: MenuItem) =>
-          holder.text setText s"item $position ${x.body}"
+          holder.text setText x.body
         }
       case holder: MenuRowLabel =>
         boxes findItemAt position foreach { case (x: MenuLabel) =>
-          holder.text setText s"label $position ${x.body}"
+          holder.text setText x.body
         }
     }
   }

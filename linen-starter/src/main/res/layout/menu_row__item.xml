@@ -3,16 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingStart="20dp"
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp"
     android:paddingEnd="10dp"
+    android:paddingBottom="8dp"
+    android:paddingStart="23dp"
     >
 
     <TextView
         android:id="@+id/menu_row__item__text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
         android:text="sample item"
         android:textSize="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:textStyle="bold"
+        />
 
 </LinearLayout>
