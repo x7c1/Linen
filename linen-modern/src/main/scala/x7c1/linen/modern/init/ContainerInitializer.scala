@@ -50,11 +50,11 @@ class ContainerInitializer(
   )
   override lazy val actions = setupActions()
 
+  override def dipToPixel(dip: Int): Int = {
+    val metrics = activity.getResources.getDisplayMetrics
+    TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
+  }
   override lazy val widthWithMargin: Int = {
-    val dipToPixel = (dip: Int) => {
-      val metrics = activity.getResources.getDisplayMetrics
-      TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
-    }
     val radius = 20
     val margin = 10
     displaySize.x - dipToPixel(margin + radius)
