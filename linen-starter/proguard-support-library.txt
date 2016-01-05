@@ -1,4 +1,14 @@
 
+-dontnote android.support.v4.text.ICUCompat*
+    # Note: android.support.v4.text.ICUCompatApi23: can't find dynamically referenced class libcore.icu.ICU
+    # Note: android.support.v4.text.ICUCompatIcs: can't find dynamically referenced class libcore.icu.ICU
+
+-dontnote android.support.v4.app.NotificationCompatJellybean
+    # Note: android.support.v4.app.NotificationCompatJellybean calls 'Field.getType'
+
+-dontnote android.support.v7.widget.DrawableUtils
+    # Note: android.support.v7.widget.DrawableUtils: can't find dynamically referenced class android.graphics.Insets
+
 -keepclassmembernames class * { int icon; }
     # Note: android.support.v4.app.NotificationCompatJellybean accesses a declared field 'icon' dynamically
 

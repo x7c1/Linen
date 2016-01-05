@@ -1,4 +1,7 @@
 
+# Note: scala.concurrent.util.Unsafe calls 'Field.getType'
+-dontnote scala.concurrent.util.Unsafe
+
 # Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'next' dynamically
 # Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'waiter' dynamically
 # Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'item' dynamically
