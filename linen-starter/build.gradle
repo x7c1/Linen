@@ -19,6 +19,7 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro',
+                    'proguard-scala-concurrent.txt',
                     'proguard-support-library.txt'
 
             signingConfig signingConfigs.release
