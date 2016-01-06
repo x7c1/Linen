@@ -27,7 +27,7 @@
             android:toYDelta="20%"
             />
         <alpha
-            android:duration="250"
+            android:duration="200"
             android:fromAlpha="1.0"
             android:toAlpha="0"
             />
