@@ -77,8 +77,8 @@ class LinenOpenHelper(context: Context)
       s"""CREATE INDEX entries_created_at ON entries (
          |created_at)""".stripMargin
     )
-    val lists = Seq(
-      s"""CREATE TABLE IF NOT EXISTS lists (
+    val channels = Seq(
+      s"""CREATE TABLE IF NOT EXISTS channels (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |account_id INTEGER,
          |name TEXT,
@@ -87,14 +87,14 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
-    val listSourceMap = Seq(
-      s"""CREATE TABLE IF NOT EXISTS list_source_map (
-         |list_id INTEGER NOT NULL,
+    val channelSourceMap = Seq(
+      s"""CREATE TABLE IF NOT EXISTS channel_source_map (
+         |channel_id INTEGER NOT NULL,
          |source_id INTEGER NOT NULL,
          |created_at INTEGER,
-         |UNIQUE(list_id, source_id),
+         |UNIQUE(channel_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(list_id) REFERENCES lists(_id) ON DELETE CASCADE
+         |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
     val sourceStatuses = Seq(
@@ -114,8 +114,8 @@ class LinenOpenHelper(context: Context)
       sources,
       sourceRatings,
       entries,
-      lists,
-      listSourceMap,
+      channels,
+      channelSourceMap,
       sourceStatuses
     ).flatten foreach db.execSQL
 

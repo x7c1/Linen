@@ -5,7 +5,7 @@ import java.lang.Math.min
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
-import x7c1.linen.modern.display.DrawerMenuItemKind.{CrawlerSchedule, Lists, NoList, Sources}
+import x7c1.linen.modern.display.DrawerMenuItemKind.{CrawlerSchedule, Channels, NoChannel, ChannelSources}
 import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -40,13 +40,13 @@ trait DrawerMenuInitializer {
 
     MenuItemsBoxes(
       new MenuItemsBox(
-        label of "Unread lists",
-        item of NoList("(unread article not found)")
+        label of "Unread channels",
+        item of NoChannel("(all articles browsed)")
       ),
       new MenuItemsBox(
         label of "Settings",
-        item of Lists("Lists"),
-        item of Sources("Sources"),
+        item of Channels("Channels"),
+        item of ChannelSources("Channel sources"),
         item of CrawlerSchedule("Crawler schedule")
       )
     )
@@ -55,11 +55,11 @@ trait DrawerMenuInitializer {
 
 class OnDrawerMenuClick extends OnDrawerMenuClickListener {
   override def onClick(kind: DrawerMenuItemKind): Unit = kind match {
-    case _: NoList =>
+    case _: NoChannel =>
       Log info s"$kind"
-    case _: Lists =>
+    case _: Channels =>
       Log info s"$kind"
-    case _: Sources =>
+    case _: ChannelSources =>
       Log info s"$kind"
     case _: CrawlerSchedule =>
       Log info s"$kind"

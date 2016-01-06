@@ -22,7 +22,7 @@ class AccessorLoader(
 
   private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
   private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
-  private val factory = new FiniteLoaderFactory(
+  private val loaderFactory = new FiniteLoaderFactory(
     context = layout.itemView.context,
     loaderManager = loaderManager,
     startLoaderId = 0
@@ -59,7 +59,7 @@ class AccessorLoader(
   }
 
   def close(): Unit = {
-    factory.close()
+    loaderFactory.close()
 
     synchronized {
       currentSourceLength = 0
@@ -68,26 +68,28 @@ class AccessorLoader(
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources() = factory asFuture {
-    val accessor = SourceAccessor create database
-    sourceAccessor = Some(accessor)
-
-    val sourceIds = (0 to accessor.length - 1).
-      map(accessor.findAt).flatMap(_.map(_.id))
-
+  private def startLoadingSources() = loaderFactory asFuture {
+    val sourceIds = SourceAccessor create database match {
+      case Right(accessor) =>
+        sourceAccessor = Some(accessor)
+        (0 to accessor.length - 1).map(accessor.findAt).flatMap(_.map(_.id))
+      case Left(noRecordError) =>
+        Seq()
+    }
     sourceIds
   }
-  private def loadSourceEntries(remainingSourceIds: Seq[Long]) = factory asFuture {
+  private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
-    currentSourceLength += sourceIds.length
-
-    val positions = EntryAccessor.createPositionMap(database, sourceIds)
-    val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
-    outlineAccessors += outlines
-
-    val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
-    detailAccessors += details
-
+    if (sourceIds.nonEmpty){
+      val positions = EntryAccessor.createPositionMap(database, sourceIds)
+      val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
+      val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
+      synchronized {
+        currentSourceLength += sourceIds.length
+        outlineAccessors += outlines
+        detailAccessors += details
+      }
+    }
     remains
   }
   private def loadNext: Try[Seq[Long]] => Unit = {

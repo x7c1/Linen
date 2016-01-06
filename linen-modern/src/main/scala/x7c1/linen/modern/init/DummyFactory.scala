@@ -14,7 +14,7 @@ object DummyFactory {
   def setup(layout: MainLayout, activity: Activity) = {
     layout.createDummies onClick { _ =>
       async {
-        createDummies(activity)(500)
+        createDummies(activity)(100)
         layout.createDummies runUi { _ =>
           Toast.makeText(activity, "dummies inserted", Toast.LENGTH_SHORT).show()
         }
@@ -54,18 +54,18 @@ object DummyFactory {
         db.insert("accounts", null, item)
       }
     }
-    val listId = {
-      val cursor = db.rawQuery("SELECT * FROM lists ORDER BY _id LIMIT 1", Array())
+    val channelId = {
+      val cursor = db.rawQuery("SELECT * FROM channels ORDER BY _id LIMIT 1", Array())
       if (cursor.getCount > 0){
         cursor.moveToFirst()
         val idIndex = cursor getColumnIndex "_id"
         cursor getInt idIndex
       } else {
         val item = new ContentValues()
-        item.put("name", s"sample list name")
-        item.put("description", s"sample list description")
+        item.put("name", s"sample channel name")
+        item.put("description", s"sample channel description")
         item.put("account_id", accountId1: Double)
-        db.insert("lists", null, item)
+        db.insert("channels", null, item)
       }
     }
     (1 to n) foreach { i =>
@@ -96,10 +96,10 @@ object DummyFactory {
       rating2.put("rating", sourceId: Double)
       db.insert("source_ratings", null, rating2)
 
-      val listSourceMap = new ContentValues()
-      listSourceMap.put("list_id", listId: Double)
-      listSourceMap.put("source_id", sourceId: Double)
-      db.insert("list_source_map", null, listSourceMap)
+      val channelSourceMap = new ContentValues()
+      channelSourceMap.put("channel_id", channelId: Double)
+      channelSourceMap.put("source_id", sourceId: Double)
+      db.insert("channel_source_map", null, channelSourceMap)
 
       if (i % 10 == 0){
         Log info s"source at $i inserted"

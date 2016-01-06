@@ -48,26 +48,37 @@ private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
 }
 
+case class NoRecordError(message: String)
+
 object SourceAccessor {
-  def create(db: SQLiteDatabase): SourceAccessor = {
-    val listId = findFirstListId(db)
-    val accountId = findFirstAccountId(db)
-    val cursor = createCursor(db, listId, accountId)
-    new SourceAccessorImpl(cursor)
+  def create(db: SQLiteDatabase): Either[NoRecordError, SourceAccessor] = {
+    for {
+      channelId <- findFirstChannelId(db).right
+      accountId <- findFirstAccountId(db).right
+    } yield {
+      val cursor = createCursor(db, channelId, accountId)
+      new SourceAccessorImpl(cursor)
+    }
   }
-  def findFirstListId(db: SQLiteDatabase) = {
-    val cursor = db.rawQuery("SELECT * FROM lists LIMIT 1", Array())
-    cursor.moveToFirst()
-    val idIndex = cursor getColumnIndex "_id"
-    cursor getLong idIndex
+  def findFirstChannelId(db: SQLiteDatabase): Either[NoRecordError, Long] = {
+    val cursor = db.rawQuery("SELECT * FROM channels LIMIT 1", Array())
+    if (cursor.moveToFirst()) {
+      val idIndex = cursor getColumnIndex "_id"
+      Right(cursor getLong idIndex)
+    } else {
+      Left apply NoRecordError("channel not found")
+    }
   }
-  def findFirstAccountId(db: SQLiteDatabase) = {
+  def findFirstAccountId(db: SQLiteDatabase): Either[NoRecordError, Long] = {
     val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1", Array())
-    cursor.moveToFirst()
-    val idIndex = cursor getColumnIndex "_id"
-    cursor getLong idIndex
+    if (cursor.moveToFirst()){
+      val idIndex = cursor getColumnIndex "_id"
+      Right(cursor getLong idIndex)
+    } else {
+      Left apply NoRecordError("account not found")
+    }
   }
-  def createCursor(db: SQLiteDatabase, listId: Long, accountId: Long) = {
+  def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {
     val sql1 =
       """SELECT
         |   source_id,
@@ -79,11 +90,11 @@ object SourceAccessor {
     val sql2 =
       """SELECT
         |  s1.source_id,
-        |  s1.list_id,
+        |  s1.channel_id,
         |  s2.start_entry_id
-        |FROM list_source_map AS s1
+        |FROM channel_source_map AS s1
         |LEFT JOIN source_statuses AS s2 ON s1.source_id = s2.source_id
-        |WHERE s1.list_id = ? AND s2.account_id = ?
+        |WHERE s1.channel_id = ? AND s2.account_id = ?
       """.stripMargin
 
     val sql3 =
@@ -122,6 +133,6 @@ object SourceAccessor {
        """.stripMargin
 
     db.rawQuery(sql5,
-      Array(listId.toString, accountId.toString, accountId.toString))
+      Array(channelId.toString, accountId.toString, accountId.toString))
   }
 }

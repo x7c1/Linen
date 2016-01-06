@@ -20,9 +20,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val listId = SourceAccessor.findFirstListId(db)
-    val accountId = SourceAccessor.findFirstAccountId(db)
-    val cursor3 = SourceAccessor.createCursor(db, listId, accountId)
+    val Right(channelId) = SourceAccessor findFirstChannelId db
+    val Right(accountId) = SourceAccessor findFirstAccountId db
+    val cursor3 = SourceAccessor.createCursor(db, channelId, accountId)
     val rows = toMaps(cursor3)
 
     //rows.map(prettyPrint) foreach println
@@ -52,7 +52,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     */
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val sourceAccessor = SourceAccessor.create(db)
+    val Right(sourceAccessor) = SourceAccessor create db
     val sourceIds = (0 to sourceAccessor.length - 1).map(sourceAccessor.findAt).flatMap(_.map(_.id))
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
@@ -70,12 +70,12 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val accessor0 = SourceAccessor.create(db)
+    val Right(accessor0) = SourceAccessor create db
     val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
     val sourceIds = sources.flatMap(_.map(_.id))
     val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
     val rows = toMaps(cursor)
-    rows.map(prettyPrint) foreach println
+//    rows.map(prettyPrint) foreach println
   }
 
   def showTable(tableName: String) = {

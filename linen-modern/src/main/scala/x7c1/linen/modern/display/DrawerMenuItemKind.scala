@@ -5,8 +5,8 @@ sealed trait DrawerMenuItemKind {
 }
 
 object DrawerMenuItemKind {
-  case class NoList(body: String) extends DrawerMenuItemKind
-  case class Lists(body: String) extends DrawerMenuItemKind
-  case class Sources(body: String) extends DrawerMenuItemKind
+  case class NoChannel(body: String) extends DrawerMenuItemKind
+  case class Channels(body: String) extends DrawerMenuItemKind
+  case class ChannelSources(body: String) extends DrawerMenuItemKind
   case class CrawlerSchedule(body: String) extends DrawerMenuItemKind
 }
