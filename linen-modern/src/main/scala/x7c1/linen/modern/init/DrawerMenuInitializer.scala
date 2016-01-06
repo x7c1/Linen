@@ -2,15 +2,19 @@ package x7c1.linen.modern.init
 
 import java.lang.Math.min
 
+import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
+import x7c1.linen.glue.activity.ActivityLabel.SettingChannels
+import x7c1.linen.glue.activity.ActivityStarter
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
-import x7c1.linen.modern.display.DrawerMenuItemKind.{CrawlerSchedule, Channels, NoChannel, ChannelSources}
+import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, CrawlerSchedule, NoChannel}
 import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
+  def activity: Activity with ActivityStarter
   def layout: MainLayout
   def menuLabelProvider: ViewHolderProvider[MenuRowLabel]
   def menuItemProvider: ViewHolderProvider[MenuRowItem]
@@ -34,7 +38,7 @@ trait DrawerMenuInitializer {
     }
   }
   protected def menuItemsBoxes = {
-    val onClick = new OnDrawerMenuClick
+    val onClick = new OnDrawerMenuClick(activity)
     val label = new DrawerMenuLabelFactory(menuLabelProvider)
     val item = new DrawerMenuItemFactory(onClick, menuItemProvider)
 
@@ -53,12 +57,13 @@ trait DrawerMenuInitializer {
   }
 }
 
-class OnDrawerMenuClick extends OnDrawerMenuClickListener {
+class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListener {
   override def onClick(kind: DrawerMenuItemKind): Unit = kind match {
     case _: NoChannel =>
       Log info s"$kind"
     case _: Channels =>
       Log info s"$kind"
+      starter transitTo SettingChannels
     case _: ChannelSources =>
       Log info s"$kind"
     case _: CrawlerSchedule =>

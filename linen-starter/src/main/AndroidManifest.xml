@@ -19,5 +19,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingChannelsActivity"
+            android:label="setting of channels">
+        </activity>
+
     </application>
 </manifest>

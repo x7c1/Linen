@@ -1,6 +1,5 @@
 package x7c1.linen;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,7 +16,7 @@ import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 
 	private ContainerInitializer initializer = null;
 
@@ -61,4 +60,5 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		initializer.close();
 	}
+
 }

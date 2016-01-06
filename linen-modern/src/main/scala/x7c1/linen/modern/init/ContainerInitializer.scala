@@ -4,13 +4,14 @@ import android.app.Activity
 import android.graphics.Point
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
+import x7c1.linen.glue.activity.ActivityStarter
 import x7c1.linen.glue.res.layout.{MenuRowItem, MenuRowLabel, EntryDetailRow, EntryRow, MainLayout, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
 class ContainerInitializer(
-  activity: Activity,
+  override val activity: Activity with ActivityStarter,
   override val layout: MainLayout,
   override val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
   override val menuItemProvider: ViewHolderProvider[MenuRowItem],
