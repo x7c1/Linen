@@ -6,13 +6,13 @@ class LayoutSourcesFactory(locations: LayoutLocations) extends JavaSourcesFactor
   override def createFrom(layout: ParsedResource) = {
     val layoutSourceFactory = new JavaSourceFactory(
       targetDir = locations.layoutDst,
-      classSuffix = "Layout",
+      className = layout.prefix.ofClass + "Layout",
       template = x7c1.wheat.build.txt.layout.apply,
       partsFactory = new LayoutPartsFactory(locations.packages)
     )
     val providerSourceFactory = new JavaSourceFactory(
       targetDir = locations.providerDst,
-      classSuffix = "LayoutProvider",
+      className =  layout.prefix.ofClass + "LayoutProvider",
       template = x7c1.wheat.build.txt.layoutProvider.apply,
       partsFactory = new LayoutProviderPartsFactory(locations.packages)
     )

@@ -32,8 +32,9 @@ class FiniteLoaderFactory(
 
   private def createLoader[A](promise: Promise[A], f: => A) =
     new AsyncTaskLoader[Unit](context) {
+      lazy val result = f
       override def loadInBackground(): Unit = {
-        try promise trySuccess f
+        try promise trySuccess result
         catch { case e: Throwable => promise tryFailure e }
       }
       override def onStartLoading(): Unit = forceLoad()

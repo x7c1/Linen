@@ -8,7 +8,7 @@
 
 @parts.imports
 
-public class @(parts.prefix.ofClass) extends RecyclerView.ViewHolder {
+public class @(parts.prefix.ofClass) extends @(parts.parentClass) {
 
     @parts.fields
 

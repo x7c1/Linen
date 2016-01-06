@@ -12,7 +12,8 @@ trait ResourcePartsFactory [A <: ResourceParts]{
 case class ResourcePrefix(
   raw: String,
   ofClass: String,
-  ofKey: String
+  ofKey: String,
+  parentClassName: Option[String]
 )
 
 case class ParsedResource(

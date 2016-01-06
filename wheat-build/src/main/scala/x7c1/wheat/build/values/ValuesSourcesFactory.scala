@@ -6,13 +6,13 @@ class ValuesSourcesFactory(locations: ValuesLocations) extends JavaSourcesFactor
   override def createFrom(values: ParsedResource) = {
     val valuesSourceFactory = new JavaSourceFactory(
       targetDir = locations.valuesDst,
-      classSuffix = "Values",
+      className = values.prefix.ofClass + "Values",
       template = x7c1.wheat.build.txt.values.apply,
       partsFactory = new ValuesInterfacePartsFactory(locations.packages)
     )
     val providerSourceFactory = new JavaSourceFactory(
       targetDir = locations.providerDst,
-      classSuffix = "ValuesProvider",
+      className = values.prefix.ofClass + "ValuesProvider",
       template = x7c1.wheat.build.txt.valuesProvider.apply,
       partsFactory = new ValuesProviderPartsFactory(locations.packages)
     )

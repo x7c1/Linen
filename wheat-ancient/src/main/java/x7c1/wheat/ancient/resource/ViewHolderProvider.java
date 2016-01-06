@@ -4,6 +4,8 @@ import android.view.ViewGroup;
 
 public interface ViewHolderProvider<T> {
 
+	int layoutId();
+
 	T inflate(ViewGroup parent, boolean attachToRoot);
 
 	T inflateOn(ViewGroup parent);

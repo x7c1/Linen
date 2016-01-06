@@ -31,3 +31,11 @@
 -dontwarn scala.util.parsing.**
 -dontwarn scala.xml.**
 -dontwarn javax.swing.**
+
+# needless references?
+-dontnote com.google.vending.licensing.ILicensingService
+    # Note: the configuration refers to the unknown class 'com.google.vending.licensing.ILicensingService'
+-dontnote com.android.vending.licensing.ILicensingService
+    # Note: the configuration refers to the unknown class 'com.android.vending.licensing.ILicensingService'
+-dontnote scala.Enumeration$$anonfun$scala$Enumeration$$isValDef$1$1
+    # Note: scala.Enumeration$$anonfun$scala$Enumeration$$isValDef$1$1 calls 'Field.getType'

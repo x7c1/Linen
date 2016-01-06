@@ -4,6 +4,7 @@ import x7c1.wheat.build.PackageResolver.toPackage
 import x7c1.wheat.build.{ResourcePrefix, Indent, ParsedResource, ResourcePartsFactory, WheatPackages, ResourceParts}
 
 trait ViewHolderParts extends ResourceParts {
+  def parentClass: String
   def declarePackage: String
   def imports: String
   def fields: String
@@ -23,13 +24,19 @@ private class ViewHolderPartsImpl(packages: WheatPackages, layout: ParsedResourc
   extends ViewHolderParts with Indent {
   override def declarePackage: String = s"package ${packages.glueLayout};"
 
+  override def parentClass: String = {
+    layout.prefix.parentClassName getOrElse "RecyclerView.ViewHolder"
+  }
   override def imports: String = {
     val x0 = Seq(
-      "import android.support.v7.widget.RecyclerView;",
       "import android.view.View;"
     )
+    val w0 = layout.prefix.parentClassName match {
+      case Some(_) => Seq()
+      case None => Seq("import android.support.v7.widget.RecyclerView;")
+    }
     val x1 = layout.elements map { x => s"import ${toPackage(x.tag)};" }
-    (x0 ++ x1).distinct mkString "\n"
+    (w0 ++ x0 ++ x1).distinct mkString "\n"
   }
 
   override def fields: String = {

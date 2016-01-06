@@ -1,0 +1,53 @@
+
+# Note: scala.concurrent.util.Unsafe calls 'Field.getType'
+-dontnote scala.concurrent.util.Unsafe
+
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'next' dynamically
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'waiter' dynamically
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue$Node accesses a declared field 'item' dynamically
+-keepclassmembernames class scala.concurrent.forkjoin.LinkedTransferQueue$Node {
+    scala.concurrent.forkjoin.LinkedTransferQueue$Node next;
+    java.lang.Thread waiter;
+    java.lang.Object item;
+}
+
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue accesses a declared field 'head' dynamically
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue accesses a declared field 'tail' dynamically
+# Note: scala.concurrent.forkjoin.LinkedTransferQueue accesses a declared field 'sweepVotes' dynamically
+-keepclassmembernames class scala.concurrent.forkjoin.LinkedTransferQueue {
+    int sweepVotes;
+    scala.concurrent.forkjoin.LinkedTransferQueue$Node tail;
+    scala.concurrent.forkjoin.LinkedTransferQueue$Node head;
+}
+
+# Note: scala.concurrent.forkjoin.ForkJoinTask accesses a declared field 'status' dynamically
+-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinTask {
+    int status;
+}
+
+# Note: scala.concurrent.forkjoin.ForkJoinPool$WorkQueue accesses a declared field 'qlock' dynamically
+-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinPool$WorkQueue {
+    int qlock;
+}
+
+# Note: scala.concurrent.forkjoin.ForkJoinPool accesses a declared field 'ctl' dynamically
+# Note: scala.concurrent.forkjoin.ForkJoinPool accesses a declared field 'indexSeed' dynamically
+# Note: scala.concurrent.forkjoin.ForkJoinPool accesses a declared field 'plock' dynamically
+# Note: scala.concurrent.forkjoin.ForkJoinPool accesses a declared field 'stealCount' dynamically
+-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinPool {
+    long ctl;
+    int indexSeed;
+    int plock;
+    long stealCount;
+}
+
+# Note: scala.concurrent.forkjoin.ForkJoinPool accesses a declared field 'parkBlocker' dynamically
+-keepclassmembernames class java.lang.Thread {
+    java.lang.Object parkBlocker;
+}
+
+#-keepclassmembernames class scala.concurrent.forkjoin.LinkedTransferQueue {
+#    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference head;
+#    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference tail;
+#    scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference next;
+#}

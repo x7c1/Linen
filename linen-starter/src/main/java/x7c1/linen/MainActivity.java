@@ -12,6 +12,8 @@ import x7c1.linen.modern.init.ContainerInitializer;
 import x7c1.linen.res.layout.EntryDetailRowProvider;
 import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
+import x7c1.linen.res.layout.MenuRowItemProvider;
+import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 
 
@@ -45,6 +47,8 @@ public class MainActivity extends Activity {
 		this.initializer = new ContainerInitializer(
 			this,
 			layout,
+			new MenuRowLabelProvider(this),
+			new MenuRowItemProvider(this),
 			new SourceRowProvider(this),
 			new EntryRowProvider(this),
 			new EntryDetailRowProvider(this)

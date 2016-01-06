@@ -1,6 +1,5 @@
 package x7c1.linen.modern.init
 
-import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
@@ -14,7 +13,6 @@ trait SourceAreaInitializer {
   def accessors: Accessors
   def actions: Actions
   def sourceRowProvider: ViewHolderProvider[SourceRow]
-  def displaySize: Point
   def widthWithMargin: Int
 
   def setupSourceArea(): Unit = {

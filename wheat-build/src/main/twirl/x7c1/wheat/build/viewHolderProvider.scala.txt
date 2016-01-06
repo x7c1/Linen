@@ -17,6 +17,11 @@ public class @(parts.prefix.ofClass)Provider implements ViewHolderProvider<@(par
     }
 
     @@Override
+    public int layoutId(){
+        return R.layout.@(parts.prefix.raw);
+    }
+
+    @@Override
     public @(parts.prefix.ofClass) inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }

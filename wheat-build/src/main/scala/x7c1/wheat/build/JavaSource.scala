@@ -11,7 +11,8 @@ case class JavaSource(
 )
 
 class JavaSourceFactory [A <: ResourceParts](
-  targetDir: File, classSuffix: String,
+  targetDir: File,
+  className: String,
   template: A => TxtFormat.Appendable,
   partsFactory: ResourcePartsFactory[A] ){
 
@@ -19,7 +20,7 @@ class JavaSourceFactory [A <: ResourceParts](
     val parts = partsFactory.createFrom(resource)
     JavaSource(
       code = template(parts).body,
-      file = targetDir / s"${parts.prefix.ofClass}$classSuffix.java"
+      file = targetDir / s"$className.java"
     )
   }
 }

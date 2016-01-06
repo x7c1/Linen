@@ -1,11 +1,10 @@
 package x7c1.linen.modern.init
 
-import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryRow, MainLayout}
 import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver}
 import x7c1.linen.modern.action.{Actions, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.{PaneLabel, PaneDragDetector, EntryRowAdapter}
+import x7c1.linen.modern.display.{EntryRowAdapter, PaneDragDetector, PaneLabel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -14,8 +13,6 @@ trait EntryAreaInitializer {
   def accessors: Accessors
   def actions: Actions
   def entryRowProvider: ViewHolderProvider[EntryRow]
-
-  def displaySize: Point
   def widthWithMargin: Int
 
   def setupEntryArea(): Unit = {

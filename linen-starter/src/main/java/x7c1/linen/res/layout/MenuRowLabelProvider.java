@@ -13,33 +13,32 @@ import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SourceRow;
+import x7c1.linen.glue.res.layout.MenuRowLabel;
 
-public class SourceRowProvider implements ViewHolderProvider<SourceRow> {
+public class MenuRowLabelProvider implements ViewHolderProvider<MenuRowLabel> {
 
     private final LayoutInflater inflater;
 
-    public SourceRowProvider(Context context){
+    public MenuRowLabelProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int layoutId(){
-        return R.layout.source_row;
+        return R.layout.menu_row__label;
     }
 
     @Override
-    public SourceRow inflateOn(ViewGroup parent){
+    public MenuRowLabel inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public SourceRow inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.source_row, parent, attachToRoot);
-        return new SourceRow(
+    public MenuRowLabel inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.menu_row__label, parent, attachToRoot);
+        return new MenuRowLabel(
             view,
-            (TextView) view.findViewById(R.id.source_row__title),
-            (TextView) view.findViewById(R.id.source_row__description)
+            (TextView) view.findViewById(R.id.menu_row__label__text)
         );
     }
 }
