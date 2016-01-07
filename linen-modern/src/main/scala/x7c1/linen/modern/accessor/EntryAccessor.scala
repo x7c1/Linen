@@ -90,7 +90,7 @@ class EntryOutlineFactory(cursor: Cursor) extends EntryFactory[EntryOutline] {
       url = "dummy",
       shortTitle = cursor getString titleIndex,
       shortContent = cursor getString contentIndex,
-      createdAt = Date.dummy()
+      createdAt = Date.current()
     )
   }
 }
@@ -110,7 +110,7 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
       url = "dummy",
       fullTitle = cursor getString titleIndex,
       fullContent = cursor getString contentIndex,
-      createdAt = Date.dummy()
+      createdAt = Date.current()
     )
   }
 }

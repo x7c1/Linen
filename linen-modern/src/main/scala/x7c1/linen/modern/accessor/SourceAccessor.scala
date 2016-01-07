@@ -53,8 +53,8 @@ case class NoRecordError(message: String)
 object SourceAccessor {
   def create(db: SQLiteDatabase): Either[NoRecordError, SourceAccessor] = {
     def findAccountId() =
-      AccountAccessor.create(db).findFirstId() match {
-        case Some(id) => Right(id)
+      AccountAccessor.create(db).findAt(0) match {
+        case Some(account) => Right(account.accountId)
         case None => Left apply NoRecordError("account not found")
       }
     def findChannelId(accountId: Long) =

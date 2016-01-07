@@ -20,7 +20,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val Some(accountId) = AccountAccessor.create(db).findFirstId()
+    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(channelId) = ChannelAccessor.create(db, accountId).findFirstId()
     val cursor3 = SourceAccessor.createCursor(db, channelId, accountId)
     val rows = toMaps(cursor3)

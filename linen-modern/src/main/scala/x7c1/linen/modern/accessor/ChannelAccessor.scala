@@ -41,7 +41,7 @@ object ChannelAccessor {
           id = cursor getLong idIndex,
           name = cursor getString nameIndex,
           description = cursor getString descriptionIndex,
-          createdAt = Date.dummy()
+          createdAt = Date.current()
         )
       } else {
         None

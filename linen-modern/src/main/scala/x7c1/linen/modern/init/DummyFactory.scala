@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, AccountsTable, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -31,33 +31,21 @@ object DummyFactory {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
 
-    val accountId1 = {
-      val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1", Array())
-      if (cursor.getCount > 0){
-        cursor.moveToFirst()
-        val idIndex = cursor getColumnIndex "_id"
-        cursor getInt idIndex
-      } else {
-        val item = new ContentValues()
-        item.put("nickname", s"sample-user-1")
-        item.put("biography", s"sample-biography-1")
-        item.put("created_at", Date.timestamp: Double)
-        db.insertOrThrow("accounts", null, item)
-      }
+    val accountId1 = AccountAccessor.create(db) findAt 0 map (_.accountId) getOrElse {
+      val Right(id) = AccountsTable(db) insert AccountParts(
+        nickname = s"sample-user-1",
+        biography = s"sample-biography-1",
+        createdAt = Date.current()
+      )
+      id
     }
-    val accountId2 = {
-      val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1 OFFSET 1", Array())
-      if (cursor.getCount > 0){
-        cursor.moveToFirst()
-        val idIndex = cursor getColumnIndex "_id"
-        cursor getInt idIndex
-      } else {
-        val item = new ContentValues()
-        item.put("nickname", s"sample-user-2")
-        item.put("biography", s"sample-biography-2")
-        item.put("created_at", Date.timestamp: Double)
-        db.insertOrThrow("accounts", null, item)
-      }
+    val accountId2 = AccountAccessor.create(db) findAt 1 map (_.accountId) getOrElse {
+      val Right(id) = AccountsTable(db) insert AccountParts(
+        nickname = s"sample-user-2",
+        biography = s"sample-biography-2",
+        createdAt = Date.current()
+      )
+      id
     }
     val channelId = {
       val cursor = db.rawQuery("SELECT * FROM channels ORDER BY _id LIMIT 1", Array())

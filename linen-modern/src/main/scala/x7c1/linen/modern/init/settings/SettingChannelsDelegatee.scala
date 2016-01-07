@@ -20,12 +20,12 @@ class SettingChannelsDelegatee (
     val manager = new LinearLayoutManager(activity)
     println(manager)
 
-    val accountId = AccountAccessor.create(database).findFirstId() getOrElse {
+    val account = AccountAccessor.create(database) findAt 0 getOrElse {
       throw new IllegalStateException("account not found")
     }
     layout.channelList setLayoutManager manager
     layout.channelList setAdapter new ChannelRowAdapter(
-      accessor = ChannelAccessor.create(database, accountId),
+      accessor = ChannelAccessor.create(database, account.accountId),
       viewHolderProvider = channelRowProvider
     )
   }

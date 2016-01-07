@@ -19,7 +19,7 @@ class ChannelAccessorTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getWritableDatabase
-    val Some(accountId) = AccountAccessor.create(db).findFirstId()
+    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(channelId) = ChannelAccessor.create(db, accountId).findFirstId()
     assertEquals(2, channelId)
 
@@ -33,7 +33,7 @@ class ChannelAccessorTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getWritableDatabase
-    val Some(accountId) = AccountAccessor.create(db).findFirstId()
+    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val length = ChannelAccessor.create(db, accountId).length
     assertEquals(2, length)
   }
@@ -44,7 +44,7 @@ class ChannelAccessorTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getWritableDatabase
-    val Some(accountId) = AccountAccessor.create(db).findFirstId()
+    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(c1) = ChannelAccessor.create(db, accountId).findAt(0)
     assertEquals("sample channel name2", c1.name)
 
