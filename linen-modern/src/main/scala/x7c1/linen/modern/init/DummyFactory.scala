@@ -6,6 +6,7 @@ import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
 import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -39,7 +40,9 @@ object DummyFactory {
       } else {
         val item = new ContentValues()
         item.put("nickname", s"sample-user-1")
-        db.insert("accounts", null, item)
+        item.put("biography", s"sample-biography-1")
+        item.put("created_at", Date.timestamp: Double)
+        db.insertOrThrow("accounts", null, item)
       }
     }
     val accountId2 = {
@@ -51,7 +54,9 @@ object DummyFactory {
       } else {
         val item = new ContentValues()
         item.put("nickname", s"sample-user-2")
-        db.insert("accounts", null, item)
+        item.put("biography", s"sample-biography-2")
+        item.put("created_at", Date.timestamp: Double)
+        db.insertOrThrow("accounts", null, item)
       }
     }
     val channelId = {
@@ -65,47 +70,56 @@ object DummyFactory {
         item.put("name", s"sample channel name1")
         item.put("description", s"sample channel description1")
         item.put("account_id", accountId1: Double)
-        db.insert("channels", null, item)
+        item.put("created_at", Date.timestamp: Double)
+        db.insertOrThrow("channels", null, item)
 
         val item2 = new ContentValues()
         item2.put("name", s"sample channel name2")
         item2.put("description", s"sample channel description2")
         item2.put("account_id", accountId1: Double)
-        db.insert("channels", null, item2)
+        item2.put("created_at", Date.timestamp: Double)
+        db.insertOrThrow("channels", null, item2)
       }
     }
     (1 to n) foreach { i =>
       val source = new ContentValues()
       source.put("title", s"$i-title")
+      source.put("url", s"http://example.com/source$i")
       source.put("description", s"description-$i " + words(1,15))
-      val sourceId = db.insert("sources", null, source)
+      source.put("created_at", Date.timestamp: Double)
+      val sourceId = db.insertOrThrow("sources", null, source)
 
       val status1 = new ContentValues()
       status1.put("source_id", sourceId: Double)
       status1.put("account_id", accountId1: Double)
-      db.insert("source_statuses", null, status1)
+      status1.put("created_at", Date.timestamp: Double)
+      db.insertOrThrow("source_statuses", null, status1)
 
       val rating1 = new ContentValues()
       rating1.put("source_id", sourceId: Double)
       rating1.put("owner_account_id", accountId1: Double)
       rating1.put("rating", sourceId: Double)
-      db.insert("source_ratings", null, rating1)
+      rating1.put("created_at", Date.timestamp: Double)
+      db.insertOrThrow("source_ratings", null, rating1)
 
       val status2 = new ContentValues()
       status2.put("source_id", sourceId: Double)
       status2.put("account_id", accountId2: Double)
-      db.insert("source_statuses", null, status2)
+      status2.put("created_at", Date.timestamp: Double)
+      db.insertOrThrow("source_statuses", null, status2)
 
       val rating2 = new ContentValues()
       rating2.put("source_id", sourceId: Double)
       rating2.put("owner_account_id", accountId2: Double)
       rating2.put("rating", sourceId: Double)
-      db.insert("source_ratings", null, rating2)
+      rating2.put("created_at", Date.timestamp: Double)
+      db.insertOrThrow("source_ratings", null, rating2)
 
       val channelSourceMap = new ContentValues()
       channelSourceMap.put("channel_id", channelId: Double)
       channelSourceMap.put("source_id", sourceId: Double)
-      db.insert("channel_source_map", null, channelSourceMap)
+      channelSourceMap.put("created_at", Date.timestamp: Double)
+      db.insertOrThrow("channel_source_map", null, channelSourceMap)
 
       if (i % 10 == 0){
         Log info s"source at $i inserted"
@@ -115,7 +129,9 @@ object DummyFactory {
         entry.put("source_id", sourceId: Double)
         entry.put("title", s"$sourceId-$j entry title")
         entry.put("content", s"$sourceId-$j entry content " + words(100,500))
-        val entryId = db.insert("entries", null, entry)
+        entry.put("url", s"http://example.com/entry-$j")
+        entry.put("created_at", Date.timestamp: Double)
+        val entryId = db.insertOrThrow("entries", null, entry)
 
         if (i == 3){
           val status1 = new ContentValues()

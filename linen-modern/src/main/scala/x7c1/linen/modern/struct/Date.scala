@@ -4,6 +4,7 @@ import java.util
 
 object Date {
   def dummy(): Date = new DateImpl()
+  def timestamp: Int = (new util.Date().getTime / 1000).toInt
 }
 
 trait Date {
