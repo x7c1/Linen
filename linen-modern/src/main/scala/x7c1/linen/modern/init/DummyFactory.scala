@@ -62,10 +62,16 @@ object DummyFactory {
         cursor getInt idIndex
       } else {
         val item = new ContentValues()
-        item.put("name", s"sample channel name")
-        item.put("description", s"sample channel description")
+        item.put("name", s"sample channel name1")
+        item.put("description", s"sample channel description1")
         item.put("account_id", accountId1: Double)
         db.insert("channels", null, item)
+
+        val item2 = new ContentValues()
+        item2.put("name", s"sample channel name2")
+        item2.put("description", s"sample channel description2")
+        item2.put("account_id", accountId1: Double)
+        db.insert("channels", null, item2)
       }
     }
     (1 to n) foreach { i =>
