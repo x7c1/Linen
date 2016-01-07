@@ -71,24 +71,6 @@ object SourceAccessor {
       new SourceAccessorImpl(cursor)
     }
   }
-  def findFirstChannelId(db: SQLiteDatabase): Either[NoRecordError, Long] = {
-    val cursor = db.rawQuery("SELECT * FROM channels LIMIT 1", Array())
-    if (cursor.moveToFirst()) {
-      val idIndex = cursor getColumnIndex "_id"
-      Right(cursor getLong idIndex)
-    } else {
-      Left apply NoRecordError("channel not found")
-    }
-  }
-  def findFirstAccountId(db: SQLiteDatabase): Either[NoRecordError, Long] = {
-    val cursor = db.rawQuery("SELECT * FROM accounts ORDER BY _id LIMIT 1", Array())
-    if (cursor.moveToFirst()){
-      val idIndex = cursor getColumnIndex "_id"
-      Right(cursor getLong idIndex)
-    } else {
-      Left apply NoRecordError("account not found")
-    }
-  }
   def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {
     val sql1 =
       """SELECT
