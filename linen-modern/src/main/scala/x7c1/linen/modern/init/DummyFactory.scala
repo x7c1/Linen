@@ -47,7 +47,6 @@ object DummyFactory {
       )
       id
     }
-
     val channelAccessor = ChannelAccessor.create(db, accountId1)
     val channelId = channelAccessor findAt 0 map (_.channelId) getOrElse {
       ChannelsTable(db) insert ChannelParts(

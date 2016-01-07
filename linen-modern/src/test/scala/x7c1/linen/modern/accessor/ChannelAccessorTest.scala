@@ -3,8 +3,8 @@ package x7c1.linen.modern.accessor
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.{RuntimeEnvironment, RobolectricTestRunner}
 import org.robolectric.annotation.Config
+import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.modern.init.DummyFactory
 
