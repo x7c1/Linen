@@ -50,7 +50,7 @@ class AccountsTable private (db: SQLiteDatabase) {
     val values = new ContentValues()
     values.put("nickname", parts.nickname)
     values.put("biography", parts.biography)
-    values.put("created_at", parts.createdAt.timestamp: Double)
+    values.put("created_at", parts.createdAt.timestamp.toString)
     try Right apply db.insertOrThrow("accounts", null, values)
     catch {
       case e: SQLException => Left(e)

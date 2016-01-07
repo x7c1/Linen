@@ -1,13 +1,15 @@
 package x7c1.linen.modern.accessor
 
+import android.content.ContentValues
+import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.{Date, Channel}
+import x7c1.linen.modern.struct.{Channel, Date}
 
 trait ChannelAccessor {
   def findAt(position: Int): Option[Channel]
   def length: Int
   def findFirstId(): Option[Long] = {
-    findAt(0).map(_.id)
+    findAt(0).map(_.channelId)
   }
 }
 
@@ -38,10 +40,10 @@ object ChannelAccessor {
     override def findAt(position: Int) = {
       if (cursor moveToPosition position){
         Some apply Channel(
-          id = cursor getLong idIndex,
+          channelId = cursor getLong idIndex,
           name = cursor getString nameIndex,
           description = cursor getString descriptionIndex,
-          createdAt = Date.current()
+          createdAt = Date(cursor getInt createdAtIndex)
         )
       } else {
         None
@@ -50,5 +52,37 @@ object ChannelAccessor {
     override def length: Int = {
       cursor.getCount
     }
+  }
+}
+
+case class ChannelParts(
+  accountId: Long,
+  name: String,
+  description: String,
+  createdAt: Date
+)
+
+class ChannelsTable private (db: SQLiteDatabase) {
+  def insert(parts: ChannelParts): Either[SQLException, Long] = {
+    val values = toValues(parts)
+    try {
+      Right apply db.insertOrThrow("channels", null, values)
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
+  def toValues(parts: ChannelParts): ContentValues = {
+    val values = new ContentValues()
+    values.put("name", parts.name)
+    values.put("description", parts.description)
+    values.put("account_id", parts.accountId.toString)
+    values.put("created_at", parts.createdAt.timestamp.toString)
+    values
+  }
+}
+
+object ChannelsTable {
+  def apply(db: SQLiteDatabase): ChannelsTable = {
+    new ChannelsTable(db)
   }
 }

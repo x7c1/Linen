@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, AccountsTable, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{ChannelAccessor, ChannelParts, ChannelsTable, AccountAccessor, AccountParts, AccountsTable, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -47,27 +47,22 @@ object DummyFactory {
       )
       id
     }
-    val channelId = {
-      val cursor = db.rawQuery("SELECT * FROM channels ORDER BY _id LIMIT 1", Array())
-      if (cursor.getCount > 0){
-        cursor.moveToFirst()
-        val idIndex = cursor getColumnIndex "_id"
-        cursor getInt idIndex
-      } else {
-        val item = new ContentValues()
-        item.put("name", s"sample channel name1")
-        item.put("description", s"sample channel description1")
-        item.put("account_id", accountId1: Double)
-        item.put("created_at", Date.timestamp: Double)
-        db.insertOrThrow("channels", null, item)
 
-        val item2 = new ContentValues()
-        item2.put("name", s"sample channel name2")
-        item2.put("description", s"sample channel description2")
-        item2.put("account_id", accountId1: Double)
-        item2.put("created_at", Date.timestamp: Double)
-        db.insertOrThrow("channels", null, item2)
-      }
+    val channelAccessor = ChannelAccessor.create(db, accountId1)
+    val channelId = channelAccessor findAt 0 map (_.channelId) getOrElse {
+      ChannelsTable(db) insert ChannelParts(
+        accountId = accountId1,
+        name = s"sample channel name1",
+        description = s"sample channel description1",
+        createdAt = Date.current()
+      )
+      val Right(id) = ChannelsTable(db) insert ChannelParts(
+        accountId = accountId1,
+        name = s"sample channel name2",
+        description = s"sample channel description2",
+        createdAt = Date.current()
+      )
+      id
     }
     (1 to n) foreach { i =>
       val source = new ContentValues()
