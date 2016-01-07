@@ -8,7 +8,7 @@ object Date {
   def timestamp: Int = current().timestamp
 
   def apply(timestamp: Int): Date = {
-    new DateImpl(new util.Date(timestamp * 1000))
+    new DateImpl(new util.Date(timestamp.toLong * 1000))
   }
   private class DateImpl(underlying: util.Date) extends Date {
     override def format: String = underlying.toString
