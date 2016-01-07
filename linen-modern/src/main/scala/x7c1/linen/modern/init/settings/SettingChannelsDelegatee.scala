@@ -1,0 +1,35 @@
+package x7c1.linen.modern.init.settings
+
+import android.app.Activity
+import android.support.v7.widget.LinearLayoutManager
+import x7c1.linen.glue.res.layout.{SettingChannelsRow, SettingChannelsLayout}
+import x7c1.linen.modern.accessor.{AccountAccessor, LinenOpenHelper, ChannelAccessor}
+import x7c1.linen.modern.display.settings.ChannelRowAdapter
+import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
+
+class SettingChannelsDelegatee (
+  activity: Activity,
+  layout: SettingChannelsLayout,
+  channelRowProvider: ViewHolderProvider[SettingChannelsRow] ){
+
+  private lazy val database =
+    new LinenOpenHelper(activity).getReadableDatabase
+
+  def setup(): Unit = {
+    val manager = new LinearLayoutManager(activity)
+    println(manager)
+
+    val accountId = AccountAccessor.create(database).findFirstId() getOrElse {
+      throw new IllegalStateException("account not found")
+    }
+    layout.channelList setLayoutManager manager
+    layout.channelList setAdapter new ChannelRowAdapter(
+      accessor = ChannelAccessor.create(database, accountId),
+      viewHolderProvider = channelRowProvider
+    )
+  }
+  def close(): Unit = {
+    Log info "[done]"
+  }
+}

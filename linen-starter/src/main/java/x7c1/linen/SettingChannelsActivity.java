@@ -4,11 +4,14 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import x7c1.linen.glue.res.layout.SettingChannelsLayout;
+import x7c1.linen.modern.init.settings.SettingChannelsDelegatee;
 import x7c1.linen.res.layout.SettingChannelsLayoutProvider;
+import x7c1.linen.res.layout.SettingChannelsRowProvider;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class SettingChannelsActivity extends BaseActivity {
+	private SettingChannelsDelegatee delegatee = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +20,14 @@ public class SettingChannelsActivity extends BaseActivity {
 		final SettingChannelsLayout layout =
 				new SettingChannelsLayoutProvider(this).inflate(null, false);
 
+		setContentView(layout.itemView);
+
+		this.delegatee = new SettingChannelsDelegatee(
+				this,
+				layout,
+				new SettingChannelsRowProvider(this)
+		);
+		this.delegatee.setup();
 	}
 
 	@Override
@@ -27,5 +38,11 @@ public class SettingChannelsActivity extends BaseActivity {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		delegatee.close();
 	}
 }
