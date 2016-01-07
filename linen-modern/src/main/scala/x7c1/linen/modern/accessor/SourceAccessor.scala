@@ -52,9 +52,20 @@ case class NoRecordError(message: String)
 
 object SourceAccessor {
   def create(db: SQLiteDatabase): Either[NoRecordError, SourceAccessor] = {
+    def findAccountId() =
+      AccountAccessor.create(db).findFirstId() match {
+        case Some(id) => Right(id)
+        case None => Left apply NoRecordError("account not found")
+      }
+    def findChannelId(accountId: Long) =
+      ChannelAccessor.create(db, accountId).findFirstId() match {
+        case Some(id) => Right(id)
+        case None => Left apply NoRecordError("channel not found")
+      }
+
     for {
-      channelId <- findFirstChannelId(db).right
-      accountId <- findFirstAccountId(db).right
+      accountId <- findAccountId().right
+      channelId <- findChannelId(accountId).right
     } yield {
       val cursor = createCursor(db, channelId, accountId)
       new SourceAccessorImpl(cursor)
