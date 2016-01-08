@@ -20,10 +20,10 @@ class ChannelAccessorTest extends JUnitSuiteLike {
 
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(channelId) = ChannelAccessor.create(db, accountId).findFirstId()
+    val Some(channelId) = ChannelAccessor.create(db, accountId) findAt 0 map (_.channelId)
     assertEquals(2, channelId)
 
-    val channelId2 = ChannelAccessor.create(db, accountId = 123).findFirstId()
+    val channelId2 = ChannelAccessor.create(db, accountId = 123) findAt 0
     assertEquals(None, channelId2)
   }
 

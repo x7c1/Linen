@@ -59,8 +59,8 @@ object SourceAccessor {
         case None => Left apply NoRecordError("account not found")
       }
     def findChannelId(accountId: Long) =
-      ChannelAccessor.create(db, accountId).findFirstId() match {
-        case Some(id) => Right(id)
+      ChannelAccessor.create(db, accountId).findAt(0) match {
+        case Some(channel) => Right(channel.channelId)
         case None => Left apply NoRecordError("channel not found")
       }
 

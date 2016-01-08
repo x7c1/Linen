@@ -7,9 +7,6 @@ import x7c1.linen.modern.struct.{Channel, Date}
 trait ChannelAccessor {
   def findAt(position: Int): Option[Channel]
   def length: Int
-  def findFirstId(): Option[Long] = {
-    findAt(0).map(_.channelId)
-  }
 }
 
 object ChannelAccessor {
