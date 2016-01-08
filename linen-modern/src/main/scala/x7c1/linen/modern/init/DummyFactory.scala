@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{ChannelSourceMapParts, SourceRatingParts, SourceStatusParts, SourceParts, AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{EntryParts, ChannelSourceMapParts, SourceRatingParts, SourceStatusParts, SourceParts, AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -102,14 +102,13 @@ object DummyFactory {
         Log info s"source at $i inserted"
       }
       (1 to 10) foreach { j =>
-        val entry = new ContentValues()
-        entry.put("source_id", sourceId: Double)
-        entry.put("title", s"$sourceId-$j entry title")
-        entry.put("content", s"$sourceId-$j entry content " + words(100,500))
-        entry.put("url", s"http://example.com/entry-$j")
-        entry.put("created_at", Date.timestamp: Double)
-        val entryId = db.insertOrThrow("entries", null, entry)
-
+        val Right(entryId) = writable insert EntryParts(
+          sourceId = sourceId,
+          title = s"$sourceId-$j entry title",
+          content = s"$sourceId-$j entry content " + words(100,500),
+          url = s"http://example.com/entry-$j",
+          createdAt = Date.current()
+        )
         if (i == 3){
           val status1 = new ContentValues()
           status1.put("start_entry_id", entryId: Double)
