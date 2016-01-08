@@ -168,6 +168,25 @@ object SourceStatusParts {
     }
   }
 }
+case class SourceStatusAsStarted(
+  startEntryId: Long,
+  sourceId: Long,
+  accountId: Long
+)
+object SourceStatusAsStarted {
+  implicit object updatable extends Updatable[SourceStatusAsStarted] {
+    override def tableName: String = "source_statuses"
+    override def toContentValues(target: SourceStatusAsStarted): ContentValues = {
+      val values = new ContentValues()
+      values.put("start_entry_id", target.startEntryId: java.lang.Long)
+      values
+    }
+    override def where(target: SourceStatusAsStarted) = Seq(
+      "source_id" -> target.sourceId.toString,
+      "account_id" -> target.accountId.toString
+    )
+  }
+}
 
 case class SourceRatingParts(
   sourceId: Long,

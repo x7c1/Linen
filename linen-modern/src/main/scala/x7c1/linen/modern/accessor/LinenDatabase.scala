@@ -140,4 +140,27 @@ class WritableDatabase(db: SQLiteDatabase) {
       case e: SQLException => Left(e)
     }
   }
+  def update[A: Updatable](target: A): Either[SQLException, Int] = {
+    try {
+      val updatable = implicitly[Updatable[A]]
+      val where = updatable where target
+      val clause = where map { case (key, _) => s"$key = ?" }
+      val args = where map { case (_, value) => value }
+      Right apply db.update(
+        updatable.tableName,
+        updatable toContentValues  target,
+        clause mkString " AND ",
+        args.toArray
+      )
+    } catch {
+      case e: SQLException => Left(e)
+    }
+
+  }
+}
+
+trait Updatable[A] {
+  def tableName: String
+  def toContentValues(target: A): ContentValues
+  def where(target: A): Seq[(String, String)]
 }

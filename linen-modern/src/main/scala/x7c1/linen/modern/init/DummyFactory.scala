@@ -1,11 +1,11 @@
 package x7c1.linen.modern.init
 
 import android.app.Activity
-import android.content.{ContentValues, Context}
+import android.content.Context
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{EntryParts, ChannelSourceMapParts, SourceRatingParts, SourceStatusParts, SourceParts, AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -110,31 +110,24 @@ object DummyFactory {
           createdAt = Date.current()
         )
         if (i == 3){
-          val status1 = new ContentValues()
-          status1.put("start_entry_id", entryId: Double)
-          db.update(
-            "source_statuses", status1,
-            "source_id = ? AND account_id = ?",
-            Array(sourceId.toString, accountId1.toString)
+          writable update SourceStatusAsStarted(
+            startEntryId = entryId,
+            sourceId = sourceId,
+            accountId = accountId1
           )
-          val status2 = new ContentValues()
-          status2.put("start_entry_id", entryId: Double)
-          db.update(
-            "source_statuses", status2,
-            "source_id = ? AND account_id = ?",
-            Array(sourceId.toString, accountId2.toString)
+          writable update SourceStatusAsStarted(
+            startEntryId = entryId,
+            sourceId = sourceId,
+            accountId = accountId2
           )
         }
         if (i == 4){
-          val status2 = new ContentValues()
-          status2.put("start_entry_id", entryId: Double)
-          db.update(
-            "source_statuses", status2,
-            "source_id = ? AND account_id = ?",
-            Array(sourceId.toString, accountId2.toString)
+          writable update SourceStatusAsStarted(
+            startEntryId = entryId,
+            sourceId = sourceId,
+            accountId = accountId2
           )
         }
-
       }
     }
   }
