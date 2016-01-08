@@ -1,7 +1,6 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
-import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Channel, Date}
 
@@ -62,27 +61,16 @@ case class ChannelParts(
   createdAt: Date
 )
 
-class ChannelsTable private (db: SQLiteDatabase) {
-  def insert(parts: ChannelParts): Either[SQLException, Long] = {
-    val values = toValues(parts)
-    try {
-      Right apply db.insertOrThrow("channels", null, values)
-    } catch {
-      case e: SQLException => Left(e)
+object ChannelParts {
+  implicit object insertable extends Insertable[ChannelParts] {
+    override def tableName = "channels"
+    override def toContentValues(parts: ChannelParts) = {
+      val values = new ContentValues()
+      values.put("name", parts.name)
+      values.put("description", parts.description)
+      values.put("account_id", parts.accountId.toString)
+      values.put("created_at", parts.createdAt.timestamp.toString)
+      values
     }
-  }
-  def toValues(parts: ChannelParts): ContentValues = {
-    val values = new ContentValues()
-    values.put("name", parts.name)
-    values.put("description", parts.description)
-    values.put("account_id", parts.accountId.toString)
-    values.put("created_at", parts.createdAt.timestamp.toString)
-    values
-  }
-}
-
-object ChannelsTable {
-  def apply(db: SQLiteDatabase): ChannelsTable = {
-    new ChannelsTable(db)
   }
 }

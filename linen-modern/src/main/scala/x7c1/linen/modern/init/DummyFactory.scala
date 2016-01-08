@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{ChannelAccessor, ChannelParts, ChannelsTable, AccountAccessor, AccountParts, AccountsTable, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -30,9 +30,10 @@ object DummyFactory {
   def createDummies(context: Context)(n: Int) = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
+    val writable = helper.writableDatabase
 
     val accountId1 = AccountAccessor.create(db) findAt 0 map (_.accountId) getOrElse {
-      val Right(id) = AccountsTable(db) insert AccountParts(
+      val Right(id) = writable insert AccountParts(
         nickname = s"sample-user-1",
         biography = s"sample-biography-1",
         createdAt = Date.current()
@@ -40,7 +41,7 @@ object DummyFactory {
       id
     }
     val accountId2 = AccountAccessor.create(db) findAt 1 map (_.accountId) getOrElse {
-      val Right(id) = AccountsTable(db) insert AccountParts(
+      val Right(id) = writable insert AccountParts(
         nickname = s"sample-user-2",
         biography = s"sample-biography-2",
         createdAt = Date.current()
@@ -49,13 +50,13 @@ object DummyFactory {
     }
     val channelAccessor = ChannelAccessor.create(db, accountId1)
     val channelId = channelAccessor findAt 0 map (_.channelId) getOrElse {
-      ChannelsTable(db) insert ChannelParts(
+      writable insert ChannelParts(
         accountId = accountId1,
         name = s"sample channel name1",
         description = s"sample channel description1",
         createdAt = Date.current()
       )
-      val Right(id) = ChannelsTable(db) insert ChannelParts(
+      val Right(id) = writable insert ChannelParts(
         accountId = accountId1,
         name = s"sample channel name2",
         description = s"sample channel description2",

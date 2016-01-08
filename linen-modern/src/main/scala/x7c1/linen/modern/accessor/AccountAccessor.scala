@@ -1,7 +1,6 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
-import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.Date
 
@@ -44,22 +43,15 @@ case class AccountParts(
   biography: String,
   createdAt: Date
 )
-
-class AccountsTable private (db: SQLiteDatabase) {
-  def insert(parts: AccountParts): Either[SQLException, Long] = {
-    val values = new ContentValues()
-    values.put("nickname", parts.nickname)
-    values.put("biography", parts.biography)
-    values.put("created_at", parts.createdAt.timestamp.toString)
-    try Right apply db.insertOrThrow("accounts", null, values)
-    catch {
-      case e: SQLException => Left(e)
+object AccountParts {
+  implicit object insertable extends Insertable[AccountParts]{
+    override def tableName: String = "accounts"
+    override def toContentValues(target: AccountParts): ContentValues = {
+      val values = new ContentValues()
+      values.put("nickname", target.nickname)
+      values.put("biography", target.biography)
+      values.put("created_at", target.createdAt.timestamp.toString)
+      values
     }
-  }
-}
-
-object AccountsTable {
-  def apply(db: SQLiteDatabase): AccountsTable = {
-    new AccountsTable(db)
   }
 }

@@ -1,6 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
+import android.content.{ContentValues, Context}
+import android.database.SQLException
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 
 
@@ -11,6 +12,8 @@ object LinenDatabase {
 
 class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
+
+  lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
     db.setForeignKeyConstraintsEnabled(true)
@@ -119,5 +122,22 @@ class LinenOpenHelper(context: Context)
       sourceStatuses
     ).flatten foreach db.execSQL
 
+  }
+}
+
+trait Insertable[A] {
+  def tableName: String
+  def toContentValues(target: A): ContentValues
+}
+
+class WritableDatabase(db: SQLiteDatabase) {
+  def insert[A: Insertable](target: A): Either[SQLException, Long] = {
+    try {
+      val i = implicitly[Insertable[A]]
+      val id = db.insertOrThrow(i.tableName, null, i toContentValues target)
+      Right(id)
+    } catch {
+      case e: SQLException => Left(e)
+    }
   }
 }
