@@ -1,8 +1,9 @@
 package x7c1.linen.modern.accessor
 
+import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.Source
+import x7c1.linen.modern.struct.{Date, Source}
 
 trait SourceAccessor {
 
@@ -127,5 +128,81 @@ object SourceAccessor {
 
     db.rawQuery(sql5,
       Array(channelId.toString, accountId.toString, accountId.toString))
+  }
+}
+
+case class SourceParts(
+  title: String,
+  url: String,
+  description: String,
+  createdAt: Date
+)
+object SourceParts {
+  implicit object insertable extends Insertable[SourceParts] {
+    override def tableName: String = "sources"
+    override def toContentValues(target: SourceParts): ContentValues = {
+      val values = new ContentValues()
+      values.put("title", target.title)
+      values.put("url", target.url)
+      values.put("description", target.description)
+      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
+      values
+    }
+  }
+}
+
+case class SourceStatusParts(
+  sourceId: Long,
+  accountId: Long,
+  createdAt: Date
+)
+object SourceStatusParts {
+  implicit object insertable extends Insertable[SourceStatusParts] {
+    override def tableName: String = "source_statuses"
+    override def toContentValues(target: SourceStatusParts): ContentValues = {
+      val values = new ContentValues()
+      values.put("source_id", target.sourceId: java.lang.Long)
+      values.put("account_id", target.accountId: java.lang.Long)
+      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
+      values
+    }
+  }
+}
+
+case class SourceRatingParts(
+  sourceId: Long,
+  ownerAccountId: Long,
+  rating: Int,
+  createdAt: Date
+)
+object SourceRatingParts {
+  implicit object insertable extends Insertable[SourceRatingParts] {
+    override def tableName: String = "source_ratings"
+    override def toContentValues(target: SourceRatingParts): ContentValues = {
+      val values = new ContentValues()
+      values.put("source_id", target.sourceId: java.lang.Long)
+      values.put("owner_account_id", target.ownerAccountId: java.lang.Long)
+      values.put("rating", target.rating: java.lang.Integer)
+      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
+      values
+    }
+  }
+}
+
+case class ChannelSourceMapParts(
+  channelId: Long,
+  sourceId: Long,
+  createdAt: Date
+)
+object ChannelSourceMapParts {
+  implicit object insertable extends Insertable[ChannelSourceMapParts] {
+    override def tableName: String = "channel_source_map"
+    override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
+      val values = new ContentValues()
+      values.put("source_id", target.sourceId: java.lang.Long)
+      values.put("channel_id", target.channelId: java.lang.Long)
+      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
+      values
+    }
   }
 }

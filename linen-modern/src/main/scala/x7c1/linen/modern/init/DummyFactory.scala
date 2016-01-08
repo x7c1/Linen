@@ -5,7 +5,7 @@ import android.content.{ContentValues, Context}
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{ChannelSourceMapParts, SourceRatingParts, SourceStatusParts, SourceParts, AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -65,45 +65,39 @@ object DummyFactory {
       id
     }
     (1 to n) foreach { i =>
-      val source = new ContentValues()
-      source.put("title", s"$i-title")
-      source.put("url", s"http://example.com/source$i")
-      source.put("description", s"description-$i " + words(1,15))
-      source.put("created_at", Date.timestamp: Double)
-      val sourceId = db.insertOrThrow("sources", null, source)
-
-      val status1 = new ContentValues()
-      status1.put("source_id", sourceId: Double)
-      status1.put("account_id", accountId1: Double)
-      status1.put("created_at", Date.timestamp: Double)
-      db.insertOrThrow("source_statuses", null, status1)
-
-      val rating1 = new ContentValues()
-      rating1.put("source_id", sourceId: Double)
-      rating1.put("owner_account_id", accountId1: Double)
-      rating1.put("rating", sourceId: Double)
-      rating1.put("created_at", Date.timestamp: Double)
-      db.insertOrThrow("source_ratings", null, rating1)
-
-      val status2 = new ContentValues()
-      status2.put("source_id", sourceId: Double)
-      status2.put("account_id", accountId2: Double)
-      status2.put("created_at", Date.timestamp: Double)
-      db.insertOrThrow("source_statuses", null, status2)
-
-      val rating2 = new ContentValues()
-      rating2.put("source_id", sourceId: Double)
-      rating2.put("owner_account_id", accountId2: Double)
-      rating2.put("rating", sourceId: Double)
-      rating2.put("created_at", Date.timestamp: Double)
-      db.insertOrThrow("source_ratings", null, rating2)
-
-      val channelSourceMap = new ContentValues()
-      channelSourceMap.put("channel_id", channelId: Double)
-      channelSourceMap.put("source_id", sourceId: Double)
-      channelSourceMap.put("created_at", Date.timestamp: Double)
-      db.insertOrThrow("channel_source_map", null, channelSourceMap)
-
+      val Right(sourceId) = writable insert SourceParts(
+        title = s"$i-title",
+        url = s"http://example.com/source$i",
+        description = s"description-$i " + words(1,15),
+        createdAt = Date.current()
+      )
+      writable insert SourceStatusParts(
+        sourceId = sourceId,
+        accountId = accountId1,
+        createdAt = Date.current()
+      )
+      writable insert SourceRatingParts(
+        sourceId = sourceId,
+        ownerAccountId = accountId1,
+        rating = sourceId.toInt,
+        createdAt = Date.current()
+      )
+      writable insert SourceStatusParts(
+        sourceId = sourceId,
+        accountId = accountId2,
+        createdAt = Date.current()
+      )
+      writable insert SourceRatingParts(
+        sourceId = sourceId,
+        ownerAccountId = accountId2,
+        rating = sourceId.toInt,
+        createdAt = Date.current()
+      )
+      writable insert ChannelSourceMapParts(
+        channelId = channelId,
+        sourceId = sourceId,
+        createdAt = Date.current()
+      )
       if (i % 10 == 0){
         Log info s"source at $i inserted"
       }

@@ -50,7 +50,7 @@ object AccountParts {
       val values = new ContentValues()
       values.put("nickname", target.nickname)
       values.put("biography", target.biography)
-      values.put("created_at", target.createdAt.timestamp.toString)
+      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
       values
     }
   }

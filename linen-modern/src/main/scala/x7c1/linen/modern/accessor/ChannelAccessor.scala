@@ -68,8 +68,8 @@ object ChannelParts {
       val values = new ContentValues()
       values.put("name", parts.name)
       values.put("description", parts.description)
-      values.put("account_id", parts.accountId.toString)
-      values.put("created_at", parts.createdAt.timestamp.toString)
+      values.put("account_id", parts.accountId: java.lang.Long)
+      values.put("created_at", parts.createdAt.timestamp: java.lang.Integer)
       values
     }
   }
