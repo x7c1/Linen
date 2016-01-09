@@ -8,6 +8,7 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.support.v4.widget.DrawerLayout;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -16,10 +17,11 @@ import android.support.design.widget.FloatingActionButton;
 
 public class MainLayout extends RecyclerView.ViewHolder {
 
+    public final android.support.v4.widget.DrawerLayout drawerMenu;
     public final LinearLayout menuArea;
+    public final android.support.v7.widget.RecyclerView menuList;
     public final Button createDummies;
     public final Button initDummies;
-    public final android.support.v7.widget.RecyclerView menuList;
     public final LinearLayout paneContainer;
     public final RelativeLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
@@ -39,10 +41,11 @@ public class MainLayout extends RecyclerView.ViewHolder {
 
     public MainLayout(
         View itemView,
+        android.support.v4.widget.DrawerLayout drawerMenu,
         LinearLayout menuArea,
+        android.support.v7.widget.RecyclerView menuList,
         Button createDummies,
         Button initDummies,
-        android.support.v7.widget.RecyclerView menuList,
         LinearLayout paneContainer,
         RelativeLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
@@ -61,10 +64,11 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.design.widget.FloatingActionButton detailToNext
     ){
         super(itemView);
+        this.drawerMenu = drawerMenu;
         this.menuArea = menuArea;
+        this.menuList = menuList;
         this.createDummies = createDummies;
         this.initDummies = initDummies;
-        this.menuList = menuList;
         this.paneContainer = paneContainer;
         this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;

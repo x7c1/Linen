@@ -26,18 +26,9 @@ public class MainActivity extends BaseActivity {
 
 		final MainLayout layout = new MainLayoutProvider(this).inflate(null, false);
 
-		layout.sourceToolbar.setTitle("Technology");
 		layout.sourceToolbar.setNavigationIcon(R.drawable.ic_action_menu);
-		layout.sourceToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.i(getClass().getName(), v.getClass().getName());
-
-				DrawerLayout x = (DrawerLayout) layout.itemView.findViewById(R.id.drawer_layout__root);
-				x.openDrawer(GravityCompat.START);
-			}
-		});
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
+
 		layout.entryToolbar.inflateMenu(R.menu.menu_main);
 		layout.entryDetailToolbar.inflateMenu(R.menu.menu_main);
 
