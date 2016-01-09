@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
@@ -38,6 +39,7 @@ public class SettingChannelsLayoutProvider implements ViewHolderProvider<Setting
         View view = inflater.inflate(R.layout.setting_channels_layout, parent, attachToRoot);
         return new SettingChannelsLayout(
             view,
+            (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_channels_layout__toolbar),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_channels_layout__channel_list)
         );
     }

@@ -20,6 +20,7 @@ public class SettingChannelsActivity extends BaseActivity {
 		final SettingChannelsLayout layout =
 				new SettingChannelsLayoutProvider(this).inflate(null, false);
 
+		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		setContentView(layout.itemView);
 
 		this.delegatee = new SettingChannelsDelegatee(
@@ -44,5 +45,11 @@ public class SettingChannelsActivity extends BaseActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.close();
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.animator.back_slide_in, R.animator.back_slide_out);
 	}
 }

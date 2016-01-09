@@ -7,6 +7,7 @@ import x7c1.linen.modern.accessor.{AccountAccessor, LinenOpenHelper, ChannelAcce
 import x7c1.linen.modern.display.settings.ChannelRowAdapter
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.decorator.Imports._
 
 class SettingChannelsDelegatee (
   activity: Activity,
@@ -17,6 +18,9 @@ class SettingChannelsDelegatee (
     new LinenOpenHelper(activity).getReadableDatabase
 
   def setup(): Unit = {
+    layout.toolbar onClickNavigation { _ =>
+      activity.finish()
+    }
     val manager = new LinearLayoutManager(activity)
     println(manager)
 

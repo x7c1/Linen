@@ -1,10 +1,6 @@
 package x7c1.linen;
 
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.View;
 
 import x7c1.linen.glue.res.layout.MainLayout;
 import x7c1.linen.modern.init.ContainerInitializer;

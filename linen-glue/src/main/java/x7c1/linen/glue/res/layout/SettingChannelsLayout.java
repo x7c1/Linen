@@ -8,16 +8,20 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.support.v7.widget.Toolbar;
 
 public class SettingChannelsLayout extends RecyclerView.ViewHolder {
 
+    public final android.support.v7.widget.Toolbar toolbar;
     public final android.support.v7.widget.RecyclerView channelList;
 
     public SettingChannelsLayout(
         View itemView,
+        android.support.v7.widget.Toolbar toolbar,
         android.support.v7.widget.RecyclerView channelList
     ){
         super(itemView);
+        this.toolbar = toolbar;
         this.channelList = channelList;
     }
 }
