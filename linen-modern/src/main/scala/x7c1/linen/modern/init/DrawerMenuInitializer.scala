@@ -44,14 +44,14 @@ trait DrawerMenuInitializer {
 
     MenuItemsBoxes(
       new MenuItemsBox(
-        label of "Unread channels",
+        label of "Unread Channels",
         item of NoChannel("(all articles browsed)")
       ),
       new MenuItemsBox(
         label of "Settings",
         item of Channels("Channels"),
-        item of ChannelSources("Channel sources"),
-        item of CrawlerSchedule("Crawler schedule")
+        item of ChannelSources("Channel Sources"),
+        item of CrawlerSchedule("Updater Schedule")
       )
     )
   }
