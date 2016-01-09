@@ -8,5 +8,5 @@ object DrawerMenuItemKind {
   case class NoChannel(body: String) extends DrawerMenuItemKind
   case class Channels(body: String) extends DrawerMenuItemKind
   case class ChannelSources(body: String) extends DrawerMenuItemKind
-  case class CrawlerSchedule(body: String) extends DrawerMenuItemKind
+  case class UpdaterSchedule(body: String) extends DrawerMenuItemKind
 }

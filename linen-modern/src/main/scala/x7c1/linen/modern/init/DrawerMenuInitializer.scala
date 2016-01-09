@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityLabel.SettingChannels
 import x7c1.linen.glue.activity.ActivityStarter
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
-import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, CrawlerSchedule, NoChannel}
+import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, UpdaterSchedule, NoChannel}
 import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -51,7 +51,7 @@ trait DrawerMenuInitializer {
         label of "Settings",
         item of Channels("Channels"),
         item of ChannelSources("Channel Sources"),
-        item of CrawlerSchedule("Updater Schedule")
+        item of UpdaterSchedule("Updater Schedule")
       )
     )
   }
@@ -66,7 +66,7 @@ class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListe
       starter transitTo SettingChannels
     case _: ChannelSources =>
       Log info s"$kind"
-    case _: CrawlerSchedule =>
+    case _: UpdaterSchedule =>
       Log info s"$kind"
   }
 }
