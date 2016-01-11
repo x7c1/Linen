@@ -5,7 +5,13 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Source}
 
+import scala.util.Try
+
 trait SourceAccessor {
+
+  def sourceIds: Seq[Long] = {
+    (0 to length - 1).map(findAt).flatMap(_.map(_.id))
+  }
 
   def findAt(position: Int): Option[Source]
 
@@ -51,24 +57,17 @@ private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
 case class NoRecordError(message: String)
 
-object SourceAccessor {
-  def create(db: SQLiteDatabase): Either[NoRecordError, SourceAccessor] = {
-    def findAccountId() =
-      AccountAccessor.create(db).findAt(0) match {
-        case Some(account) => Right(account.accountId)
-        case None => Left apply NoRecordError("account not found")
-      }
-    def findChannelId(accountId: Long) =
-      ChannelAccessor.create(db, accountId).findAt(0) match {
-        case Some(channel) => Right(channel.channelId)
-        case None => Left apply NoRecordError("channel not found")
-      }
+class SourceAccessorFactory(db: SQLiteDatabase){
+  def create(channelId: Long, accountId: Long): SourceAccessor = {
+    val cursor = SourceAccessor.createCursor(db, channelId, accountId)
+    new SourceAccessorImpl(cursor)
+  }
+}
 
-    for {
-      accountId <- findAccountId().right
-      channelId <- findChannelId(accountId).right
-    } yield {
-      val cursor = createCursor(db, channelId, accountId)
+object SourceAccessor {
+  def create(db: SQLiteDatabase, accountId: Long, channelId: Long): Try[SourceAccessor] = {
+    Try {
+      val cursor = SourceAccessor.createCursor(db, channelId, accountId)
       new SourceAccessorImpl(cursor)
     }
   }

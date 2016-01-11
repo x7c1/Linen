@@ -3,7 +3,7 @@ package x7c1.linen.modern.init
 import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
+import x7c1.linen.modern.accessor.{AccountAccessor, ChannelAccessor, EntryAccessor, EntryAccessorBinder, SourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -68,15 +68,10 @@ class AccessorLoader(
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources() = loaderFactory asFuture {
-    val sourceIds = SourceAccessor create database match {
-      case Right(accessor) =>
-        sourceAccessor = Some(accessor)
-        (0 to accessor.length - 1).map(accessor.findAt).flatMap(_.map(_.id))
-      case Left(noRecordError) =>
-        Seq()
-    }
-    sourceIds
+  private def startLoadingSources(): Future[Seq[Long]] = loaderFactory asFuture {
+    val accessor = AccessorLoader inspectSourceAccessor database
+    this.sourceAccessor = accessor
+    accessor map (_.sourceIds) getOrElse Seq()
   }
   private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
@@ -138,4 +133,25 @@ class AccessorLoader(
       (e.toString +: e.getStackTrace.take(30) mkString "\n")
   }
 
+}
+
+object AccessorLoader {
+  def inspectSourceAccessor(db: SQLiteDatabase): Option[SourceAccessor] = {
+    val accessor = (for {
+      accountId <- AccountAccessor.inspectAccountId(db).right
+      channelId <- ChannelAccessor.inspectChannelId(db, accountId).right
+    } yield {
+      SourceAccessor.create(db, accountId, channelId)
+    }) match {
+      case Right(Success(x)) =>
+        Some(x)
+      case Right(Failure(throwable)) =>
+        Log error throwable.getMessage
+        None
+      case Left(noRecord) =>
+        Log info noRecord.message
+        None
+    }
+    accessor
+  }
 }

@@ -12,6 +12,12 @@ object AccountAccessor {
   def create(db: SQLiteDatabase): AccountAccessor = {
     new AccountAccessorImpl(db)
   }
+  def inspectAccountId(db: SQLiteDatabase): Either[NoRecordError, Long] =
+    AccountAccessor.create(db).findAt(0) match {
+      case Some(account) => Right(account.accountId)
+      case None => Left apply NoRecordError("account not found")
+    }
+
   private class AccountAccessorImpl(db: SQLiteDatabase) extends AccountAccessor {
     private lazy val cursor = {
       val sql =

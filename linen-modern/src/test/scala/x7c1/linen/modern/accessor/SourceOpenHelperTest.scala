@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.init.DummyFactory
+import x7c1.linen.modern.init.{AccessorLoader, DummyFactory}
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
@@ -52,8 +52,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     */
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = SourceAccessor create db
-    val sourceIds = (0 to sourceAccessor.length - 1).map(sourceAccessor.findAt).flatMap(_.map(_.id))
+    val Some(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db)
+    val sourceIds = sourceAccessor.sourceIds
+
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
@@ -70,9 +71,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val Right(accessor0) = SourceAccessor create db
-    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
-    val sourceIds = sources.flatMap(_.map(_.id))
+    val Some(accessor0) = AccessorLoader.inspectSourceAccessor(db)
+    val sourceIds = accessor0.sourceIds
+
     val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
     val rows = toMaps(cursor)
 //    rows.map(prettyPrint) foreach println
