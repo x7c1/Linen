@@ -3,7 +3,11 @@ package x7c1.linen.modern.init
 import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{SqlError, NoRecordError, AccessorError, AccountAccessor, ChannelAccessor, EntryAccessor, EntryAccessorBinder, SourceAccessor}
+import x7c1.linen.modern.accessor.AccountAccessor.findCurrentAccountId
+import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
+import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -69,12 +73,12 @@ class AccessorLoader(
     }
   }
   private def startLoadingSources(): Future[Seq[Long]] = loaderFactory asFuture {
-    AccessorLoader inspectSourceAccessor database match {
-      case Left(error: NoRecordError) =>
-        Log info error.toString
-        Seq()
-      case Left(error: SqlError) =>
+    inspectSourceAccessor(database).toEither match {
+      case Left(error: ErrorEmpty) =>
         Log error error.message
+        Seq()
+      case Left(empty) =>
+        Log info empty.message
         Seq()
       case Right(accessor) =>
         this.sourceAccessor = Some(accessor)
@@ -140,18 +144,22 @@ class AccessorLoader(
     "[failed] " +
       (e.toString +: e.getStackTrace.take(30) mkString "\n")
   }
-
 }
 
 object AccessorLoader {
-  def inspectSourceAccessor(db: SQLiteDatabase): Either[AccessorError, SourceAccessor] = {
-    val accessor = for {
-      accountId <- AccountAccessor.inspectAccountId(db).right
-      channelId <- ChannelAccessor.inspectChannelId(db, accountId).right
-      accessor <- SourceAccessor.create(db, accountId, channelId).right
-    } yield {
-      accessor
+  import scalaz.\/
+  import scalaz.\/.{left, right}
+  import scalaz.std.option.optionSyntax._
+
+  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ SourceAccessor =
+    try for {
+      accountId <- findCurrentAccountId(db) \/> AccountNotFound
+      channelId <- findCurrentChannelId(db, accountId) \/> ChannelNotFound(accountId)
+      accessor <- SourceAccessor.create(db, accountId, channelId) match {
+        case Failure(exception) => left(Abort(exception))
+        case Success(accessor) => right(accessor)
+      }
+    } yield accessor catch {
+      case e: Exception => left(Abort(e))
     }
-    accessor
-  }
 }

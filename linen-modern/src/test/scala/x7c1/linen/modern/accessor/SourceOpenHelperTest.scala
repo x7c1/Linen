@@ -7,7 +7,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.init.{AccessorLoader, DummyFactory}
+import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.DummyFactory
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
@@ -52,7 +53,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     */
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db)
+    val Right(sourceAccessor) = inspectSourceAccessor(db).toEither
     val sourceIds = sourceAccessor.sourceIds
 
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
@@ -71,7 +72,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val Right(accessor0) = AccessorLoader.inspectSourceAccessor(db)
+    val Right(accessor0) = inspectSourceAccessor(db).toEither
     val sourceIds = accessor0.sourceIds
 
     val cursor = EntryAccessor.createPositionCursor(db, sourceIds)

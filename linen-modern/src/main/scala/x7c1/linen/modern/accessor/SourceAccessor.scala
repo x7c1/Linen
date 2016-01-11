@@ -1,9 +1,11 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.{Cursor, SQLException}
 import x7c1.linen.modern.struct.{Date, Source}
+
+import scala.util.Try
 
 trait SourceAccessor {
 
@@ -63,14 +65,11 @@ class SourceAccessorFactory(db: SQLiteDatabase){
 object SourceAccessor {
   def create(
     db: SQLiteDatabase,
-    accountId: Long,
-    channelId: Long): Either[SqlError, SourceAccessor] = {
+    accountId: Long, channelId: Long): Try[SourceAccessor] = {
 
-    try {
+    Try {
       val cursor = SourceAccessor.createCursor(db, channelId, accountId)
-      Right apply new SourceAccessorImpl(cursor)
-    } catch {
-      case e: SQLException => Left apply SqlError(e)
+      new SourceAccessorImpl(cursor)
     }
   }
   def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {

@@ -13,11 +13,9 @@ object ChannelAccessor {
   def create(db: SQLiteDatabase, accountId: Long): ChannelAccessor = {
     new ChannelAccessorImpl(db, accountId)
   }
-  def inspectChannelId(db: SQLiteDatabase, accountId: Long): Either[NoRecordError, Long] =
-    ChannelAccessor.create(db, accountId) findAt 0 match {
-      case Some(channel) => Right(channel.channelId)
-      case None => Left apply NoRecordError("channel not found")
-    }
+  def findCurrentChannelId(db: SQLiteDatabase, accountId: Long): Option[Long] = {
+    ChannelAccessor.create(db, accountId) findAt 0 map (_.channelId)
+  }
 
   private class ChannelAccessorImpl(
     db: SQLiteDatabase, accountId: Long) extends ChannelAccessor {
