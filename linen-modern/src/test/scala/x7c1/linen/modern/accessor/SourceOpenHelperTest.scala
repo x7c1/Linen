@@ -52,7 +52,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     */
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Some(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db)
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
 
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
@@ -71,7 +71,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val Some(accessor0) = AccessorLoader.inspectSourceAccessor(db)
+    val Right(accessor0) = AccessorLoader.inspectSourceAccessor(db)
     val sourceIds = accessor0.sourceIds
 
     val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
