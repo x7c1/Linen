@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.SourceRow
 import x7c1.linen.modern.accessor.UnreadSourceAccessor
-import x7c1.linen.modern.struct.Source
+import x7c1.linen.modern.struct.UnreadSource
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -36,6 +36,6 @@ trait OnSourceSelectedListener {
   def onSourceSelected(event: SourceSelectedEvent): Unit
 }
 
-case class SourceSelectedEvent (position: Int, source: Source){
+case class SourceSelectedEvent (position: Int, source: UnreadSource){
   def dump: String = s"sourceId:${source.id}, position:$position"
 }

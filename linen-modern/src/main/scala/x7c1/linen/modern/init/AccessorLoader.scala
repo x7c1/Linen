@@ -8,7 +8,7 @@ import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
 import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
 import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -36,7 +36,7 @@ class AccessorLoader(
 
   def createSourceAccessor: UnreadSourceAccessor =
     new UnreadSourceAccessor {
-      override def findAt(position: Int): Option[Source] = {
+      override def findAt(position: Int): Option[UnreadSource] = {
         sourceAccessor.flatMap(_ findAt position)
       }
       override def positionOf(sourceId: Long): Option[Int] = {

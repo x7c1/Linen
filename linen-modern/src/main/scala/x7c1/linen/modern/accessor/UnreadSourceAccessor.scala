@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.{Date, Source}
+import x7c1.linen.modern.struct.{Date, UnreadSource}
 
 import scala.util.Try
 
@@ -13,7 +13,7 @@ trait UnreadSourceAccessor {
     (0 to length - 1).map(findAt).flatMap(_.map(_.id))
   }
 
-  def findAt(position: Int): Option[Source]
+  def findAt(position: Int): Option[UnreadSource]
 
   def length: Int
 
@@ -29,7 +29,7 @@ private class UnreadSourceAccessorImpl(cursor: Cursor) extends UnreadSourceAcces
 
   override def findAt(position: Int) = synchronized {
     if (cursor moveToPosition position){
-      Some apply Source(
+      Some apply UnreadSource(
         id = cursor.getLong(idIndex),
         url = "dummy",
         title = cursor.getString(titleIndex),
