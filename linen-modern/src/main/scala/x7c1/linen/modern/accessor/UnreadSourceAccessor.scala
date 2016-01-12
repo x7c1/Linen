@@ -7,7 +7,7 @@ import x7c1.linen.modern.struct.{Date, Source}
 
 import scala.util.Try
 
-trait SourceAccessor {
+trait UnreadSourceAccessor {
 
   def sourceIds: Seq[Long] = {
     (0 to length - 1).map(findAt).flatMap(_.map(_.id))
@@ -20,7 +20,7 @@ trait SourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
-private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
+private class UnreadSourceAccessorImpl(cursor: Cursor) extends UnreadSourceAccessor {
 
   private lazy val idIndex = cursor getColumnIndex "source_id"
   private lazy val titleIndex = cursor getColumnIndex "title"
@@ -55,21 +55,21 @@ private class SourceAccessorImpl(cursor: Cursor) extends SourceAccessor {
 
 }
 
-class SourceAccessorFactory(db: SQLiteDatabase){
-  def create(channelId: Long, accountId: Long): SourceAccessor = {
-    val cursor = SourceAccessor.createCursor(db, channelId, accountId)
-    new SourceAccessorImpl(cursor)
+class UnreadSourceAccessorFactory(db: SQLiteDatabase){
+  def create(channelId: Long, accountId: Long): UnreadSourceAccessor = {
+    val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
+    new UnreadSourceAccessorImpl(cursor)
   }
 }
 
-object SourceAccessor {
+object UnreadSourceAccessor {
   def create(
     db: SQLiteDatabase,
-    accountId: Long, channelId: Long): Try[SourceAccessor] = {
+    accountId: Long, channelId: Long): Try[UnreadSourceAccessor] = {
 
     Try {
-      val cursor = SourceAccessor.createCursor(db, channelId, accountId)
-      new SourceAccessorImpl(cursor)
+      val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
+      new UnreadSourceAccessorImpl(cursor)
     }
   }
   def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {

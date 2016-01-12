@@ -1,13 +1,13 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.SourceAccessor
+import x7c1.linen.modern.accessor.UnreadSourceAccessor
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 
 class SourceAreaAction(
   sourceArea: SourceArea,
-  sourceAccessor: SourceAccessor
+  sourceAccessor: UnreadSourceAccessor
 ) extends OnSourceSelected with OnSourceSkipped
   with OnEntrySelected with OnEntryFocused with OnEntrySkipStopped
   with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {

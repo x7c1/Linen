@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.AccountAccessor.findCurrentAccountId
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
 import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
@@ -31,11 +31,11 @@ class AccessorLoader(
     loaderManager = loaderManager,
     startLoaderId = 0
   )
-  private var sourceAccessor: Option[SourceAccessor] = None
+  private var sourceAccessor: Option[UnreadSourceAccessor] = None
   private var currentSourceLength: Int = 0
 
-  def createSourceAccessor: SourceAccessor =
-    new SourceAccessor {
+  def createSourceAccessor: UnreadSourceAccessor =
+    new UnreadSourceAccessor {
       override def findAt(position: Int): Option[Source] = {
         sourceAccessor.flatMap(_ findAt position)
       }
@@ -151,11 +151,11 @@ object AccessorLoader {
   import scalaz.\/.{left, right}
   import scalaz.std.option.optionSyntax._
 
-  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ SourceAccessor =
+  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor =
     try for {
       accountId <- findCurrentAccountId(db) \/> AccountNotFound
       channelId <- findCurrentChannelId(db, accountId) \/> ChannelNotFound(accountId)
-      accessor <- SourceAccessor.create(db, accountId, channelId) match {
+      accessor <- UnreadSourceAccessor.create(db, accountId, channelId) match {
         case Failure(exception) => left(Abort(exception))
         case Success(accessor) => right(accessor)
       }

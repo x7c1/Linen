@@ -1,6 +1,6 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.{EntryAccessor, SourceAccessor}
+import x7c1.linen.modern.accessor.{EntryAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
 import x7c1.wheat.modern.callback.CallbackTask
@@ -53,7 +53,7 @@ case class SourceFocusedEvent(
   override val position: Int,
   source: Source) extends ItemFocusedEvent
 
-class SourceFocusedEventFactory(sourceAccessor: SourceAccessor)
+class SourceFocusedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
@@ -67,7 +67,7 @@ case class SourceSkippedEvent(
   override val nextPosition: Int,
   nextSource: Source ) extends ItemSkippedEvent
 
-class SourceSkippedEventFactory(sourceAccessor: SourceAccessor)
+class SourceSkippedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends ItemSkippedEventFactory[SourceSkippedEvent]{
 
   override def createAt(next: Int) = {
@@ -81,7 +81,7 @@ case class SourceSkipStopped(
   override val currentPosition: Int,
   currentSource: Source ) extends SkipStoppedEvent
 
-class SourceSkipStoppedFactory(sourceAccessor: SourceAccessor)
+class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
   extends SkipStoppedEventFactory[SourceSkipStopped]{
 
   override def createAt(current: Int) = {
