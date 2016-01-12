@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.dev
 
 import android.content.Context
 import x7c1.linen.modern.accessor.DummyString.words
