@@ -5,10 +5,10 @@ import java.lang.Math.min
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.glue.activity.ActivityLabel.SettingChannels
+import x7c1.linen.glue.activity.ActivityLabel.{CreateDummies, SettingChannels}
 import x7c1.linen.glue.activity.ActivityStarter
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
-import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, UpdaterSchedule, NoChannel}
+import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
 import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -52,6 +52,11 @@ trait DrawerMenuInitializer {
         item of Channels("Channels"),
         item of ChannelSources("Channel Sources"),
         item of UpdaterSchedule("Updater Schedule")
+      ),
+      new MenuItemsBox(
+        label of "Developments",
+        item of DevCreateDummies("Create Dummies"),
+        item of DevShowRecords("Show Records")
       )
     )
   }
@@ -68,5 +73,10 @@ class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListe
       Log info s"$kind"
     case _: UpdaterSchedule =>
       Log info s"$kind"
+
+    case _: DevShowRecords =>
+      Log info s"$kind"
+    case _: DevCreateDummies =>
+      starter transitTo CreateDummies
   }
 }

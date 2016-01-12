@@ -8,8 +8,6 @@ import x7c1.linen.modern.init.settings.SettingChannelsDelegatee;
 import x7c1.linen.res.layout.SettingChannelsLayoutProvider;
 import x7c1.linen.res.layout.SettingChannelsRowProvider;
 
-import static android.view.KeyEvent.KEYCODE_BACK;
-
 public class SettingChannelsActivity extends BaseActivity {
 	private SettingChannelsDelegatee delegatee = null;
 
@@ -33,23 +31,15 @@ public class SettingChannelsActivity extends BaseActivity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
-		if (keyCode == KEYCODE_BACK){
-			finish();
-			overridePendingTransition(R.animator.back_slide_in, R.animator.back_slide_out);
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
+		return onKeyDownFromChild(keyCode, event);
 	}
-
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.close();
 	}
-
 	@Override
 	public void finish() {
-		super.finish();
-		overridePendingTransition(R.animator.back_slide_in, R.animator.back_slide_out);
+		finishFromChild();
 	}
 }

@@ -24,5 +24,10 @@
             android:label="setting of channels">
         </activity>
 
+        <activity
+            android:name=".dev.CreateDummiesActivity"
+            android:label="create dummies">
+        </activity>
+
     </application>
 </manifest>

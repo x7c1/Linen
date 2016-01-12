@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.LinearLayout;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
@@ -20,8 +19,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.v4.widget.DrawerLayout drawerMenu;
     public final LinearLayout menuArea;
     public final android.support.v7.widget.RecyclerView menuList;
-    public final Button createDummies;
-    public final Button initDummies;
     public final LinearLayout paneContainer;
     public final RelativeLayout sourceArea;
     public final android.support.v7.widget.Toolbar sourceToolbar;
@@ -44,8 +41,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         android.support.v4.widget.DrawerLayout drawerMenu,
         LinearLayout menuArea,
         android.support.v7.widget.RecyclerView menuList,
-        Button createDummies,
-        Button initDummies,
         LinearLayout paneContainer,
         RelativeLayout sourceArea,
         android.support.v7.widget.Toolbar sourceToolbar,
@@ -67,8 +62,6 @@ public class MainLayout extends RecyclerView.ViewHolder {
         this.drawerMenu = drawerMenu;
         this.menuArea = menuArea;
         this.menuList = menuList;
-        this.createDummies = createDummies;
-        this.initDummies = initDummies;
         this.paneContainer = paneContainer;
         this.sourceArea = sourceArea;
         this.sourceToolbar = sourceToolbar;

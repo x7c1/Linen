@@ -149,7 +149,7 @@ class AccessorLoader(
 object AccessorLoader {
   import scalaz.\/
   import scalaz.\/.{left, right}
-  import scalaz.std.option.optionSyntax._
+  import scalaz.syntax.std.option._
 
   def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor =
     try for {

@@ -1,32 +1,12 @@
 package x7c1.linen.modern.init
 
-import android.app.Activity
 import android.content.Context
-import android.widget.Toast
-import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.DummyString.words
 import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.patch.TaskAsync.async
 
 object DummyFactory {
-  def setup(layout: MainLayout, activity: Activity) = {
-    layout.createDummies onClick { _ =>
-      async {
-        createDummies(activity)(100)
-        layout.createDummies runUi { _ =>
-          Toast.makeText(activity, "dummies inserted", Toast.LENGTH_SHORT).show()
-        }
-      }
-    }
-    layout.initDummies onClick { _ =>
-      activity deleteDatabase "linen-db"
-      Toast.makeText(activity, "database deleted", Toast.LENGTH_SHORT).show()
-    }
-  }
-
   def createDummies(context: Context)(n: Int) = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase

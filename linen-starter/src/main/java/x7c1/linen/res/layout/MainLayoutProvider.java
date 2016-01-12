@@ -13,7 +13,6 @@ import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.LinearLayout;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
@@ -47,8 +46,6 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
             (android.support.v4.widget.DrawerLayout) view.findViewById(R.id.main_layout__drawer_menu),
             (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.main_layout__menu_list),
-            (Button) view.findViewById(R.id.main_layout__create_dummies),
-            (Button) view.findViewById(R.id.main_layout__init_dummies),
             (LinearLayout) view.findViewById(R.id.activity_main__pane_container),
             (RelativeLayout) view.findViewById(R.id.activity_main__source_area),
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.activity_main__source_toolbar),

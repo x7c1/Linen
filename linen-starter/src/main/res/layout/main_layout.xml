@@ -36,19 +36,5 @@
             android:layout_weight="1"
             />
 
-        <Button
-            android:id="@+id/main_layout__create_dummies"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="create dummies"
-            />
-
-        <Button
-            android:id="@+id/main_layout__init_dummies"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="init dummies"
-            />
-
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

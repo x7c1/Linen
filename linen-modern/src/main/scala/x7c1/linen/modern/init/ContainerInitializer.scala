@@ -25,8 +25,6 @@ class ContainerInitializer(
   with EntryDetailAreaInitializer {
 
   def setup(): Unit = {
-    DummyFactory.setup(layout, activity)
-
     setupDrawerMenu()
     setupSourceArea()
     setupEntryArea()
