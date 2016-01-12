@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.KeyEvent;
 
-import x7c1.linen.dev.CreateDummiesActivity;
+import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.activity.ActivityStarter;
 
@@ -40,8 +40,8 @@ public class BaseActivity extends Activity implements ActivityStarter {
 			case SettingChannels:
 				intent = new Intent(this, SettingChannelsActivity.class);
 				break;
-			case CreateDummies:
-				intent = new Intent(this, CreateDummiesActivity.class);
+			case CreateRecords:
+				intent = new Intent(this, CreateRecordsActivity.class);
 				break;
 			default:
 				throw new IllegalArgumentException(format("unknown label: %s", label));

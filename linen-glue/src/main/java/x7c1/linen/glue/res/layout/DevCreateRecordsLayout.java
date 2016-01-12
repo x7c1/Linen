@@ -11,13 +11,13 @@ import android.view.View;
 import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 
-public class DevCreateDummiesLayout extends RecyclerView.ViewHolder {
+public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final Button createDummies;
     public final Button deleteDatabase;
 
-    public DevCreateDummiesLayout(
+    public DevCreateRecordsLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
         Button createDummies,

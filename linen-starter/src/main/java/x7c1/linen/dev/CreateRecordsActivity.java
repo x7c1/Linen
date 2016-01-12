@@ -5,25 +5,25 @@ import android.view.KeyEvent;
 
 import x7c1.linen.BaseActivity;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.DevCreateDummiesLayout;
-import x7c1.linen.modern.init.dev.CreateDummiesDelegatee;
-import x7c1.linen.res.layout.DevCreateDummiesLayoutProvider;
+import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
+import x7c1.linen.modern.init.dev.CreateRecordsDelegatee;
+import x7c1.linen.res.layout.DevCreateRecordsLayoutProvider;
 
-public class CreateDummiesActivity extends BaseActivity {
-	private CreateDummiesDelegatee delegatee = null;
+public class CreateRecordsActivity extends BaseActivity {
+	private CreateRecordsDelegatee delegatee = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final DevCreateDummiesLayout layout =
-				new DevCreateDummiesLayoutProvider(this).inflate(null, false);
+		final DevCreateRecordsLayout layout =
+				new DevCreateRecordsLayoutProvider(this).inflate(null, false);
 
 
 		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		setContentView(layout.itemView);
 
-		this.delegatee = new CreateDummiesDelegatee(this, layout);
+		this.delegatee = new CreateRecordsDelegatee(this, layout);
 		this.delegatee.setup();
 	}
 

@@ -5,7 +5,7 @@ import java.lang.Math.min
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.glue.activity.ActivityLabel.{CreateDummies, SettingChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
 import x7c1.linen.glue.activity.ActivityStarter
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
 import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
@@ -77,6 +77,6 @@ class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListe
     case _: DevShowRecords =>
       Log info s"$kind"
     case _: DevCreateDummies =>
-      starter transitTo CreateDummies
+      starter transitTo CreateRecords
   }
 }

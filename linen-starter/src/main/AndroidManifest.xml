@@ -25,7 +25,7 @@
         </activity>
 
         <activity
-            android:name=".dev.CreateDummiesActivity"
+            android:name=".dev.CreateRecordsActivity"
             android:label="create dummies">
         </activity>
 
