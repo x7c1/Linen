@@ -7,20 +7,20 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 
-class UpdaterDelegatee(service: Service){
+class UpdaterServiceDelegatee(service: Service){
 
-  def create(): Unit = {
-    Log info "[init]"
-  }
-  def destroy(): Unit = {
-    Log info "[init]"
-  }
-  def setupBinder(intent: Intent): Option[IBinder] = {
+  def onBind(intent: Intent): Option[IBinder] = {
     Log info "[init]"
     None
   }
-  def startCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
+  def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info "[init]"
+
+//    val notification = new Notification()
+    
     NotSticky
+  }
+  def onDestroy(): Unit = {
+    Log info "[init]"
   }
 }
