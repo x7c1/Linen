@@ -19,7 +19,6 @@ public class CreateRecordsActivity extends BaseActivity {
 		final DevCreateRecordsLayout layout =
 				new DevCreateRecordsLayoutProvider(this).inflate(null, false);
 
-
 		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		setContentView(layout.itemView);
 
