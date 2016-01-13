@@ -29,5 +29,10 @@
             android:label="create dummies">
         </activity>
 
+        <service
+            android:name=".UpdaterService"
+            android:exported="false"
+            />
+
     </application>
 </manifest>

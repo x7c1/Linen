@@ -55,4 +55,16 @@ public class BaseActivity extends Activity implements ActivityControl, ServiceCo
 		}
 		return intent;
 	}
+	private Intent getServiceIntentOf(ServiceLabel label) {
+		final Intent intent;
+		switch(label){
+			case Updater:
+				intent = new Intent(this, UpdaterService.class);
+				break;
+			default:
+				throw new IllegalArgumentException(format("unknown service label: %s", label));
+		}
+		return intent;
+	}
+
 }
