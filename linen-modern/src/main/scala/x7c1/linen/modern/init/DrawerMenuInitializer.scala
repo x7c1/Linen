@@ -6,7 +6,7 @@ import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
-import x7c1.linen.glue.activity.ActivityStarter
+import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
 import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
 import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
@@ -14,7 +14,7 @@ import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
-  def activity: Activity with ActivityStarter
+  def activity: Activity with ActivityControl
   def layout: MainLayout
   def menuLabelProvider: ViewHolderProvider[MenuRowLabel]
   def menuItemProvider: ViewHolderProvider[MenuRowItem]
@@ -62,13 +62,13 @@ trait DrawerMenuInitializer {
   }
 }
 
-class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListener {
+class OnDrawerMenuClick(control: ActivityControl) extends OnDrawerMenuClickListener {
   override def onClick(kind: DrawerMenuItemKind): Unit = kind match {
     case _: NoChannel =>
       Log info s"$kind"
     case _: Channels =>
       Log info s"$kind"
-      starter transitTo SettingChannels
+      control startActivityOf SettingChannels
     case _: ChannelSources =>
       Log info s"$kind"
     case _: UpdaterSchedule =>
@@ -77,6 +77,6 @@ class OnDrawerMenuClick(starter: ActivityStarter) extends OnDrawerMenuClickListe
     case _: DevShowRecords =>
       Log info s"$kind"
     case _: DevCreateDummies =>
-      starter transitTo CreateRecords
+      control startActivityOf CreateRecords
   }
 }

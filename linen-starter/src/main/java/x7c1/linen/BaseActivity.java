@@ -6,18 +6,25 @@ import android.view.KeyEvent;
 
 import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
-import x7c1.linen.glue.activity.ActivityStarter;
+import x7c1.linen.glue.activity.ActivityControl;
+import x7c1.linen.glue.service.ServiceLabel;
+import x7c1.linen.glue.service.ServiceControl;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static java.lang.String.format;
 
-public class BaseActivity extends Activity implements ActivityStarter {
+public class BaseActivity extends Activity implements ActivityControl, ServiceControl {
 
 	@Override
-	public void transitTo(ActivityLabel label) {
+	public void startActivityOf(ActivityLabel label) {
 		Intent intent = getIntentOf(label);
 		startActivity(intent);
 		overridePendingTransition(R.animator.slide_in, R.animator.slide_out);
+	}
+	@Override
+	public void startServiceOf(ServiceLabel label) {
+		Intent intent = getServiceIntentOf(label);
+		startService(intent);
 	}
 	protected boolean onKeyDownFromChild(int keyCode, KeyEvent event){
 		final boolean consumed;
