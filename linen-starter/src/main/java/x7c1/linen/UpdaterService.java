@@ -33,13 +33,6 @@ public class UpdaterService extends Service implements ServiceControl {
 		this.delegatee.onDestroy();
 	}
 
-
-	@Override
-	public void startServiceOf(ServiceLabel label) {
-		Intent intent = Control.getServiceIntentOf(this, label);
-		startService(intent);
-	}
-
 	@Override
 	public Class<?> getClassOf(ServiceLabel label) {
 		return Control.getServiceClassOf(label);

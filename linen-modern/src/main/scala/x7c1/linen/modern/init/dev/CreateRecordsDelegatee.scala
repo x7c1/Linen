@@ -1,6 +1,7 @@
 package x7c1.linen.modern.init.dev
 
 import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout
 import x7c1.linen.glue.service.ServiceControl
@@ -21,7 +22,8 @@ class CreateRecordsDelegatee (
     }
     layout.createDummies onClick { _ =>
       async {
-        activity startServiceOf Updater
+        activity startService new Intent(
+          activity, activity getClassOf Updater )
       }
     }
     layout.deleteDatabase onClick { _ =>

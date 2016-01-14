@@ -14,8 +14,7 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 public class BaseActivity extends Activity implements ActivityControl, ServiceControl {
 
 	@Override
-	public void startActivityOf(ActivityLabel label) {
-		Intent intent = Control.getActivityIntentOf(this, label);
+	public void startActivityBy(Intent intent) {
 		startActivity(intent);
 		overridePendingTransition(R.animator.slide_in, R.animator.slide_out);
 	}
@@ -23,12 +22,6 @@ public class BaseActivity extends Activity implements ActivityControl, ServiceCo
 	@Override
 	public Class<?> getClassOf(ActivityLabel label) {
 		return Control.getActivityClassOf(label);
-	}
-
-	@Override
-	public void startServiceOf(ServiceLabel label) {
-		Intent intent = Control.getServiceIntentOf(this, label);
-		startService(intent);
 	}
 
 	@Override

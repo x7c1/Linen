@@ -3,6 +3,7 @@ package x7c1.linen.modern.init
 import java.lang.Math.min
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
@@ -62,13 +63,18 @@ trait DrawerMenuInitializer {
   }
 }
 
-class OnDrawerMenuClick(control: ActivityControl) extends OnDrawerMenuClickListener {
+class OnDrawerMenuClick(
+  activity: Activity with ActivityControl) extends OnDrawerMenuClickListener {
+
   override def onClick(kind: DrawerMenuItemKind): Unit = kind match {
     case _: NoChannel =>
       Log info s"$kind"
     case _: Channels =>
       Log info s"$kind"
-      control startActivityOf SettingChannels
+
+      activity startActivityBy new Intent(
+        activity, activity getClassOf SettingChannels)
+
     case _: ChannelSources =>
       Log info s"$kind"
     case _: UpdaterSchedule =>
@@ -77,6 +83,7 @@ class OnDrawerMenuClick(control: ActivityControl) extends OnDrawerMenuClickListe
     case _: DevShowRecords =>
       Log info s"$kind"
     case _: DevCreateDummies =>
-      control startActivityOf CreateRecords
+      activity startActivityBy new Intent(
+        activity, activity getClassOf CreateRecords)
   }
 }
