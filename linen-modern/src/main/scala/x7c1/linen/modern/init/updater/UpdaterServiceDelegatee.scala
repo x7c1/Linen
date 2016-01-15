@@ -1,10 +1,11 @@
 package x7c1.linen.modern.init.updater
 
-import android.app.Notification.Builder
-import android.app.{Notification, NotificationManager, PendingIntent, Service}
+import android.app.{NotificationManager, PendingIntent, Service}
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.{Bundle, Handler, IBinder, Message, Messenger, RemoteException}
+import android.support.v4.app.NotificationCompat
+import android.support.v7.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.modern.init.dev.CreateRecordsDelegatee.{MessageTypeForProgress, MessageTypeForRegister, MessageTypeForSet, MessageTypeForUnregister}
 import x7c1.wheat.macros.logger.Log
@@ -37,7 +38,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
       setProgress(100, notificationId, false).
       setSmallIcon(android.R.drawable.ic_dialog_info)
 
-    val style0 = new Notification.InboxStyle(builder)
+    val style0 = new NotificationCompat.InboxStyle(builder)
       .setSummaryText(s"summary $notificationId")
       .setBigContentTitle(s"title $notificationId")
 
