@@ -5,14 +5,20 @@ import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.{Bundle, Handler, IBinder, Message, Messenger, RemoteException}
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.modern.init.dev.CreateRecordsDelegatee.{MessageTypeForProgress, MessageTypeForRegister, MessageTypeForSet, MessageTypeForUnregister}
+import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee.ActionTypeSample
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 
 import scala.collection.mutable.ListBuffer
+
+object UpdaterServiceDelegatee {
+  val ActionTypeSample = "hoge"
+}
 
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
 
@@ -53,6 +59,8 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     service.startForeground(notificationId, notification)
     manager.notify(notificationId, notification)
 
+    sendMessage(notificationId)
+
     clients foreach { client =>
       val message = Message.obtain(null, MessageTypeForProgress)
       message setData {
@@ -69,6 +77,13 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onDestroy(): Unit = {
     Log info "[init]"
   }
+  def sendMessage(n: Int) = {
+    Log info s"[init] $n"
+    val intent = new Intent(ActionTypeSample)
+    intent.putExtra("sample-message", "hello!!!")
+    LocalBroadcastManager.getInstance(service).sendBroadcast(intent)
+  }
+
 }
 
 class IncomingHandler2(clients: ListBuffer[Messenger]) extends Handler {

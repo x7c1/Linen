@@ -2,14 +2,16 @@ package x7c1.linen.modern.init.dev
 
 import android.app.Activity
 import android.content.Context.BIND_AUTO_CREATE
-import android.content.{ComponentName, Intent, ServiceConnection}
-import android.os.{Handler, Message, RemoteException, Messenger, IBinder}
+import android.content.{IntentFilter, Context, BroadcastReceiver, ComponentName, Intent, ServiceConnection}
+import android.os.{Handler, IBinder, Message, Messenger, RemoteException}
+import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.accessor.LinenDatabase
-import x7c1.linen.modern.init.dev.CreateRecordsDelegatee.{MessageTypeForUnregister, MessageTypeForSet, MessageTypeForRegister}
+import x7c1.linen.modern.init.dev.CreateRecordsDelegatee.{MessageTypeForRegister, MessageTypeForSet, MessageTypeForUnregister}
+import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -18,7 +20,7 @@ object CreateRecordsDelegatee {
   val MessageTypeForRegister = 1
   val MessageTypeForSet = 2
   val MessageTypeForProgress = 3
-  val MessageTypeForUnregister = 3
+  val MessageTypeForUnregister = 4
 }
 
 class CreateRecordsDelegatee (
@@ -48,7 +50,21 @@ class CreateRecordsDelegatee (
       Log info "[done]"
     }
   }
+
+  lazy val receiver = new BroadcastReceiver {
+    override def onReceive(context: Context, intent: Intent): Unit = {
+      val x = intent.getStringExtra("sample-message")
+      Log info x
+      Log info s"$intent"
+    }
+  }
+  def getBroadcastManager = LocalBroadcastManager.getInstance(activity)
+
   def setup(): Unit = {
+
+    getBroadcastManager.registerReceiver(
+      receiver, new IntentFilter(UpdaterServiceDelegatee.ActionTypeSample))
+
     val intent = new Intent(activity, activity getClassOf Updater)
     activity.bindService(intent, connection, BIND_AUTO_CREATE)
 
@@ -69,6 +85,8 @@ class CreateRecordsDelegatee (
 
   def close(): Unit = {
     Log info "[done]"
+
+    getBroadcastManager unregisterReceiver receiver
 
     serviceMessenger foreach { messenger =>
       try {
