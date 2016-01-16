@@ -24,7 +24,7 @@ private object ServiceCallerImpl {
       override val universe: c.universe.type = c.universe
       override val block = f
     }
-    val intent = TermName(c freshName "intentss")
+    val intent = TermName(c freshName "intent")
     val tree = q"""{
       val $intent = new ${typeOf[Intent]}($context, $klass)
       $intent.setAction(${factory.methodName})
@@ -32,7 +32,7 @@ private object ServiceCallerImpl {
       $context.startService($intent)
     }"""
 
-    println(showCode(tree))
+//    println(showCode(tree))
     tree
   }
 }
