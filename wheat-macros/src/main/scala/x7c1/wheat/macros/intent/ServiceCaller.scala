@@ -4,8 +4,9 @@ import android.content.{Context, Intent}
 import android.os.Bundle
 import android.util.Log
 
+import scala.annotation.tailrec
 import scala.language.experimental.macros
-import scala.reflect.macros.blackbox
+import scala.reflect.macros.{Universe, blackbox}
 
 object ServiceCaller {
   def using[A]: ServiceCaller[A] = new ServiceCaller[A]
@@ -66,18 +67,77 @@ private object ServiceCallerImpl {
 
 object MethodCaller {
   def via(intent: Intent): Unit =
-    macro MethodCallerImpl.callMethod[Intent]
+    macro MethodCallerImpl.expandMethods[Intent]
 }
 
 private object MethodCallerImpl {
-  def callMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
+  def expandMethods[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
     import c.universe._
-    println(intent)
-    println(intent.symbol)
-    println(intent.symbol.owner)
-    val klass = intent.symbol.owner.owner.asClass
 
-    val methodSymbols = klass.typeSignature.members collect {
+    val factory = new MethodCallerTreeFactory {
+      val universe: c.universe.type = c.universe
+      val intentTree = intent
+    }
+    val methods = factory.createMethods
+    val tree = q"""
+      $intent.getAction match {
+        case ..${methods.map(_.toCase)}
+        case ${factory.caseUnknownAction}
+      }
+     """
+
+    println(showCode(tree))
+    tree
+  }
+}
+
+trait MethodCallerTreeFactory {
+  val universe: Universe
+
+  import universe._
+  val intentTree: Tree
+
+  class MethodParameter(
+    key: String,
+    paramName: String,
+    paramType: Type ){
+
+    def toArg: Tree = {
+      val tree = paramType match {
+        case x if x =:= typeOf[Int] => q"$intentTree.getIntExtra($key, -1)"
+        case x if x =:= typeOf[Long] => q"$intentTree.getLongExtra($key, -1)"
+        case x if x =:= typeOf[String] => q"$intentTree.getStringExtra($key)"
+        case x =>
+          q""
+          //throw new IllegalArgumentException(s"unsupported type : $x")
+      }
+      tree
+    }
+  }
+  case class Method(
+    name: String,
+    fullName: String,
+    params: Seq[MethodParameter] ){
+
+    def toCase = {
+      val key = Literal(Constant(fullName))
+      val method = TermName(name)
+      val args = params.map(_.toArg)
+      cq"$key => $method(..$args)"
+    }
+  }
+
+  def enclosingClass = {
+    @tailrec
+    def traverse(x: Symbol): ClassSymbol = {
+      if (x.isClass) x.asClass
+      else traverse(x.owner)
+    }
+    traverse(intentTree.symbol)
+  }
+
+  def createMethods: Iterable[Method] = {
+    val methodSymbols = enclosingClass.typeSignature.members collect {
       case x if x.isMethod && x.isPublic => x.asMethod
     } filter {
       method =>
@@ -85,43 +145,12 @@ private object MethodCallerImpl {
         ! method.fullName.startsWith("java.lang.") &&
         ! method.fullName.startsWith("scala.")
     } filter {
-      method =>
-        method.paramLists.length == 1
+      _.paramLists.length == 1
     }
-    println("------")
-    methodSymbols.foreach(println)
-
-    case class MethodParameter(
-      key: String,
-      paramName: String,
-      paramType: Type ){
-
-      def toArg: Tree = {
-        val tree = paramType match {
-          case x if x =:= typeOf[Int] => q"$intent.getIntExtra($key, -1)"
-          case x if x =:= typeOf[Long] => q"$intent.getLongExtra($key, -1)"
-          case x if x =:= typeOf[String] => q"$intent.getStringExtra($key)"
-          case _ => q""
-        }
-        tree
-      }
-    }
-    case class Method(
-      name: String,
-      fullName: String,
-      params: Seq[MethodParameter] ){
-
-      def toCase = {
-        val key = Literal(Constant(fullName))
-        val method = TermName(name)
-        val args = params.map(_.toArg)
-        cq"$key => $method(..$args)"
-      }
-    }
-    val methods = methodSymbols map { method =>
+    methodSymbols map { method =>
       val params = method.paramLists.head map { param =>
         val paramName = param.name.encodedName.toString
-        MethodParameter(
+        new MethodParameter(
           key = s"${method.fullName}.$paramName",
           paramName = paramName,
           paramType = param.typeSignature
@@ -129,20 +158,11 @@ private object MethodCallerImpl {
       }
       Method(method.name.encodedName.toString, method.fullName, params)
     }
-    methods foreach println
-
+  }
+  def caseUnknownAction = {
     val Log = typeOf[Log].companion
-    val tag = Literal(Constant(klass.fullName))
-    val tree =
-      q"""
-        $intent.getAction match {
-          case ..${methods.map(_.toCase)}
-          case x => $Log.e($tag, "unknown action : " + x)
-        }
-       """
-
-    println(showCode(tree))
-    tree
+    val tag = Literal(Constant(enclosingClass.fullName))
+    cq"""x => $Log.e($tag, "unknown action : " + x)"""
   }
 }
 
