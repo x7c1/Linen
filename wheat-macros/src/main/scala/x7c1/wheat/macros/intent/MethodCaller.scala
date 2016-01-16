@@ -43,7 +43,7 @@ trait MethodCallerTreeFactory {
     paramName: String,
     paramType: Type ){
 
-    def toArg: Tree = {
+    lazy val toArg: (TermName, Tree) = {
       val tree = paramType match {
         case x if x =:= typeOf[Int] => q"$intentTree.getIntExtra($key, -1)"
         case x if x =:= typeOf[Long] => q"$intentTree.getLongExtra($key, -1)"
@@ -51,7 +51,12 @@ trait MethodCallerTreeFactory {
         case x =>
           throw new IllegalArgumentException(s"unsupported type : $x")
       }
-      tree
+      val name = TermName(context freshName "x")
+      val message = s"extra not found: $key"
+      name -> q"""
+        val $name =
+          if ($intentTree.hasExtra($key)) $tree
+          else throw new IllegalArgumentException($message)"""
     }
   }
   case class Method(
@@ -60,10 +65,14 @@ trait MethodCallerTreeFactory {
     params: Seq[MethodParameter] ){
 
     def toCase = {
-      val key = Literal(Constant(fullName))
       val method = TermName(name)
-      val args = params.map(_.toArg)
-      cq"$key => $method(..$args)"
+      val pairs = params.map(_.toArg)
+      val args = pairs.map(_._1)
+      val assigns = pairs.map(_._2)
+      cq"""
+        $fullName =>
+          ..$assigns
+          $method(..$args)"""
     }
   }
 
@@ -112,6 +121,7 @@ trait MethodCallerTreeFactory {
   def caseUnknownAction = {
     val Log = typeOf[Log].companion
     val tag = Literal(Constant(enclosingClass.fullName))
-    cq"""x => $Log.e($tag, "unknown action : " + x)"""
+    val x = TermName(context freshName "x")
+    cq"""$x => $Log.e($tag, "unknown action: " + $x)"""
   }
 }

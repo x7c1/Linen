@@ -25,12 +25,12 @@ private object ServiceCallerImpl {
       override val block = f
     }
     val intent = factory.intent
-    val tree = q"""{
+    val tree = q"""
       val $intent = new ${typeOf[Intent]}($context, $klass)
       $intent.setAction(${factory.methodName})
       ..${factory putExtras intent}
       $context.startService($intent)
-    }"""
+    """
 
 //    println(showCode(tree))
     tree
