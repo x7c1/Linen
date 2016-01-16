@@ -108,8 +108,7 @@ trait MethodCallerTreeFactory {
         case x if x =:= typeOf[Long] => q"$intentTree.getLongExtra($key, -1)"
         case x if x =:= typeOf[String] => q"$intentTree.getStringExtra($key)"
         case x =>
-          q""
-          //throw new IllegalArgumentException(s"unsupported type : $x")
+          throw new IllegalArgumentException(s"unsupported type : $x")
       }
       tree
     }
@@ -127,10 +126,19 @@ trait MethodCallerTreeFactory {
     }
   }
 
-  def enclosingClass = {
+  lazy val enclosingClass = {
     @tailrec
     def traverse(x: Symbol): ClassSymbol = {
       if (x.isClass) x.asClass
+      else traverse(x.owner)
+    }
+    traverse(intentTree.symbol)
+  }
+
+  lazy val enclosingMethod = {
+    @tailrec
+    def traverse(x: Symbol): MethodSymbol = {
+      if (x.isMethod) x.asMethod
       else traverse(x.owner)
     }
     traverse(intentTree.symbol)
@@ -143,7 +151,8 @@ trait MethodCallerTreeFactory {
       method =>
         ! method.isConstructor &&
         ! method.fullName.startsWith("java.lang.") &&
-        ! method.fullName.startsWith("scala.")
+        ! method.fullName.startsWith("scala.") &&
+        ! (method == enclosingMethod)
     } filter {
       _.paramLists.length == 1
     }
