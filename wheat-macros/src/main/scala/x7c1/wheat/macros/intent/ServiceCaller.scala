@@ -4,7 +4,7 @@ import android.content.{Context, Intent}
 import android.os.Bundle
 
 import scala.language.experimental.macros
-import scala.reflect.macros.{Universe, blackbox}
+import scala.reflect.macros.blackbox
 
 object ServiceCaller {
   def using[A]: ServiceCaller[A] = new ServiceCaller[A]
@@ -21,10 +21,10 @@ private object ServiceCallerImpl {
     import c.universe._
 
     val factory = new ServiceCallerTreeFactory {
-      override val universe: c.universe.type = c.universe
+      override val context: c.type = c
       override val block = f
     }
-    val intent = TermName(c freshName "intent")
+    val intent = factory.intent
     val tree = q"""{
       val $intent = new ${typeOf[Intent]}($context, $klass)
       $intent.setAction(${factory.methodName})
@@ -38,9 +38,8 @@ private object ServiceCallerImpl {
 }
 
 private trait ServiceCallerTreeFactory {
-  val universe: Universe
-  import universe._
-
+  val context: blackbox.Context
+  import context.universe._
   val block: Tree
 
   case class IntentExtra(
@@ -52,6 +51,8 @@ private trait ServiceCallerTreeFactory {
     case Seq(x, y: Apply) => x -> y
     case _ => throw new IllegalArgumentException("invalid form of expression")
   }
+  lazy val intent: TermName = TermName(context freshName "intent")
+
   lazy val methodName: String = call.symbol.asMethod.fullName
 
   private def extras: List[IntentExtra] = {

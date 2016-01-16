@@ -5,7 +5,7 @@ import android.util.Log
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
-import scala.reflect.macros.{Universe, blackbox}
+import scala.reflect.macros.blackbox
 
 object MethodCaller {
   def using(intent: Intent): Unit =
@@ -17,7 +17,7 @@ private object MethodCallerImpl {
     import c.universe._
 
     val factory = new MethodCallerTreeFactory {
-      override val universe: c.universe.type = c.universe
+      override val context: c.type = c
       override val intentTree = intent
     }
     val methods = factory.createMethods
@@ -34,9 +34,8 @@ private object MethodCallerImpl {
 }
 
 trait MethodCallerTreeFactory {
-  val universe: Universe
-
-  import universe._
+  val context: blackbox.Context
+  import context.universe._
   val intentTree: Tree
 
   class MethodParameter(
