@@ -8,11 +8,13 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
+import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee.ActionTypeSample
 import x7c1.wheat.macros.intent.MethodCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
+import x7c1.wheat.modern.patch.TaskAsync.async
 
 object UpdaterServiceDelegatee {
   val ActionTypeSample = "hoge"
@@ -30,18 +32,12 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info s"[init] start:$startId, $intent"
 
-    /*
-    val methods = new UpdaterMethods(service)
-    val delegator = MethodDelegator.create(methods)
-    delegator.execute(methods, intent)
-    */
-    /*
-     */
-
-    new UpdaterMethods(service).executeBy(intent)
-
-    showNotification()
-
+    Option(intent.getAction) match {
+      case Some(_) =>
+        new UpdaterMethods(service, startId) executeBy intent
+      case None =>
+        service stopForeground true
+    }
     NotSticky
   }
   def showNotification() = {
@@ -84,14 +80,42 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   }
 
 }
-trait Hogehoge {
-  def hogehoge(i: Int): Unit = {
-    Log info s"$i"
-  }
-}
-class UpdaterMethods(service: Service) extends Hogehoge {
+class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
   def executeBy(intent: Intent): Unit = MethodCaller using intent
+
+  def createDummies(): Unit = async {
+    Log info "[init]"
+    val max = 100
+    DummyFactory.createDummies0(service)(max){ n =>
+      notifyProgress(max, n)
+    }
+    service stopSelf startId
+  }
+  private def manager =
+    service.getSystemService(NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
+
+  private def notifyProgress(max: Int, current: Int): Unit ={
+    val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
+    val pendingIntent =
+      PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+
+    val builder = new Builder(service).
+      setContentIntent(pendingIntent).
+      setContentTitle(s"Progress $current/$max").
+      setContentText(s"inserting").
+      setProgress(100, current, false).
+      setSmallIcon(android.R.drawable.ic_dialog_info)
+
+    val style0 = new NotificationCompat.InboxStyle(builder)
+      .setSummaryText(s"inserted $current/$max")
+      .setBigContentTitle("Progress")
+
+    val notification = style0.build()
+
+    service.startForeground(123, notification)
+    manager.notify(123, notification)
+  }
 
   def baz: Unit = {
     Log info "baz"
@@ -109,7 +133,6 @@ class UpdaterMethods(service: Service) extends Hogehoge {
     Log info s"Hello!"
   }
 }
-
 
 /*
 case class Hoge123(name: String)

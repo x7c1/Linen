@@ -21,9 +21,7 @@ class CreateRecordsDelegatee (
 
   lazy val receiver = new BroadcastReceiver {
     override def onReceive(context: Context, intent: Intent): Unit = {
-      val x = intent.getStringExtra("sample-message")
-      Log info x
-      Log info s"$intent"
+      Log info s"${intent.getExtras}"
     }
   }
   def getBroadcastManager = LocalBroadcastManager.getInstance(activity)
@@ -46,14 +44,14 @@ class CreateRecordsDelegatee (
 
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
-            _.hogehoge(111)
+            _.createDummies()
           }
 
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
             _.sample_?(hogeValue, 123, 456L)
           }
-//
+
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
             _.hello("World")
@@ -85,6 +83,7 @@ class CreateRecordsDelegatee (
             _.baz
           }
         */
+
       }
     }
     layout.deleteDatabase onClick { _ =>

@@ -7,7 +7,10 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 
 object DummyFactory {
-  def createDummies(context: Context)(n: Int) = {
+  def createDummies(context: Context)(n: Int): Unit = {
+    createDummies0(context)(n)(_ => ())
+  }
+  def createDummies0(context: Context)(n: Int)(callback: Int => Unit): Unit = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
     val writable = helper.writableDatabase
@@ -109,6 +112,7 @@ object DummyFactory {
           )
         }
       }
+      callback(i)
     }
   }
 }
