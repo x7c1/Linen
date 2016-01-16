@@ -27,7 +27,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   var notificationId: Int = 1
 
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
-    Log info s"[init] start:$startId"
+    Log info s"[init] start:$startId, $intent"
 
     val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
     val pendingIntent = PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -53,6 +53,12 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     service.startForeground(notificationId, notification)
     manager.notify(notificationId, notification)
 
+    /*
+    val methods = new UpdaterMethods(service)
+    val delegator = MethodDelegator.create(methods)
+    delegator execute intent
+     */
+
     sendMessage(notificationId)
 
     notificationId += 1
@@ -70,3 +76,37 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   }
 
 }
+
+class UpdaterMethods(service: Service){
+  def baz: Unit = {
+    Log info "baz"
+  }
+  def foo(): Unit = {
+    Log info s"Hello!"
+  }
+  def hello(arg1: String): Unit = {
+    Log info s"Hello, $arg1!"
+  }
+  def sample_?(arg1_! : String, arg2: Int, arg3: Long): Unit = {
+    Log info s"sample, ${arg1_!}, $arg2, $arg3"
+  }
+
+  def bar(x: Int)(y: Long): Unit = {
+    Log info s"Hello!"
+  }
+}
+
+
+/*
+case class Hoge123(name: String)
+
+object Hoge123 {
+  implicit object convertible extends BundleConvertible[Hoge123] {
+    override def toBundle(target: Hoge123): Bundle = {
+      val x = new Bundle()
+      x.putString("name", target.name)
+      x
+    }
+  }
+}
+*/
