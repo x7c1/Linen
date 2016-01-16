@@ -91,7 +91,7 @@ trait Hogehoge {
 }
 class UpdaterMethods(service: Service) extends Hogehoge {
 
-  def executeBy(intent: Intent): Unit = MethodCaller via intent
+  def executeBy(intent: Intent): Unit = MethodCaller using intent
 
   def baz: Unit = {
     Log info "baz"

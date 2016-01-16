@@ -8,7 +8,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.{Universe, blackbox}
 
 object MethodCaller {
-  def via(intent: Intent): Unit =
+  def using(intent: Intent): Unit =
     macro MethodCallerImpl.expandMethods[Intent]
 }
 
@@ -17,8 +17,8 @@ private object MethodCallerImpl {
     import c.universe._
 
     val factory = new MethodCallerTreeFactory {
-      val universe: c.universe.type = c.universe
-      val intentTree = intent
+      override val universe: c.universe.type = c.universe
+      override val intentTree = intent
     }
     val methods = factory.createMethods
     val tree = q"""
