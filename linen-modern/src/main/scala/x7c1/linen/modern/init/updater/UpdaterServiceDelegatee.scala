@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee.ActionTypeSample
+import x7c1.wheat.macros.intent.MethodCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
@@ -29,6 +30,21 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info s"[init] start:$startId, $intent"
 
+    /*
+    val methods = new UpdaterMethods(service)
+    val delegator = MethodDelegator.create(methods)
+    delegator.execute(methods, intent)
+    */
+    /*
+     */
+
+    new UpdaterMethods(service).executeBy(intent)
+
+    showNotification()
+
+    NotSticky
+  }
+  def showNotification() = {
     val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
     val pendingIntent = PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     val builder = new Builder(service).
@@ -53,17 +69,9 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     service.startForeground(notificationId, notification)
     manager.notify(notificationId, notification)
 
-    /*
-    val methods = new UpdaterMethods(service)
-    val delegator = MethodDelegator.create(methods)
-    delegator execute intent
-     */
-
     sendMessage(notificationId)
 
     notificationId += 1
-
-    NotSticky
   }
   def onDestroy(): Unit = {
     Log info "[init]"
@@ -71,13 +79,20 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def sendMessage(n: Int) = {
     Log info s"[init] $n"
     val intent = new Intent(ActionTypeSample)
-    intent.putExtra("sample-message", "hello!!!")
+    intent.putExtra("sample-message", s"hello!!! $n")
     LocalBroadcastManager.getInstance(service).sendBroadcast(intent)
   }
 
 }
+trait Hogehoge {
+  def hogehoge(i: Int): Unit = {
+    Log info s"$i"
+  }
+}
+class UpdaterMethods(service: Service) extends Hogehoge {
 
-class UpdaterMethods(service: Service){
+  def executeBy(intent: Intent): Unit = MethodCaller via intent
+
   def baz: Unit = {
     Log info "baz"
   }
@@ -90,7 +105,6 @@ class UpdaterMethods(service: Service){
   def sample_?(arg1_! : String, arg2: Int, arg3: Long): Unit = {
     Log info s"sample, ${arg1_!}, $arg2, $arg3"
   }
-
   def bar(x: Int)(y: Long): Unit = {
     Log info s"Hello!"
   }

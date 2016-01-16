@@ -46,18 +46,23 @@ class CreateRecordsDelegatee (
 
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
-            _.sample_?(hogeValue, 123, 456L)
+            _.hogehoge(111)
           }
 
+        ServiceCaller.using[UpdaterMethods].
+          startService(activity, activity getClassOf Updater){
+            _.sample_?(hogeValue, 123, 456L)
+          }
+//
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
             _.hello("World")
           }
+
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
             _.foo()
           }
-
 
         /*// examples of invalid form
 
