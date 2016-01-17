@@ -22,16 +22,17 @@ class SettingChannelsDelegatee (
       activity.finish()
     }
     val manager = new LinearLayoutManager(activity)
-    println(manager)
-
-    val account = AccountAccessor.create(database) findAt 0 getOrElse {
-      throw new IllegalStateException("account not found")
-    }
     layout.channelList setLayoutManager manager
-    layout.channelList setAdapter new ChannelRowAdapter(
-      accessor = ChannelAccessor.create(database, account.accountId),
-      viewHolderProvider = channelRowProvider
-    )
+
+    AccountAccessor findCurrentAccountId database match {
+      case Some(accountId) =>
+        layout.channelList setAdapter new ChannelRowAdapter(
+          accessor = ChannelAccessor.create(database, accountId),
+          viewHolderProvider = channelRowProvider
+        )
+      case None =>
+        Log warn "account not found"
+    }
   }
   def close(): Unit = {
     Log info "[done]"
