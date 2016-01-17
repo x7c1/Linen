@@ -49,22 +49,6 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
     notifier.notifyDone()
     service stopSelf startId
   }
-
-  def baz: Unit = {
-    Log info "baz"
-  }
-  def foo(): Unit = {
-    Log info s"Hello!"
-  }
-  def hello(arg1: String): Unit = {
-    Log info s"Hello, $arg1!"
-  }
-  def sample_?(arg1_! : String, arg2: Int, arg3: Long): Unit = {
-    Log info s"sample, ${arg1_!}, $arg2, $arg3"
-  }
-  def bar(x: Int)(y: Long): Unit = {
-    Log info s"Hello!"
-  }
 }
 
 /*
