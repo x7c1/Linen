@@ -1,5 +1,6 @@
 package x7c1.linen.modern.accessor
 
+import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
@@ -90,7 +91,7 @@ class EntryOutlineFactory(cursor: Cursor) extends EntryFactory[EntryOutline] {
       url = "dummy",
       shortTitle = cursor getString titleIndex,
       shortContent = cursor getString contentIndex,
-      createdAt = Date.dummy()
+      createdAt = Date(cursor getInt createdAtIndex)
     )
   }
 }
@@ -110,7 +111,7 @@ class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
       url = "dummy",
       fullTitle = cursor getString titleIndex,
       fullContent = cursor getString contentIndex,
-      createdAt = Date.dummy()
+      createdAt = Date(cursor getInt createdAtIndex)
     )
   }
 }
@@ -191,5 +192,27 @@ object EntryAccessor {
     }
     cursor.close()
     pairs.toMap
+  }
+}
+
+case class EntryParts(
+  sourceId: Long,
+  title: String,
+  content: String,
+  url: String,
+  createdAt: Date
+)
+object EntryParts {
+  implicit object insertable extends Insertable[EntryParts] {
+    override def tableName: String = "entries"
+    override def toContentValues(target: EntryParts): ContentValues = {
+      val entry = new ContentValues()
+      entry.put("source_id", target.sourceId: java.lang.Long)
+      entry.put("title", target.title)
+      entry.put("content", target.content)
+      entry.put("url", target.url)
+      entry.put("created_at", target.createdAt.timestamp: java.lang.Integer)
+      entry
+    }
   }
 }

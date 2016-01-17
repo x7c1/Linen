@@ -7,7 +7,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.init.DummyFactory
+import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.dev.DummyFactory
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
@@ -20,9 +21,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val Right(channelId) = SourceAccessor findFirstChannelId db
-    val Right(accountId) = SourceAccessor findFirstAccountId db
-    val cursor3 = SourceAccessor.createCursor(db, channelId, accountId)
+    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
+    val Some(channel) = ChannelAccessor.create(db, accountId) findAt 0
+    val cursor3 = UnreadSourceAccessor.createCursor(db, channel.channelId, accountId)
     val rows = toMaps(cursor3)
 
     //rows.map(prettyPrint) foreach println
@@ -52,8 +53,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     */
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = SourceAccessor create db
-    val sourceIds = (0 to sourceAccessor.length - 1).map(sourceAccessor.findAt).flatMap(_.map(_.id))
+    val Right(sourceAccessor) = inspectSourceAccessor(db).toEither
+    val sourceIds = sourceAccessor.sourceIds
+
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
@@ -70,9 +72,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getReadableDatabase
     DummyFactory.createDummies(context)(5)
 
-    val Right(accessor0) = SourceAccessor create db
-    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
-    val sourceIds = sources.flatMap(_.map(_.id))
+    val Right(accessor0) = inspectSourceAccessor(db).toEither
+    val sourceIds = accessor0.sourceIds
+
     val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
     val rows = toMaps(cursor)
 //    rows.map(prettyPrint) foreach println

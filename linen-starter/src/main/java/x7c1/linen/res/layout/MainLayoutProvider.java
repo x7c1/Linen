@@ -10,8 +10,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.support.v4.widget.DrawerLayout;
 import android.widget.LinearLayout;
-import android.widget.Button;
 import android.support.v7.widget.RecyclerView;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
@@ -43,9 +43,8 @@ public class MainLayoutProvider implements ViewHolderProvider<MainLayout> {
         View view = inflater.inflate(R.layout.main_layout, parent, attachToRoot);
         return new MainLayout(
             view,
+            (android.support.v4.widget.DrawerLayout) view.findViewById(R.id.main_layout__drawer_menu),
             (LinearLayout) view.findViewById(R.id.main_layout__menu_area),
-            (Button) view.findViewById(R.id.main_layout__create_dummies),
-            (Button) view.findViewById(R.id.main_layout__init_dummies),
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.main_layout__menu_list),
             (LinearLayout) view.findViewById(R.id.activity_main__pane_container),
             (RelativeLayout) view.findViewById(R.id.activity_main__source_area),

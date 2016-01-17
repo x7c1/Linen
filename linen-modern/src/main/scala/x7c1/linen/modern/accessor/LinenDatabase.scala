@@ -1,6 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import android.content.Context
+import android.content.{ContentValues, Context}
+import android.database.SQLException
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 
 
@@ -11,6 +12,8 @@ object LinenDatabase {
 
 class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
+
+  lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
     db.setForeignKeyConstraintsEnabled(true)
@@ -23,9 +26,9 @@ class LinenOpenHelper(context: Context)
     val accounts = Seq(
       s"""CREATE TABLE IF NOT EXISTS accounts (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         |nickname TEXT,
-         |biography TEXT,
-         |created_at INTEGER
+         |nickname TEXT NOT NULL,
+         |biography TEXT NOT NULL,
+         |created_at INTEGER NOT NULL
          |)""".stripMargin,
 
       s"""CREATE INDEX accounts_created_at ON accounts (
@@ -34,10 +37,10 @@ class LinenOpenHelper(context: Context)
     val sources = Seq(
       s"""CREATE TABLE IF NOT EXISTS sources (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         |url TEXT,
+         |url TEXT NOT NULL,
          |title TEXT NOT NULL,
          |description TEXT NOT NULL,
-         |created_at INTEGER
+         |created_at INTEGER NOT NULL
          |)""".stripMargin,
 
       s"""CREATE INDEX sources_created_at ON sources (
@@ -48,7 +51,7 @@ class LinenOpenHelper(context: Context)
          |source_id INTEGER NOT NULL,
          |owner_account_id INTEGER NOT NULL,
          |rating INTEGER NOT NULL,
-         |created_at INTEGER,
+         |created_at INTEGER NOT NULL,
          |UNIQUE(owner_account_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(owner_account_id) REFERENCES accounts(_id) ON DELETE CASCADE
@@ -60,11 +63,11 @@ class LinenOpenHelper(context: Context)
     val entries = Seq(
       s"""CREATE TABLE IF NOT EXISTS entries (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         |source_id INTEGER,
-         |url TEXT,
-         |title TEXT,
-         |content TEXT,
-         |created_at INTEGER,
+         |source_id INTEGER NOT NULL,
+         |url TEXT NOT NULL,
+         |title TEXT NOT NULL,
+         |content TEXT NOT NULL,
+         |created_at INTEGER NOT NULL,
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE
          |)""".stripMargin,
 
@@ -80,10 +83,10 @@ class LinenOpenHelper(context: Context)
     val channels = Seq(
       s"""CREATE TABLE IF NOT EXISTS channels (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         |account_id INTEGER,
-         |name TEXT,
-         |description TEXT,
-         |created_at INTEGER,
+         |account_id INTEGER NOT NULL,
+         |name TEXT NOT NULL,
+         |description TEXT NOT NULL,
+         |created_at INTEGER NOT NULL,
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
@@ -91,7 +94,7 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS channel_source_map (
          |channel_id INTEGER NOT NULL,
          |source_id INTEGER NOT NULL,
-         |created_at INTEGER,
+         |created_at INTEGER NOT NULL,
          |UNIQUE(channel_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
@@ -102,7 +105,7 @@ class LinenOpenHelper(context: Context)
          |source_id INTEGER NOT NULL,
          |start_entry_id INTEGER,
          |account_id INTEGER NOT NULL,
-         |created_at INTEGER,
+         |created_at INTEGER NOT NULL,
          |UNIQUE(source_id, account_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(start_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
@@ -120,4 +123,44 @@ class LinenOpenHelper(context: Context)
     ).flatten foreach db.execSQL
 
   }
+}
+
+trait Insertable[A] {
+  def tableName: String
+  def toContentValues(target: A): ContentValues
+}
+
+class WritableDatabase(db: SQLiteDatabase) {
+  def insert[A: Insertable](target: A): Either[SQLException, Long] = {
+    try {
+      val i = implicitly[Insertable[A]]
+      val id = db.insertOrThrow(i.tableName, null, i toContentValues target)
+      Right(id)
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
+  def update[A: Updatable](target: A): Either[SQLException, Int] = {
+    try {
+      val updatable = implicitly[Updatable[A]]
+      val where = updatable where target
+      val clause = where map { case (key, _) => s"$key = ?" }
+      val args = where map { case (_, value) => value }
+      Right apply db.update(
+        updatable.tableName,
+        updatable toContentValues  target,
+        clause mkString " AND ",
+        args.toArray
+      )
+    } catch {
+      case e: SQLException => Left(e)
+    }
+
+  }
+}
+
+trait Updatable[A] {
+  def tableName: String
+  def toContentValues(target: A): ContentValues
+  def where(target: A): Seq[(String, String)]
 }

@@ -1,13 +1,14 @@
 package x7c1.linen.modern.init
 
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Gravity.START
 import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.{PaneDragDetector, PaneLabel, SourceRowAdapter}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
-
 trait SourceAreaInitializer {
   def layout: MainLayout
   def accessors: Accessors
@@ -20,6 +21,10 @@ trait SourceAreaInitializer {
       val params = layout.sourceArea.getLayoutParams
       params.width = widthWithMargin
       params
+    }
+    layout.sourceToolbar setTitle "Technology"
+    layout.sourceToolbar onClickNavigation { _ =>
+      layout.drawerMenu openDrawer START
     }
     val manager = new LinearLayoutManager(layout.sourceList.getContext)
     layout.sourceList setLayoutManager manager

@@ -3,8 +3,12 @@ package x7c1.linen.modern.init
 import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, SourceAccessor}
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, Source}
+import x7c1.linen.modern.accessor.AccountAccessor.findCurrentAccountId
+import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
+import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
+import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -27,12 +31,12 @@ class AccessorLoader(
     loaderManager = loaderManager,
     startLoaderId = 0
   )
-  private var sourceAccessor: Option[SourceAccessor] = None
+  private var sourceAccessor: Option[UnreadSourceAccessor] = None
   private var currentSourceLength: Int = 0
 
-  def createSourceAccessor: SourceAccessor =
-    new SourceAccessor {
-      override def findAt(position: Int): Option[Source] = {
+  def createSourceAccessor: UnreadSourceAccessor =
+    new UnreadSourceAccessor {
+      override def findAt(position: Int): Option[UnreadSource] = {
         sourceAccessor.flatMap(_ findAt position)
       }
       override def positionOf(sourceId: Long): Option[Int] = {
@@ -68,15 +72,18 @@ class AccessorLoader(
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources() = loaderFactory asFuture {
-    val sourceIds = SourceAccessor create database match {
-      case Right(accessor) =>
-        sourceAccessor = Some(accessor)
-        (0 to accessor.length - 1).map(accessor.findAt).flatMap(_.map(_.id))
-      case Left(noRecordError) =>
+  private def startLoadingSources(): Future[Seq[Long]] = loaderFactory asFuture {
+    inspectSourceAccessor(database).toEither match {
+      case Left(error: ErrorEmpty) =>
+        Log error error.message
         Seq()
+      case Left(empty) =>
+        Log info empty.message
+        Seq()
+      case Right(accessor) =>
+        this.sourceAccessor = Some(accessor)
+        accessor.sourceIds
     }
-    sourceIds
   }
   private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
@@ -137,5 +144,22 @@ class AccessorLoader(
     "[failed] " +
       (e.toString +: e.getStackTrace.take(30) mkString "\n")
   }
+}
 
+object AccessorLoader {
+  import scalaz.\/
+  import scalaz.\/.{left, right}
+  import scalaz.syntax.std.option._
+
+  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor =
+    try for {
+      accountId <- findCurrentAccountId(db) \/> AccountNotFound
+      channelId <- findCurrentChannelId(db, accountId) \/> ChannelNotFound(accountId)
+      accessor <- UnreadSourceAccessor.create(db, accountId, channelId) match {
+        case Failure(exception) => left(Abort(exception))
+        case Success(accessor) => right(accessor)
+      }
+    } yield accessor catch {
+      case e: Exception => left(Abort(e))
+    }
 }

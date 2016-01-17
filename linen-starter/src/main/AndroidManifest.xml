@@ -19,5 +19,20 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingChannelsActivity"
+            android:label="setting of channels">
+        </activity>
+
+        <activity
+            android:name=".dev.CreateRecordsActivity"
+            android:label="create dummies">
+        </activity>
+
+        <service
+            android:name=".UpdaterService"
+            android:exported="false"
+            />
+
     </application>
 </manifest>

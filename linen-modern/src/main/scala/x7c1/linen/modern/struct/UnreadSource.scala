@@ -1,6 +1,6 @@
 package x7c1.linen.modern.struct
 
-case class Source(
+case class UnreadSource(
   id: Long,
   url: String,
   title: String,
