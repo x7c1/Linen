@@ -36,7 +36,6 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
       case Some(_) =>
         new UpdaterMethods(service, startId) executeBy intent
       case None =>
-        service stopForeground true
     }
     NotSticky
   }
@@ -84,18 +83,19 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
   def executeBy(intent: Intent): Unit = MethodCaller using intent
 
-  def createDummies(): Unit = async {
+  def createDummies(max: Int): Unit = async {
     Log info "[init]"
-    val max = 100
     DummyFactory.createDummies0(service)(max){ n =>
       notifyProgress(max, n)
     }
+    notifyDone(max, max)
     service stopSelf startId
   }
   private def manager =
     service.getSystemService(NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
 
-  private def notifyProgress(max: Int, current: Int): Unit ={
+  private def notifyDone(max: Int, current: Int): Unit = {
+
     val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
     val pendingIntent =
       PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -104,7 +104,35 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
       setContentIntent(pendingIntent).
       setContentTitle(s"Progress $current/$max").
       setContentText(s"inserting").
-      setProgress(100, current, false).
+      setProgress(max, current, false/*indeterminate*/).
+      setAutoCancel(true).
+      setSmallIcon(android.R.drawable.ic_dialog_info)
+
+    val style0 = new NotificationCompat.InboxStyle(builder)
+      .setSummaryText(s"inserted $current/$max")
+      .setBigContentTitle("Progress")
+
+    val notification = style0.build()
+
+    /*
+    rebuild notification for kitkat device
+     */
+    service stopForeground {
+      val removeNotification = true
+      removeNotification
+    }
+    manager.notify(123, notification)
+  }
+  private def notifyProgress(max: Int, current: Int): Unit = {
+    val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
+    val pendingIntent =
+      PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+
+    val builder = new Builder(service).
+      setContentIntent(pendingIntent).
+      setContentTitle(s"Progress $current/$max").
+      setContentText(s"inserting").
+      setProgress(max, current, false/*indeterminate*/).
       setSmallIcon(android.R.drawable.ic_dialog_info)
 
     val style0 = new NotificationCompat.InboxStyle(builder)

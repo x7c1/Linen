@@ -44,7 +44,7 @@ class CreateRecordsDelegatee (
 
         ServiceCaller.using[UpdaterMethods].
           startService(activity, activity getClassOf Updater){
-            _.createDummies()
+            _.createDummies(25)
           }
 
         ServiceCaller.using[UpdaterMethods].
