@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.settings
 import android.app.Activity
 import android.content.Intent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.wheat.macros.intent.MethodCaller
+import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 
 class ChannelSourcesDelegatee (
@@ -28,7 +28,7 @@ class ChannelSourcesDelegatee (
 
 class ChannelSourcesMethods(activity: Activity with ActivityControl){
 
-  def executeBy(intent: Intent): Unit = MethodCaller executeBy intent
+  def executeBy(intent: Intent): Unit = IntentExpander executeBy intent
 
   def showSources(accountId: Long, channelId: Long): Unit = {
     Log info s"account:$accountId, channel:$channelId"

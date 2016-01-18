@@ -7,18 +7,18 @@ import scala.annotation.tailrec
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-object MethodCaller {
-  def findFrom(intent: Intent): Either[MethodCallerError, () => Unit] =
-    macro MethodCallerImpl.findMethod[Intent]
+object IntentExpander {
+  def findFrom(intent: Intent): Either[IntentExpanderError, () => Unit] =
+    macro IntentExpanderImpl.findMethod[Intent]
 
   def executeBy(intent: Intent): Unit =
-    macro MethodCallerImpl.executeMethod[Intent]
+    macro IntentExpanderImpl.executeMethod[Intent]
 }
 
-private object MethodCallerImpl {
+private object IntentExpanderImpl {
   def findMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
 
-    val factory = new MethodCallerTreeFactory {
+    val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
     }
@@ -29,7 +29,7 @@ private object MethodCallerImpl {
   def executeMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
     import c.universe._
 
-    val factory = new MethodCallerTreeFactory {
+    val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
     }
@@ -51,7 +51,7 @@ private object MethodCallerImpl {
   }
 }
 
-trait MethodCallerTreeFactory {
+trait IntentExpanderTreeFactory {
   val context: blackbox.Context
   import context.universe._
   val intentTree: Tree
@@ -165,7 +165,3 @@ trait MethodCallerTreeFactory {
       """
   }
 }
-
-sealed trait MethodCallerError
-
-case class UnknownAction(action: String) extends MethodCallerError

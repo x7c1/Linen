@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.init.dev.DummyFactory
-import x7c1.wheat.macros.intent.MethodCaller
+import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
@@ -39,7 +39,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 }
 class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
-  def executeBy(intent: Intent) = MethodCaller executeBy intent
+  def executeBy(intent: Intent) = IntentExpander executeBy intent
 
   def createDummies(max: Int): Unit = async {
     Log info "[init]"
