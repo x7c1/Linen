@@ -18,20 +18,14 @@ private object IntentFactoryImpl {
   def createIntent[A: c.WeakTypeTag](c: blackbox.Context)
       (context: c.Tree, klass: c.Tree)(f: c.Tree): c.Tree = {
 
-    import c.universe._
     val factory = new IntentTreeFactory {
       override val context: c.type = c
       override val block = f
     }
-    val intent = factory.intent
-    val tree = q"""
-      val $intent = new ${typeOf[Intent]}($context, $klass)
-      $intent.setAction(${factory.methodName})
-      ..${factory putExtras intent}
-      $intent
-       """
+    val tree = factory.newIntent(context, klass)
 
-    println(showCode(tree))
+//    import c.universe._
+//    println(showCode(tree))
     tree
   }
 }
@@ -50,8 +44,6 @@ private trait IntentTreeFactory {
     case Seq(x, y: Apply) => x -> y
     case _ => throw new IllegalArgumentException("invalid form of expression")
   }
-  lazy val intent: TermName = TermName(context freshName "intent")
-
   lazy val methodName: String = call.symbol.asMethod.fullName
 
   private def extras: List[IntentExtra] = {
@@ -75,5 +67,13 @@ private trait IntentTreeFactory {
   def putExtras(intent: TermName): List[Tree] = extras map { extra =>
     q"$intent.putExtra(${extra.key}, ${extra.value})"
   }
-
+  def newIntent(androidContext: Tree, klass: Tree): Tree = {
+    val intent = TermName(context freshName "intent")
+    q"""{
+      val $intent = new ${typeOf[Intent]}($androidContext, $klass)
+      $intent.setAction($methodName)
+      ..${putExtras(intent)}
+      $intent
+    }"""
+  }
 }

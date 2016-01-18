@@ -1,6 +1,6 @@
 package x7c1.wheat.macros.intent
 
-import android.content.{Context, Intent}
+import android.content.Context
 import android.os.Bundle
 
 import scala.language.experimental.macros
@@ -24,11 +24,9 @@ private object ServiceCallerImpl {
       override val context: c.type = c
       override val block = f
     }
-    val intent = factory.intent
+    val intent = TermName(c freshName "intent")
     val tree = q"""
-      val $intent = new ${typeOf[Intent]}($context, $klass)
-      $intent.setAction(${factory.methodName})
-      ..${factory putExtras intent}
+      val $intent = ${factory.newIntent(context, klass)}
       $context.startService($intent)
     """
 
