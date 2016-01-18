@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.init.dev.DummyFactory
-import x7c1.wheat.macros.intent.IntentExpander
+import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
@@ -25,12 +25,8 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info s"[init] start:$startId, $intent"
 
-    Option(intent.getAction) match {
-      case Some(action) =>
-        new UpdaterMethods(service, startId) executeBy intent
-      case None =>
-        Log info s"empty action"
-    }
+    new UpdaterMethods(service, startId) execute intent
+
     NotSticky
   }
   def onDestroy(): Unit = {
@@ -39,7 +35,11 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 }
 class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
-  def executeBy(intent: Intent) = IntentExpander executeBy intent
+  def execute(intent: Intent) = IntentExpander findFrom intent match {
+    case Left(e: ExtraNotFound) => Log error e.toString
+    case Left(notFound) => Log info notFound.toString
+    case Right(f) => f.apply()
+  }
 
   def createDummies(max: Int): Unit = async {
     Log info "[init]"

@@ -1,5 +1,6 @@
 package x7c1.wheat.macros.intent
 
+import android.app.Activity
 import android.content.Intent
 import android.util.Log
 
@@ -8,45 +9,53 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object IntentExpander {
-  def findFrom(intent: Intent): Either[IntentExpanderError, () => Unit] =
+  def findFrom(intent: Intent): Either[IntentNotExpanded, () => Unit] =
     macro IntentExpanderImpl.findMethod[Intent]
 
   def executeBy(intent: Intent): Unit =
     macro IntentExpanderImpl.executeMethod[Intent]
+
+  def executeBy(activity: Activity): Unit =
+    macro IntentExpanderImpl.executeByActivity[Intent]
 }
 
 private object IntentExpanderImpl {
   def findMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
-
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
     }
-    val tree = factory.findCallee(intent)
-//    println(showCode(tree))
+    val tree = factory.findCallee
+//    println(c.universe.showCode(tree))
     tree
   }
   def executeMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
-    import c.universe._
-
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
     }
-    val f = TermName(c freshName "f")
-    val callee = TermName(c freshName "callee")
+    val tree = factory.executeCallee
+//    println(c.universe.showCode(tree))
+    tree
+  }
+  def executeByActivity[A: c.WeakTypeTag](c: blackbox.Context)(activity: c.Tree): c.Tree = {
+    import c.universe._
 
+    val intent = q"${TermName(c.freshName("intent"))}"
+    val factory = new IntentExpanderTreeFactory {
+      override val context: c.type = c
+      override val intentTree: c.Tree = intent
+    }
     val tree = q"""
-      val $callee = ${factory findCallee intent}
-      $callee match {
-        case Right($f) =>
-          try $f()
-          catch { case ${factory.caseIllegalArgument} }
-        case ${factory.caseUnknownAction}
+      val $intent = $activity.getIntent
+      Option($intent) match {
+        case Some(_) =>
+          ${factory.executeCallee}
+        case None =>
+          Left apply new ${typeOf[NoIntent]}
       }
-    """
-
-//    println(showCode(tree))
+     """
+//    println(c.universe.showCode(tree))
     tree
   }
 }
@@ -70,11 +79,11 @@ trait IntentExpanderTreeFactory {
           throw new IllegalArgumentException(s"unsupported type : $x")
       }
       val name = TermName(context freshName "x")
-      val message = s"extra not assigned: $key"
+      val exception = typeOf[ExtraNotFoundException]
       name -> q"""
         val $name =
           if ($intentTree.hasExtra($key)) $tree
-          else throw new IllegalArgumentException($message)"""
+          else throw new $exception($key)"""
     }
   }
   case class Method(
@@ -88,10 +97,13 @@ trait IntentExpanderTreeFactory {
       val args = pairs.map(_._1)
       val assigns = pairs.map(_._2)
       cq"""
-        $fullName => Right(() => {
+        $fullName => try {
           ..$assigns
-          $method(..$args)
-        })
+          Right(() => $method(..$args))
+        } catch {
+          case e: ${typeOf[ExtraNotFoundException]} =>
+            Left(new ${typeOf[ExtraNotFound]}(e.key))
+        }
         """
     }
   }
@@ -102,7 +114,7 @@ trait IntentExpanderTreeFactory {
       if (x.isClass) x.asClass
       else traverse(x.owner)
     }
-    traverse(intentTree.symbol)
+    traverse(context.internal.enclosingOwner)
   }
 
   lazy val enclosingMethod = {
@@ -111,7 +123,7 @@ trait IntentExpanderTreeFactory {
       if (x.isMethod) x.asMethod
       else traverse(x.owner)
     }
-    traverse(intentTree.symbol)
+    traverse(context.internal.enclosingOwner)
   }
 
   def createMethods: Iterable[Method] = {
@@ -138,30 +150,35 @@ trait IntentExpanderTreeFactory {
       Method(method.name.encodedName.toString, method.fullName, params)
     }
   }
-  def findCallee(intent: Tree) = {
+  def findCallee = {
     val methods = createMethods
-    val unknown = typeOf[UnknownAction]
     q"""
-      $intent.getAction match {
-        case ..${methods.map(_.toCase)}
-        case action => Left apply new $unknown(action)
+      Option($intentTree.getAction) match {
+        case Some(action) =>
+          action match {
+            case ..${methods.map(_.toCase)}
+            case action =>
+              Left apply new ${typeOf[UnknownAction]}(action)
+          }
+        case None =>
+          Left apply new ${typeOf[NoIntentAction]}
       }
       """
   }
-  def caseUnknownAction = {
-    val Log = typeOf[Log].companion
+  def executeCallee = {
+    val f = TermName(context freshName "f")
+    val callee = TermName(context freshName "callee")
+    val log = typeOf[Log].companion
     val tag = enclosingClass.fullName
-    val x = TermName(context freshName "x")
-    cq""" $x =>
-      $Log.e($tag, "unknown action: " + $x)
-      """
-  }
-  def caseIllegalArgument = {
-    val Log = typeOf[Log].companion
-    val tag = enclosingClass.fullName
-    val x = TermName(context freshName "x")
-    cq""" $x: IllegalArgumentException =>
-      $Log.e($tag, $x.getMessage)
-      """
+    q"""
+      val $callee = $findCallee
+      $callee match {
+        case Right($f) => $f()
+        case Left(e) => $log.e($tag, e.toString)
+      }
+    """
   }
 }
+
+class ExtraNotFoundException(
+  val key: String) extends Exception
