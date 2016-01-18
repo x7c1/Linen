@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Channel, Date}
 
 trait ChannelAccessor {
+  def accountId: Long
   def findAt(position: Int): Option[Channel]
   def length: Int
 }
@@ -18,7 +19,8 @@ object ChannelAccessor {
   }
 
   private class ChannelAccessorImpl(
-    db: SQLiteDatabase, accountId: Long) extends ChannelAccessor {
+    db: SQLiteDatabase,
+    override val accountId: Long) extends ChannelAccessor {
 
     private lazy val idIndex = cursor getColumnIndex "channel_id"
     private lazy val nameIndex = cursor getColumnIndex "name"
