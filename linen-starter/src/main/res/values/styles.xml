@@ -4,6 +4,9 @@
 
         <!-- e.g. option menu on Toolbar -->
         <item name="colorControlNormal">@color/transparent_white</item>
+
+        <!-- e.g. SwitchCompat -->
+        <item name="colorControlActivated">@color/to_next_button_background</item>
     </style>
 
     <style name="AppTheme.Polyfill">
