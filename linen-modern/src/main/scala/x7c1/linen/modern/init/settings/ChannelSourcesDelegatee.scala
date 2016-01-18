@@ -28,7 +28,7 @@ class ChannelSourcesDelegatee (
 
 class ChannelSourcesMethods(activity: Activity with ActivityControl){
 
-  def executeBy(intent: Intent): Unit = MethodCaller using intent
+  def executeBy(intent: Intent): Unit = MethodCaller executeBy intent
 
   def showSources(accountId: Long, channelId: Long): Unit = {
     Log info s"account:$accountId, channel:$channelId"

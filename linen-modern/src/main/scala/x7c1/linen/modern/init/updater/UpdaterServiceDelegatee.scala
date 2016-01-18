@@ -26,9 +26,10 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     Log info s"[init] start:$startId, $intent"
 
     Option(intent.getAction) match {
-      case Some(_) =>
+      case Some(action) =>
         new UpdaterMethods(service, startId) executeBy intent
       case None =>
+        Log info s"empty action"
     }
     NotSticky
   }
@@ -38,7 +39,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 }
 class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
-  def executeBy(intent: Intent): Unit = MethodCaller using intent
+  def executeBy(intent: Intent) = MethodCaller executeBy intent
 
   def createDummies(max: Int): Unit = async {
     Log info "[init]"
