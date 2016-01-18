@@ -3,10 +3,12 @@ package x7c1.linen.modern.init.settings
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingChannelsRow, SettingChannelsLayout}
-import x7c1.linen.modern.accessor.{AccountAccessor, LinenOpenHelper, ChannelAccessor}
-import x7c1.linen.modern.display.settings.{ChannelSourcesEvent, OnChannelSourcesListener, ChannelRowAdapter}
+import x7c1.linen.glue.activity.ActivityLabel.SettingChannelSources
+import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingChannelsRow}
+import x7c1.linen.modern.accessor.{AccountAccessor, ChannelAccessor, LinenOpenHelper}
+import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesEvent, OnChannelSourcesListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -47,5 +49,12 @@ class OnChannelSources(activity: Activity with ActivityControl)
 
   override def onSourcesSelected(event: ChannelSourcesEvent): Unit = {
     Log info s"[init] $event"
+
+    val intent = IntentFactory.using[ChannelSourcesMethods].
+      create(activity, activity getClassOf SettingChannelSources){
+        _.showSources(event.accountId, event.channelId)
+      }
+
+    activity startActivityBy intent
   }
 }

@@ -14,6 +14,9 @@ public class Control {
 			case SettingChannels:
 				klass = SettingChannelsActivity.class;
 				break;
+			case SettingChannelSources:
+				klass = SettingChannelSourcesActivity.class;
+				break;
 			case CreateRecords:
 				klass = CreateRecordsActivity.class;
 				break;

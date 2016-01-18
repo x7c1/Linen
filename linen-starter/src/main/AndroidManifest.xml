@@ -21,7 +21,12 @@
 
         <activity
             android:name=".SettingChannelsActivity"
-            android:label="setting of channels">
+            >
+        </activity>
+
+        <activity
+            android:name=".SettingChannelSourcesActivity"
+            >
         </activity>
 
         <activity
