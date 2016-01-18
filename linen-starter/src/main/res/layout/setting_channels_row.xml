@@ -1,45 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    >
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="10dp"
-    android:paddingEnd="5dp"
-    android:paddingStart="10dp"
+    android:paddingTop="@dimen/setting_channels_row_padding"
     >
 
     <TextView
         android:id="@+id/setting_channels_row__name"
+        android:paddingStart="@dimen/setting_channels_row_padding"
+        android:paddingEnd="@dimen/setting_channels_row_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:textSize="18sp"
         />
 
     <TextView
         android:id="@+id/setting_channels_row__description"
+        android:paddingStart="@dimen/setting_channels_row_padding"
+        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:layout_below="@id/setting_channels_row__name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:paddingStart="3dp"
-        android:paddingEnd="3dp"
+        android:layout_marginBottom="12dp"
         android:textSize="15sp"
         />
 
-    <TextView
-        android:id="@+id/setting_channels_row__created_at"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp"
-        android:textSize="12sp"
-        android:textAlignment="textEnd"
-        />
-
     <View
+        android:id="@+id/border"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/menu_label"
+        android:layout_below="@id/setting_channels_row__description"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/text_secondary"
         />
 
-</LinearLayout>
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/setting_channels_row__switch_subscribe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/border"
+        android:layout_alignParentEnd="true"
+        android:paddingTop="@dimen/setting_channels_row_padding"
+        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingBottom="@dimen/setting_channels_row_padding"
+        android:paddingStart="5dp"
+        />
+
+    <TextView
+        android:id="@+id/setting_channels_row__edit"
+        style="@style/SettingChannelsRowButtons"
+        android:text="EDIT"
+        android:layout_below="@id/border"
+        android:layout_toStartOf="@id/setting_channels_row__switch_subscribe"
+        />
+
+    <TextView
+        android:id="@+id/setting_channels_row__sources"
+        style="@style/SettingChannelsRowButtons"
+        android:text="SOURCES"
+        android:layout_below="@id/border"
+        android:layout_toStartOf="@id/setting_channels_row__edit"
+        />
+
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>

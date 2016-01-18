@@ -20,7 +20,6 @@ class ChannelRowAdapter(
     accessor findAt position foreach { channel =>
       holder.name.text = channel.name
       holder.description.text = channel.description
-      holder.createdAt.text = channel.createdAt.format
     }
   }
 }

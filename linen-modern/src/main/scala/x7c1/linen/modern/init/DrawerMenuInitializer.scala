@@ -55,8 +55,8 @@ trait DrawerMenuInitializer {
         item of UpdaterSchedule("Updater Schedule")
       ),
       new MenuItemsBox(
-        label of "Developments",
-        item of DevCreateDummies("Create Dummies"),
+        label of "Developer Menu",
+        item of DevCreateDummies("Create Records"),
         item of DevShowRecords("Show Records")
       )
     )

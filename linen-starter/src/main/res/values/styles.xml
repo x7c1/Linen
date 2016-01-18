@@ -16,7 +16,7 @@
     <style name="AppItemList">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/opaque_blue</item>
+        <item name="android:background">@color/list_background</item>
         <item name="android:layout_marginBottom">@dimen/app_toolbar_bottom_height</item>
     </style>
 
@@ -87,8 +87,9 @@
 
     <dimen name="app_toolbar_bottom_height">38dp</dimen>
 
-    <color name="menu_label">#878787</color>
+    <color name="text_secondary">#878787</color>
     <color name="toolbar_background">@color/dark_imperial_blue</color>
+    <color name="list_background">@color/opaque_blue</color>
     <color name="to_next_button_background">@color/lapis_lazuli</color>
 
     <color name="opaque_orange">#faf0ec</color>
