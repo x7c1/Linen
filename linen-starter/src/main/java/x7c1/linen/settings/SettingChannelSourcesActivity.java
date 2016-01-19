@@ -8,6 +8,7 @@ import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 import x7c1.linen.modern.init.settings.ChannelSourcesDelegatee;
 import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
+import x7c1.linen.res.layout.SettingChannelSourcesRowProvider;
 
 public class SettingChannelSourcesActivity extends BaseActivity {
 	private ChannelSourcesDelegatee delegatee = null;
@@ -24,7 +25,8 @@ public class SettingChannelSourcesActivity extends BaseActivity {
 
 		delegatee = new ChannelSourcesDelegatee(
 				this,
-				layout
+				layout,
+				new SettingChannelSourcesRowProvider(this)
 		);
 		delegatee.setup();
 	}
