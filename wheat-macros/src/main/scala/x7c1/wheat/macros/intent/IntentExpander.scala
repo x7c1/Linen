@@ -10,17 +10,17 @@ import scala.reflect.macros.blackbox
 
 object IntentExpander {
   def findFrom(intent: Intent): Either[IntentNotExpanded, () => Unit] =
-    macro IntentExpanderImpl.findMethod[Intent]
+    macro IntentExpanderImpl.findMethod
 
   def executeBy(intent: Intent): Unit =
-    macro IntentExpanderImpl.executeMethod[Intent]
+    macro IntentExpanderImpl.executeMethod
 
   def executeBy(activity: Activity): Unit =
-    macro IntentExpanderImpl.executeByActivity[Intent]
+    macro IntentExpanderImpl.executeByActivity
 }
 
 private object IntentExpanderImpl {
-  def findMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
+  def findMethod(c: blackbox.Context)(intent: c.Tree): c.Tree = {
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
@@ -29,7 +29,7 @@ private object IntentExpanderImpl {
 //    println(c.universe.showCode(tree))
     tree
   }
-  def executeMethod[A: c.WeakTypeTag](c: blackbox.Context)(intent: c.Tree): c.Tree = {
+  def executeMethod(c: blackbox.Context)(intent: c.Tree): c.Tree = {
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
@@ -38,7 +38,7 @@ private object IntentExpanderImpl {
 //    println(c.universe.showCode(tree))
     tree
   }
-  def executeByActivity[A: c.WeakTypeTag](c: blackbox.Context)(activity: c.Tree): c.Tree = {
+  def executeByActivity(c: blackbox.Context)(activity: c.Tree): c.Tree = {
     import c.universe._
 
     val intent = q"${TermName(c.freshName("intent"))}"
@@ -54,7 +54,7 @@ private object IntentExpanderImpl {
         case None =>
           Left apply new ${typeOf[NoIntent]}
       }
-     """
+    """
 //    println(c.universe.showCode(tree))
     tree
   }

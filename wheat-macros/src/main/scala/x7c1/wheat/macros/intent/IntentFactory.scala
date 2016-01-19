@@ -11,11 +11,11 @@ object IntentFactory {
 
 class IntentFactory[A]{
   def create(context: Context, klass: Class[_])(f: A => Unit): Intent =
-    macro IntentFactoryImpl.createIntent[A]
+    macro IntentFactoryImpl.createIntent
 }
 
 private object IntentFactoryImpl {
-  def createIntent[A: c.WeakTypeTag](c: blackbox.Context)
+  def createIntent(c: blackbox.Context)
       (context: c.Tree, klass: c.Tree)(f: c.Tree): c.Tree = {
 
     val factory = new IntentTreeFactory {
@@ -23,9 +23,7 @@ private object IntentFactoryImpl {
       override val block = f
     }
     val tree = factory.newIntent(context, klass)
-
-//    import c.universe._
-//    println(showCode(tree))
+//    println(c.universe.showCode(tree))
     tree
   }
 }
