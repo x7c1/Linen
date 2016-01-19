@@ -9,17 +9,11 @@ class ChannelSourcesDelegatee (
   activity: Activity with ActivityControl
 ){
   def setup(): Unit = {
-    new ChannelSourcesMethods(activity).execute()
+    IntentExpander executeBy activity.getIntent
   }
   def close(): Unit = {
     Log info "[init]"
   }
-}
-
-class ChannelSourcesMethods(activity: Activity with ActivityControl){
-
-  def execute() = IntentExpander executeBy activity.getIntent
-
   def showSources(accountId: Long, channelId: Long): Unit = {
     Log info s"account:$accountId, channel:$channelId"
   }

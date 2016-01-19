@@ -50,7 +50,7 @@ class OnChannelSources(activity: Activity with ActivityControl)
   override def onSourcesSelected(event: ChannelSourcesEvent): Unit = {
     Log info s"[init] $event"
 
-    val intent = IntentFactory.using[ChannelSourcesMethods].
+    val intent = IntentFactory.using[ChannelSourcesDelegatee].
       create(activity, activity getClassOf SettingChannelSources){
         _.showSources(event.accountId, event.channelId)
       }
