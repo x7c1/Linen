@@ -4,17 +4,28 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import x7c1.linen.BaseActivity;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 import x7c1.linen.modern.init.settings.ChannelSourcesDelegatee;
+import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
 
 public class SettingChannelSourcesActivity extends BaseActivity {
-
 	private ChannelSourcesDelegatee delegatee = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		delegatee = new ChannelSourcesDelegatee(this);
+		final SettingChannelSourcesLayout layout =
+				new SettingChannelSourcesLayoutProvider(this).inflate(null, false);
+
+		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
+		setContentView(layout.itemView);
+
+		delegatee = new ChannelSourcesDelegatee(
+				this,
+				layout
+		);
 		delegatee.setup();
 	}
 	@Override
