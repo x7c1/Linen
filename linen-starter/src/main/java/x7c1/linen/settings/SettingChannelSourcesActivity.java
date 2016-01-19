@@ -1,8 +1,9 @@
-package x7c1.linen;
+package x7c1.linen.settings;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import x7c1.linen.BaseActivity;
 import x7c1.linen.modern.init.settings.ChannelSourcesDelegatee;
 
 public class SettingChannelSourcesActivity extends BaseActivity {
