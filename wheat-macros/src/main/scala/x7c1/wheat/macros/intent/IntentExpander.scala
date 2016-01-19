@@ -1,6 +1,5 @@
 package x7c1.wheat.macros.intent
 
-import android.app.Activity
 import android.content.Intent
 import android.util.Log
 
@@ -14,9 +13,6 @@ object IntentExpander {
 
   def executeBy(intent: Intent): Unit =
     macro IntentExpanderImpl.executeMethod
-
-  def executeBy(activity: Activity): Unit =
-    macro IntentExpanderImpl.executeByActivity
 }
 
 private object IntentExpanderImpl {
@@ -35,26 +31,6 @@ private object IntentExpanderImpl {
       override val intentTree = intent
     }
     val tree = factory.executeCallee
-//    println(c.universe.showCode(tree))
-    tree
-  }
-  def executeByActivity(c: blackbox.Context)(activity: c.Tree): c.Tree = {
-    import c.universe._
-
-    val intent = q"${TermName(c.freshName("intent"))}"
-    val factory = new IntentExpanderTreeFactory {
-      override val context: c.type = c
-      override val intentTree: c.Tree = intent
-    }
-    val tree = q"""
-      val $intent = $activity.getIntent
-      Option($intent) match {
-        case Some(_) =>
-          ${factory.executeCallee}
-        case None =>
-          Left apply new ${typeOf[NoIntent]}
-      }
-    """
 //    println(c.universe.showCode(tree))
     tree
   }
@@ -150,31 +126,36 @@ trait IntentExpanderTreeFactory {
       Method(method.name.encodedName.toString, method.fullName, params)
     }
   }
+  def createTermNames(names: String*): Seq[TermName] = {
+    names map (x => TermName(context freshName x))
+  }
   def findCallee = {
     val methods = createMethods
+    val Seq(intent, action) = createTermNames("intent", "action")
     q"""
-      Option($intentTree.getAction) match {
-        case Some(action) =>
-          action match {
+      Option($intentTree) match {
+        case Some($intent) => Option($intent.getAction) match {
+          case Some($action) => $action match {
             case ..${methods.map(_.toCase)}
-            case action =>
-              Left apply new ${typeOf[UnknownAction]}(action)
+            case _ =>
+              Left apply new ${typeOf[UnknownAction]}($action)
           }
-        case None =>
-          Left apply new ${typeOf[NoIntentAction]}
+          case None =>
+            Left apply new ${typeOf[NoIntentAction]}
+        }
+        case _ => Left apply new ${typeOf[NoIntent]}
       }
       """
   }
   def executeCallee = {
-    val f = TermName(context freshName "f")
-    val callee = TermName(context freshName "callee")
+    val Seq(f, e, callee) = createTermNames("f", "e", "callee")
     val log = typeOf[Log].companion
-    val tag = enclosingClass.fullName
+    val tag = enclosingMethod.fullName
     q"""
       val $callee = $findCallee
       $callee match {
         case Right($f) => $f()
-        case Left(e) => $log.e($tag, e.toString)
+        case Left($e) => $log.e($tag, $e.toString)
       }
     """
   }
