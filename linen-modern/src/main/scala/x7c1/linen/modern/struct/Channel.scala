@@ -39,7 +39,7 @@ object Channel {
           channelId = column._id,
           description = column.description,
           name = column.name,
-          createdAt = ???
+          createdAt = column.created_at.typed
         )
       } else None
     }
@@ -50,4 +50,5 @@ trait ChannelRecordColumn extends ColumnDefinition {
   def _id: Long
   def name: String
   def description: String
+  def created_at: Int --> Date
 }

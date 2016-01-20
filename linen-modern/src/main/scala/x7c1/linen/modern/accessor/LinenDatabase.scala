@@ -175,7 +175,7 @@ class SingleSelector[A](db: SQLiteDatabase){
 
   def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
     try {
-      val i = implicitly[SingleSelectable[A, B]]
+      val i = implicitly[Selectable[B]]
       val clause = i.where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
       val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
       val args = i.where(id) map { case (_, value) => value }

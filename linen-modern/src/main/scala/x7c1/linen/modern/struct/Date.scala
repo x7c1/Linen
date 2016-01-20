@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{TimeZone, Locale}
 
+import x7c1.wheat.macros.database.ColumnConvertible
+
 object Date {
   def current(): Date = new DateImpl(new util.Date)
 
@@ -11,6 +13,9 @@ object Date {
 
   def apply(timestamp: Int): Date = {
     new DateImpl(new util.Date(timestamp.toLong * 1000))
+  }
+  implicit object convertible extends ColumnConvertible[Int, Date] {
+    override def convertFrom(value: Int): Date = Date(value)
   }
   private lazy val dateFormat: SimpleDateFormat = {
     val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
