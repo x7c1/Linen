@@ -1,8 +1,8 @@
 package x7c1.linen.modern.accessor
 
 import android.content.{ContentValues, Context}
-import android.database.SQLException
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
+import android.database.{Cursor, SQLException}
 
 
 object LinenDatabase {
@@ -14,6 +14,7 @@ class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
   lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
+  lazy val readable = new ReadableDatabase(getReadableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
     db.setForeignKeyConstraintsEnabled(true)
@@ -163,4 +164,31 @@ trait Updatable[A] {
   def tableName: String
   def toContentValues(target: A): ContentValues
   def where(target: A): Seq[(String, String)]
+}
+
+class ReadableDatabase(db: SQLiteDatabase) {
+  def selectOne[A]: SingleSelector[A] = new SingleSelector[A](db)
+}
+
+class SingleSelector[A](db: SQLiteDatabase){
+  private type Selectable[X] = SingleSelectable[A, X]
+
+  def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
+    try {
+      val i = implicitly[SingleSelectable[A, B]]
+      val clause = i.where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
+      val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
+      val args = i.where(id) map { case (_, value) => value }
+      val cursor = db.rawQuery(sql, args.toArray)
+      Right apply i.fromCursor(cursor)
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
+}
+
+trait SingleSelectable[A, ID] {
+  def tableName: String
+  def where(id: ID): Seq[(String, String)]
+  def fromCursor(cursor: Cursor): Option[A]
 }
