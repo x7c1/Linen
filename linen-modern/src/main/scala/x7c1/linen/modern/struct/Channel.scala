@@ -2,7 +2,7 @@ package x7c1.linen.modern.struct
 
 import android.database.Cursor
 import x7c1.linen.modern.accessor.SingleSelectable
-import x7c1.wheat.macros.database.{ColumnDefinition, TypedColumn}
+import x7c1.wheat.macros.database.TypedCursor
 
 case class Channel(
   channelId: Long,
@@ -32,21 +32,21 @@ object Channel {
         )
       } else None
     }
-    def fromCursorSample2(cursor: Cursor) = {
-      if (cursor moveToPosition 0){
-        val column = TypedColumn[ChannelRecordColumn](cursor)
+    def fromCursorSample(rawCursor: Cursor) = {
+      val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
+      if (cursor moveTo 0){
         Some apply Channel(
-          channelId = column._id,
-          description = column.description,
-          name = column.name,
-          createdAt = column.created_at.typed
+          channelId = cursor._id,
+          description = cursor.description,
+          name = cursor.name,
+          createdAt = cursor.created_at.typed
         )
       } else None
     }
   }
 }
 
-trait ChannelRecordColumn extends ColumnDefinition {
+trait ChannelRecordColumn extends TypedCursor {
   def _id: Long
   def name: String
   def description: String

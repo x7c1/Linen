@@ -6,12 +6,13 @@ import scala.language.dynamics
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-object TypedColumn {
-  def apply[A <: ColumnDefinition](cursor: Cursor): A = macro TypedColumnImpl.create[A]
+object TypedCursor {
+  def apply[A <: TypedCursor](cursor: Cursor): A = macro TypedColumnImpl.create[A]
 }
 
-trait ColumnDefinition {
+trait TypedCursor {
   type -->[A, B] = ColumnTransform[A, B]
+  def moveTo(n: Int): Boolean
 }
 
 trait ColumnTransform[A, B]{
@@ -64,6 +65,7 @@ private object TypedColumnImpl {
     val tree = q"""
       new $definition {
         ..$overrides
+        override def moveTo(n: Int) = $cursor.moveToPosition(n)
       }
     """
 //    println(showCode(tree))
