@@ -180,7 +180,8 @@ class SingleSelector[A](db: SQLiteDatabase){
       val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
       val args = i.where(id) map { case (_, value) => value }
       val cursor = db.rawQuery(sql, args.toArray)
-      Right apply i.fromCursor(cursor)
+      try Right apply i.fromCursor(cursor)
+      finally cursor.close()
     } catch {
       case e: SQLException => Left(e)
     }
