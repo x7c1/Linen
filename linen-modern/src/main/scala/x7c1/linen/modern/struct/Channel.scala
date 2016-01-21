@@ -20,14 +20,14 @@ object Channel {
 
     override def fromCursor(rawCursor: Cursor) = {
       val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
-      if (cursor moveTo 0){
-        Some apply Channel(
+      cursor.moveToFind(0){
+        Channel(
           channelId = cursor._id,
           description = cursor.description,
           name = cursor.name,
           createdAt = cursor.created_at.typed
         )
-      } else None
+      }
     }
   }
 }
