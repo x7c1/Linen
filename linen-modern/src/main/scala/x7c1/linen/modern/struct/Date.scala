@@ -15,7 +15,8 @@ object Date {
     new DateImpl(new util.Date(timestamp.toLong * 1000))
   }
   implicit object convertible extends ColumnConvertible[Int, Date] {
-    override def convertFrom(value: Int): Date = Date(value)
+    override def wrap(value: Int): Date = Date(value)
+    override def unwrap(value: Date): Int = value.timestamp
   }
   private lazy val dateFormat: SimpleDateFormat = {
     val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)

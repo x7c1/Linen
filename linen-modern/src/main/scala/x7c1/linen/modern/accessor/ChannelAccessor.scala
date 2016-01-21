@@ -1,6 +1,5 @@
 package x7c1.linen.modern.accessor
 
-import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Channel, Date}
 import x7c1.wheat.macros.database.TypedCursor
@@ -66,19 +65,23 @@ trait ChannelRecordColumn extends TypedCursor {
   def _id: Long
   def name: String
   def description: String
+  def account_id: Long
   def created_at: Int --> Date
 }
 
 object ChannelParts {
   implicit object insertable extends Insertable[ChannelParts] {
+
     override def tableName = "channels"
+
     override def toContentValues(parts: ChannelParts) = {
-      val values = new ContentValues()
-      values.put("name", parts.name)
-      values.put("description", parts.description)
-      values.put("account_id", parts.accountId: java.lang.Long)
-      values.put("created_at", parts.createdAt.timestamp: java.lang.Integer)
-      values
+      val column = TypedCursor.expose[ChannelRecordColumn]
+      TypedCursor toContentValues (
+        column.name -> parts.name,
+        column.description -> parts.description,
+        column.account_id -> parts.accountId,
+        column.created_at -> parts.createdAt
+      )
     }
   }
 }

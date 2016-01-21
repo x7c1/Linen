@@ -1,5 +1,6 @@
 package x7c1.wheat.macros.database
 
+import android.content.ContentValues
 import android.database.Cursor
 
 import scala.language.dynamics
@@ -8,6 +9,8 @@ import scala.reflect.macros.blackbox
 
 object TypedCursor {
   def apply[A <: TypedCursor](cursor: Cursor): A = macro TypedColumnImpl.create[A]
+  def expose[A <: TypedCursor]: A = macro TypedContentValues.extract[A]
+  def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
 }
 
 trait TypedCursor {
@@ -21,7 +24,8 @@ trait ColumnTransform[A, B]{
 }
 
 trait ColumnConvertible[A, B]{
-  def convertFrom(value: A): B
+  def wrap(value: A): B
+  def unwrap(value: B): A
 }
 
 private object TypedColumnImpl {
@@ -54,7 +58,7 @@ private object TypedColumnImpl {
         q"""
           new $transform {
             override def raw = $value
-            override def typed = implicitly[$convertible].convertFrom($value)
+            override def typed = implicitly[$convertible].wrap($value)
           }"""
 
       case x =>
