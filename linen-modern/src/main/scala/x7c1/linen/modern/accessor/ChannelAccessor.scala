@@ -36,18 +36,16 @@ object ChannelAccessor {
     }
     private lazy val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
 
-    override def findAt(position: Int) = {
-      if (cursor moveTo position){
-        Some apply Channel(
+    override def findAt(position: Int) =
+      cursor.moveToFind(position){
+        Channel(
           channelId = cursor._id,
           name = cursor.name,
           description = cursor.description,
           createdAt = cursor.created_at.typed
         )
-      } else {
-        None
       }
-    }
+
     override def length: Int = {
       rawCursor.getCount
     }

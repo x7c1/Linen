@@ -15,7 +15,13 @@ object TypedCursor {
 
 trait TypedCursor {
   type -->[A, B] = ColumnTransform[A, B]
+
   def moveTo(n: Int): Boolean
+
+  def moveToFind[A](n: Int)(f: => A): Option[A] = {
+    if (moveTo(n)) Some(f)
+    else None
+  }
 }
 
 trait ColumnTransform[A, B]{

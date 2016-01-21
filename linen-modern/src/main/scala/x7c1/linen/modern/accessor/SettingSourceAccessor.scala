@@ -2,26 +2,26 @@ package x7c1.linen.modern.accessor
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import x7c1.wheat.macros.database.TypedCursor
 
 trait SettingSourceAccessor {
   def findAt(position: Int): Option[SettingSource]
   def length: Int
 }
 
-private class SettingSourceAccessorImpl(cursor: Cursor) extends SettingSourceAccessor {
+private class SettingSourceAccessorImpl(rawCursor: Cursor) extends SettingSourceAccessor {
 
-  private lazy val idIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
+  private lazy val cursor = TypedCursor[SourceRecordColumn](rawCursor)
 
-  override def length: Int = cursor.getCount
+  override def length: Int = rawCursor.getCount
 
   override def findAt(position: Int): Option[SettingSource] = {
-    if (cursor moveToPosition position){
-      Some apply SettingSource(
-        sourceId = cursor getLong idIndex,
-        title = cursor getString titleIndex
+    cursor.moveToFind(position){
+      SettingSource(
+        sourceId = cursor._id,
+        title = cursor.title
       )
-    } else None
+    }
   }
 }
 
@@ -38,8 +38,8 @@ class SettingSourceAccessorFactory(
   def createCursor(channelId: Long): Cursor = {
     val sql1 =
       """SELECT
-        | _id as source_id,
-        | title as title
+        | _id,
+        | title
         |FROM sources
       """.stripMargin
 

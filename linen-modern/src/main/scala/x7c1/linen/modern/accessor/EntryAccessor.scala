@@ -191,6 +191,7 @@ trait EntryRecordColumn extends TypedCursor {
   def source_id: Long
   def title: String
   def content: String
+  def url: String
   def created_at: Int --> Date
 }
 
@@ -205,13 +206,14 @@ object EntryParts {
   implicit object insertable extends Insertable[EntryParts] {
     override def tableName: String = "entries"
     override def toContentValues(target: EntryParts): ContentValues = {
-      val entry = new ContentValues()
-      entry.put("source_id", target.sourceId: java.lang.Long)
-      entry.put("title", target.title)
-      entry.put("content", target.content)
-      entry.put("url", target.url)
-      entry.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      entry
+      val column = TypedCursor.expose[EntryRecordColumn]
+      TypedCursor toContentValues (
+        column.source_id -> target.sourceId,
+        column.title -> target.title,
+        column.content -> target.content,
+        column.url -> target.url,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }

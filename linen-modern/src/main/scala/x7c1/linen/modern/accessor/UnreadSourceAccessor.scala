@@ -25,15 +25,15 @@ private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAc
   private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
   override def findAt(position: Int) = synchronized {
-    if (cursor moveTo position){
-      Some apply UnreadSource(
+    cursor.moveToFind(position){
+      UnreadSource(
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,
         description = cursor.description,
         startEntryId = cursor.start_entry_id
       )
-    } else None
+    }
   }
   override def length = {
     rawCursor.getCount
@@ -128,6 +128,14 @@ trait UnreadSourceColumn extends TypedCursor {
   def start_entry_id: Option[Long]
 }
 
+trait SourceRecordColumn extends TypedCursor {
+  def _id: Long
+  def title: String
+  def description: String
+  def url: String
+  def created_at: Int --> Date
+}
+
 case class SourceParts(
   title: String,
   url: String,
@@ -138,12 +146,13 @@ object SourceParts {
   implicit object insertable extends Insertable[SourceParts] {
     override def tableName: String = "sources"
     override def toContentValues(target: SourceParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("title", target.title)
-      values.put("url", target.url)
-      values.put("description", target.description)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
+      val column = TypedCursor.expose[SourceRecordColumn]
+      TypedCursor toContentValues (
+        column.title -> target.title,
+        column.url -> target.url,
+        column.description -> target.description,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }
