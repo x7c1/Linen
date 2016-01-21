@@ -39,6 +39,13 @@ private object TypedColumnImpl {
       case x if x =:= typeOf[String] => q"$cursor.getString($indexKey)"
       case x if x =:= typeOf[Long] => q"$cursor.getLong($indexKey)"
       case x if x =:= typeOf[Int] => q"$cursor.getInt($indexKey)"
+      case x if x =:= typeOf[Option[Long]] =>
+        /*
+          cannot use cursor.getLong here
+            because it returns 0 when target value is null
+         */
+        q"Option($cursor.getString($indexKey)).map(_.toLong)"
+
       case x if x <:< typeOf[ColumnTransform[_, _]] =>
         val Seq(from, to) = tpe.typeArgs
         val value = getValue(from, indexKey)
@@ -58,7 +65,7 @@ private object TypedColumnImpl {
       val indexKey = TermName(c.freshName(key + "_index_"))
       val value = getValue(method.returnType, indexKey)
       Seq(
-        q"lazy val $indexKey = $cursor.getColumnIndex($key)",
+        q"lazy val $indexKey = $cursor.getColumnIndexOrThrow($key)",
         q"override def ${TermName(key)} = $value"
       )
     }
