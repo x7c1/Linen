@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, UnreadSource}
+import x7c1.wheat.macros.database.TypedCursor
 
 import scala.util.Try
 
@@ -20,39 +21,28 @@ trait UnreadSourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
-private class UnreadSourceAccessorImpl(cursor: Cursor) extends UnreadSourceAccessor {
-
-  private lazy val idIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
-  private lazy val descriptionIndex = cursor getColumnIndex "description"
-  private lazy val startEntryIdIndex = cursor getColumnIndex "start_entry_id"
+private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAccessor {
+  private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
   override def findAt(position: Int) = synchronized {
-    if (cursor moveToPosition position){
+    if (cursor moveTo position){
       Some apply UnreadSource(
-        id = cursor.getLong(idIndex),
+        id = cursor.source_id,
         url = "dummy",
-        title = cursor.getString(titleIndex),
-        description = cursor.getString(descriptionIndex),
-        startEntryId = {
-          /*
-            cannot use cursor.getLong here
-              because it returns 0 when target value is null
-           */
-          Option(cursor getString startEntryIdIndex).map(_.toLong)
-        }
+        title = cursor.title,
+        description = cursor.description,
+        startEntryId = cursor.start_entry_id
       )
     } else None
   }
   override def length = {
-    cursor.getCount
+    rawCursor.getCount
   }
   override def positionOf(sourceId: Long): Option[Int] = {
     (0 to length - 1) find { n =>
       findAt(n).exists(_.id == sourceId)
     }
   }
-
 }
 
 class UnreadSourceAccessorFactory(db: SQLiteDatabase){
@@ -129,6 +119,13 @@ object UnreadSourceAccessor {
     db.rawQuery(sql5,
       Array(channelId.toString, accountId.toString, accountId.toString))
   }
+}
+
+trait UnreadSourceColumn extends TypedCursor {
+  def source_id: Long
+  def title: String
+  def description: String
+  def start_entry_id: Option[Long]
 }
 
 case class SourceParts(

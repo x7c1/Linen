@@ -3,6 +3,7 @@ package x7c1.linen.modern.accessor
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Channel, Date}
+import x7c1.wheat.macros.database.TypedCursor
 
 trait ChannelAccessor {
   def accountId: Long
@@ -22,15 +23,10 @@ object ChannelAccessor {
     db: SQLiteDatabase,
     override val accountId: Long) extends ChannelAccessor {
 
-    private lazy val idIndex = cursor getColumnIndex "channel_id"
-    private lazy val nameIndex = cursor getColumnIndex "name"
-    private lazy val descriptionIndex = cursor getColumnIndex "description"
-    private lazy val createdAtIndex = cursor getColumnIndex "created_at"
-
-    private lazy val cursor = {
+    private lazy val rawCursor = {
       val sql1 =
         """SELECT
-          | _id as channel_id,
+          | _id,
           | name,
           | description,
           | created_at
@@ -39,20 +35,22 @@ object ChannelAccessor {
 
       db.rawQuery(sql1, Array(accountId.toString))
     }
+    private lazy val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
+
     override def findAt(position: Int) = {
-      if (cursor moveToPosition position){
+      if (cursor moveTo position){
         Some apply Channel(
-          channelId = cursor getLong idIndex,
-          name = cursor getString nameIndex,
-          description = cursor getString descriptionIndex,
-          createdAt = Date(cursor getInt createdAtIndex)
+          channelId = cursor._id,
+          name = cursor.name,
+          description = cursor.description,
+          createdAt = cursor.created_at.typed
         )
       } else {
         None
       }
     }
     override def length: Int = {
-      cursor.getCount
+      rawCursor.getCount
     }
   }
 }
@@ -63,6 +61,13 @@ case class ChannelParts(
   description: String,
   createdAt: Date
 )
+
+trait ChannelRecordColumn extends TypedCursor {
+  def _id: Long
+  def name: String
+  def description: String
+  def created_at: Int --> Date
+}
 
 object ChannelParts {
   implicit object insertable extends Insertable[ChannelParts] {
