@@ -88,7 +88,7 @@ private object TypedContentValues {
         throw new IllegalArgumentException(s"invalid typeArgs: $typeArgs")
     }
     def toSetters(values: Tree): ((Tree, Tree)) => Seq[Tree] = {
-      case (left, right) if left.tpe =:= right.tpe =>
+      case (left, right) if left.tpe.widen =:= right.tpe.widen =>
         forPrimitive(values)(left, right)
       case (left, right) if left.tpe <:< typeOf[ColumnTransform[_, _]] =>
         forConvertible(values)(left, right)
@@ -106,7 +106,6 @@ private object TypedContentValues {
       ..$setters
       $values
     """
-
 //    println(tree)
     tree
   }
