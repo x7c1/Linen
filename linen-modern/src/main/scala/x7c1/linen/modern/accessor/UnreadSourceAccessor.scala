@@ -214,6 +214,11 @@ object SourceRatingParts {
   }
 }
 
+trait ChannelSourceMapColumn extends TypedCursor {
+  def source_id: Long
+  def channel_id: Long
+  def created_at: Int --> Date
+}
 case class ChannelSourceMapParts(
   channelId: Long,
   sourceId: Long,
@@ -223,11 +228,12 @@ object ChannelSourceMapParts {
   implicit object insertable extends Insertable[ChannelSourceMapParts] {
     override def tableName: String = "channel_source_map"
     override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("source_id", target.sourceId: java.lang.Long)
-      values.put("channel_id", target.channelId: java.lang.Long)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
+      val column = TypedCursor.expose[ChannelSourceMapColumn]
+      TypedCursor toContentValues (
+        column.source_id -> target.sourceId,
+        column.channel_id -> target.channelId,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }
