@@ -9,16 +9,23 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.support.v7.widget.SwitchCompat;
 
 public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
+    public final TextView description;
+    public final android.support.v7.widget.SwitchCompat switchSubscribe;
 
     public SettingChannelSourcesRow(
         View itemView,
-        TextView title
+        TextView title,
+        TextView description,
+        android.support.v7.widget.SwitchCompat switchSubscribe
     ){
         super(itemView);
         this.title = title;
+        this.description = description;
+        this.switchSubscribe = switchSubscribe;
     }
 }

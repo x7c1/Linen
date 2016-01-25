@@ -20,7 +20,9 @@ private class SettingSourceAccessorImpl(rawCursor: Cursor) extends SettingSource
     cursor.moveToFind(position){
       SettingSource(
         sourceId = cursor.source_id,
-        title = cursor.title
+        title = cursor.title,
+        description = cursor.description,
+        rating = cursor.rating
       )
     }
   }
@@ -28,7 +30,9 @@ private class SettingSourceAccessorImpl(rawCursor: Cursor) extends SettingSource
 
 case class SettingSource(
   sourceId: Long,
-  title: String
+  title: String,
+  description: String,
+  rating: Int
 )
 
 trait SettingSourceRecord extends TypedCursor {

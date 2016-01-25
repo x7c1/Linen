@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
+import android.support.v7.widget.SwitchCompat;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow;
@@ -38,7 +39,9 @@ public class SettingChannelSourcesRowProvider implements ViewHolderProvider<Sett
         View view = inflater.inflate(R.layout.setting_channel_sources_row, parent, attachToRoot);
         return new SettingChannelSourcesRow(
             view,
-            (TextView) view.findViewById(R.id.setting_channel_sources_row__title)
+            (TextView) view.findViewById(R.id.setting_channel_sources_row__title),
+            (TextView) view.findViewById(R.id.setting_channel_sources_row__description),
+            (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_channel_sources_row__switch_subscribe)
         );
     }
 }

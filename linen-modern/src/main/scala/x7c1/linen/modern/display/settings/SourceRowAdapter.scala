@@ -20,6 +20,8 @@ class SourceRowAdapter (
   override def onBindViewHolder(holder: SettingChannelSourcesRow, position: Int): Unit = {
     accessor findAt position foreach { source =>
       holder.title.text = source.title
+      holder.description.text = source.description
+      holder.switchSubscribe setChecked true
     }
   }
 
