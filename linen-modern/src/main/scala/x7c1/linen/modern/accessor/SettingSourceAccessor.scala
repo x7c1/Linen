@@ -75,14 +75,14 @@ class SettingSourceAccessorFactory(
     new Query(sql2, Array(channelId.toString, accountId.toString))
   }
 
-  def inspect(channelId: Long): Seq[Survey] = {
-    val query = createQuery(channelId).toInspect
+  def explain(channelId: Long): Seq[QueryPlan] = {
+    val query = createQuery(channelId).toExplain
     val rawCursor = db.rawQuery(query.sql, query.selectionArgs)
-    val cursor = TypedCursor[InspectionColumn](rawCursor)
+    val cursor = TypedCursor[QueryPlanColumn](rawCursor)
     try {
       (0 to rawCursor.getCount - 1) flatMap { n =>
         cursor.moveToFind(n){
-          Survey(detail = cursor.detail)
+          QueryPlan(detail = cursor.detail)
         }
       }
     } finally {

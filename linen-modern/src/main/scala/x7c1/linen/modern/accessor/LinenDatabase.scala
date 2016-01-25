@@ -225,7 +225,7 @@ class Query(
   val sql: String,
   val selectionArgs: Array[String]){
 
-  def toInspect: Query = new Query(
+  def toExplain: Query = new Query(
     "EXPLAIN QUERY PLAN " + sql,
     selectionArgs
   )
@@ -233,7 +233,7 @@ class Query(
     s"""sql: $sql, args: ${selectionArgs.mkString(",")}"""
 }
 
-trait InspectionColumn extends TypedCursor {
+trait QueryPlanColumn extends TypedCursor {
   def detail: String
 }
-case class Survey(detail: String)
+case class QueryPlan(detail: String)
