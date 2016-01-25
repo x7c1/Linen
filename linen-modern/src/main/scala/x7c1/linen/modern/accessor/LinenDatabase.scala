@@ -131,6 +131,24 @@ trait Insertable[A] {
   def toContentValues(target: A): ContentValues
 }
 
+object WritableDatabase {
+  def transaction[A]
+    (db: SQLiteDatabase)
+    (writable: WritableDatabase => Either[SQLException, A]): Either[SQLException, A] = {
+
+    try {
+      db.beginTransaction()
+      val result = writable(new WritableDatabase(db))
+      if (result.isRight){
+        db.setTransactionSuccessful()
+      }
+      result
+    } finally {
+      db.endTransaction()
+    }
+  }
+}
+
 class WritableDatabase(db: SQLiteDatabase) {
   def insert[A: Insertable](target: A): Either[SQLException, Long] = {
     try {

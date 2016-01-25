@@ -1,6 +1,7 @@
 package x7c1.linen.modern.accessor
 
 import android.database.Cursor
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -13,7 +14,7 @@ import x7c1.linen.modern.struct.{Channel, Date}
 class SettingSourceAccessorTest extends JUnitSuiteLike {
 
   @Test
-  def testQueryForSourceArea() = {
+  def testQueryForSources() = {
 
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
@@ -22,10 +23,27 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     val factory = new SampleFactory(helper)
     val account = factory.setupAccount()
     val channel = factory.setupChannel(account)
+    val channelOwner = new ChannelOwner(db, channel.channelId, account.accountId)
+
+    channelOwner addSource ChannelSourceParts(
+      url = "http://example.com/1",
+      title = "hoge1",
+      description = "piyo1",
+      rating = 99
+    )
+    channelOwner addSource ChannelSourceParts(
+      url = "http://example.com/2",
+      title = "hoge2",
+      description = "piyo2",
+      rating = 88
+    )
+
     val cursor = new SettingSourceAccessorFactory(db, account.accountId).
       createCursor(channel.channelId)
 
-    toMaps(cursor) foreach println
+    val maps = toMaps(cursor)
+    assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
+    assertEquals(Seq("88", "99"), maps map {_("rating")})
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {

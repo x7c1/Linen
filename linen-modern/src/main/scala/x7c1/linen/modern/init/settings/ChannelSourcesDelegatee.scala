@@ -29,8 +29,8 @@ class ChannelSourcesDelegatee (
     IntentExpander executeBy activity.getIntent
   }
   def close(): Unit = {
-    database.close()
     Log info "[init]"
+    database.close()
   }
   def showSources(accountId: Long, channelId: Long): Unit = {
     Log info s"account:$accountId, channel:$channelId"
