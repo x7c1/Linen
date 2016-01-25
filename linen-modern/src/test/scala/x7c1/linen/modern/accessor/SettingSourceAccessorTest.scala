@@ -47,13 +47,12 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
       createCursor(channel1.channelId)
 
     val maps = toMaps(cursor)
-    maps foreach println
+//    maps foreach println
     assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
     assertEquals(Seq("88", "99"), maps map {_("rating")})
 
     val surveys = accessorFactory inspect channel1.channelId
-    surveys.foreach(println)
-
+//    surveys foreach println
     assertEquals("USE TEMP B-TREE",
       false, surveys.exists(_.detail contains "USE TEMP B-TREE"))
   }
