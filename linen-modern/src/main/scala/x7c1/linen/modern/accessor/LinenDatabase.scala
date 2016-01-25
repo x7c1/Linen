@@ -3,6 +3,7 @@ package x7c1.linen.modern.accessor
 import android.content.{ContentValues, Context}
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import android.database.{Cursor, SQLException}
+import x7c1.wheat.macros.database.TypedCursor
 
 
 object LinenDatabase {
@@ -219,3 +220,20 @@ trait SingleSelectable[A, ID] {
   def where(id: ID): Seq[(String, String)]
   def fromCursor(cursor: Cursor): Option[A]
 }
+
+class Query(
+  val sql: String,
+  val selectionArgs: Array[String]){
+
+  def toInspect: Query = new Query(
+    "EXPLAIN QUERY PLAN " + sql,
+    selectionArgs
+  )
+  override def toString =
+    s"""sql: $sql, args: ${selectionArgs.mkString(",")}"""
+}
+
+trait InspectionColumn extends TypedCursor {
+  def detail: String
+}
+case class Survey(detail: String)

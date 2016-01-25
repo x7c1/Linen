@@ -47,20 +47,47 @@ class SettingSourceAccessorFactory(
     new SettingSourceAccessorImpl(cursor)
   }
   def createCursor(channelId: Long): Cursor = {
+    val query = createQuery(channelId)
+    db.rawQuery(query.sql, query.selectionArgs)
+  }
+
+  def createQuery(channelId: Long) = {
     val sql1 =
       """SELECT
-        | channel_source_map.source_id,
-        | title,
-        | description,
-        | rating
-        |FROM channel_source_map
-        |INNER JOIN sources ON sources._id = channel_source_map.source_id
-        |INNER JOIN source_ratings ON sources._id = source_ratings.source_id
-        |WHERE channel_id = ? AND source_ratings.owner_account_id = ?
-        |ORDER BY sources._id DESC
+        | s1.source_id AS source_id,
+        | s2.rating AS rating
+        |FROM channel_source_map AS s1
+        |INNER JOIN source_ratings AS s2 ON s1.source_id = s2.source_id
+        |WHERE s1.channel_id = ? AND s2.owner_account_id = ?
       """.stripMargin
 
-    db.rawQuery(sql1, Array(channelId.toString, accountId.toString))
+    val sql2 =
+      s"""SELECT
+        | t1._id AS source_id,
+        | t1.title AS title,
+        | t1.description AS description,
+        | t2.rating AS rating
+        |FROM sources AS t1
+        |INNER JOIN ($sql1) AS t2 ON t1._id = t2.source_id
+        |ORDER BY t2.source_id DESC
+      """.stripMargin
+
+    new Query(sql2, Array(channelId.toString, accountId.toString))
+  }
+
+  def inspect(channelId: Long): Seq[Survey] = {
+    val query = createQuery(channelId).toInspect
+    val rawCursor = db.rawQuery(query.sql, query.selectionArgs)
+    val cursor = TypedCursor[InspectionColumn](rawCursor)
+    try {
+      (0 to rawCursor.getCount - 1) flatMap { n =>
+        cursor.moveToFind(n){
+          Survey(detail = cursor.detail)
+        }
+      }
+    } finally {
+      rawCursor.close()
+    }
   }
 }
 
@@ -105,7 +132,6 @@ class SourceSubscriber(db: SQLiteDatabase, accountId: Long, sourceId: Long){
         createdAt = Date.current()
       )
     }
-
 }
 
 case class ChannelSourceParts(

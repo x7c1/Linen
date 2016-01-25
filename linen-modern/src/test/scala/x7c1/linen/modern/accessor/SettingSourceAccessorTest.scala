@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import android.database.Cursor
 import org.junit.Assert.assertEquals
+import android.database.Cursor
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -24,6 +24,7 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     val account1 = factory.createAccount()
     val account2 = factory.createAccount()
     val channel1 = factory.createChannel(account1)
+    val channel2 = factory.createChannel(account2)
 
     val channelOwner1 = new ChannelOwner(db, channel1.channelId, account1.accountId)
     val Right(sourceId1) = channelOwner1 addSource ChannelSourceParts(
@@ -41,13 +42,20 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     val subscriber1 = new SourceSubscriber(db, account2.accountId, sourceId1)
     subscriber1 updateRating 55
 
-    val cursor = new SettingSourceAccessorFactory(db, account1.accountId).
+    val accessorFactory = new SettingSourceAccessorFactory(db, account1.accountId)
+    val cursor = accessorFactory.
       createCursor(channel1.channelId)
 
     val maps = toMaps(cursor)
-    maps.foreach(println)
+    maps foreach println
     assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
     assertEquals(Seq("88", "99"), maps map {_("rating")})
+
+    val surveys = accessorFactory inspect channel1.channelId
+    surveys.foreach(println)
+
+    assertEquals("USE TEMP B-TREE",
+      false, surveys.exists(_.detail contains "USE TEMP B-TREE"))
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {
