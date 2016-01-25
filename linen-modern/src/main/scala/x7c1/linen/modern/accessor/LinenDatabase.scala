@@ -174,7 +174,15 @@ class WritableDatabase(db: SQLiteDatabase) {
     } catch {
       case e: SQLException => Left(e)
     }
-
+  }
+  def replace[A: Insertable](target: A): Either[SQLException, Long] = {
+    try {
+      val i = implicitly[Insertable[A]]
+      val id = db.replaceOrThrow(i.tableName, null, i toContentValues target)
+      Right(id)
+    } catch {
+      case e: SQLException => Left(e)
+    }
   }
 }
 

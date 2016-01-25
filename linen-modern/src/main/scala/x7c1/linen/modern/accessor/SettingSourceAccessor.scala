@@ -56,16 +56,16 @@ class SettingSourceAccessorFactory(
         |FROM channel_source_map
         |INNER JOIN sources ON sources._id = channel_source_map.source_id
         |INNER JOIN source_ratings ON sources._id = source_ratings.source_id
-        |WHERE channel_id = ?
+        |WHERE channel_id = ? AND source_ratings.owner_account_id = ?
         |ORDER BY sources._id DESC
       """.stripMargin
 
-    db.rawQuery(sql1, Array(channelId.toString))
+    db.rawQuery(sql1, Array(channelId.toString, accountId.toString))
   }
 }
 
 class ChannelOwner(db: SQLiteDatabase, channelId: Long, accountId: Long){
-  def addSource(source: ChannelSourceParts): Either[SQLException, Unit] = {
+  def addSource(source: ChannelSourceParts): Either[SQLException, Long] = {
     WritableDatabase.transaction(db){ writable =>
       val createdAt = Date.current()
       def insertSource() = writable insert SourceParts(
@@ -89,10 +89,23 @@ class ChannelOwner(db: SQLiteDatabase, channelId: Long, accountId: Long){
         sourceId <- insertSource().right
         ratingId <- insertRating(sourceId).right
         _ <- insertMap(sourceId).right
-      } yield ()
+      } yield sourceId
     }
 
   }
+}
+
+class SourceSubscriber(db: SQLiteDatabase, accountId: Long, sourceId: Long){
+  def updateRating(rating: Int): Either[SQLException, Long] =
+    WritableDatabase.transaction(db){ writable =>
+      writable replace SourceRatingParts(
+        sourceId = sourceId,
+        ownerAccountId = accountId,
+        rating = rating,
+        createdAt = Date.current()
+      )
+    }
+
 }
 
 case class ChannelSourceParts(
