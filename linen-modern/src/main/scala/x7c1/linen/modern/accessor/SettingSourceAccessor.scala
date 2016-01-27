@@ -78,21 +78,6 @@ class SettingSourceAccessorFactory(
 
     new Query(sql2, Array(channelId.toString, accountId.toString))
   }
-
-  def explain(channelId: Long): Seq[QueryPlan] = {
-    val query = createQuery(channelId).toExplain
-    val rawCursor = db.rawQuery(query.sql, query.selectionArgs)
-    val cursor = TypedCursor[QueryPlanColumn](rawCursor)
-    try {
-      (0 to rawCursor.getCount - 1) flatMap { n =>
-        cursor.moveToFind(n){
-          QueryPlan(detail = cursor.detail)
-        }
-      }
-    } finally {
-      rawCursor.close()
-    }
-  }
 }
 
 class ChannelOwner(db: SQLiteDatabase, channelId: Long, accountId: Long){

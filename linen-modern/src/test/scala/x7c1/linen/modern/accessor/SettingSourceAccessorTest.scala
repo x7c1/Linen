@@ -51,10 +51,11 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
     assertEquals(Seq("88", "99"), maps map {_("rating")})
 
-    val surveys = accessorFactory explain channel1.channelId
-//    surveys foreach println
+    val plans = QueryExplainer(db).
+      explain(accessorFactory createQuery channel1.channelId)
+
     assertEquals("USE TEMP B-TREE",
-      false, surveys.exists(_.detail contains "USE TEMP B-TREE"))
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {

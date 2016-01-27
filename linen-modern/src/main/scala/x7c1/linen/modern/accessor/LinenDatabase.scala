@@ -237,3 +237,22 @@ trait QueryPlanColumn extends TypedCursor {
   def detail: String
 }
 case class QueryPlan(detail: String)
+
+class QueryExplainer(db: SQLiteDatabase){
+  def explain(query: Query): Seq[QueryPlan] = {
+    val rawCursor = db.rawQuery(query.toExplain.sql, query.selectionArgs)
+    val cursor = TypedCursor[QueryPlanColumn](rawCursor)
+    try {
+      (0 to rawCursor.getCount - 1) flatMap { n =>
+        cursor.moveToFind(n){
+          QueryPlan(detail = cursor.detail)
+        }
+      }
+    } finally {
+      rawCursor.close()
+    }
+  }
+}
+object QueryExplainer {
+  def apply(db: SQLiteDatabase): QueryExplainer = new QueryExplainer(db)
+}
