@@ -22,6 +22,7 @@ class SourceRowAdapter (
       holder.title.text = source.title
       holder.description.text = source.description
       holder.switchSubscribe setChecked true
+      holder.ratingBar setProgress source.rating
     }
   }
 
