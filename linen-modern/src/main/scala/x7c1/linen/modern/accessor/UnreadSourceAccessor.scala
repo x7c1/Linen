@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, UnreadSource}
+import x7c1.wheat.macros.database.TypedCursor
 
 import scala.util.Try
 
@@ -20,39 +21,28 @@ trait UnreadSourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
-private class UnreadSourceAccessorImpl(cursor: Cursor) extends UnreadSourceAccessor {
-
-  private lazy val idIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
-  private lazy val descriptionIndex = cursor getColumnIndex "description"
-  private lazy val startEntryIdIndex = cursor getColumnIndex "start_entry_id"
+private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAccessor {
+  private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
   override def findAt(position: Int) = synchronized {
-    if (cursor moveToPosition position){
-      Some apply UnreadSource(
-        id = cursor.getLong(idIndex),
+    cursor.moveToFind(position){
+      UnreadSource(
+        id = cursor.source_id,
         url = "dummy",
-        title = cursor.getString(titleIndex),
-        description = cursor.getString(descriptionIndex),
-        startEntryId = {
-          /*
-            cannot use cursor.getLong here
-              because it returns 0 when target value is null
-           */
-          Option(cursor getString startEntryIdIndex).map(_.toLong)
-        }
+        title = cursor.title,
+        description = cursor.description,
+        startEntryId = cursor.start_entry_id
       )
-    } else None
+    }
   }
   override def length = {
-    cursor.getCount
+    rawCursor.getCount
   }
   override def positionOf(sourceId: Long): Option[Int] = {
     (0 to length - 1) find { n =>
       findAt(n).exists(_.id == sourceId)
     }
   }
-
 }
 
 class UnreadSourceAccessorFactory(db: SQLiteDatabase){
@@ -131,6 +121,21 @@ object UnreadSourceAccessor {
   }
 }
 
+trait UnreadSourceColumn extends TypedCursor {
+  def source_id: Long
+  def title: String
+  def description: String
+  def start_entry_id: Option[Long]
+}
+
+trait SourceRecordColumn extends TypedCursor {
+  def _id: Long
+  def title: String
+  def description: String
+  def url: String
+  def created_at: Int --> Date
+}
+
 case class SourceParts(
   title: String,
   url: String,
@@ -141,12 +146,13 @@ object SourceParts {
   implicit object insertable extends Insertable[SourceParts] {
     override def tableName: String = "sources"
     override def toContentValues(target: SourceParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("title", target.title)
-      values.put("url", target.url)
-      values.put("description", target.description)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
+      val column = TypedCursor.expose[SourceRecordColumn]
+      TypedCursor toContentValues (
+        column.title -> target.title,
+        column.url -> target.url,
+        column.description -> target.description,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }
@@ -208,6 +214,11 @@ object SourceRatingParts {
   }
 }
 
+trait ChannelSourceMapColumn extends TypedCursor {
+  def source_id: Long
+  def channel_id: Long
+  def created_at: Int --> Date
+}
 case class ChannelSourceMapParts(
   channelId: Long,
   sourceId: Long,
@@ -217,11 +228,88 @@ object ChannelSourceMapParts {
   implicit object insertable extends Insertable[ChannelSourceMapParts] {
     override def tableName: String = "channel_source_map"
     override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("source_id", target.sourceId: java.lang.Long)
-      values.put("channel_id", target.channelId: java.lang.Long)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
+      val column = TypedCursor.expose[ChannelSourceMapColumn]
+      TypedCursor toContentValues (
+        column.source_id -> target.sourceId,
+        column.channel_id -> target.channelId,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }
+
+
+/*
+object channel_source_map extends Table(name = "channel_source_map"){
+  trait Record extends TypedField {
+    def source_id: Long
+    def channel_id: Long
+    def created_at: Int --> Date
+  }
+  case class Key extends TypedKey (
+    def source_id: Long,
+    def channel_id: Long
+  )
+  object Record {
+
+    implicit def single: SingleSelectable[Record, Key] =
+      TypedField.toSingleSelectable(channel_source_map.name)
+
+    // is expanded like:
+
+    implicit def single: SingleSelectable[Record, Key] = new SingleSelectable[Record, Key]{
+      override def tableName: String = channel_source_map.tableName
+
+      override def fromCursor(cursor: android.database.Cursor): Option[Record] = {
+        val row = TypedCursor[Record](cursor)
+        row.moveToFind(0){
+          new Record {
+            override val source_id: Long = row.source_id
+            override val channel_id: Long = row.channel_id
+            override val created_at: Int --> Date = row.created_at
+          }
+        }
+      }
+      override def where(key: Key): Seq[(String, String)] = Seq(
+        "channel_id" -> key.channel_id,
+        "source_id" -> key.source_id
+      )
+    }
+    // can be used like:
+    database.selectOne[channel_source_map.Record](channel_source_map.Key(
+      source_id = 111,
+      channel_id = 222
+    ))
+
+  }
+
+  trait Selector {
+    def findBy(source_id: Long, channel_id: Long): Option[Record]
+  }
+  def apply(db: ReadableDatabase): Selector = TypedCursor.selectorOf[Selector]
+
+  // is expanded as:
+
+  new Selector {
+    override def findBy(source_id: Long, channel_id: Long): Option[Record] = {
+      val selectable = new SingleSelectable {
+        override def tableName = channel_source_map.this.tableName
+        override def where(id: (Long, Long)) = Seq(
+          "source_id" -> id._1,
+          "channel_id" -> id._2
+        )
+        override def fromCursor(cursor: Cursor) = new Record with TypedCursor {
+          ...
+        }
+      }
+      db.selectOne[Record].apply(source_id, channel_id)(selectable)
+    }
+  }
+
+  // usage
+  channel_source_map(database).findBy(
+    source_id = 111,
+    channel_id = 222
+  )
+}
+*/

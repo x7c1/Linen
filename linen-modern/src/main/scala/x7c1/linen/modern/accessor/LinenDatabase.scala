@@ -1,8 +1,9 @@
 package x7c1.linen.modern.accessor
 
 import android.content.{ContentValues, Context}
-import android.database.SQLException
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
+import android.database.{Cursor, SQLException}
+import x7c1.wheat.macros.database.TypedCursor
 
 
 object LinenDatabase {
@@ -14,6 +15,7 @@ class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
   lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
+  lazy val readable = new ReadableDatabase(getReadableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
     db.setForeignKeyConstraintsEnabled(true)
@@ -130,6 +132,24 @@ trait Insertable[A] {
   def toContentValues(target: A): ContentValues
 }
 
+object WritableDatabase {
+  def transaction[A]
+    (db: SQLiteDatabase)
+    (writable: WritableDatabase => Either[SQLException, A]): Either[SQLException, A] = {
+
+    try {
+      db.beginTransaction()
+      val result = writable(new WritableDatabase(db))
+      if (result.isRight){
+        db.setTransactionSuccessful()
+      }
+      result
+    } finally {
+      db.endTransaction()
+    }
+  }
+}
+
 class WritableDatabase(db: SQLiteDatabase) {
   def insert[A: Insertable](target: A): Either[SQLException, Long] = {
     try {
@@ -155,7 +175,15 @@ class WritableDatabase(db: SQLiteDatabase) {
     } catch {
       case e: SQLException => Left(e)
     }
-
+  }
+  def replace[A: Insertable](target: A): Either[SQLException, Long] = {
+    try {
+      val i = implicitly[Insertable[A]]
+      val id = db.replaceOrThrow(i.tableName, null, i toContentValues target)
+      Right(id)
+    } catch {
+      case e: SQLException => Left(e)
+    }
   }
 }
 
@@ -164,3 +192,48 @@ trait Updatable[A] {
   def toContentValues(target: A): ContentValues
   def where(target: A): Seq[(String, String)]
 }
+
+class ReadableDatabase(db: SQLiteDatabase) {
+  def selectOne[A]: SingleSelector[A] = new SingleSelector[A](db)
+}
+
+class SingleSelector[A](db: SQLiteDatabase){
+  private type Selectable[X] = SingleSelectable[A, X]
+
+  def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
+    try {
+      val i = implicitly[Selectable[B]]
+      val clause = i.where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
+      val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
+      val args = i.where(id) map { case (_, value) => value }
+      val cursor = db.rawQuery(sql, args.toArray)
+      try Right apply i.fromCursor(cursor)
+      finally cursor.close()
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
+}
+
+trait SingleSelectable[A, ID] {
+  def tableName: String
+  def where(id: ID): Seq[(String, String)]
+  def fromCursor(cursor: Cursor): Option[A]
+}
+
+class Query(
+  val sql: String,
+  val selectionArgs: Array[String]){
+
+  def toExplain: Query = new Query(
+    "EXPLAIN QUERY PLAN " + sql,
+    selectionArgs
+  )
+  override def toString =
+    s"""sql: $sql, args: ${selectionArgs.mkString(",")}"""
+}
+
+trait QueryPlanColumn extends TypedCursor {
+  def detail: String
+}
+case class QueryPlan(detail: String)

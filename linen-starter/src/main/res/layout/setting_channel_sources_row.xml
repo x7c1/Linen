@@ -14,7 +14,7 @@
     >
 
     <TextView
-        android:id="@+id/setting_channels_row__name"
+        android:id="@+id/setting_channel_sources_row__title"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:layout_width="match_parent"
@@ -24,10 +24,10 @@
         />
 
     <TextView
-        android:id="@+id/setting_channels_row__description"
+        android:id="@+id/setting_channel_sources_row__description"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:paddingEnd="@dimen/setting_channels_row_padding"
-        android:layout_below="@id/setting_channels_row__name"
+        android:layout_below="@id/setting_channel_sources_row__title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/setting_channels_row_padding"
@@ -38,38 +38,49 @@
         android:id="@+id/border"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:layout_below="@id/setting_channels_row__description"
+        android:layout_below="@id/setting_channel_sources_row__description"
         android:layout_marginStart="@dimen/setting_channels_row_padding"
         android:layout_marginEnd="@dimen/setting_channels_row_padding"
         android:background="@color/text_secondary"
         />
 
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/setting_channels_row__switch_subscribe"
+        android:id="@+id/setting_channel_sources_row__switch_subscribe"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_below="@id/border"
         android:layout_alignParentEnd="true"
-        android:paddingTop="@dimen/setting_channels_row_padding"
         android:paddingEnd="@dimen/setting_channels_row_padding"
-        android:paddingBottom="@dimen/setting_channels_row_padding"
-        android:paddingStart="5dp"
+        android:paddingStart="0dp"
+        />
+
+    <SeekBar
+        android:id="@+id/setting_channel_sources_row__rating_bar"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        android:progress="0"
+        android:max="100"
+        android:layout_below="@id/border"
+        android:layout_toStartOf="@id/setting_channel_sources_row__switch_subscribe"
+
+        android:layout_centerVertical="true"
+        android:minHeight="45dp"
+        android:maxHeight="45dp"
+        android:progressTint="@color/to_next_button_background"
+        android:progressBackgroundTint="@color/to_next_button_background"
         />
 
     <TextView
-        android:id="@+id/setting_channels_row__edit"
-        style="@style/SettingChannelsRowButtons"
-        android:text="EDIT"
+        android:id="@+id/setting_channel_sources_row__rating_label"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:text="RATING"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold"
         android:layout_below="@id/border"
-        android:layout_toStartOf="@id/setting_channels_row__switch_subscribe"
-        />
-
-    <TextView
-        android:id="@+id/setting_channels_row__sources"
-        style="@style/SettingChannelsRowButtons"
-        android:text="SOURCES"
-        android:layout_below="@id/border"
-        android:layout_toStartOf="@id/setting_channels_row__edit"
+        android:layout_toStartOf="@id/setting_channel_sources_row__rating_bar"
         />
 
 </RelativeLayout>

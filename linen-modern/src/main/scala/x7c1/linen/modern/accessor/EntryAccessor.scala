@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
+import x7c1.wheat.macros.database.TypedCursor
 
 import scala.annotation.tailrec
 
@@ -76,42 +77,32 @@ trait EntryFactory[A <: Entry]{
   def createEntry(): A
 }
 
-class EntryOutlineFactory(cursor: Cursor) extends EntryFactory[EntryOutline] {
-
-  private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
-  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
-  private lazy val contentIndex = cursor getColumnIndex "content"
-  private lazy val createdAtIndex = cursor getColumnIndex "created_at"
+class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[EntryOutline] {
+  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
 
   override def createEntry(): EntryOutline = {
     EntryOutline(
-      entryId = cursor getInt entryIdIndex,
-      sourceId = cursor getInt sourceIdIndex,
+      entryId = cursor.entry_id,
+      sourceId = cursor.source_id,
       url = "dummy",
-      shortTitle = cursor getString titleIndex,
-      shortContent = cursor getString contentIndex,
-      createdAt = Date(cursor getInt createdAtIndex)
+      shortTitle = cursor.title,
+      shortContent = cursor.content,
+      createdAt = cursor.created_at.typed
     )
   }
 }
 
-class EntryDetailFactory(cursor: Cursor) extends EntryFactory[EntryDetail] {
-
-  private lazy val entryIdIndex = cursor getColumnIndex "entry_id"
-  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
-  private lazy val titleIndex = cursor getColumnIndex "title"
-  private lazy val contentIndex = cursor getColumnIndex "content"
-  private lazy val createdAtIndex = cursor getColumnIndex "created_at"
+class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[EntryDetail] {
+  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
 
   override def createEntry(): EntryDetail = {
     EntryDetail(
-      entryId = cursor getInt entryIdIndex,
-      sourceId = cursor getInt sourceIdIndex,
+      entryId = cursor.entry_id,
+      sourceId = cursor.source_id,
       url = "dummy",
-      fullTitle = cursor getString titleIndex,
-      fullContent = cursor getString contentIndex,
-      createdAt = Date(cursor getInt createdAtIndex)
+      fullTitle = cursor.title,
+      fullContent = cursor.content,
+      createdAt = cursor.created_at.typed
     )
   }
 }
@@ -195,6 +186,15 @@ object EntryAccessor {
   }
 }
 
+trait EntryRecordColumn extends TypedCursor {
+  def entry_id: Long
+  def source_id: Long
+  def title: String
+  def content: String
+  def url: String
+  def created_at: Int --> Date
+}
+
 case class EntryParts(
   sourceId: Long,
   title: String,
@@ -206,13 +206,14 @@ object EntryParts {
   implicit object insertable extends Insertable[EntryParts] {
     override def tableName: String = "entries"
     override def toContentValues(target: EntryParts): ContentValues = {
-      val entry = new ContentValues()
-      entry.put("source_id", target.sourceId: java.lang.Long)
-      entry.put("title", target.title)
-      entry.put("content", target.content)
-      entry.put("url", target.url)
-      entry.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      entry
+      val column = TypedCursor.expose[EntryRecordColumn]
+      TypedCursor toContentValues (
+        column.source_id -> target.sourceId,
+        column.title -> target.title,
+        column.content -> target.content,
+        column.url -> target.url,
+        column.created_at -> target.createdAt
+      )
     }
   }
 }

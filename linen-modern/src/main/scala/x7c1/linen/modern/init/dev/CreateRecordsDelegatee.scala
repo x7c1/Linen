@@ -9,10 +9,9 @@ import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.accessor.LinenDatabase
 import x7c1.linen.modern.init.updater.{UpdaterMethods, UpdaterServiceDelegatee}
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.macros.intent.ServiceCaller
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.patch.TaskAsync.async
 
 
 class CreateRecordsDelegatee (
@@ -34,57 +33,10 @@ class CreateRecordsDelegatee (
       activity.finish()
     }
     layout.createDummies onClick { _ =>
-      async {
-        Log info "start"
-        val intent = new Intent(activity, activity getClassOf Updater)
-        intent.putExtra("hogehoge-", "piyopiyo-")
-        activity.startService(intent)
-
-        val hogeValue = "hoge"
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            _.createDummies(25)
-          }
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            _.sample_?(hogeValue, 123, 456L)
-          }
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            _.hello("World")
-          }
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            _.foo()
-          }
-
-        /*// examples of invalid form
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){ x =>
-            // multiple expressions
-            println(x)
-            x.foo()
-          }
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            // multiple paramLists
-            _.bar(111)(456L)
-          }
-
-        ServiceCaller.using[UpdaterMethods].
-          startService(activity, activity getClassOf Updater){
-            // no parenthesis
-            _.baz
-          }
-        */
-
-      }
+      ServiceCaller.using[UpdaterMethods].
+        startService(activity, activity getClassOf Updater){
+          _.createDummies(25)
+        }
     }
     layout.deleteDatabase onClick { _ =>
       activity deleteDatabase LinenDatabase.name

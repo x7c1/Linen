@@ -11,18 +11,19 @@
         android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/setting_channels_layout__toolbar"
+            android:id="@+id/setting_channel_sources_layout__toolbar"
             style="@style/AppToolbar"
-            app:title="Channel Settings"
+            app:title="Source Settings"
             />
 
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/setting_channels_layout__channel_list"
+        android:id="@+id/setting_channel_sources_layout__source_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/list_background"
         />
+
 </LinearLayout>

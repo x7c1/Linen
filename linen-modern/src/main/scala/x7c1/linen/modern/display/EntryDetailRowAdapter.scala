@@ -35,7 +35,7 @@ class EntryDetailRowAdapter(
 }
 
 trait OnEntryDetailSelectedListener {
-  def onEntryDetailSelected(event: EntryDetailSelectedEvent)
+  def onEntryDetailSelected(event: EntryDetailSelectedEvent): Unit
 }
 
 case class EntryDetailSelectedEvent(position: Int, entry: EntryDetail){

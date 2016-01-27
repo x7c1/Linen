@@ -3,6 +3,8 @@ package x7c1.linen;
 import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceLabel;
+import x7c1.linen.settings.SettingChannelSourcesActivity;
+import x7c1.linen.settings.SettingChannelsActivity;
 
 import static java.lang.String.format;
 
@@ -13,6 +15,9 @@ public class Control {
 		switch(label){
 			case SettingChannels:
 				klass = SettingChannelsActivity.class;
+				break;
+			case SettingChannelSources:
+				klass = SettingChannelSourcesActivity.class;
 				break;
 			case CreateRecords:
 				klass = CreateRecordsActivity.class;
