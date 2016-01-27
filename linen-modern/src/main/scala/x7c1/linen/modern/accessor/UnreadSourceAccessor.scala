@@ -137,6 +137,28 @@ trait SourceRecordColumn extends TypedCursor {
   def url: String
   def created_at: Int --> Date
 }
+object SourceRecordColumn {
+  implicit object selectable extends SingleSelectable[SourceRecordColumn, Long]{
+    override def tableName: String = "sources"
+    override def where(id: Long): Seq[(String, String)] = Seq(
+      "_id" -> id.toString
+    )
+    override def fromCursor(rawCursor: Cursor): Option[SourceRecordColumn] = {
+      val cursor = TypedCursor[SourceRecordColumn](rawCursor)
+      cursor.moveToFind(0){
+        new SourceRecordColumn {
+          override val created_at = cursor.created_at
+          override val url = cursor.url
+          override val description = cursor.description
+          override val title = cursor.title
+          override val _id = cursor._id
+          override def moveTo(n: Int): Boolean = cursor.moveTo(n)
+        }
+      }
+
+    }
+  }
+}
 
 case class SourceParts(
   title: String,

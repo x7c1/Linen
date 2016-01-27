@@ -41,6 +41,7 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
             view,
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.dev_create_records_layout__toolbar),
             (Button) view.findViewById(R.id.dev_create_records_layout__create_dummies),
+            (Button) view.findViewById(R.id.dev_create_records_layout__create_preset),
             (Button) view.findViewById(R.id.dev_create_records_layout__delete_database)
         );
     }

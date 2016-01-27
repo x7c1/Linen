@@ -15,17 +15,20 @@ public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final Button createDummies;
+    public final Button createPreset;
     public final Button deleteDatabase;
 
     public DevCreateRecordsLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
         Button createDummies,
+        Button createPreset,
         Button deleteDatabase
     ){
         super(itemView);
         this.toolbar = toolbar;
         this.createDummies = createDummies;
+        this.createPreset = createPreset;
         this.deleteDatabase = deleteDatabase;
     }
 }

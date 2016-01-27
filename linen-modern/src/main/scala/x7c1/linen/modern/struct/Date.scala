@@ -14,6 +14,8 @@ object Date {
   def apply(timestamp: Int): Date = {
     new DateImpl(new util.Date(timestamp.toLong * 1000))
   }
+  def apply(date: util.Date): Date = new DateImpl(date)
+
   implicit object convertible extends ColumnConvertible[Int, Date] {
     override def wrap(value: Int): Date = Date(value)
     override def unwrap(value: Date): Int = value.timestamp
