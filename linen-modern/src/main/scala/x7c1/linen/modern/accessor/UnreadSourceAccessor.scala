@@ -30,7 +30,8 @@ private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAc
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,
-        description = cursor.description,
+        description = s"rating:${cursor.rating}-" +  cursor.description,
+        rating = cursor.rating,
         startEntryId = cursor.start_entry_id
       )
     }
@@ -125,6 +126,7 @@ trait UnreadSourceColumn extends TypedCursor {
   def source_id: Long
   def title: String
   def description: String
+  def rating: Int
   def start_entry_id: Option[Long]
 }
 

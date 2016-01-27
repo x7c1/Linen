@@ -5,5 +5,6 @@ case class UnreadSource(
   url: String,
   title: String,
   description: String,
+  rating: Int,
   startEntryId: Option[Long]
 )
