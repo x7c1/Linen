@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.SeekBar;
+import android.widget.ImageView;
 
 public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
 
@@ -19,6 +20,7 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
     public final android.support.v7.widget.SwitchCompat switchSubscribe;
     public final SeekBar ratingBar;
     public final TextView ratingLabel;
+    public final ImageView sync;
 
     public SettingChannelSourcesRow(
         View itemView,
@@ -26,7 +28,8 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
         TextView description,
         android.support.v7.widget.SwitchCompat switchSubscribe,
         SeekBar ratingBar,
-        TextView ratingLabel
+        TextView ratingLabel,
+        ImageView sync
     ){
         super(itemView);
         this.title = title;
@@ -34,5 +37,6 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
         this.switchSubscribe = switchSubscribe;
         this.ratingBar = ratingBar;
         this.ratingLabel = ratingLabel;
+        this.sync = sync;
     }
 }

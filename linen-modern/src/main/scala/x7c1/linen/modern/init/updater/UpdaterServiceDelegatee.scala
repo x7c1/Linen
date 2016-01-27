@@ -65,6 +65,61 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
     new PresetFactory(service, helper).createPreset()
   }
+  def loadSource(sourceId: Long): Unit = async {
+    Log error s"[init] source-id: $sourceId"
+
+    helper.readable.selectOne[SourceRecordColumn](sourceId) match {
+      case Right(Some(source)) =>
+        Log info source.title
+        loadEntries(source.url) foreach { entry =>
+          Log info entry.getUri
+          helper.writableDatabase insert EntryParts(
+            sourceId = sourceId,
+            title = Option(entry.getTitle) getOrElse "",
+            content = entry.getDescription.getValue,
+            url = entry.getLink,
+            createdAt = Date(entry.getPublishedDate)
+          )
+        }
+
+      case Right(none) =>
+      case Left(exception) =>
+    }
+
+    service stopSelfResult startId
+  }
+  private def loadEntries(url: String): Seq[SyndEntry] = {
+    Log info s"[init] $url"
+
+    val url2 = new URL(url)
+    val connection = url2.openConnection().asInstanceOf[HttpURLConnection]
+    connection setRequestMethod "GET"
+
+    Log info s"code:${connection.getResponseCode}"
+    val stream = new BufferedInputStream(connection.getInputStream)
+    val reader = new BufferedReader(new InputStreamReader(stream))
+    val lines = SampleReader(reader) read { line =>
+      line
+    }
+    Log info lines.mkString("\n")
+    lines foreach { line =>
+      Log info line
+    }
+    Log error s"lines:${lines.length}"
+
+    val input2 = new SyndFeedInput()
+    val feed2 = input2.build(new XmlReader(url2))
+    Log error feed2.getTitle
+    Log info feed2.getDescription
+
+    import scala.collection.JavaConversions._
+    feed2.getEntries map { case entry: SyndEntry =>
+      Log error entry.getTitle
+      Log info entry.getDescription.getValue
+      entry
+    }
+  }
+}
 
 object SampleReader {
   def apply(reader: BufferedReader): SampleReader = new SampleReader(reader)

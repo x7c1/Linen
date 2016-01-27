@@ -41,7 +41,14 @@ class ChannelSourcesDelegatee (
 
     layout.sourceList setAdapter new SourceRowAdapter(
       accessor = accessorFactory create channelId,
-      viewHolderProvider = sourceRowProvider
+      viewHolderProvider = sourceRowProvider,
+      onSyncClicked = onSyncClicked
     )
+  }
+  private def onSyncClicked = OnSyncClickedListener { event =>
+    ServiceCaller.using[UpdaterMethods].
+      startService(activity, activity getClassOf Updater){
+        _ loadSource event.sourceId
+      }
   }
 }
