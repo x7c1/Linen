@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import org.junit.Assert.assertEquals
 import android.database.Cursor
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config

@@ -7,55 +7,49 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.AccessorLoader
 import x7c1.linen.modern.init.dev.DummyFactory
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
 class SourceOpenHelperTest extends JUnitSuiteLike {
 
+  def isSortedDesc(xs: Seq[Long]) = {
+    xs.zip(xs.tail).forall(x => x._1 > x._2)
+  }
   @Test
   def testQueryForSourceArea() = {
     val context = RuntimeEnvironment.application
-    DummyFactory.createDummies(context)(5)
-
     val helper = new LinenOpenHelper(context)
+    val fixture = new UnreadSourceFixture(helper)
+
     val db = helper.getWritableDatabase
-    val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(channel) = ChannelAccessor.create(db, accountId) findAt 0
-    val cursor3 = UnreadSourceAccessor.createCursor(db, channel.channelId, accountId)
-    val rows = toMaps(cursor3)
-
-    //rows.map(prettyPrint) foreach println
-
-    assertEquals(
-      Seq("5", "4", "2", "1"),
-      rows map {_("source_id")}
+    val cursor3 = UnreadSourceAccessor.createCursor(
+      db,
+      fixture.channel1.channelId,
+      fixture.account1.accountId
     )
+    val rows = toMaps(cursor3)
+//    rows.map(prettyPrint) foreach println
+
+    assertEquals(Seq("33", "11"), rows.map(_("rating")))
+    assertEquals(Seq("description1", "description2"), rows.map(_("description")))
+
     assertEquals(
-      Seq("5-title", "4-title", "2-title", "1-title"),
-      rows map {_("title")}
+      Seq(fixture.entryId1_2, fixture.entryId2_1),
+      rows.map(_("latest_entry_id")).map(_.toLong)
     )
   }
+
   @Test
   def testQueryForEntryArea() = {
 
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    /*
-    val accessor0 = SourceAccessor.create(context)
-    val sources = (0 to accessor0.length - 1).map(accessor0.findAt)
-    val sourceIds = sources.flatMap(_.map(_.id))
-    val cursor = EntryAccessor.createOutlineCursor(context, sourceIds)
-    val rows = toMaps(cursor)
-    rows.map(prettyPrint) foreach println
-    */
-
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = inspectSourceAccessor(db).toEither
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
     val sourceIds = sourceAccessor.sourceIds
-
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
@@ -63,21 +57,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
     assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
-
-    assertEquals(Seq(5,4,2,1), entries.map(_.sourceId).distinct)
-  }
-  @Test
-  def testQueryToCountEntry() = {
-    val context = RuntimeEnvironment.application
-    val db = new LinenOpenHelper(context).getReadableDatabase
-    DummyFactory.createDummies(context)(5)
-
-    val Right(accessor0) = inspectSourceAccessor(db).toEither
-    val sourceIds = accessor0.sourceIds
-
-    val cursor = EntryAccessor.createPositionCursor(db, sourceIds)
-    val rows = toMaps(cursor)
-//    rows.map(prettyPrint) foreach println
   }
 
   def showTable(tableName: String) = {

@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
-import android.database.Cursor
+import android.database.{SQLException, Cursor}
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
 import x7c1.wheat.macros.database.TypedCursor
@@ -215,5 +215,25 @@ object EntryParts {
         column.created_at -> target.createdAt
       )
     }
+  }
+}
+
+case class RetrievedEntry(
+  title: String,
+  content: String,
+  url: String,
+  createdAt: Date
+)
+
+class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
+  def addEntry(entry: RetrievedEntry): Either[SQLException, Long] = {
+    val parts = EntryParts(
+      sourceId = sourceId,
+      title = entry.title,
+      content = entry.content,
+      url = entry.url,
+      createdAt = entry.createdAt
+    )
+    new WritableDatabase(db).insert(parts)
   }
 }

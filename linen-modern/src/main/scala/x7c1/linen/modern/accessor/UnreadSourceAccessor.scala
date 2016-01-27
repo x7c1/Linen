@@ -79,7 +79,7 @@ object UnreadSourceAccessor {
         |  s2.start_entry_id
         |FROM channel_source_map AS s1
         |LEFT JOIN source_statuses AS s2 ON s1.source_id = s2.source_id
-        |WHERE s1.channel_id = ? AND s2.account_id = ?
+        |WHERE s1.channel_id = ? AND (s2.account_id IS NULL OR s2.account_id = ?)
       """.stripMargin
 
     val sql3 =
