@@ -1,24 +1,25 @@
 package x7c1.linen.modern.init.updater
 
-import java.io.{BufferedInputStream, BufferedReader, InputStreamReader}
+import java.io.{BufferedInputStream, Closeable, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.sun.syndication.feed.synd.SyndEntry
-import com.sun.syndication.io.{SyndFeedInput, XmlReader}
+import com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 import x7c1.wheat.modern.patch.TaskAsync.async
 
-import scala.annotation.tailrec
+import scalaz.{-\/, \/, \/-}
 
 object UpdaterServiceDelegatee {
   val ActionTypeSample = "hoge"
@@ -71,15 +72,10 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
     helper.readable.selectOne[SourceRecordColumn](sourceId) match {
       case Right(Some(source)) =>
         Log info source.title
-        loadEntries(source.url) foreach { entry =>
-          Log info entry.getUri
-          helper.writableDatabase insert EntryParts(
-            sourceId = sourceId,
-            title = Option(entry.getTitle) getOrElse "",
-            content = entry.getDescription.getValue,
-            url = entry.getLink,
-            createdAt = Date(entry.getPublishedDate)
-          )
+
+        try loadEntries2(source)(insertEntries)
+        catch {
+          case e: Exception => Log error e.getMessage
         }
 
       case Right(none) =>
@@ -88,55 +84,96 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
 
     service stopSelfResult startId
   }
-  private def loadEntries(url: String): Seq[SyndEntry] = {
-    Log info s"[init] $url"
+  private def insertEntries(entries: Seq[EntryNotLoaded \/ EntryParts]): Unit =
+    entries foreach {
+      case \/-(entry) =>
+        Log info entry.url
+        Log info entry.title
+        Log info entry.content
+        helper.writableDatabase insert entry
+      case -\/(empty) =>
+    }
 
-    val url2 = new URL(url)
-    val connection = url2.openConnection().asInstanceOf[HttpURLConnection]
+  private def loadEntries
+    (source: SourceRecordColumn): Seq[EntryNotLoaded \/ EntryParts] = {
+
+    val sourceUrl = source.url
+    Log info s"[init] $sourceUrl"
+
+    val feedUrl = new URL(sourceUrl)
+    val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
 
     Log info s"code:${connection.getResponseCode}"
-    val stream = new BufferedInputStream(connection.getInputStream)
-    val reader = new BufferedReader(new InputStreamReader(stream))
-    val lines = SampleReader(reader) read { line =>
-      line
-    }
-    Log info lines.mkString("\n")
-    lines foreach { line =>
-      Log info line
-    }
-    Log error s"lines:${lines.length}"
 
-    val input2 = new SyndFeedInput()
-    val feed2 = input2.build(new XmlReader(url2))
-    Log error feed2.getTitle
-    Log info feed2.getDescription
+    val stream = new BufferedInputStream(connection.getInputStream)
+    val reader = new InputStreamReader(stream)
+    val input = new SyndFeedInput()
+    val feed = input.build(reader)
+
+    Log error feed.getTitle
+    Log info feed.getDescription
 
     import scala.collection.JavaConversions._
-    feed2.getEntries map { case entry: SyndEntry =>
-      Log error entry.getTitle
-      Log info entry.getDescription.getValue
-      entry
+    feed.getEntries map { case entry: SyndEntry =>
+      convertEntry(source)(entry)
+    }
+  }
+  private def loadEntries2
+    (source: SourceRecordColumn): CallbackTask[Seq[EntryNotLoaded \/ EntryParts]] = {
+
+    val sourceUrl = source.url
+    Log info s"[init] $sourceUrl"
+
+    val feedUrl = new URL(sourceUrl)
+    val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
+    connection setRequestMethod "GET"
+
+    Log info s"code:${connection.getResponseCode}"
+
+    import scala.collection.JavaConversions._
+    for {
+      stream <- using(new BufferedInputStream(connection.getInputStream))
+      reader <- using(new InputStreamReader(stream))
+    } yield {
+      val feed = new SyndFeedInput().build(reader)
+
+      Log error feed.getTitle
+      Log info feed.getDescription
+
+      feed.getEntries map { case entry: SyndEntry =>
+        convertEntry(source)(entry)
+      }
+    }
+
+  }
+
+  private def using[A <: Closeable](closeable: A): CallbackTask[A] =
+    CallbackTask { f =>
+      try f(closeable)
+      finally closeable.close()
+    }
+
+  private def convertEntry
+    (source: SourceRecordColumn)(entry: SyndEntry): EntryNotLoaded \/ EntryParts = {
+    import scalaz.\/.left
+    import scalaz.syntax.std.option._
+
+    try for {
+      url <- Option(entry.getLink) \/> EmptyUrl()
+      published <- Option(entry.getPublishedDate) \/> EmptyPublishedDate()
+    } yield EntryParts(
+      sourceId = source._id,
+      title = Option(entry.getTitle) getOrElse "",
+      content = Option(entry.getDescription.getValue) getOrElse "",
+      url = url,
+      createdAt = Date(published)
+    ) catch {
+      case e: Exception => left apply Abort(e)
     }
   }
 }
 
-object SampleReader {
-  def apply(reader: BufferedReader): SampleReader = new SampleReader(reader)
-}
-class SampleReader private (reader: BufferedReader){
-  def read[A](f: String => A): Seq[A] = {
-    @tailrec
-    def loop(xs: Seq[A]): Seq[A] = Option(reader.readLine()) match {
-      case Some(line) =>
-        loop(xs :+ f(line))
-      case None =>
-        xs
-    }
-    try loop(Seq())
-    finally reader.close()
-  }
-}
 
 /*
 case class Hoge123(name: String)
