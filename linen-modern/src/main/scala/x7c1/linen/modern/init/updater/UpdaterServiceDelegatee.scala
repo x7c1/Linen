@@ -4,12 +4,12 @@ import java.io.{BufferedInputStream, BufferedReader, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
 import android.app.Service
-import android.content.{Context, Intent}
+import android.content.Intent
 import android.os.IBinder
 import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.io.{SyndFeedInput, XmlReader}
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.{EntryParts, AccountAccessor, ChannelAccessor, ChannelOwner, ChannelSourceParts, LinenOpenHelper, SourceRecordColumn}
+import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
@@ -152,25 +152,3 @@ object Hoge123 {
 }
 */
 
-class PresetFactory (context: Context, helper: LinenOpenHelper){
-  def createPreset() = {
-    val db = helper.getWritableDatabase
-    val writable = helper.writableDatabase
-
-    val Some(accountId) = AccountAccessor.findCurrentAccountId(db)
-    val Some(channelId) = ChannelAccessor.findCurrentChannelId(db, accountId)
-
-    val Some(channelOwner) = for {
-      accountId <- AccountAccessor.findCurrentAccountId(db)
-      channelId <- ChannelAccessor.findCurrentChannelId(db, accountId)
-    } yield {
-      new ChannelOwner(db, channelId, accountId)
-    }
-    channelOwner addSource ChannelSourceParts(
-      url = "http://www.gizmodo.jp/atom.xml",
-      title = "ギズモード・ジャパン",
-      description = "ガジェット情報満載ブログ",
-      rating = 100
-    )
-  }
-}
