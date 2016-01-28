@@ -43,7 +43,11 @@ trait ActionsInitializer {
         sourceAccessor = accessors.source,
         entryAccessor = accessors.entryOutline
       ),
-      new EntryDetailAreaAction(entryDetailArea, accessors.entryDetail)
+      new EntryDetailAreaAction(
+        entryDetailArea,
+        accessors.source,
+        accessors.entryDetail
+      )
     )
   }
 }
