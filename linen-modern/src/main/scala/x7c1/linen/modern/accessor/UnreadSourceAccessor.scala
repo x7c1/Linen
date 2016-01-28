@@ -30,7 +30,7 @@ private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAc
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,
-        description = s"rating:${cursor.rating}-" +  cursor.description,
+        description = cursor.description,
         rating = cursor.rating,
         startEntryId = cursor.start_entry_id
       )
