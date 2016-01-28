@@ -39,7 +39,6 @@ public class EntryRowProvider implements ViewHolderProvider<EntryRow> {
         return new EntryRow(
             view,
             (TextView) view.findViewById(R.id.entry_row__title),
-            (TextView) view.findViewById(R.id.entry_row__content),
             (TextView) view.findViewById(R.id.entry_row__created_at)
         );
     }

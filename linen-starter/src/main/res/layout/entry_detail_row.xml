@@ -6,24 +6,19 @@
 
     <LinearLayout
         style="@style/AppCardViewRow"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:orientation="vertical"
         >
-
         <TextView
             android:id="@+id/entry_detail_row__title"
             android:textSize="17sp"
-            android:gravity="center_vertical"
             android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
+            android:paddingBottom="10dp"
             android:lineSpacingExtra="4dp"
             android:lineSpacingMultiplier="1.1"
             android:textColor="@color/rouiro"
             />
-        <!--android:lineSpacingMultiplier="1.2"-->
 
         <View
             android:layout_width="match_parent"
@@ -37,13 +32,11 @@
             android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#5b5b5b"
+            android:textColor="#4b4b4b"
             android:textColorLink="@color/to_next_button_background"
             android:lineSpacingExtra="4dp"
             android:lineSpacingMultiplier="1.2"
             />
-
-        <!--android:lineSpacingMultiplier="1.2"-->
 
         <TextView
             android:id="@+id/entry_detail_row__created_at"
