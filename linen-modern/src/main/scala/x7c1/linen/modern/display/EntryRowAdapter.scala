@@ -1,16 +1,12 @@
 package x7c1.linen.modern.display
 
-import android.animation.{AnimatorSet, ObjectAnimator}
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.{View, ViewGroup}
+import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.EntryRow
 import x7c1.linen.modern.accessor.EntryAccessor
 import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.tasks.Async.await
-import x7c1.wheat.modern.tasks.UiThread.via
 
 
 class EntryRowAdapter(
@@ -25,37 +21,15 @@ class EntryRowAdapter(
     provider inflateOn parent
   }
   override def onBindViewHolder(holder: EntryRow, position: Int) = {
-    val display = for {
-      Some(entry) <- task { entryAccessor findAt position }
-      _ <- task {
-        holder.title.text = entry.shortTitle
-        holder.content.text = ""
-        holder.createdAt.text = ""
-        holder.itemView onClick { _ =>
-          val event = EntrySelectedEvent(position, entry)
-          entrySelectedListener onEntrySelected event
-        }
+    entryAccessor findAt position foreach { entry =>
+      holder.title.text = entry.shortTitle
+      holder.itemView onClick { _ =>
+        val event = EntrySelectedEvent(position, entry)
+        entrySelectedListener onEntrySelected event
       }
-      _ <- await(300)
-      animator <- task(new AnimatorSet) if position == holder.getAdapterPosition
-      _ <- task apply animator.playTogether(
-        fadeIn(holder.content),
-        fadeIn(holder.createdAt)
-      )
-      _ <- via(holder.itemView){ _ =>
-        animator.start()
-        holder.content.text = entry.shortContent
-        holder.createdAt.text = entry.createdAt.format
-      }
-    } yield ()
-
-    display.execute()
+      holder.createdAt.text = entry.createdAt.format
+    }
   }
-
-  private def fadeIn(view: View) = {
-    ObjectAnimator.ofFloat(view, "alpha", 0.3F, 1f).setDuration(300)
-  }
-
 }
 
 trait OnEntrySelectedListener {
