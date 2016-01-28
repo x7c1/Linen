@@ -1,6 +1,6 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.{EntryAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.modern.callback.CallbackTask
@@ -9,6 +9,7 @@ import x7c1.wheat.modern.callback.CallbackTask.task
 class EntryAreaAction(
   entryArea: EntryArea,
   sourceAccessor: UnreadSourceAccessor,
+  rawSourceAccessor: RawSourceAccessor,
   entryAccessor: EntryAccessor[EntryOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
   with OnEntrySelected with OnEntryFocused with OnEntrySkipped
@@ -62,10 +63,7 @@ class EntryAreaAction(
   } yield ()
 
   private def updateToolbar(sourceId: Long) = task {
-    sourceAccessor positionOf sourceId flatMap
-      sourceAccessor.findAt foreach { source =>
-        entryArea updateToolbar source.title
-      }
+    rawSourceAccessor.findTitleOf(sourceId) foreach entryArea.updateToolbar
   }
   private def findEntryPosition(sourceId: Long) = task {
     entryAccessor firstEntryPositionOf sourceId
