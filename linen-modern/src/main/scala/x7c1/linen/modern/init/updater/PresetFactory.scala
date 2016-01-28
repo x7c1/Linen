@@ -24,5 +24,11 @@ class PresetFactory (context: Context, helper: LinenOpenHelper){
       description = "日々のあらゆるシーンで役立つ情報を提供するIT系ニュースサイト。毎日更新中。",
       rating = 100
     )
+    channelOwner addSource ChannelSourceParts(
+      url = "http://wired.jp/feed/",
+      title = "WIRED.jp",
+      description = "未来をつくるIDEAS + INNOVATIONS。最新テクノロジーニュース、気になる人物インタビュー、ガジェット情報、サイエンスの最前線など、「未来のトレンド」を毎日発信。US/UK/ITALIA版WIREDからの翻訳記事をいち早くお届け。日本発、注目の動向を追ったオリジナル記事も満載。",
+      rating = 98
+    )
   }
 }
