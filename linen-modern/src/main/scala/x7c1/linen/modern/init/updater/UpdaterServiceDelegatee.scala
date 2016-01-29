@@ -6,8 +6,8 @@ import java.net.{HttpURLConnection, URL}
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.sun.syndication.feed.synd.SyndEntry
-import com.sun.syndication.io.SyndFeedInput
+import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
+import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.init.dev.DummyFactory

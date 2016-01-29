@@ -21,7 +21,6 @@ object LinenBuild extends Build with LinenSettings {
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
   lazy val scalaz = "org.scalaz" %% "scalaz-concurrent" % "7.1.5"
-  lazy val rome = "rome" % "rome" % "1.0"
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -34,9 +33,9 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
-    settings(libraryDependencies ++= Seq(scalaz, rome)).
+    settings(libraryDependencies += scalaz).
     settings(
-      unmanagedJars in Compile := androidSdkClasspath,
+      unmanagedJars in Compile ++= androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value
     )
@@ -54,7 +53,6 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
-    settings(libraryDependencies ++= Seq(scalaz, rome)).
     settings(libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % Test,
       "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
@@ -70,13 +68,12 @@ object LinenBuild extends Build with LinenSettings {
       fork in Test := true
     ).
     settings(
-      unmanagedJars in Compile := androidSdkClasspath,
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-modern`)
+    dependsOn(`linen-glue`, `wheat-modern`, `linen-pickle`)
 
   lazy val `wheat-build` = project.
     settings(
@@ -143,7 +140,7 @@ trait LinenSettings {
     val ignore = (path: String) =>
       (path startsWith "scalaz") ||
       (path startsWith "org/jdom") || (path startsWith "JDOMAbout") ||
-      (path startsWith "com/sun") || (path startsWith "META-INF") ||
+      (path startsWith "com/google/code/rome") || (path startsWith "META-INF") ||
       (path startsWith "x7c1/linen/glue") ||
       (path startsWith "x7c1/wheat/ancient")
 
