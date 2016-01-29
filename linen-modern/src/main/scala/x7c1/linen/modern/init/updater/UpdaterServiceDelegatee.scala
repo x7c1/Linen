@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.updater
 
-import java.io.{BufferedInputStream, Closeable, InputStreamReader}
+import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
 import android.app.Service
@@ -15,6 +15,7 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
+import x7c1.wheat.modern.callback.CallbackTask.using
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -122,12 +123,6 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
     }
 
   }
-
-  private def using[A <: Closeable](closeable: A): CallbackTask[A] =
-    CallbackTask { f =>
-      try f(closeable)
-      finally closeable.close()
-    }
 
   private def convertEntry
     (source: SourceRecordColumn)(entry: SyndEntry): EntryNotLoaded \/ EntryParts = {
