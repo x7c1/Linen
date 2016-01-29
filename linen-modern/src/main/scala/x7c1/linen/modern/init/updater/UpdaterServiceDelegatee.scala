@@ -73,7 +73,7 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
       case Right(Some(source)) =>
         Log info source.title
 
-        try loadEntries2(source)(insertEntries)
+        try loadEntries(source)(insertEntries)
         catch {
           case e: Exception => Log error e.getMessage
         }
@@ -95,31 +95,6 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
     }
 
   private def loadEntries
-    (source: SourceRecordColumn): Seq[EntryNotLoaded \/ EntryParts] = {
-
-    val sourceUrl = source.url
-    Log info s"[init] $sourceUrl"
-
-    val feedUrl = new URL(sourceUrl)
-    val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
-    connection setRequestMethod "GET"
-
-    Log info s"code:${connection.getResponseCode}"
-
-    val stream = new BufferedInputStream(connection.getInputStream)
-    val reader = new InputStreamReader(stream)
-    val input = new SyndFeedInput()
-    val feed = input.build(reader)
-
-    Log error feed.getTitle
-    Log info feed.getDescription
-
-    import scala.collection.JavaConversions._
-    feed.getEntries map { case entry: SyndEntry =>
-      convertEntry(source)(entry)
-    }
-  }
-  private def loadEntries2
     (source: SourceRecordColumn): CallbackTask[Seq[EntryNotLoaded \/ EntryParts]] = {
 
     val sourceUrl = source.url
