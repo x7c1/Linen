@@ -53,6 +53,7 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
     settings(libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % Test,
       "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
