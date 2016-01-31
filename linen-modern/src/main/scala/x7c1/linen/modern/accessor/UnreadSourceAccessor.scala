@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, UnreadSource}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 import scala.util.Try
 
@@ -122,7 +122,7 @@ object UnreadSourceAccessor {
   }
 }
 
-trait UnreadSourceColumn extends TypedCursor {
+trait UnreadSourceColumn extends TypedFields {
   def source_id: Long
   def title: String
   def description: String
@@ -130,7 +130,7 @@ trait UnreadSourceColumn extends TypedCursor {
   def start_entry_id: Option[Long]
 }
 
-trait SourceRecordColumn extends TypedCursor {
+trait SourceRecordColumn extends TypedFields {
   def _id: Long
   def title: String
   def description: String
@@ -152,7 +152,6 @@ object SourceRecordColumn {
           override val description = cursor.description
           override val title = cursor.title
           override val _id = cursor._id
-          override def moveTo(n: Int): Boolean = cursor.moveTo(n)
         }
       }
 
@@ -170,8 +169,8 @@ object SourceParts {
   implicit object insertable extends Insertable[SourceParts] {
     override def tableName: String = "sources"
     override def toContentValues(target: SourceParts): ContentValues = {
-      val column = TypedCursor.expose[SourceRecordColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[SourceRecordColumn]
+      TypedFields toContentValues (
         column.title -> target.title,
         column.url -> target.url,
         column.description -> target.description,
@@ -238,7 +237,7 @@ object SourceRatingParts {
   }
 }
 
-trait ChannelSourceMapColumn extends TypedCursor {
+trait ChannelSourceMapColumn extends TypedFields {
   def source_id: Long
   def channel_id: Long
   def created_at: Int --> Date
@@ -252,8 +251,8 @@ object ChannelSourceMapParts {
   implicit object insertable extends Insertable[ChannelSourceMapParts] {
     override def tableName: String = "channel_source_map"
     override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
-      val column = TypedCursor.expose[ChannelSourceMapColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[ChannelSourceMapColumn]
+      TypedFields toContentValues (
         column.source_id -> target.sourceId,
         column.channel_id -> target.channelId,
         column.created_at -> target.createdAt

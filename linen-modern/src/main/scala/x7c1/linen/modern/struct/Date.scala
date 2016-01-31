@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{TimeZone, Locale}
 
-import x7c1.wheat.macros.database.ColumnConvertible
+import x7c1.wheat.macros.database.FieldConvertible
 
 object Date {
   def current(): Date = new DateImpl(new util.Date)
@@ -16,7 +16,7 @@ object Date {
   }
   def apply(date: util.Date): Date = new DateImpl(date)
 
-  implicit object convertible extends ColumnConvertible[Int, Date] {
+  implicit object convertible extends FieldConvertible[Int, Date] {
     override def wrap(value: Int): Date = Date(value)
     override def unwrap(value: Date): Int = value.timestamp
   }

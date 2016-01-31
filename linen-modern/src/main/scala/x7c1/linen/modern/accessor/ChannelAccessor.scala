@@ -2,7 +2,7 @@ package x7c1.linen.modern.accessor
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Channel, Date}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 trait ChannelAccessor {
   def accountId: Long
@@ -59,7 +59,7 @@ case class ChannelParts(
   createdAt: Date
 )
 
-trait ChannelRecordColumn extends TypedCursor {
+trait ChannelRecordColumn extends TypedFields {
   def _id: Long
   def name: String
   def description: String
@@ -73,8 +73,8 @@ object ChannelParts {
     override def tableName = "channels"
 
     override def toContentValues(parts: ChannelParts) = {
-      val column = TypedCursor.expose[ChannelRecordColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[ChannelRecordColumn]
+      TypedFields toContentValues (
         column.name -> parts.name,
         column.description -> parts.description,
         column.account_id -> parts.accountId,

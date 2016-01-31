@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.dev
 import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.modern.accessor.{SingleSelectable, SourceRecordColumn, Updatable}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 case class SourceTitle(
   sourceId: Long,
@@ -14,8 +14,8 @@ object SourceTitle {
   implicit object updatable extends Updatable[SourceTitle]{
     override def tableName: String = "sources"
     override def toContentValues(target: SourceTitle): ContentValues = {
-      val column = TypedCursor.expose[SourceRecordColumn]
-      TypedCursor.toContentValues(
+      val column = TypedFields.expose[SourceRecordColumn]
+      TypedFields toContentValues (
         column._id -> target.sourceId,
         column.title -> target.title
       )

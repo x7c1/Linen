@@ -8,14 +8,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object TypedCursor {
-  def apply[A <: TypedCursor](cursor: Cursor): A = macro TypedColumnImpl.create[A]
-  def expose[A <: TypedCursor]: A = macro TypedContentValues.extract[A]
-  def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
+  def apply[A <: TypedFields]
+    (cursor: Cursor): A with TypedCursor = macro TypedColumnImpl.create[A]
 }
 
 trait TypedCursor {
-  type -->[A, B] = ColumnTransform[A, B]
-
   def moveTo(n: Int): Boolean
 
   def moveToFind[A](n: Int)(f: => A): Option[A] = {
@@ -24,12 +21,23 @@ trait TypedCursor {
   }
 }
 
-trait ColumnTransform[A, B]{
+trait TypedFields {
+  type -->[A, B] = FieldTransform[A, B]
+}
+
+object TypedFields {
+
+  def expose[A <: TypedFields]: A = macro TypedContentValues.extract[A]
+
+  def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
+}
+
+trait FieldTransform[A, B]{
   def raw: A
   def typed: B
 }
 
-trait ColumnConvertible[A, B]{
+trait FieldConvertible[A, B]{
   def wrap(value: A): B
   def unwrap(value: B): A
 }
@@ -56,11 +64,11 @@ private object TypedColumnImpl {
          */
         q"Option($cursor.getString($indexKey)).map(_.toLong)"
 
-      case x if x <:< typeOf[ColumnTransform[_, _]] =>
+      case x if x <:< typeOf[FieldTransform[_, _]] =>
         val Seq(from, to) = tpe.typeArgs
         val value = getValue(from, indexKey)
-        val convertible = appliedType(typeOf[ColumnConvertible[_, _]].typeConstructor, from, to)
-        val transform = appliedType(typeOf[ColumnTransform[_, _]].typeConstructor, from, to)
+        val convertible = appliedType(typeOf[FieldConvertible[_, _]].typeConstructor, from, to)
+        val transform = appliedType(typeOf[FieldTransform[_, _]].typeConstructor, from, to)
         q"""
           new $transform {
             override def raw = $value
@@ -80,7 +88,7 @@ private object TypedColumnImpl {
       )
     }
     val tree = q"""
-      new $definition {
+      new $definition with ${typeOf[TypedCursor]}{
         ..$overrides
         override def moveTo(n: Int) = $cursor.moveToPosition(n)
       }

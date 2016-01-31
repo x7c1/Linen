@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
 import x7c1.linen.modern.struct.Date
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 trait SettingSourceAccessor {
   def findAt(position: Int): Option[SettingSource]
@@ -35,7 +35,7 @@ case class SettingSource(
   rating: Int
 )
 
-trait SettingSourceRecord extends TypedCursor {
+trait SettingSourceRecord extends TypedFields {
   def source_id: Long
   def title: String
   def description: String

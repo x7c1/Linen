@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor
 import android.content.{ContentValues, Context}
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 
 object LinenDatabase {
@@ -233,7 +233,7 @@ class Query(
     s"""sql: $sql, args: ${selectionArgs.mkString(",")}"""
 }
 
-trait QueryPlanColumn extends TypedCursor {
+trait QueryPlanColumn extends TypedFields {
   def detail: String
 }
 case class QueryPlan(detail: String)
