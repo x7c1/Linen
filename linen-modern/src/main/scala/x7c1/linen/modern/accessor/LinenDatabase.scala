@@ -194,7 +194,7 @@ trait Updatable[A] {
 }
 
 class ReadableDatabase(db: SQLiteDatabase) {
-  def selectOne[A]: SingleSelector[A] = new SingleSelector[A](db)
+  def find[A]: SingleSelector[A] = new SingleSelector[A](db)
 }
 
 class SingleSelector[A](db: SQLiteDatabase){

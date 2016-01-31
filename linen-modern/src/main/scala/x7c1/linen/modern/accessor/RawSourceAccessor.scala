@@ -8,7 +8,7 @@ class RawSourceAccessor(helper: LinenOpenHelper){
   private lazy val readable = helper.readable
 
   def findTitleOf(sourceId: Long): Option[String] = {
-    readable.selectOne[SourceTitle](sourceId) match {
+    readable.find[SourceTitle](sourceId) match {
       case Left(exception) =>
         Log error exception.getMessage
         None

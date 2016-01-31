@@ -70,7 +70,7 @@ class UpdaterMethods(service: Service with ServiceControl, startId: Int){
   def loadSource(sourceId: Long): Unit = async {
     Log error s"[init] source-id: $sourceId"
 
-    helper.readable.selectOne[SourceRecordColumn](sourceId) match {
+    helper.readable.find[SourceRecordColumn](sourceId) match {
       case Right(Some(source)) =>
         Log info source.title
 
