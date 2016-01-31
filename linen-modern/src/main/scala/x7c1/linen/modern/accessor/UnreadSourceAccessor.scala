@@ -144,17 +144,7 @@ object SourceRecordColumn {
       "_id" -> id.toString
     )
     override def fromCursor(rawCursor: Cursor): Option[SourceRecordColumn] = {
-      val cursor = TypedCursor[SourceRecordColumn](rawCursor)
-      cursor.moveToFind(0){
-        new SourceRecordColumn {
-          override val created_at = cursor.created_at
-          override val url = cursor.url
-          override val description = cursor.description
-          override val title = cursor.title
-          override val _id = cursor._id
-        }
-      }
-
+      TypedCursor[SourceRecordColumn](rawCursor) freezeAt 0
     }
   }
 }

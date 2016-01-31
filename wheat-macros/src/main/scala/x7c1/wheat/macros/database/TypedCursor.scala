@@ -9,16 +9,17 @@ import scala.reflect.macros.blackbox
 
 object TypedCursor {
   def apply[A <: TypedFields]
-    (cursor: Cursor): A with TypedCursor = macro TypedColumnImpl.create[A]
+    (cursor: Cursor): A with TypedCursor[A] = macro TypedColumnImpl.create[A]
 }
 
-trait TypedCursor {
+trait TypedCursor[X] {
   def moveTo(n: Int): Boolean
 
   def moveToFind[A](n: Int)(f: => A): Option[A] = {
     if (moveTo(n)) Some(f)
     else None
   }
+  def freezeAt(n: Int): Option[X]
 }
 
 trait TypedFields {
@@ -71,26 +72,39 @@ private object TypedColumnImpl {
         val transform = appliedType(typeOf[FieldTransform[_, _]].typeConstructor, from, to)
         q"""
           new $transform {
-            override def raw = $value
-            override def typed = implicitly[$convertible].wrap($value)
+            override val raw = $value
+            override val typed = implicitly[$convertible].wrap($value)
           }"""
 
       case x =>
         throw new IllegalArgumentException(s"unsupported type: $x")
     }
-    val overrides = methods flatMap { method =>
+    val kvs = methods map { method =>
       val key = method.name.toString
       val indexKey = TermName(c.freshName(key + "_index_"))
       val value = getValue(method.returnType, indexKey)
+      (indexKey, key, value)
+    }
+    val overrides = kvs flatMap { case (indexKey, key, value) =>
       Seq(
         q"lazy val $indexKey = $cursor.getColumnIndexOrThrow($key)",
         q"override def ${TermName(key)} = $value"
       )
     }
+    val freeze = kvs map {
+      case (_, key, value) =>
+        q"override val ${TermName(key)} = $value"
+    }
+    val typedCursor = appliedType(
+      typeOf[TypedCursor[_]].typeConstructor, definition
+    )
     val tree = q"""
-      new $definition with ${typeOf[TypedCursor]}{
+      new $definition with $typedCursor {
         ..$overrides
         override def moveTo(n: Int) = $cursor.moveToPosition(n)
+        override def freezeAt(n: Int) =
+          if (moveTo(n)) Some(new $definition { ..$freeze })
+          else None
       }
     """
 //    println(showCode(tree))
