@@ -16,7 +16,7 @@ import x7c1.wheat.modern.callback.CallbackTask.{task, using}
 import scala.concurrent.{Future, Promise}
 import scalaz.\/
 
-class SourceLoader(
+class SourceInspector(
   service: Service with ServiceControl,
   helper: LinenOpenHelper ){
 
@@ -25,7 +25,7 @@ class SourceLoader(
       _ map (source => new URL(source.url))
     }
 
-  def loadEntries(sourceId: Long)(feedUrl: URL): Future[Seq[EntryNotLoaded \/ EntryParts]] = {
+  def loadEntries(sourceId: Long)(feedUrl: URL): Future[Seq[InvalidEntry \/ EntryParts]] = {
     val callback = loadRawEntries(feedUrl)
     val entries = {
       val p = Promise[Seq[SyndEntry]]()
@@ -53,7 +53,7 @@ class SourceLoader(
       feed.getEntries map { case x: SyndEntry => x }
     }
   }
-  private def convertEntry(sourceId: Long)(entry: SyndEntry): EntryNotLoaded \/ EntryParts = {
+  private def convertEntry(sourceId: Long)(entry: SyndEntry): InvalidEntry \/ EntryParts = {
     import scalaz.\/.left
     import scalaz.syntax.std.option._
 

@@ -78,7 +78,7 @@ class UpdaterMethods(
     Log info s"[init] source-id: $sourceId"
 
     import LinenService.Implicits._
-    val loader = new SourceLoader(service, helper)
+    val loader = new SourceInspector(service, helper)
     Future {
       loader findFeedUrl sourceId
     } flatMap {
@@ -90,7 +90,7 @@ class UpdaterMethods(
       case Failure(e) => Log error e.getMessage
     }
   }
-  private def insertEntries(entries: Seq[EntryNotLoaded \/ EntryParts]): Unit = {
+  private def insertEntries(entries: Seq[InvalidEntry \/ EntryParts]): Unit = {
     val loadedEntries = entries collect { case \/-(entry) => entry }
     val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
