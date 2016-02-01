@@ -13,7 +13,7 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.{task, using}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 import scalaz.\/
 
 class SourceInspector(
@@ -27,14 +27,8 @@ class SourceInspector(
 
   def loadEntries(sourceId: Long)(feedUrl: URL): Future[Seq[InvalidEntry \/ EntryParts]] = {
     val callback = loadRawEntries(feedUrl)
-    val entries = {
-      val p = Promise[Seq[SyndEntry]]()
-      callback { entries =>
-        try p trySuccess entries
-        catch { case e: Throwable => p tryFailure e }
-      }
-      p.future
-    }
+    val entries = callback.toFuture
+
     import LinenService.Implicits._
     entries map (_ map convertEntry(sourceId))
   }
