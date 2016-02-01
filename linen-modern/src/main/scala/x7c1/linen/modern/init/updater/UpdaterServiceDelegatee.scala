@@ -6,7 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
@@ -16,6 +16,7 @@ import x7c1.wheat.modern.patch.TaskAsync.async
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import scalaz.{\/-, \/}
 
 object LinenService {
   object Implicits {
@@ -77,16 +78,28 @@ class UpdaterMethods(
     Log info s"[init] source-id: $sourceId"
 
     import LinenService.Implicits._
+    val loader = new SourceLoader(service, helper)
     Future {
-      new SourceLoader(service, helper).start(sourceId)
-    } map { _ =>
-      service stopSelfResult startId
+      loader findFeedUrl sourceId
+    } flatMap {
+      case Right(Some(url)) => loader.loadEntries(sourceId)(url)
+      case Right(None) => Future(Seq())
+      case Left(e) => throw e
     } onComplete {
-      case Success(_) =>
-        Log info "[done]"
-      case Failure(e) =>
-        Log error e.getMessage
+      case Success(entries) => insertEntries(entries)
+      case Failure(e) => Log error e.getMessage
     }
+  }
+  private def insertEntries(entries: Seq[EntryNotLoaded \/ EntryParts]): Unit = {
+    val loadedEntries = entries collect { case \/-(entry) => entry }
+    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
+    loadedEntries.zipWithIndex foreach {
+      case (entry, index) =>
+        Log info entry.title
+        helper.writableDatabase insert entry
+        notifier.notifyProgress(index)
+    }
+    notifier.notifyDone()
   }
 }
 

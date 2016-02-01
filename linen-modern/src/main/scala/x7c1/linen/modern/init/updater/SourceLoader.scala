@@ -4,81 +4,56 @@ import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
 import android.app.Service
+import android.database.SQLException
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.struct.Date
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.CallbackTask.using
+import x7c1.wheat.modern.callback.CallbackTask.{task, using}
 
-import scalaz.{\/, \/-}
+import scala.concurrent.{Future, Promise}
+import scalaz.\/
 
 class SourceLoader(
   service: Service with ServiceControl,
   helper: LinenOpenHelper ){
 
-  def start(sourceId: Long): Unit = {
-    Log info s"[init] source-id: $sourceId"
-
-    helper.readable.find[SourceRecordColumn](sourceId) match {
-      case Right(Some(source)) =>
-        Log info source.title
-
-        try loadEntries(source)(insertEntries)
-        catch {
-          case e: Exception => Log error e.getMessage
-        }
-
-      case Right(none) =>
-      case Left(exception) =>
+  def findFeedUrl(sourceId: Long): Either[SQLException, Option[URL]] =
+    helper.readable.find[SourceRecordColumn](sourceId).right map {
+      _ map (source => new URL(source.url))
     }
-  }
 
-  private def insertEntries(entries: Seq[EntryNotLoaded \/ EntryParts]): Unit = {
-
-    val loadedEntries = entries collect { case \/-(entry) => entry }
-    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
-    loadedEntries.zipWithIndex foreach {
-      case (entry, index) =>
-        Log info entry.title
-        helper.writableDatabase insert entry
-        notifier.notifyProgress(index)
+  def loadEntries(sourceId: Long)(feedUrl: URL): Future[Seq[EntryNotLoaded \/ EntryParts]] = {
+    val callback = loadRawEntries(feedUrl)
+    val entries = {
+      val p = Promise[Seq[SyndEntry]]()
+      callback { entries =>
+        try p trySuccess entries
+        catch { case e: Throwable => p tryFailure e }
+      }
+      p.future
     }
-    notifier.notifyDone()
+    import LinenService.Implicits._
+    entries map (_ map convertEntry(sourceId))
   }
-
-  private def loadEntries
-    (source: SourceRecordColumn): CallbackTask[Seq[EntryNotLoaded \/ EntryParts]] = {
-
-    val sourceUrl = source.url
-    Log info s"[init] $sourceUrl"
-
-    val feedUrl = new URL(sourceUrl)
-    val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
-    connection setRequestMethod "GET"
-
-    Log info s"code:${connection.getResponseCode}"
-
+  private def loadRawEntries(feedUrl: URL): CallbackTask[Seq[SyndEntry]] = {
     import scala.collection.JavaConversions._
     for {
+      connection <- task {
+        val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
+        connection setRequestMethod "GET"
+        connection
+      }
       stream <- using(new BufferedInputStream(connection.getInputStream))
       reader <- using(new InputStreamReader(stream))
     } yield {
       val feed = new SyndFeedInput().build(reader)
-
-      Log error feed.getTitle
-      Log info feed.getDescription
-
-      feed.getEntries map { case entry: SyndEntry =>
-        convertEntry(source)(entry)
-      }
+      feed.getEntries map { case x: SyndEntry => x }
     }
   }
-
-  private def convertEntry
-    (source: SourceRecordColumn)(entry: SyndEntry): EntryNotLoaded \/ EntryParts = {
+  private def convertEntry(sourceId: Long)(entry: SyndEntry): EntryNotLoaded \/ EntryParts = {
     import scalaz.\/.left
     import scalaz.syntax.std.option._
 
@@ -86,13 +61,14 @@ class SourceLoader(
       url <- Option(entry.getLink) \/> EmptyUrl()
       published <- Option(entry.getPublishedDate) \/> EmptyPublishedDate()
     } yield EntryParts(
-        sourceId = source._id,
-        title = Option(entry.getTitle) getOrElse "",
-        content = Option(entry.getDescription.getValue) getOrElse "",
-        url = url,
-        createdAt = Date(published)
-      ) catch {
+      sourceId = sourceId,
+      title = Option(entry.getTitle) getOrElse "",
+      content = Option(entry.getDescription.getValue) getOrElse "",
+      url = url,
+      createdAt = Date(published)
+    ) catch {
       case e: Exception => left apply Abort(e)
     }
   }
+
 }
