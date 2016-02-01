@@ -6,5 +6,5 @@ class RichTextView[A <: TextView](view: A){
 
   def text: CharSequence = view.getText
 
-  def text_=(value: String): Unit = view.setText(value)
+  def text_=(value: CharSequence): Unit = view.setText(value)
 }

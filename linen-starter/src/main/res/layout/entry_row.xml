@@ -6,34 +6,27 @@
 
 <LinearLayout
     style="@style/AppCardViewRow"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp"
     android:orientation="vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp"
     >
     <TextView
         android:id="@+id/entry_row__title"
-        android:textSize="18sp"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:lineSpacingExtra="3dp"
+        android:lineSpacingMultiplier="1.1"
+        android:textColor="#4b4b4b"
         android:ellipsize="end"
-        android:lines="1"
-        />
-
-    <TextView
-        android:id="@+id/entry_row__content"
-        android:textSize="15sp"
-        android:layout_marginTop="3dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:lines="2"
+        android:maxLines="3"
         />
 
     <TextView
         android:id="@+id/entry_row__created_at"
         android:textSize="12sp"
         android:textAlignment="textEnd"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"

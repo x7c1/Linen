@@ -6,6 +6,8 @@ import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccesso
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 
+import scala.util.Random
+
 object DummyFactory {
   def createDummies(context: Context)(n: Int): Unit = {
     createDummies0(context)(n)(_ => ())
@@ -54,6 +56,10 @@ object DummyFactory {
         description = s"description-$i " + words(1,15),
         createdAt = Date.current()
       )
+      writable update SourceTitle(
+        sourceId = sourceId,
+        title = s"$sourceId-title"
+      )
       writable insert SourceStatusParts(
         sourceId = sourceId,
         accountId = accountId1,
@@ -62,7 +68,7 @@ object DummyFactory {
       writable insert SourceRatingParts(
         sourceId = sourceId,
         ownerAccountId = accountId1,
-        rating = sourceId.toInt,
+        rating = generateRating(),
         createdAt = Date.current()
       )
       writable insert SourceStatusParts(
@@ -73,7 +79,7 @@ object DummyFactory {
       writable insert SourceRatingParts(
         sourceId = sourceId,
         ownerAccountId = accountId2,
-        rating = sourceId.toInt,
+        rating = generateRating(),
         createdAt = Date.current()
       )
       writable insert ChannelSourceMapParts(
@@ -114,5 +120,9 @@ object DummyFactory {
       }
       callback(i)
     }
+  }
+  def generateRating() = {
+    val range = 1 to 100
+    range(Random.nextInt(range.size - 1))
   }
 }

@@ -1,6 +1,8 @@
 package x7c1.linen.modern.display
 
 import android.support.v7.widget.RecyclerView.Adapter
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.EntryDetailRow
 import x7c1.linen.modern.accessor.EntryAccessor
@@ -23,7 +25,8 @@ class EntryDetailRowAdapter(
   override def onBindViewHolder(holder: EntryDetailRow, position: Int): Unit = {
     entryAccessor findAt position foreach { entry =>
       holder.title.text = entry.fullTitle
-      holder.content.text = entry.fullContent
+      holder.content.text = Html.fromHtml(entry.fullContent)
+      holder.content setMovementMethod LinkMovementMethod.getInstance()
       holder.createdAt.text = entry.createdAt.format
       holder.itemView onClick { _ =>
         val event = EntryDetailSelectedEvent(position, entry)

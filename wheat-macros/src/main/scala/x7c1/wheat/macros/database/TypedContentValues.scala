@@ -10,8 +10,8 @@ private object TypedContentValues {
   def extract[A: c.WeakTypeTag](c: blackbox.Context): c.Tree = {
     import c.universe._
 
-    val cursor = weakTypeOf[A]
-    val methods = cursor.members filter { symbol =>
+    val field = weakTypeOf[A]
+    val methods = field.members filter { symbol =>
       !symbol.fullName.startsWith("java.") &&
         !symbol.fullName.startsWith("scala.") &&
         !symbol.isConstructor && symbol.isMethod
@@ -22,9 +22,8 @@ private object TypedContentValues {
       q"override def ${TermName(key)} = ???"
     }
     val tree = q"""
-      new $cursor {
+      new $field {
         ..$overrides
-        override def moveTo(n: Int) = ???
       }"""
 
 //    println(tree)
@@ -68,7 +67,7 @@ private object TypedContentValues {
     def forConvertible(values: Tree)(left: Tree, right: Tree) = left.tpe.typeArgs match {
       case Seq(from, to) if to =:= right.tpe =>
         val convertible = appliedType(
-          typeOf[ColumnConvertible[_, _]].typeConstructor,
+          typeOf[FieldConvertible[_, _]].typeConstructor,
           from,
           to
         )
@@ -90,7 +89,7 @@ private object TypedContentValues {
     def toSetters(values: Tree): ((Tree, Tree)) => Seq[Tree] = {
       case (left, right) if left.tpe.widen =:= right.tpe.widen =>
         forPrimitive(values)(left, right)
-      case (left, right) if left.tpe <:< typeOf[ColumnTransform[_, _]] =>
+      case (left, right) if left.tpe <:< typeOf[FieldTransform[_, _]] =>
         forConvertible(values)(left, right)
       case (left, right) =>
         throw new IllegalArgumentException(

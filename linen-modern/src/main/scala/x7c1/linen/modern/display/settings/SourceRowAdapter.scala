@@ -9,7 +9,8 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class SourceRowAdapter (
   accessor: SettingSourceAccessor,
-  viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow] )
+  viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
+  onSyncClicked: OnSyncClickedListener )
   extends Adapter[SettingChannelSourcesRow]{
 
   override def getItemCount: Int = accessor.length
@@ -22,7 +23,25 @@ class SourceRowAdapter (
       holder.title.text = source.title
       holder.description.text = source.description
       holder.switchSubscribe setChecked true
+      holder.ratingBar setProgress source.rating
+      holder.sync onClick { view =>
+        onSyncClicked onSyncClicked SyncClickedEvent(source.sourceId)
+      }
     }
   }
 
 }
+
+trait OnSyncClickedListener {
+  def onSyncClicked(event: SyncClickedEvent): Unit
+}
+object OnSyncClickedListener {
+  def apply(f: SyncClickedEvent => Unit): OnSyncClickedListener =
+    new OnSyncClickedListener {
+      override def onSyncClicked(event: SyncClickedEvent): Unit = f(event)
+    }
+}
+
+case class SyncClickedEvent(
+  sourceId: Long
+)

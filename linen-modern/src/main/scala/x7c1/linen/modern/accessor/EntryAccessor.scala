@@ -1,10 +1,10 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
-import android.database.Cursor
+import android.database.{SQLException, Cursor}
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 import scala.annotation.tailrec
 
@@ -186,7 +186,7 @@ object EntryAccessor {
   }
 }
 
-trait EntryRecordColumn extends TypedCursor {
+trait EntryRecordColumn extends TypedFields {
   def entry_id: Long
   def source_id: Long
   def title: String
@@ -206,8 +206,8 @@ object EntryParts {
   implicit object insertable extends Insertable[EntryParts] {
     override def tableName: String = "entries"
     override def toContentValues(target: EntryParts): ContentValues = {
-      val column = TypedCursor.expose[EntryRecordColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[EntryRecordColumn]
+      TypedFields toContentValues (
         column.source_id -> target.sourceId,
         column.title -> target.title,
         column.content -> target.content,
@@ -215,5 +215,25 @@ object EntryParts {
         column.created_at -> target.createdAt
       )
     }
+  }
+}
+
+case class RetrievedEntry(
+  title: String,
+  content: String,
+  url: String,
+  createdAt: Date
+)
+
+class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
+  def addEntry(entry: RetrievedEntry): Either[SQLException, Long] = {
+    val parts = EntryParts(
+      sourceId = sourceId,
+      title = entry.title,
+      content = entry.content,
+      url = entry.url,
+      createdAt = entry.createdAt
+    )
+    new WritableDatabase(db).insert(parts)
   }
 }

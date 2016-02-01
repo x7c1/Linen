@@ -8,28 +8,37 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object TypedCursor {
-  def apply[A <: TypedCursor](cursor: Cursor): A = macro TypedColumnImpl.create[A]
-  def expose[A <: TypedCursor]: A = macro TypedContentValues.extract[A]
-  def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
+  def apply[A <: TypedFields]
+    (cursor: Cursor): A with TypedCursor[A] = macro TypedColumnImpl.create[A]
 }
 
-trait TypedCursor {
-  type -->[A, B] = ColumnTransform[A, B]
-
+trait TypedCursor[X] {
   def moveTo(n: Int): Boolean
 
   def moveToFind[A](n: Int)(f: => A): Option[A] = {
     if (moveTo(n)) Some(f)
     else None
   }
+  def freezeAt(n: Int): Option[X]
 }
 
-trait ColumnTransform[A, B]{
+trait TypedFields {
+  type -->[A, B] = FieldTransform[A, B]
+}
+
+object TypedFields {
+
+  def expose[A <: TypedFields]: A = macro TypedContentValues.extract[A]
+
+  def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
+}
+
+trait FieldTransform[A, B]{
   def raw: A
   def typed: B
 }
 
-trait ColumnConvertible[A, B]{
+trait FieldConvertible[A, B]{
   def wrap(value: A): B
   def unwrap(value: B): A
 }
@@ -56,33 +65,46 @@ private object TypedColumnImpl {
          */
         q"Option($cursor.getString($indexKey)).map(_.toLong)"
 
-      case x if x <:< typeOf[ColumnTransform[_, _]] =>
+      case x if x <:< typeOf[FieldTransform[_, _]] =>
         val Seq(from, to) = tpe.typeArgs
         val value = getValue(from, indexKey)
-        val convertible = appliedType(typeOf[ColumnConvertible[_, _]].typeConstructor, from, to)
-        val transform = appliedType(typeOf[ColumnTransform[_, _]].typeConstructor, from, to)
+        val convertible = appliedType(typeOf[FieldConvertible[_, _]].typeConstructor, from, to)
+        val transform = appliedType(typeOf[FieldTransform[_, _]].typeConstructor, from, to)
         q"""
           new $transform {
-            override def raw = $value
-            override def typed = implicitly[$convertible].wrap($value)
+            override val raw = $value
+            override val typed = implicitly[$convertible].wrap($value)
           }"""
 
       case x =>
         throw new IllegalArgumentException(s"unsupported type: $x")
     }
-    val overrides = methods flatMap { method =>
+    val kvs = methods map { method =>
       val key = method.name.toString
       val indexKey = TermName(c.freshName(key + "_index_"))
       val value = getValue(method.returnType, indexKey)
+      (indexKey, key, value)
+    }
+    val overrides = kvs flatMap { case (indexKey, key, value) =>
       Seq(
         q"lazy val $indexKey = $cursor.getColumnIndexOrThrow($key)",
         q"override def ${TermName(key)} = $value"
       )
     }
+    val freeze = kvs map {
+      case (_, key, value) =>
+        q"override val ${TermName(key)} = $value"
+    }
+    val typedCursor = appliedType(
+      typeOf[TypedCursor[_]].typeConstructor, definition
+    )
     val tree = q"""
-      new $definition {
+      new $definition with $typedCursor {
         ..$overrides
         override def moveTo(n: Int) = $cursor.moveToPosition(n)
+        override def freezeAt(n: Int) =
+          if (moveTo(n)) Some(new $definition { ..$freeze })
+          else None
       }
     """
 //    println(showCode(tree))

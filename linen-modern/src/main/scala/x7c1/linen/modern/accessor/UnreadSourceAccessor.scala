@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, UnreadSource}
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 import scala.util.Try
 
@@ -31,6 +31,7 @@ private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAc
         url = "dummy",
         title = cursor.title,
         description = cursor.description,
+        rating = cursor.rating,
         startEntryId = cursor.start_entry_id
       )
     }
@@ -78,7 +79,7 @@ object UnreadSourceAccessor {
         |  s2.start_entry_id
         |FROM channel_source_map AS s1
         |LEFT JOIN source_statuses AS s2 ON s1.source_id = s2.source_id
-        |WHERE s1.channel_id = ? AND s2.account_id = ?
+        |WHERE s1.channel_id = ? AND (s2.account_id IS NULL OR s2.account_id = ?)
       """.stripMargin
 
     val sql3 =
@@ -121,19 +122,31 @@ object UnreadSourceAccessor {
   }
 }
 
-trait UnreadSourceColumn extends TypedCursor {
+trait UnreadSourceColumn extends TypedFields {
   def source_id: Long
   def title: String
   def description: String
+  def rating: Int
   def start_entry_id: Option[Long]
 }
 
-trait SourceRecordColumn extends TypedCursor {
+trait SourceRecordColumn extends TypedFields {
   def _id: Long
   def title: String
   def description: String
   def url: String
   def created_at: Int --> Date
+}
+object SourceRecordColumn {
+  implicit object selectable extends SingleSelectable[SourceRecordColumn, Long]{
+    override def tableName: String = "sources"
+    override def where(id: Long): Seq[(String, String)] = Seq(
+      "_id" -> id.toString
+    )
+    override def fromCursor(rawCursor: Cursor): Option[SourceRecordColumn] = {
+      TypedCursor[SourceRecordColumn](rawCursor) freezeAt 0
+    }
+  }
 }
 
 case class SourceParts(
@@ -146,8 +159,8 @@ object SourceParts {
   implicit object insertable extends Insertable[SourceParts] {
     override def tableName: String = "sources"
     override def toContentValues(target: SourceParts): ContentValues = {
-      val column = TypedCursor.expose[SourceRecordColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[SourceRecordColumn]
+      TypedFields toContentValues (
         column.title -> target.title,
         column.url -> target.url,
         column.description -> target.description,
@@ -214,7 +227,7 @@ object SourceRatingParts {
   }
 }
 
-trait ChannelSourceMapColumn extends TypedCursor {
+trait ChannelSourceMapColumn extends TypedFields {
   def source_id: Long
   def channel_id: Long
   def created_at: Int --> Date
@@ -228,8 +241,8 @@ object ChannelSourceMapParts {
   implicit object insertable extends Insertable[ChannelSourceMapParts] {
     override def tableName: String = "channel_source_map"
     override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
-      val column = TypedCursor.expose[ChannelSourceMapColumn]
-      TypedCursor toContentValues (
+      val column = TypedFields.expose[ChannelSourceMapColumn]
+      TypedFields toContentValues (
         column.source_id -> target.sourceId,
         column.channel_id -> target.channelId,
         column.created_at -> target.createdAt

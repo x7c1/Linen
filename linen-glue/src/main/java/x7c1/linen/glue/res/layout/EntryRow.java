@@ -13,18 +13,15 @@ import android.widget.TextView;
 public class EntryRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
-    public final TextView content;
     public final TextView createdAt;
 
     public EntryRow(
         View itemView,
         TextView title,
-        TextView content,
         TextView createdAt
     ){
         super(itemView);
         this.title = title;
-        this.content = content;
         this.createdAt = createdAt;
     }
 }

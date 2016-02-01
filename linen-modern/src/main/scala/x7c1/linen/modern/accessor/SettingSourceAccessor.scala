@@ -1,9 +1,9 @@
 package x7c1.linen.modern.accessor
 
-import android.database.{SQLException, Cursor}
 import android.database.sqlite.SQLiteDatabase
+import android.database.{Cursor, SQLException}
 import x7c1.linen.modern.struct.Date
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 trait SettingSourceAccessor {
   def findAt(position: Int): Option[SettingSource]
@@ -35,7 +35,7 @@ case class SettingSource(
   rating: Int
 )
 
-trait SettingSourceRecord extends TypedCursor {
+trait SettingSourceRecord extends TypedFields {
   def source_id: Long
   def title: String
   def description: String
@@ -77,21 +77,6 @@ class SettingSourceAccessorFactory(
       """.stripMargin
 
     new Query(sql2, Array(channelId.toString, accountId.toString))
-  }
-
-  def explain(channelId: Long): Seq[QueryPlan] = {
-    val query = createQuery(channelId).toExplain
-    val rawCursor = db.rawQuery(query.sql, query.selectionArgs)
-    val cursor = TypedCursor[QueryPlanColumn](rawCursor)
-    try {
-      (0 to rawCursor.getCount - 1) flatMap { n =>
-        cursor.moveToFind(n){
-          QueryPlan(detail = cursor.detail)
-        }
-      }
-    } finally {
-      rawCursor.close()
-    }
   }
 }
 

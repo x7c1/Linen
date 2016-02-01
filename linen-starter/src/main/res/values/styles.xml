@@ -20,6 +20,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">@color/list_background</item>
+        <item name="android:overScrollMode">never</item>
         <item name="android:layout_marginBottom">@dimen/app_toolbar_bottom_height</item>
     </style>
 
@@ -65,8 +66,11 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
 
-        <item name="android:paddingTop">7dp</item>
-        <item name="android:paddingBottom">7dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+
+        <!--<item name="android:paddingTop">16dp</item>-->
+        <!--<item name="android:paddingBottom">16dp</item>-->
 
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>

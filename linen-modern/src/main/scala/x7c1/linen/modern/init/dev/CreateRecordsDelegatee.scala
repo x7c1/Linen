@@ -38,6 +38,12 @@ class CreateRecordsDelegatee (
           _.createDummies(25)
         }
     }
+    layout.createPreset onClick { _ =>
+      ServiceCaller.using[UpdaterMethods].
+        startService(activity, activity getClassOf Updater){
+          _.createPreset()
+        }
+    }
     layout.deleteDatabase onClick { _ =>
       activity deleteDatabase LinenDatabase.name
       Toast.makeText(activity, "database deleted", Toast.LENGTH_SHORT).show()

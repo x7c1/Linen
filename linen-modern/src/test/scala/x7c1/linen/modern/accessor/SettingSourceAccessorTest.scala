@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor
 
-import org.junit.Assert.assertEquals
 import android.database.Cursor
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -51,10 +51,11 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
     assertEquals(Seq("88", "99"), maps map {_("rating")})
 
-    val surveys = accessorFactory explain channel1.channelId
-//    surveys foreach println
+    val plans = QueryExplainer(db).
+      explain(accessorFactory createQuery channel1.channelId)
+
     assertEquals("USE TEMP B-TREE",
-      false, surveys.exists(_.detail contains "USE TEMP B-TREE"))
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {
@@ -93,7 +94,7 @@ class SampleFactory (helper: LinenOpenHelper){
       description = s"sample channel description",
       createdAt = Date.current()
     )
-    val Right(Some(channel)) = readable.selectOne[Channel](id)
+    val Right(Some(channel)) = readable.find[Channel](id)
     channel
   }
 }

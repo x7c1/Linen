@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
-import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, LinenOpenHelper, UnreadSourceAccessor}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
@@ -36,8 +36,9 @@ class ContainerInitializer(
     loader.close()
     database.close()
   }
-  private lazy val database =
-    new LinenOpenHelper(activity).getReadableDatabase
+  private lazy val helper = new LinenOpenHelper(activity)
+
+  private lazy val database = helper.getReadableDatabase
 
   private lazy val loader =
     new AccessorLoader(database, layout, activity.getLoaderManager)
@@ -45,7 +46,8 @@ class ContainerInitializer(
   override lazy val accessors = new Accessors(
     source = loader.createSourceAccessor,
     entryOutline = loader.createOutlineAccessor,
-    entryDetail = loader.createDetailAccessor
+    entryDetail = loader.createDetailAccessor,
+    rawSource = new RawSourceAccessor(helper)
   )
   override lazy val actions = setupActions()
 
@@ -69,5 +71,6 @@ class ContainerInitializer(
 class Accessors(
   val source: UnreadSourceAccessor,
   val entryOutline: EntryAccessor[EntryOutline],
-  val entryDetail: EntryAccessor[EntryDetail]
+  val entryDetail: EntryAccessor[EntryDetail],
+  val rawSource: RawSourceAccessor
 )
