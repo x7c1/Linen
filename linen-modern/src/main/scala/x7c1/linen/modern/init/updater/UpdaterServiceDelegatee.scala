@@ -1,5 +1,7 @@
 package x7c1.linen.modern.init.updater
 
+import java.util.concurrent.Executors
+
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -11,6 +13,17 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 import x7c1.wheat.modern.patch.TaskAsync.async
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
+object LinenService {
+  object Implicits {
+    import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+    private lazy val pool = Executors.newCachedThreadPool()
+    implicit def executor: ExecutionContextExecutor = ExecutionContext fromExecutor pool
+  }
+}
 
 object UpdaterServiceDelegatee {
   val ActionTypeSample = "hoge"
@@ -60,9 +73,20 @@ class UpdaterMethods(
     Log info "[init]"
     new PresetFactory(service, helper).createPreset()
   }
-  def loadSource(sourceId: Long): Unit = async {
+  def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"
-    new SourceLoader(service, helper, startId, sourceId).start()
+
+    import LinenService.Implicits._
+    Future {
+      new SourceLoader(service, helper).start(sourceId)
+    } map { _ =>
+      service stopSelfResult startId
+    } onComplete {
+      case Success(_) =>
+        Log info "[done]"
+      case Failure(e) =>
+        Log error e.getMessage
+    }
   }
 }
 

@@ -17,12 +17,10 @@ import scalaz.{\/, \/-}
 
 class SourceLoader(
   service: Service with ServiceControl,
-  helper: LinenOpenHelper,
-  startId: Int,
-  sourceId: Long){
+  helper: LinenOpenHelper ){
 
-  def start(): Unit = {
-    Log error s"[init] source-id: $sourceId"
+  def start(sourceId: Long): Unit = {
+    Log info s"[init] source-id: $sourceId"
 
     helper.readable.find[SourceRecordColumn](sourceId) match {
       case Right(Some(source)) =>
@@ -36,7 +34,6 @@ class SourceLoader(
       case Right(none) =>
       case Left(exception) =>
     }
-    service stopSelfResult startId
   }
 
   private def insertEntries(entries: Seq[EntryNotLoaded \/ EntryParts]): Unit = {
