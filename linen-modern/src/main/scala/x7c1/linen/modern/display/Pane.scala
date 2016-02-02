@@ -104,7 +104,7 @@ object PaneDragDetector {
     onTouch: OnTouchListener): HorizontalDragDetector[PaneDragStoppedEvent] = {
 
     val threshold = {
-      val dp = 30
+      val dp = 15
       val metrics = context.getResources.getDisplayMetrics
       TypedValue.applyDimension(COMPLEX_UNIT_DIP, dp, metrics)
     }
