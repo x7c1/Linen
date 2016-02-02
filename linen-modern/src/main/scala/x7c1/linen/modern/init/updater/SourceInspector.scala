@@ -18,19 +18,19 @@ object SourceInspector {
 
 class SourceInspector private (helper: LinenOpenHelper){
 
-  def findFeedUrl(sourceId: Long): Either[SourceInspectorError, URL] =
+  def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
     helper.readable.find[SourceRecordColumn](sourceId) match {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
-      case Right(Some(source)) => Right(new URL(source.url))
+      case Right(Some(source)) => Right(InspectedSource(sourceId, new URL(source.url)))
     }
 
-  def loadEntries(sourceId: Long)(feedUrl: URL): Future[LoadedEntries] = {
-    val callback = loadRawEntries(feedUrl)
+  def loadEntries(source: InspectedSource): Future[LoadedEntries] = {
+    val callback = loadRawEntries(source.feedUrl)
     val entries = callback.toFuture
 
     import LinenService.Implicits._
-    entries map (_ map convertEntry(sourceId)) map (new LoadedEntries(_))
+    entries map (_ map convertEntry(source.sourceId)) map (new LoadedEntries(_))
   }
   private def loadRawEntries(feedUrl: URL): CallbackTask[Seq[SyndEntry]] = {
     import scala.collection.JavaConversions._
@@ -64,6 +64,11 @@ class SourceInspector private (helper: LinenOpenHelper){
   }
 
 }
+
+case class InspectedSource(
+  sourceId: Long,
+  feedUrl: URL
+)
 
 class LoadedEntries(entries: Seq[Either[InvalidEntry, EntryParts]]){
   lazy val validEntries = entries collect { case Right(x) => x }

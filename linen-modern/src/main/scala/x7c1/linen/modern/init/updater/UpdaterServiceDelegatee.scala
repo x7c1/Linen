@@ -82,8 +82,8 @@ class UpdaterMethods(
 
     import scalaz.std.scalaFuture._
     val either = for {
-      url <- EitherT fromEither Future { inspector findFeedUrl sourceId }
-      entries <- EitherT right inspector.loadEntries(sourceId)(url)
+      source <- EitherT fromEither Future { inspector inspectSource sourceId }
+      entries <- EitherT right inspector.loadEntries(source)
     } yield
       insertEntries(entries)
 
