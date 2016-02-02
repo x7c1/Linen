@@ -15,8 +15,6 @@ import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 import x7c1.wheat.modern.patch.TaskAsync.async
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
-import scalaz.{-\/, \/-, EitherT}
 
 object LinenService {
   object Implicits {
@@ -31,8 +29,8 @@ object UpdaterServiceDelegatee {
 }
 
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
-
   private lazy val helper = new LinenOpenHelper(service)
+  private lazy val queue = new SourceUpdaterQueue(service, helper)
 
   def onBind(intent: Intent): Option[IBinder] = {
     Log info "[init]"
@@ -42,7 +40,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info s"[init] start:$startId, $intent"
 
-    new UpdaterMethods(service, helper, startId) execute intent
+    new UpdaterMethods(service, helper, queue, startId) execute intent
     NotSticky
   }
   def onDestroy(): Unit = {
@@ -54,6 +52,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 class UpdaterMethods(
   service: Service with ServiceControl,
   helper: LinenOpenHelper,
+  queue: SourceUpdaterQueue,
   startId: Int){
 
   def execute(intent: Intent) = IntentExpander findFrom intent match {
@@ -79,30 +78,13 @@ class UpdaterMethods(
 
     import LinenService.Implicits._
     val inspector = SourceInspector(helper)
-
-    import scalaz.std.scalaFuture._
-    val either = for {
-      source <- EitherT fromEither Future { inspector inspectSource sourceId }
-      entries <- EitherT right inspector.loadEntries(source)
-    } yield
-      insertEntries(entries)
-
-    either.run onComplete {
-      case Success(\/-(_)) => Log info s"[done] source-id:$sourceId"
-      case Success(-\/(e)) => Log error e.message
-      case Failure(e) => Log error e.getMessage
+    val future = Future { inspector inspectSource sourceId } map {
+      case Right(source) => queue enqueue source
+      case Left(error) => Log error error.message
     }
-  }
-  private def insertEntries(entries: LoadedEntries): Unit = {
-    val loadedEntries = entries.validEntries
-    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
-    loadedEntries.zipWithIndex foreach {
-      case (entry, index) =>
-        Log info entry.title
-        helper.writableDatabase insert entry
-        notifier.notifyProgress(index)
+    future onFailure {
+      case e => Log error e.getMessage
     }
-    notifier.notifyDone()
   }
 }
 
