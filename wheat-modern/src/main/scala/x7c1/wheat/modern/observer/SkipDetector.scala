@@ -18,21 +18,12 @@ object SkipDetector {
     onSkippedListener: OnItemSkippedListener[A],
     onSkipDoneListener: OnSkipStoppedListener[B]): OnTouchListener = {
 
-    /*
-    val detector = new GestureDetector(
-      context,
-      new GestureListener
-    )
-    */
-
     new OnTouchListener {
-
       val timer = new Timer()
 
       val maxInterval = 2000L
       val minInterval = 150L
       var interval = 500L
-      val multiplier = 1.2
 
       var task: Option[TimerTask] = None
       var previous: Option[Long] = None
@@ -46,6 +37,7 @@ object SkipDetector {
         }
       }
       private def elapsed(msec: Long): Long = {
+        val multiplier = 1.2
         ((currentTimeMillis() - msec) * multiplier).toLong
       }
       override def onTouch(v: View, event: MotionEvent): Boolean = {
@@ -86,37 +78,6 @@ object SkipDetector {
       }
     }
   }
-  /*
-  private class GestureListener extends GestureDetector.OnGestureListener {
-    override def onSingleTapUp(e: MotionEvent): Boolean = {
-      Log error "[init]"
-
-      true
-    }
-    override def onFling(
-      e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
-
-      Log error "[init]"
-      true
-    }
-    override def onShowPress(e: MotionEvent): Unit = {
-      Log error "[init]"
-    }
-    override def onLongPress(e: MotionEvent): Unit = {
-      Log error "[init]"
-    }
-    override def onScroll(
-      e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
-
-      Log error "[init]"
-      false
-    }
-    override def onDown(e: MotionEvent): Boolean = {
-      Log error "[init]"
-      false
-    }
-  }
-  */
 }
 
 trait ItemSkippedEvent {
