@@ -11,7 +11,6 @@ import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.{task, using}
 
 import scala.concurrent.Future
-import scalaz.\/
 
 object SourceInspector {
   def apply(helper: LinenOpenHelper ): SourceInspector = new SourceInspector(helper)
@@ -48,13 +47,11 @@ class SourceInspector private (helper: LinenOpenHelper){
       feed.getEntries map { case x: SyndEntry => x }
     }
   }
-  private def convertEntry(sourceId: Long)(entry: SyndEntry): InvalidEntry \/ EntryParts = {
-    import scalaz.\/.left
-    import scalaz.syntax.std.option._
 
+  private def convertEntry(sourceId: Long)(entry: SyndEntry): Either[InvalidEntry, EntryParts] = {
     try for {
-      url <- Option(entry.getLink) \/> EmptyUrl()
-      published <- Option(entry.getPublishedDate) \/> EmptyPublishedDate()
+      url <- (Option(entry.getLink) toRight EmptyUrl()).right
+      published <- (Option(entry.getPublishedDate) toRight EmptyPublishedDate()).right
     } yield EntryParts(
       sourceId = sourceId,
       title = Option(entry.getTitle) getOrElse "",
@@ -62,14 +59,13 @@ class SourceInspector private (helper: LinenOpenHelper){
       url = url,
       createdAt = Date(published)
     ) catch {
-      case e: Exception => left apply Abort(e)
+      case e: Exception => Left(Abort(e))
     }
   }
 
 }
 
-class LoadedEntries(entries: Seq[InvalidEntry \/ EntryParts]){
-  import scalaz.{-\/, \/-}
-  lazy val validEntries = entries collect { case \/-(x) => x }
-  lazy val invalidEntries = entries collect { case -\/(x) => x }
+class LoadedEntries(entries: Seq[Either[InvalidEntry, EntryParts]]){
+  lazy val validEntries = entries collect { case Right(x) => x }
+  lazy val invalidEntries = entries collect { case Left(x) => x }
 }
