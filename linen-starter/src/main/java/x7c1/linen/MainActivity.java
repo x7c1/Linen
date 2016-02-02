@@ -25,7 +25,10 @@ public class MainActivity extends BaseActivity {
 		layout.sourceToolbar.setNavigationIcon(R.drawable.ic_action_menu);
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
 
+		layout.entryToolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		layout.entryToolbar.inflateMenu(R.menu.menu_main);
+
+		layout.entryDetailToolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		layout.entryDetailToolbar.inflateMenu(R.menu.menu_main);
 
 		setContentView(layout.itemView);
