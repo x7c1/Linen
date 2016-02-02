@@ -3,11 +3,8 @@ package x7c1.linen.modern.init.updater
 import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
-import android.app.Service
-import android.database.SQLException
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
@@ -16,21 +13,25 @@ import x7c1.wheat.modern.callback.CallbackTask.{task, using}
 import scala.concurrent.Future
 import scalaz.\/
 
-class SourceInspector(
-  service: Service with ServiceControl,
-  helper: LinenOpenHelper ){
+object SourceInspector {
+  def apply(helper: LinenOpenHelper ): SourceInspector = new SourceInspector(helper)
+}
 
-  def findFeedUrl(sourceId: Long): Either[SQLException, Option[URL]] =
-    helper.readable.find[SourceRecordColumn](sourceId).right map {
-      _ map (source => new URL(source.url))
+class SourceInspector private (helper: LinenOpenHelper){
+
+  def findFeedUrl(sourceId: Long): Either[SourceInspectorError, URL] =
+    helper.readable.find[SourceRecordColumn](sourceId) match {
+      case Left(e) => Left(SqlError(e))
+      case Right(None) => Left(SourceNotFound(sourceId))
+      case Right(Some(source)) => Right(new URL(source.url))
     }
 
-  def loadEntries(sourceId: Long)(feedUrl: URL): Future[Seq[InvalidEntry \/ EntryParts]] = {
+  def loadEntries(sourceId: Long)(feedUrl: URL): Future[LoadedEntries] = {
     val callback = loadRawEntries(feedUrl)
     val entries = callback.toFuture
 
     import LinenService.Implicits._
-    entries map (_ map convertEntry(sourceId))
+    entries map (_ map convertEntry(sourceId)) map (new LoadedEntries(_))
   }
   private def loadRawEntries(feedUrl: URL): CallbackTask[Seq[SyndEntry]] = {
     import scala.collection.JavaConversions._
@@ -65,4 +66,10 @@ class SourceInspector(
     }
   }
 
+}
+
+class LoadedEntries(entries: Seq[InvalidEntry \/ EntryParts]){
+  import scalaz.{-\/, \/-}
+  lazy val validEntries = entries collect { case \/-(x) => x }
+  lazy val invalidEntries = entries collect { case -\/(x) => x }
 }

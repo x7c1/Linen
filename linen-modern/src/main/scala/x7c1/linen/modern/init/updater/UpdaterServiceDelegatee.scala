@@ -6,7 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper}
+import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
@@ -16,7 +16,7 @@ import x7c1.wheat.modern.patch.TaskAsync.async
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import scalaz.{\/-, \/}
+import scalaz.{-\/, \/-, EitherT}
 
 object LinenService {
   object Implicits {
@@ -78,20 +78,23 @@ class UpdaterMethods(
     Log info s"[init] source-id: $sourceId"
 
     import LinenService.Implicits._
-    val loader = new SourceInspector(service, helper)
-    Future {
-      loader findFeedUrl sourceId
-    } flatMap {
-      case Right(Some(url)) => loader.loadEntries(sourceId)(url)
-      case Right(None) => Future(Seq())
-      case Left(e) => throw e
-    } onComplete {
-      case Success(entries) => insertEntries(entries)
+    val inspector = SourceInspector(helper)
+
+    import scalaz.std.scalaFuture._
+    val either = for {
+      url <- EitherT fromEither Future { inspector findFeedUrl sourceId }
+      entries <- EitherT right inspector.loadEntries(sourceId)(url)
+    } yield
+      insertEntries(entries)
+
+    either.run onComplete {
+      case Success(\/-(_)) => Log info s"[done] source-id:$sourceId"
+      case Success(-\/(e)) => Log error e.message
       case Failure(e) => Log error e.getMessage
     }
   }
-  private def insertEntries(entries: Seq[InvalidEntry \/ EntryParts]): Unit = {
-    val loadedEntries = entries collect { case \/-(entry) => entry }
+  private def insertEntries(entries: LoadedEntries): Unit = {
+    val loadedEntries = entries.validEntries
     val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
