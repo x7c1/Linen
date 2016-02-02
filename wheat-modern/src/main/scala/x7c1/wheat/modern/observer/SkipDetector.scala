@@ -47,6 +47,7 @@ object SkipDetector {
       override def onTouch(v: View, event: MotionEvent): Boolean = {
         event.getAction match {
           case MotionEvent.ACTION_DOWN =>
+            task foreach {_.cancel()}
             task = Some(createTimerTask)
             previous foreach { msec =>
               interval = min(
