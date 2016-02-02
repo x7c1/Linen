@@ -44,7 +44,7 @@ trait EntryAreaInitializer {
       actions = actions,
       onTouch = forFocus
     )
-    layout.entryToNext setOnTouchListener SkipDetector.createListener(
+    val forSkip = SkipDetector.createListener(
       context = layout.entryToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
@@ -52,5 +52,7 @@ trait EntryAreaInitializer {
       onSkippedListener = new EntrySkippedObserver(actions),
       onSkipDoneListener = new EntrySkipStoppedObserver(actions)
     )
+    layout.entryToNext setOnTouchListener forSkip
+    layout.entryBottomBar setOnTouchListener forSkip
   }
 }

@@ -44,7 +44,7 @@ trait SourceAreaInitializer {
       actions = actions,
       onTouch = forFocus
     )
-    layout.sourceToNext setOnTouchListener SkipDetector.createListener(
+    val forSkip = SkipDetector.createListener(
       context = layout.sourceToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new SourceSkippedEventFactory(accessors.source),
@@ -52,5 +52,7 @@ trait SourceAreaInitializer {
       onSkippedListener = new SourceSkippedObserver(actions),
       onSkipDoneListener = new SourceSkipStoppedObserver(actions)
     )
+    layout.sourceToNext setOnTouchListener forSkip
+    layout.sourceBottomBar setOnTouchListener forSkip
   }
 }
