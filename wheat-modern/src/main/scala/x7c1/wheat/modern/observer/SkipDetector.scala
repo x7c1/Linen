@@ -29,9 +29,10 @@ object SkipDetector {
 
       val timer = new Timer()
 
-      val maxInterval = 1500L
-      val minInterval = 100L
+      val maxInterval = 2000L
+      val minInterval = 150L
       var interval = 500L
+      val multiplier = 1.2
 
       var task: Option[TimerTask] = None
       var previous: Option[Long] = None
@@ -44,6 +45,9 @@ object SkipDetector {
           onSkippedListener onSkipped event
         }
       }
+      private def elapsed(msec: Long): Long = {
+        ((currentTimeMillis() - msec) * multiplier).toLong
+      }
       override def onTouch(v: View, event: MotionEvent): Boolean = {
         event.getAction match {
           case MotionEvent.ACTION_DOWN =>
@@ -52,7 +56,7 @@ object SkipDetector {
             previous foreach { msec =>
               interval = min(
                 maxInterval,
-                max(minInterval, currentTimeMillis() - msec)
+                max(minInterval, elapsed(msec))
               )
             }
             previous = Some(currentTimeMillis())
@@ -61,8 +65,7 @@ object SkipDetector {
           case MotionEvent.ACTION_UP | MotionEvent.ACTION_CANCEL =>
             task foreach {_.cancel()}
             previous foreach { msec =>
-              val elapsed = currentTimeMillis() - msec
-              if (elapsed < interval) for {
+              if (elapsed(msec) < interval) for {
                 next <- positionFinder.findNext
                 skipped <- skippedEventFactory createAt next
                 done <- skipDoneEventFactory createAt next
