@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.Point
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
+import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
 import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, LinenOpenHelper, UnreadSourceAccessor}
@@ -35,6 +36,14 @@ class ContainerInitializer(
   def close(): Unit = {
     loader.close()
     database.close()
+  }
+  def onKeyDown(keyCode: Int, event: KeyEvent): Boolean = {
+    keyCode match {
+      case KeyEvent.KEYCODE_BACK =>
+        actions.container.onBack()
+      case _ =>
+        false
+    }
   }
   private lazy val helper = new LinenOpenHelper(activity)
 

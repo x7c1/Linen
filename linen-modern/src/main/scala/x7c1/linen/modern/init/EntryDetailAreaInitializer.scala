@@ -5,11 +5,10 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.res.layout.{EntryDetailRow, MainLayout}
 import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver}
 import x7c1.linen.modern.action.{Actions, EntryDetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.PaneLabel.EntryArea
-import x7c1.linen.modern.display.{PaneLabel, PaneDragDetector, EntryDetailRowAdapter}
+import x7c1.linen.modern.display.{EntryDetailRowAdapter, PaneDragDetector, PaneLabel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait EntryDetailAreaInitializer {
   def layout: MainLayout
@@ -25,7 +24,7 @@ trait EntryDetailAreaInitializer {
       params
     }
     layout.entryDetailToolbar onClickNavigation { _ =>
-      actions.container onBack EntryArea
+      actions.container.onBack()
     }
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager

@@ -46,7 +46,6 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
     val diff = min(width - current, max(x, -current))
     view.scrollBy(diff, 0)
   }
-
   def scrollTo(pane: Pane): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
       _ <- task {
@@ -58,6 +57,14 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
         view post new ContainerScroller(done)
       }
     } yield ()
+  }
+  def findPreviousPane(panes: Seq[Pane]): Option[Pane] = {
+    val current = view.getScrollX
+    panes find { _.displayPosition < current }
+  }
+  def findCurrentPane(panes: Seq[Pane]): Option[Pane] = {
+    val current = view.getScrollX
+    panes.find(_.displayPosition == current)
   }
   private class ContainerScroller(done: OnFinish) extends Runnable {
     override def run(): Unit = {

@@ -1,6 +1,7 @@
 package x7c1.linen;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import x7c1.linen.glue.res.layout.MainLayout;
 import x7c1.linen.modern.init.ContainerInitializer;
@@ -51,4 +52,9 @@ public class MainActivity extends BaseActivity {
 		initializer.close();
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		return initializer.onKeyDown(keyCode, event) ||
+				super.onKeyDown(keyCode, event);
+	}
 }

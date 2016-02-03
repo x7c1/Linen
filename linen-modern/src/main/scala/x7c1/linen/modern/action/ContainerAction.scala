@@ -1,7 +1,6 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.display.PaneLabel.{EntryArea, EntryDetailArea, SourceArea}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneDragStoppedEvent, PaneLabel, SourceArea, SourceSelectedEvent}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, EntrySelectedEvent, PaneContainer, PaneDragStoppedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.observer.recycler.{DragEvent, Next, Previous}
 
 class ContainerAction(
@@ -17,13 +16,28 @@ class ContainerAction(
   override def onEntrySelected(event: EntrySelectedEvent) = {
     container scrollTo entryDetailArea
   }
-  def onBack(to: PaneLabel) = {
-    val pane = to match {
-      case SourceArea => sourceArea
-      case EntryArea => entryArea
-      case EntryDetailArea => entryDetailArea
+  def onBack(): Boolean = {
+    val panes = Seq(
+      entryDetailArea,
+      entryArea,
+      sourceArea
+    )
+    val target = container findCurrentPane panes collect {
+      case x if x == entryArea => sourceArea
+      case x if x == entryDetailArea => entryArea
+    } match {
+      case Some(p) => Some(p)
+      case None => container findPreviousPane panes collect {
+        case x if x == entryArea => sourceArea
+      }
     }
-    container.scrollTo(pane).execute()
+    target match {
+      case Some(pane) =>
+        container.scrollTo(pane).execute()
+        true
+      case None =>
+        false
+    }
   }
   def onPaneDragging(event: DragEvent): Unit = {
     container.scrollBy(- event.distance.toInt)
