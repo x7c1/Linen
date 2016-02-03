@@ -8,17 +8,18 @@ import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
 import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, LinenOpenHelper, UnreadSourceAccessor}
+import x7c1.linen.modern.display.{PaneContainer, EntryDetailArea, EntryArea, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
 class ContainerInitializer(
-  override val activity: Activity with ActivityControl,
-  override val layout: MainLayout,
-  override val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
-  override val menuItemProvider: ViewHolderProvider[MenuRowItem],
-  override val sourceRowProvider: ViewHolderProvider[SourceRow],
-  override val entryRowProvider: ViewHolderProvider[EntryRow],
-  override val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
+  val activity: Activity with ActivityControl,
+  val layout: MainLayout,
+  val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
+  val menuItemProvider: ViewHolderProvider[MenuRowItem],
+  val sourceRowProvider: ViewHolderProvider[SourceRow],
+  val entryRowProvider: ViewHolderProvider[EntryRow],
+  val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
 ) extends ActionsInitializer
   with DrawerMenuInitializer
   with SourceAreaInitializer
@@ -52,24 +53,47 @@ class ContainerInitializer(
   private lazy val loader =
     new AccessorLoader(database, layout, activity.getLoaderManager)
 
-  override lazy val accessors = new Accessors(
+  lazy val container = new PaneContainer(
+    view = layout.paneContainer,
+    displayWidth = displaySize.x,
+    sourceArea = new SourceArea(
+      sources = accessors.source,
+      recyclerView = layout.sourceList,
+      getPosition = () => 0
+    ),
+    entryArea = new EntryArea(
+      toolbar = layout.entryToolbar,
+      recyclerView = layout.entryList,
+      getPosition = () => {
+        layout.sourceArea.getWidth
+      }
+    ),
+    entryDetailArea = new EntryDetailArea(
+      toolbar = layout.entryDetailToolbar,
+      recyclerView = layout.entryDetailList,
+      getPosition = () => {
+        layout.sourceArea.getWidth + layout.entryArea.getWidth
+      }
+    )
+  )
+  lazy val accessors = new Accessors(
     source = loader.createSourceAccessor,
     entryOutline = loader.createOutlineAccessor,
     entryDetail = loader.createDetailAccessor,
     rawSource = new RawSourceAccessor(helper)
   )
-  override lazy val actions = setupActions()
+  lazy val actions = setupActions()
 
-  override def dipToPixel(dip: Int): Int = {
+  def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
   }
-  override lazy val widthWithMargin: Int = {
+  lazy val widthWithMargin: Int = {
     val radius = 20
     val margin = 10
     displaySize.x - dipToPixel(margin + radius)
   }
-  override lazy val displaySize: Point = {
+  lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay
     val size = new Point
     display getSize size

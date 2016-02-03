@@ -2,19 +2,14 @@ package x7c1.linen.modern.init
 
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Gravity.START
-import x7c1.linen.glue.res.layout.{MainLayout, SourceRow}
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
-import x7c1.linen.modern.action.{Actions, SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{PaneDragDetector, PaneLabel, SourceRowAdapter}
-import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.linen.modern.action.{SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
+import x7c1.linen.modern.display.{PaneDragDetector, SourceRowAdapter}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
+
 trait SourceAreaInitializer {
-  def layout: MainLayout
-  def accessors: Accessors
-  def actions: Actions
-  def sourceRowProvider: ViewHolderProvider[SourceRow]
-  def widthWithMargin: Int
+  self: ContainerInitializer =>
 
   def setupSourceArea(): Unit = {
     layout.sourceArea setLayoutParams {
@@ -40,7 +35,7 @@ trait SourceAreaInitializer {
     )
     layout.sourceList addOnItemTouchListener PaneDragDetector.create(
       context = layout.sourceList.getContext,
-      label = PaneLabel.SourceArea,
+      from = container.sourceArea,
       actions = actions,
       onTouch = forFocus
     )
