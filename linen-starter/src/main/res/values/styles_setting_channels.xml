@@ -13,6 +13,9 @@
         <item name="android:paddingEnd">@dimen/setting_channels_row_padding</item>
         <item name="android:paddingBottom">@dimen/setting_channels_row_padding</item>
         <item name="android:paddingStart">@dimen/setting_channels_row_padding</item>
+
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:clickable">true</item>
     </style>
 
     <dimen name="setting_channels_row_padding">16dp</dimen>
