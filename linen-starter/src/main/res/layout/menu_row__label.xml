@@ -18,13 +18,13 @@
         android:text="sample label"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/text_secondary"
+        android:background="@color/text_tertiary"
         />
 
 </LinearLayout>

@@ -18,7 +18,8 @@
         android:layout_margin="3dp"
         android:text="sample item"
         android:textSize="15sp"
-        android:textStyle="bold"
+        android:textColor="@color/text_secondary"
         />
+    <!--android:textStyle="bold"-->
 
 </LinearLayout>

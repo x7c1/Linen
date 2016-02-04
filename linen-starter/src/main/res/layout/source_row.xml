@@ -13,7 +13,7 @@
     <TextView
         android:id="@+id/source_row__title"
         android:textSize="17sp"
-        android:textColor="@color/rouiro"
+        android:textColor="@color/text_primary"
         android:layout_alignParentTop="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
     <TextView
         android:id="@+id/source_row__description"
         android:textSize="14sp"
-        android:textColor="#4b4b4b"
+        android:textColor="@color/text_secondary"
         android:layout_marginTop="8dp"
         android:layout_below="@+id/source_row__title"
         android:layout_width="wrap_content"
