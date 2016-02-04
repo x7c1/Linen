@@ -7,8 +7,8 @@ import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
-import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, LinenOpenHelper, UnreadSourceAccessor}
-import x7c1.linen.modern.display.{PaneContainer, EntryDetailArea, EntryArea, SourceArea}
+import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
@@ -41,7 +41,7 @@ class ContainerInitializer(
   def onKeyDown(keyCode: Int, event: KeyEvent): Boolean = {
     keyCode match {
       case KeyEvent.KEYCODE_BACK =>
-        actions.container.onBack()
+        actions.drawer.onBack() || actions.container.onBack()
       case _ =>
         false
     }

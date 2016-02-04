@@ -1,12 +1,13 @@
 package x7c1.linen.modern.init
 
-import x7c1.linen.modern.action.{Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
+import x7c1.linen.modern.action.{DrawerAction, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
 
 trait ActionsInitializer {
   self: ContainerInitializer =>
 
   def setupActions(): Actions = {
     new Actions(
+      new DrawerAction(layout),
       new ContainerAction(container),
       new SourceAreaAction(container.sourceArea, accessors.source),
       new EntryAreaAction(
