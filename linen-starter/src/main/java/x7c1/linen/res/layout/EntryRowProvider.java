@@ -38,8 +38,7 @@ public class EntryRowProvider implements ViewHolderProvider<EntryRow> {
         View view = inflater.inflate(R.layout.entry_row, parent, attachToRoot);
         return new EntryRow(
             view,
-            (TextView) view.findViewById(R.id.entry_row__title),
-            (TextView) view.findViewById(R.id.entry_row__created_at)
+            (TextView) view.findViewById(R.id.entry_row__title)
         );
     }
 }

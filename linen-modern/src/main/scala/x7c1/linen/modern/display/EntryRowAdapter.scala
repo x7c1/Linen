@@ -27,7 +27,6 @@ class EntryRowAdapter(
         val event = EntrySelectedEvent(position, entry)
         entrySelectedListener onEntrySelected event
       }
-      holder.createdAt.text = entry.createdAt.format
     }
   }
 }
