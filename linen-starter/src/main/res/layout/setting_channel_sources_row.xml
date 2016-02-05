@@ -82,9 +82,9 @@
         android:layout_height="45dp"
         android:text="RATING"
         android:gravity="center_vertical"
-        android:textColor="@color/text_tertiary"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/text_primary"
         android:textSize="12sp"
-        android:textStyle="bold"
         android:layout_below="@id/border"
         android:layout_toStartOf="@id/setting_channel_sources_row__rating_bar"
         />
