@@ -46,7 +46,8 @@ private class ViewHolderPartsImpl(packages: WheatPackages, layout: ParsedResourc
 
   override def arguments: String = {
     val x0 = layout.elements map { x => s"${x.tag} ${x.label}" }
-    x0 mkString indent(",", 2)
+    val x1 = "View itemView"
+    (x0 :+ x1) mkString indent(",", 2)
   }
 
   override def assignments: String = {
