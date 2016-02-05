@@ -14,7 +14,7 @@
         android:id="@+id/menu_row__label__text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:textColor="@color/text_tertiary"
         />
 
