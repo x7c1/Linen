@@ -10,6 +10,7 @@ import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
 import x7c1.linen.res.layout.MenuRowItemProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
+import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 
 
@@ -39,6 +40,7 @@ public class MainActivity extends BaseActivity {
 			layout,
 			new MenuRowLabelProvider(this),
 			new MenuRowItemProvider(this),
+			new MenuRowSeparatorProvider(this),
 			new SourceRowProvider(this),
 			new EntryRowProvider(this),
 			new EntryDetailRowProvider(this)

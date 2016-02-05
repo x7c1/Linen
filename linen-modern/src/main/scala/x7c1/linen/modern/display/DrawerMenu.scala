@@ -56,25 +56,41 @@ class DrawerMenuLabelFactory(
   }
 }
 
-class MenuItemsBox(label: DrawerMenuLabel, items: DrawerMenuItem*){
+trait MenuItemsContainer {
+  def length: Int
+  def itemAt(position: Int): DrawerMenu
+}
 
-  def length: Int = 1 + items.size
+class MenuItemSeparator(
+  viewHolderProvider: ViewHolderProvider[_]) extends MenuItemsContainer {
 
-  def itemAt(position: Int): DrawerMenu = position match {
+  private lazy val separator = new DrawerMenu {
+    override def viewType: Int = viewHolderProvider.layoutId()
+  }
+  override def length: Int = 1
+
+  override def itemAt(position: Int): DrawerMenu = separator
+}
+
+class MenuItemsBox(label: DrawerMenuLabel, items: DrawerMenuItem*) extends MenuItemsContainer {
+
+  override def length: Int = 1 + items.size
+
+  override def itemAt(position: Int): DrawerMenu = position match {
     case 0 => label
     case n => items(n - 1)
   }
 }
 
-case class MenuItemsBoxes(boxes: MenuItemsBox*){
+case class MenuItemsBoxes(containers: MenuItemsContainer*){
   import scala.annotation.tailrec
-  require(boxes.nonEmpty, "empty boxes")
+  require(containers.nonEmpty, "empty boxes")
 
-  def count: Int = boxes.foldLeft(0){_ + _.length}
+  def count: Int = containers.foldLeft(0){_ + _.length}
 
   def findItemAt(position: Int): Option[DrawerMenu] = {
     @tailrec
-    def loop(boxes: Seq[MenuItemsBox], prev: Int): Option[(MenuItemsBox, Int)] = {
+    def loop(boxes: Seq[MenuItemsContainer], prev: Int): Option[(MenuItemsContainer, Int)] = {
       boxes match {
         case x +: xs => x.length + prev match {
           case sum if sum > position => Some(x -> prev)
@@ -83,7 +99,7 @@ case class MenuItemsBoxes(boxes: MenuItemsBox*){
         case Seq() => None
       }
     }
-    loop(boxes, 0) map { case (x, prev) => x.itemAt(position - prev) }
+    loop(containers, 0) map { case (x, prev) => x.itemAt(position - prev) }
   }
 }
 

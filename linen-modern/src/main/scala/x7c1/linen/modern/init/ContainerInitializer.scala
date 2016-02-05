@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
+import x7c1.linen.glue.res.layout.{MenuRowSeparator, EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
@@ -17,6 +17,7 @@ class ContainerInitializer(
   val layout: MainLayout,
   val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
   val menuItemProvider: ViewHolderProvider[MenuRowItem],
+  val menuSeparatorProvider: ViewHolderProvider[MenuRowSeparator],
   val sourceRowProvider: ViewHolderProvider[SourceRow],
   val entryRowProvider: ViewHolderProvider[EntryRow],
   val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
