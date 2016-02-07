@@ -1,19 +1,19 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, OutlineArea, SourceSelectedEvent}
 import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 
-class EntryAreaAction(
-  entryArea: EntryArea,
+class OutlineAreaAction(
+  outlineArea: OutlineArea,
   sourceAccessor: UnreadSourceAccessor,
   rawSourceAccessor: RawSourceAccessor,
   entryAccessor: EntryAccessor[EntryOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
-  with OnEntrySelected with OnEntryFocused with OnEntrySkipped
-  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
+  with OnOutlineSelected with OnOutlineFocused with OnOutlineSkipped
+  with OnDetailSelected with OnDetailFocused with OnDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     fastScrollTo(event.source.id)
@@ -26,34 +26,34 @@ class EntryAreaAction(
     _ <- skipTo(n, event.currentSource.id)
   } yield ()
 
-  override def onEntrySelected(event: EntrySelectedEvent) = {
+  override def onOutlineSelected(event: OutlineSelectedEvent) = {
     for {
-      _ <- entryArea scrollTo event.position
+      _ <- outlineArea scrollTo event.position
       _ <- updateToolbar(event.entry.sourceId)
     } yield ()
   }
-  override def onEntryFocused(event: EntryFocusedEvent) = {
+  override def onOutlineFocused(event: OutlineFocusedEvent) = {
     updateToolbar(event.entry.sourceId)
   }
-  override def onEntrySkipped(event: EntrySkippedEvent) = {
+  override def onOutlineSkipped(event: EntrySkippedEvent) = {
     skipTo(event.nextPosition, event.nextEntry.sourceId)
   }
-  override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
+  override def onDetailSelected(event: DetailSelectedEvent) = {
     fastScrollTo(event.position, event.entry.sourceId)
   }
-  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = {
+  override def onDetailFocused(event: DetailFocusedEvent) = {
     fastScrollTo(event.position, event.entry.sourceId)
   }
-  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = {
+  override def onDetailSkipStopped(event: EntrySkipStopped) = {
     skipTo(event.currentPosition, event.currentEntry.sourceId)
   }
   private def fastScrollTo(position: Int, sourceId: Long) = for {
-    _ <- entryArea fastScrollTo position
+    _ <- outlineArea fastScrollTo position
     _ <- updateToolbar(sourceId)
   } yield ()
 
   private def skipTo(position: Int, sourceId: Long) = for {
-    _ <- entryArea skipTo position
+    _ <- outlineArea skipTo position
     _ <- updateToolbar(sourceId)
   } yield ()
 
@@ -63,7 +63,7 @@ class EntryAreaAction(
   } yield ()
 
   private def updateToolbar(sourceId: Long) = task {
-    rawSourceAccessor.findTitleOf(sourceId) foreach entryArea.updateToolbar
+    rawSourceAccessor.findTitleOf(sourceId) foreach outlineArea.updateToolbar
   }
   private def findEntryPosition(sourceId: Long) = task {
     entryAccessor firstEntryPositionOf sourceId

@@ -1,4 +1,4 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup

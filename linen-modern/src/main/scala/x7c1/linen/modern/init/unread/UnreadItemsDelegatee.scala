@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 import android.app.Activity
 import android.graphics.Point
@@ -6,13 +6,13 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MenuRowSeparator, EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, SourceRow}
+import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, MenuRowSeparator, SourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.{EntryArea, EntryDetailArea, PaneContainer, SourceArea}
+import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
-class ContainerInitializer(
+class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
   val layout: MainLayout,
   val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
@@ -24,8 +24,8 @@ class ContainerInitializer(
 ) extends ActionsInitializer
   with DrawerMenuInitializer
   with SourceAreaInitializer
-  with EntryAreaInitializer
-  with EntryDetailAreaInitializer {
+  with OutlineAreaInitializer
+  with DetailAreaInitializer {
 
   def setup(): Unit = {
     setupDrawerMenu()
@@ -62,14 +62,14 @@ class ContainerInitializer(
       recyclerView = layout.sourceList,
       getPosition = () => 0
     ),
-    entryArea = new EntryArea(
+    entryArea = new OutlineArea(
       toolbar = layout.entryToolbar,
       recyclerView = layout.entryList,
       getPosition = () => {
         layout.sourceArea.getWidth
       }
     ),
-    entryDetailArea = new EntryDetailArea(
+    entryDetailArea = new DetailArea(
       toolbar = layout.entryDetailToolbar,
       recyclerView = layout.entryDetailList,
       getPosition = () => {

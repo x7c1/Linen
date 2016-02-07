@@ -1,14 +1,14 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, EntryDetailSelectedObserver, EntryDetailSkipStoppedObserver, EntryDetailSkippedObserver}
-import x7c1.linen.modern.action.{EntryDetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.{EntryDetailRowAdapter, PaneDragDetector}
+import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, DetailSelectedObserver, EntryDetailSkipStoppedObserver, DetailSkippedObserver}
+import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
+import x7c1.linen.modern.display.unread.{PaneDragDetector, DetailRowAdapter}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
-trait EntryDetailAreaInitializer {
-  self: ContainerInitializer =>
+trait DetailAreaInitializer {
+  self: UnreadItemsDelegatee =>
 
   def setupEntryDetailArea(): Unit = {
     layout.entryDetailArea setLayoutParams {
@@ -21,14 +21,14 @@ trait EntryDetailAreaInitializer {
     }
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager
-    layout.entryDetailList setAdapter new EntryDetailRowAdapter(
+    layout.entryDetailList setAdapter new DetailRowAdapter(
       accessors.entryDetail,
-      new EntryDetailSelectedObserver(actions),
+      new DetailSelectedObserver(actions),
       entryDetailRowProvider
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,
-      focusedEventFactory = new EntryDetailFocusedEventFactory(accessors.entryDetail),
+      focusedEventFactory = new DetailFocusedEventFactory(accessors.entryDetail),
       onFocused = new EntryDetailFocusedObserver(actions)
     )
     layout.entryDetailList addOnItemTouchListener PaneDragDetector.create(
@@ -42,7 +42,7 @@ trait EntryDetailAreaInitializer {
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
       skipDoneEventFactory = new EntrySkipStoppedFactory(accessors.entryOutline),
-      onSkippedListener = new EntryDetailSkippedObserver(actions),
+      onSkippedListener = new DetailSkippedObserver(actions),
       onSkipDoneListener = new EntryDetailSkipStoppedObserver(actions)
     )
     layout.detailToNext setOnTouchListener forSkip

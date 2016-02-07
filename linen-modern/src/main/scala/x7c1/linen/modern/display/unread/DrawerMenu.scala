@@ -1,4 +1,4 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import android.view.View
 import android.view.View.OnClickListener

@@ -1,4 +1,4 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import java.lang.Math.{abs, max, min}
 
@@ -12,7 +12,7 @@ import x7c1.linen.modern.action.Actions
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
-import x7c1.wheat.modern.observer.recycler.{HorizontalDragDetector, DragDirection, DragStoppedEvent, DragStoppedEventFactory}
+import x7c1.wheat.modern.observer.recycler.{DragDirection, DragStoppedEvent, DragStoppedEventFactory, HorizontalDragDetector}
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
 trait Pane {
@@ -35,8 +35,8 @@ class PaneContainer(
   view: ViewGroup,
   displayWidth: Int,
   val sourceArea: SourceArea,
-  val entryArea: EntryArea,
-  val entryDetailArea: EntryDetailArea
+  val entryArea: OutlineArea,
+  val entryDetailArea: DetailArea
 ) {
   private lazy val scroller = new Scroller(view.getContext)
 

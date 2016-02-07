@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 import java.lang.Math.min
 
@@ -7,12 +7,12 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
-import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
-import x7c1.linen.modern.display.{MenuItemSeparator, DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
+import x7c1.linen.modern.display.unread.{DrawerMenuRowAdapter, DrawerMenuItemKind, OnDrawerMenuClickListener, MenuItemsBoxes, MenuItemsBox, MenuItemSeparator, DrawerMenuLabelFactory, DrawerMenuItemFactory}
+import DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
-  self: ContainerInitializer =>
+  self: UnreadItemsDelegatee =>
 
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)

@@ -1,15 +1,15 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Gravity.START
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
-import x7c1.linen.modern.display.{PaneDragDetector, SourceRowAdapter}
+import x7c1.linen.modern.display.unread.{PaneDragDetector, SourceRowAdapter}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait SourceAreaInitializer {
-  self: ContainerInitializer =>
+  self: UnreadItemsDelegatee =>
 
   def setupSourceArea(): Unit = {
     layout.sourceArea setLayoutParams {

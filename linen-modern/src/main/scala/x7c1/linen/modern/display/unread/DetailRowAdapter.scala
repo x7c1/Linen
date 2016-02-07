@@ -1,4 +1,4 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.text.Html
@@ -11,9 +11,9 @@ import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
 
-class EntryDetailRowAdapter(
+class DetailRowAdapter(
   entryAccessor: EntryAccessor[EntryDetail],
-  selectedListener: OnEntryDetailSelectedListener,
+  selectedListener: OnDetailSelectedListener,
   viewHolderProvider: ViewHolderProvider[EntryDetailRow]) extends Adapter[EntryDetailRow] {
 
   override def getItemCount: Int = entryAccessor.length
@@ -29,7 +29,7 @@ class EntryDetailRowAdapter(
       holder.content setMovementMethod LinkMovementMethod.getInstance()
       holder.createdAt.text = entry.createdAt.format
       holder.itemView onClick { _ =>
-        val event = EntryDetailSelectedEvent(position, entry)
+        val event = DetailSelectedEvent(position, entry)
         selectedListener onEntryDetailSelected event
       }
     }
@@ -37,10 +37,10 @@ class EntryDetailRowAdapter(
 
 }
 
-trait OnEntryDetailSelectedListener {
-  def onEntryDetailSelected(event: EntryDetailSelectedEvent): Unit
+trait OnDetailSelectedListener {
+  def onEntryDetailSelected(event: DetailSelectedEvent): Unit
 }
 
-case class EntryDetailSelectedEvent(position: Int, entry: EntryDetail){
+case class DetailSelectedEvent(position: Int, entry: EntryDetail){
   def dump: String = s"position:$position, entry:$entry"
 }

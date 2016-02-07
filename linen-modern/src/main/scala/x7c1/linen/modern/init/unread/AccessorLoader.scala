@@ -1,13 +1,13 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.AccountAccessor.findCurrentAccountId
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
+import SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
-import x7c1.linen.modern.init.AccessorLoader.inspectSourceAccessor
-import x7c1.linen.modern.init.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
+import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._

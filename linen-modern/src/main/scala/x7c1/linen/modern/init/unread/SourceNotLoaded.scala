@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
 sealed trait SourceNotLoaded {
   def message: String

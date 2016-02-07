@@ -2,7 +2,7 @@ package x7c1.linen.modern.action.observer
 
 import x7c1.linen.modern.action.observer.CallbackTaskRunner.runAsync
 import x7c1.linen.modern.action.{Actions, SourceFocusedEvent, SourceSkipStopped, SourceSkippedEvent}
-import x7c1.linen.modern.display.{OnSourceSelectedListener, SourceSelectedEvent}
+import x7c1.linen.modern.display.unread.{OnSourceSelectedListener, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.{OnItemFocusedListener, OnItemSkippedListener, OnSkipStoppedListener}
 
@@ -12,7 +12,7 @@ class SourceFocusedObserver(actions: Actions)
 
   override def onFocused(event: SourceFocusedEvent): Unit = {
     val sync = for {
-      _ <- actions.entryArea onSourceFocused event
+      _ <- actions.outlineArea onSourceFocused event
       _ <- actions.detailArea onSourceFocused event
     } yield ()
 
@@ -25,7 +25,7 @@ class SourceSelectedObserver(actions: Actions)
 
   override def onSourceSelected(event: SourceSelectedEvent): Unit = {
     val sync = for {
-      _ <- actions.entryArea onSourceSelected event
+      _ <- actions.outlineArea onSourceSelected event
       _ <- actions.sourceArea onSourceSelected event
       _ <- actions.container onSourceSelected event
       _ <- actions.detailArea onSourceSelected event
@@ -52,7 +52,7 @@ class SourceSkipStoppedObserver(actions: Actions)
 
   override def onSkipStopped(event: SourceSkipStopped): Unit = {
     val sync = for {
-      _ <- actions.entryArea onSourceSkipStopped event
+      _ <- actions.outlineArea onSourceSkipStopped event
       _ <- actions.detailArea onSourceSkipStopped event
     } yield ()
 

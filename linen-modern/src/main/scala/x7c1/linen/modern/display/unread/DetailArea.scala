@@ -1,10 +1,10 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.{RecyclerView, Toolbar}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.tasks.ScrollerTasks
 
-class EntryArea(
+class DetailArea(
   toolbar: Toolbar,
   recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
@@ -14,11 +14,11 @@ class EntryArea(
   override protected val scrollerTasks =
     ScrollerTasks(
       recyclerView,
-      flowSpaceDip = 50,
-      flowTimePerInch = 200F
+      flowSpaceDip = 100,
+      flowTimePerInch = 125F
     )
 
   def updateToolbar(title: String): Unit = {
-    toolbar runUi { _ setTitle title }
+    toolbar runUi {_ setTitle title}
   }
 }

@@ -1,4 +1,4 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 sealed trait DrawerMenuItemKind {
   def body: String

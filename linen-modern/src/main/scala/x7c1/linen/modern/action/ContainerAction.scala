@@ -1,18 +1,18 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.display.{EntrySelectedEvent, PaneContainer, PaneDragStoppedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, PaneContainer, PaneDragStoppedEvent, SourceSelectedEvent}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.observer.recycler.{DragEvent, Next, Previous}
 
 class ContainerAction(container: PaneContainer)
-  extends OnSourceSelected with OnEntrySelected {
+  extends OnSourceSelected with OnOutlineSelected {
 
   import container.{entryArea, entryDetailArea, sourceArea}
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     container scrollTo entryArea
   }
-  override def onEntrySelected(event: EntrySelectedEvent) = {
+  override def onOutlineSelected(event: OutlineSelectedEvent) = {
     container scrollTo entryDetailArea
   }
   def onBack(): Boolean = {

@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceSelectedEvent}
+import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
@@ -10,8 +10,8 @@ class Actions (
   val drawer: DrawerAction,
   val container: ContainerAction,
   val sourceArea: SourceAreaAction,
-  val entryArea: EntryAreaAction,
-  val detailArea: EntryDetailAreaAction
+  val outlineArea: OutlineAreaAction,
+  val detailArea: DetailAreaAction
 )
 trait OnSourceSelected {
   def onSourceSelected(event: SourceSelectedEvent): CallbackTask[Unit]
@@ -25,29 +25,29 @@ trait OnSourceSkipped{
 trait OnSourceSkipStopped {
   def onSourceSkipStopped(event: SourceSkipStopped): CallbackTask[Unit]
 }
-trait OnEntryFocused {
-  def onEntryFocused(event: EntryFocusedEvent): CallbackTask[Unit]
+trait OnOutlineFocused {
+  def onOutlineFocused(event: OutlineFocusedEvent): CallbackTask[Unit]
 }
-trait OnEntrySelected {
-  def onEntrySelected(event: EntrySelectedEvent): CallbackTask[Unit]
+trait OnOutlineSelected {
+  def onOutlineSelected(event: OutlineSelectedEvent): CallbackTask[Unit]
 }
-trait OnEntrySkipped {
-  def onEntrySkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+trait OnOutlineSkipped {
+  def onOutlineSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
 }
-trait OnEntrySkipStopped {
-  def onEntrySkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
+trait OnOutlineSkipStopped {
+  def onOutlineSkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
 }
-trait OnEntryDetailFocused {
-  def onEntryDetailFocused(event: EntryDetailFocusedEvent): CallbackTask[Unit]
+trait OnDetailFocused {
+  def onDetailFocused(event: DetailFocusedEvent): CallbackTask[Unit]
 }
-trait OnEntryDetailSelected {
-  def onEntryDetailSelected(event: EntryDetailSelectedEvent): CallbackTask[Unit]
+trait OnDetailSelected {
+  def onDetailSelected(event: DetailSelectedEvent): CallbackTask[Unit]
 }
-trait OnEntryDetailSkipped {
-  def onEntryDetailSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
+trait OnDetailSkipped {
+  def onDetailSkipped(event: EntrySkippedEvent): CallbackTask[Unit]
 }
-trait OnEntryDetailSkipStopped {
-  def onEntryDetailSkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
+trait OnDetailSkipStopped {
+  def onDetailSkipStopped(event: EntrySkipStopped): CallbackTask[Unit]
 }
 
 case class SourceFocusedEvent(
@@ -92,16 +92,16 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
   }
 }
 
-case class EntryFocusedEvent(
+case class OutlineFocusedEvent(
   override val position: Int,
   entry: EntryOutline) extends ItemFocusedEvent
 
-class EntryFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
-  extends FocusedEventFactory[EntryFocusedEvent] {
+class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
+  extends FocusedEventFactory[OutlineFocusedEvent] {
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      EntryFocusedEvent(position, entry)
+      OutlineFocusedEvent(position, entry)
     }
   }
 }
@@ -134,16 +134,16 @@ class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[EntryOutline])
   }
 }
 
-case class EntryDetailFocusedEvent(
+case class DetailFocusedEvent(
   override val position: Int,
   entry: EntryDetail ) extends ItemFocusedEvent
 
-class EntryDetailFocusedEventFactory(entryAccessor: EntryAccessor[EntryDetail])
-  extends FocusedEventFactory[EntryDetailFocusedEvent]{
+class DetailFocusedEventFactory(entryAccessor: EntryAccessor[EntryDetail])
+  extends FocusedEventFactory[DetailFocusedEvent]{
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      EntryDetailFocusedEvent(position, entry)
+      DetailFocusedEvent(position, entry)
     }
   }
 }

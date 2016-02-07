@@ -1,8 +1,8 @@
-package x7c1.linen.modern.display
+package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.{MenuRowSeparator, MenuRow, MenuRowItem, MenuRowLabel}
+import x7c1.linen.glue.res.layout.{MenuRow, MenuRowItem, MenuRowLabel, MenuRowSeparator}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 

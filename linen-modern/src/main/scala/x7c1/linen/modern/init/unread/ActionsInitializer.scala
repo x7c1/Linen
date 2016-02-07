@@ -1,22 +1,22 @@
-package x7c1.linen.modern.init
+package x7c1.linen.modern.init.unread
 
-import x7c1.linen.modern.action.{DrawerAction, Actions, ContainerAction, EntryAreaAction, EntryDetailAreaAction, SourceAreaAction}
+import x7c1.linen.modern.action.{Actions, ContainerAction, DrawerAction, OutlineAreaAction, DetailAreaAction, SourceAreaAction}
 
 trait ActionsInitializer {
-  self: ContainerInitializer =>
+  self: UnreadItemsDelegatee =>
 
   def setupActions(): Actions = {
     new Actions(
       new DrawerAction(layout),
       new ContainerAction(container),
       new SourceAreaAction(container.sourceArea, accessors.source),
-      new EntryAreaAction(
-        entryArea = container.entryArea,
+      new OutlineAreaAction(
+        outlineArea = container.entryArea,
         sourceAccessor = accessors.source,
         rawSourceAccessor = accessors.rawSource,
         entryAccessor = accessors.entryOutline
       ),
-      new EntryDetailAreaAction(
+      new DetailAreaAction(
         container.entryDetailArea,
         accessors.source,
         accessors.rawSource,
