@@ -10,15 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-public class SourceRow extends RecyclerView.ViewHolder {
+public class UnreadSourceRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
     public final TextView description;
 
-    public SourceRow(
-        View itemView,
+    public UnreadSourceRow(
         TextView title,
-        TextView description
+        TextView description,
+        View itemView
     ){
         super(itemView);
         this.title = title;

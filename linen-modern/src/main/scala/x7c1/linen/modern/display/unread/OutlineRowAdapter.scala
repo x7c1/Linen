@@ -2,7 +2,7 @@ package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.EntryRow
+import x7c1.linen.glue.res.layout.UnreadOutlineRow
 import x7c1.linen.modern.accessor.EntryAccessor
 import x7c1.linen.modern.struct.EntryOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -12,7 +12,7 @@ import x7c1.wheat.modern.decorator.Imports._
 class OutlineRowAdapter(
   entryAccessor: EntryAccessor[EntryOutline],
   entrySelectedListener: OnOutlineSelectedListener,
-  provider: ViewHolderProvider[EntryRow]) extends Adapter[EntryRow] {
+  provider: ViewHolderProvider[UnreadOutlineRow]) extends Adapter[UnreadOutlineRow] {
 
   override def getItemCount = {
     entryAccessor.length
@@ -20,7 +20,7 @@ class OutlineRowAdapter(
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     provider inflateOn parent
   }
-  override def onBindViewHolder(holder: EntryRow, position: Int) = {
+  override def onBindViewHolder(holder: UnreadOutlineRow, position: Int) = {
     entryAccessor findAt position foreach { entry =>
       holder.title.text = entry.shortTitle
       holder.itemView onClick { _ =>

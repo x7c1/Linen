@@ -11,7 +11,7 @@
     >
 
     <TextView
-        android:id="@+id/source_row__title"
+        android:id="@+id/unread_source_row__title"
         android:textSize="17sp"
         android:textColor="@color/text_primary"
         android:layout_alignParentTop="true"
@@ -22,11 +22,11 @@
         />
 
     <TextView
-        android:id="@+id/source_row__description"
+        android:id="@+id/unread_source_row__description"
         android:textSize="14sp"
         android:textColor="@color/text_secondary"
         android:layout_marginTop="8dp"
-        android:layout_below="@+id/source_row__title"
+        android:layout_below="@+id/unread_source_row__title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"

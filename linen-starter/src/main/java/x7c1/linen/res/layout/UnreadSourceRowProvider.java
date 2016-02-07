@@ -13,32 +13,33 @@ import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.EntryRow;
+import x7c1.linen.glue.res.layout.UnreadSourceRow;
 
-public class EntryRowProvider implements ViewHolderProvider<EntryRow> {
+public class UnreadSourceRowProvider implements ViewHolderProvider<UnreadSourceRow> {
 
     private final LayoutInflater inflater;
 
-    public EntryRowProvider(Context context){
+    public UnreadSourceRowProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int layoutId(){
-        return R.layout.entry_row;
+        return R.layout.unread_source_row;
     }
 
     @Override
-    public EntryRow inflateOn(ViewGroup parent){
+    public UnreadSourceRow inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public EntryRow inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.entry_row, parent, attachToRoot);
-        return new EntryRow(
+    public UnreadSourceRow inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.unread_source_row, parent, attachToRoot);
+        return new UnreadSourceRow(
             view,
-            (TextView) view.findViewById(R.id.entry_row__title)
+            (TextView) view.findViewById(R.id.unread_source_row__title),
+            (TextView) view.findViewById(R.id.unread_source_row__description)
         );
     }
 }

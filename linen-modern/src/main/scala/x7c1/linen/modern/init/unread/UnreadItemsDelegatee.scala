@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{EntryDetailRow, EntryRow, MainLayout, MenuRowItem, MenuRowLabel, MenuRowSeparator, SourceRow}
+import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadOutlineRow, MainLayout, MenuRowItem, MenuRowLabel, MenuRowSeparator, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
@@ -18,9 +18,9 @@ class UnreadItemsDelegatee(
   val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
   val menuItemProvider: ViewHolderProvider[MenuRowItem],
   val menuSeparatorProvider: ViewHolderProvider[MenuRowSeparator],
-  val sourceRowProvider: ViewHolderProvider[SourceRow],
-  val entryRowProvider: ViewHolderProvider[EntryRow],
-  val entryDetailRowProvider: ViewHolderProvider[EntryDetailRow]
+  val sourceRowProvider: ViewHolderProvider[UnreadSourceRow],
+  val entryRowProvider: ViewHolderProvider[UnreadOutlineRow],
+  val entryDetailRowProvider: ViewHolderProvider[UnreadDetailRow]
 ) extends ActionsInitializer
   with DrawerMenuInitializer
   with SourceAreaInitializer

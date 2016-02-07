@@ -10,13 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-public class EntryRow extends RecyclerView.ViewHolder {
+public class UnreadOutlineRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
 
-    public EntryRow(
-        View itemView,
-        TextView title
+    public UnreadOutlineRow(
+        TextView title,
+        View itemView
     ){
         super(itemView);
         this.title = title;
