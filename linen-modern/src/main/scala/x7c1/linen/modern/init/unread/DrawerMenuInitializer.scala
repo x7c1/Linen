@@ -33,27 +33,27 @@ trait DrawerMenuInitializer {
   }
   protected def menuItemsBoxes = {
     val onClick = new OnDrawerMenuClick(activity)
-    val label = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
-    val item = new DrawerMenuLabelFactory(onClick, menuRowProviders.forLabel)
+    val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
+    val label = new DrawerMenuLabelFactory(onClick, menuRowProviders.forLabel)
     val separator = new MenuItemSeparator(menuRowProviders.forSeparator)
 
     MenuItemsBoxes(
       new MenuItemsBox(
-        label of "Unread Channels",
-        item of NoChannel("(all articles browsed)")
+        title of "Unread Channels",
+        label of NoChannel("(all articles browsed)")
       ),
       separator,
       new MenuItemsBox(
-        label of "Settings",
-        item of Channels("Channels"),
-        item of ChannelSources("Channel Sources"),
-        item of UpdaterSchedule("Updater Schedule")
+        title of "Settings",
+        label of Channels("Channels"),
+        label of ChannelSources("Channel Sources"),
+        label of UpdaterSchedule("Updater Schedule")
       ),
       separator,
       new MenuItemsBox(
-        label of "Developer Menu",
-        item of DevCreateDummies("Create Records"),
-        item of DevShowRecords("Show Records")
+        title of "Developer Menu",
+        label of DevCreateDummies("Create Records"),
+        label of DevShowRecords("Show Records")
       )
     )
   }
