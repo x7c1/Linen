@@ -7,8 +7,8 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
-import x7c1.linen.modern.display.unread.{DrawerMenuRowAdapter, DrawerMenuItemKind, OnDrawerMenuClickListener, MenuItemsBoxes, MenuItemsBox, MenuItemSeparator, DrawerMenuTitleFactory, DrawerMenuLabelFactory}
-import DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
+import x7c1.linen.modern.display.unread.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
+import x7c1.linen.modern.display.unread.{DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemSeparator, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
@@ -17,12 +17,7 @@ trait DrawerMenuInitializer {
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
-    layout.menuList setAdapter new DrawerMenuRowAdapter(
-      menuRowProviders.forTitle,
-      menuRowProviders.forLabel,
-      menuRowProviders.forSeparator,
-      menuItemsBoxes
-    )
+    layout.menuList setAdapter new DrawerMenuRowAdapter(menuItemsBoxes)
     layout.menuArea setLayoutParams {
       val params = layout.menuArea.getLayoutParams
       val maxWidth = dipToPixel(320)
