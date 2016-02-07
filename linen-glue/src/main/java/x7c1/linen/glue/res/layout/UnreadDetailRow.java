@@ -17,10 +17,10 @@ public class UnreadDetailRow extends RecyclerView.ViewHolder {
     public final TextView createdAt;
 
     public UnreadDetailRow(
+        View itemView,
         TextView title,
         TextView content,
-        TextView createdAt,
-        View itemView
+        TextView createdAt
     ){
         super(itemView);
         this.title = title;

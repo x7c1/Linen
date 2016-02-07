@@ -15,8 +15,8 @@ public class UnreadOutlineRow extends RecyclerView.ViewHolder {
     public final TextView title;
 
     public UnreadOutlineRow(
-        TextView title,
-        View itemView
+        View itemView,
+        TextView title
     ){
         super(itemView);
         this.title = title;

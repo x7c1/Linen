@@ -16,9 +16,9 @@ public class UnreadSourceRow extends RecyclerView.ViewHolder {
     public final TextView description;
 
     public UnreadSourceRow(
+        View itemView,
         TextView title,
-        TextView description,
-        View itemView
+        TextView description
     ){
         super(itemView);
         this.title = title;
