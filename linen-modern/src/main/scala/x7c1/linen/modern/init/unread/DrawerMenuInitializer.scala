@@ -7,7 +7,7 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
-import x7c1.linen.modern.display.unread.{DrawerMenuRowAdapter, DrawerMenuItemKind, OnDrawerMenuClickListener, MenuItemsBoxes, MenuItemsBox, MenuItemSeparator, DrawerMenuLabelFactory, DrawerMenuItemFactory}
+import x7c1.linen.modern.display.unread.{DrawerMenuRowAdapter, DrawerMenuItemKind, OnDrawerMenuClickListener, MenuItemsBoxes, MenuItemsBox, MenuItemSeparator, DrawerMenuTitleFactory, DrawerMenuLabelFactory}
 import DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
 import x7c1.wheat.macros.logger.Log
 
@@ -18,8 +18,8 @@ trait DrawerMenuInitializer {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuList setAdapter new DrawerMenuRowAdapter(
+      menuRowProviders.forTitle,
       menuRowProviders.forLabel,
-      menuRowProviders.forItem,
       menuRowProviders.forSeparator,
       menuItemsBoxes
     )
@@ -33,8 +33,8 @@ trait DrawerMenuInitializer {
   }
   protected def menuItemsBoxes = {
     val onClick = new OnDrawerMenuClick(activity)
-    val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel)
-    val item = new DrawerMenuItemFactory(onClick, menuRowProviders.forItem)
+    val label = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
+    val item = new DrawerMenuLabelFactory(onClick, menuRowProviders.forLabel)
     val separator = new MenuItemSeparator(menuRowProviders.forSeparator)
 
     MenuItemsBoxes(

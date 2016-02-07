@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadOutlineRow, MainLayout, MenuRowItem, MenuRowLabel, MenuRowSeparator, UnreadSourceRow}
+import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadOutlineRow, MainLayout, MenuRowLabel, MenuRowTitle, MenuRowSeparator, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
 import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
@@ -106,8 +106,8 @@ class Accessors(
 )
 
 class MenuRowProviders(
+  val forTitle: ViewHolderProvider[MenuRowTitle],
   val forLabel: ViewHolderProvider[MenuRowLabel],
-  val forItem: ViewHolderProvider[MenuRowItem],
   val forSeparator: ViewHolderProvider[MenuRowSeparator]
 )
 

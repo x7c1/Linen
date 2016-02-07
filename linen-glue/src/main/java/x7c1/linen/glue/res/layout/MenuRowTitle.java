@@ -9,11 +9,11 @@ package x7c1.linen.glue.res.layout;
 import android.view.View;
 import android.widget.TextView;
 
-public class MenuRowItem extends MenuRow {
+public class MenuRowTitle extends MenuRow {
 
     public final TextView text;
 
-    public MenuRowItem(
+    public MenuRowTitle(
         View itemView,
         TextView text
     ){

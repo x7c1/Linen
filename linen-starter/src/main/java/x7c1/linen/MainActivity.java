@@ -8,9 +8,9 @@ import x7c1.linen.modern.init.unread.MenuRowProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
 import x7c1.linen.modern.init.unread.UnreadRowProviders;
 import x7c1.linen.res.layout.MainLayoutProvider;
-import x7c1.linen.res.layout.MenuRowItemProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
+import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowProvider;
 import x7c1.linen.res.layout.UnreadSourceRowProvider;
@@ -41,8 +41,8 @@ public class MainActivity extends BaseActivity {
 			this,
 			layout,
 			new MenuRowProviders(
+				new MenuRowTitleProvider(this),
 				new MenuRowLabelProvider(this),
-				new MenuRowItemProvider(this),
 				new MenuRowSeparatorProvider(this)
 			),
 			new UnreadRowProviders(

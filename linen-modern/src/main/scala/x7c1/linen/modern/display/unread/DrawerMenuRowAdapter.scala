@@ -2,13 +2,13 @@ package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.{MenuRow, MenuRowItem, MenuRowLabel, MenuRowSeparator}
+import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel, MenuRowTitle, MenuRowSeparator}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 
 class DrawerMenuRowAdapter(
-  menuLabelProvider: ViewHolderProvider[MenuRowLabel],
-  menuItemProvider: ViewHolderProvider[MenuRowItem],
+  menuLabelProvider: ViewHolderProvider[MenuRowTitle],
+  menuItemProvider: ViewHolderProvider[MenuRowLabel],
   menuSeparatorProvider: ViewHolderProvider[MenuRowSeparator],
   boxes: MenuItemsBoxes) extends Adapter[MenuRow]{
 
@@ -21,13 +21,13 @@ class DrawerMenuRowAdapter(
 
   override def onBindViewHolder(row: MenuRow, position: Int): Unit = {
     row match {
-      case holder: MenuRowItem =>
-        boxes findItemAt position foreach { case (x: DrawerMenuItem) =>
+      case holder: MenuRowLabel =>
+        boxes findItemAt position foreach { case (x: DrawerMenuLabel) =>
           holder.text setText x.body
           holder.itemView setOnClickListener x.onClick
         }
-      case holder: MenuRowLabel =>
-        boxes findItemAt position foreach { case (x: DrawerMenuLabel) =>
+      case holder: MenuRowTitle =>
+        boxes findItemAt position foreach { case (x: DrawerMenuTitle) =>
           holder.text setText x.body
         }
       case holder: MenuRowSeparator =>
