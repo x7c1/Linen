@@ -7,8 +7,8 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
-import x7c1.linen.modern.display.unread.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
-import x7c1.linen.modern.display.unread.{DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemSeparator, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
+import x7c1.linen.modern.display.unread.{MenuLabelFactory, DrawerMenuRowAdapter, MenuTitleFactory, MenuItemKind, MenuItemSeparator, MenuItemsBox, MenuItemsBoxes, OnMenuItemClickListener}
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
@@ -27,9 +27,9 @@ trait DrawerMenuInitializer {
     }
   }
   protected def menuItemsBoxes = {
-    val onClick = new OnDrawerMenuClick(activity)
-    val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
-    val label = new DrawerMenuLabelFactory(onClick, menuRowProviders.forLabel)
+    val onClick = new OnMenuItemClick(activity)
+    val title = new MenuTitleFactory(menuRowProviders.forTitle)
+    val label = new MenuLabelFactory(onClick, menuRowProviders.forLabel)
     val separator = new MenuItemSeparator(menuRowProviders.forSeparator)
 
     MenuItemsBoxes(
@@ -54,10 +54,10 @@ trait DrawerMenuInitializer {
   }
 }
 
-class OnDrawerMenuClick(
-  activity: Activity with ActivityControl) extends OnDrawerMenuClickListener {
+class OnMenuItemClick(
+  activity: Activity with ActivityControl) extends OnMenuItemClickListener {
 
-  override def onClick(kind: DrawerMenuItemKind): Unit = kind match {
+  override def onClick(kind: MenuItemKind): Unit = kind match {
     case _: NoChannel =>
       Log info s"$kind"
     case _: Channels =>

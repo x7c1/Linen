@@ -4,7 +4,7 @@ import android.view.{ViewGroup, View}
 import android.view.View.OnClickListener
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
-trait DrawerMenuItem[+A] {
+trait MenuItem[+A] {
   def viewType: Int = viewHolderProvider.layoutId()
   def viewHolderProvider: ViewHolderProvider[_ <: A]
 }
@@ -13,7 +13,7 @@ trait MenuTitle {
   def body: String
 }
 
-trait TypedMenuTitle[+A] extends DrawerMenuItem[A] with MenuTitle
+trait TypedMenuTitle[+A] extends MenuItem[A] with MenuTitle
 
 object TypedMenuTitle {
   def apply[A](body: String, provider: ViewHolderProvider[A]): TypedMenuTitle[A] = {
@@ -29,7 +29,7 @@ trait MenuLabel {
   def onClick: OnClickListener
 }
 
-trait TypedMenuLabel[+A] extends DrawerMenuItem[A] with MenuLabel
+trait TypedMenuLabel[+A] extends MenuItem[A] with MenuLabel
 
 object TypedMenuLabel {
   def apply[A](
@@ -44,16 +44,16 @@ object TypedMenuLabel {
     override val viewHolderProvider: ViewHolderProvider[A],
     override val onClick: OnClickListener ) extends TypedMenuLabel[A]
 }
-class DrawerMenuLabelFactory[A](
-  listener: OnDrawerMenuClickListener, provider: ViewHolderProvider[A]){
+class MenuLabelFactory[A](
+  listener: OnMenuItemClickListener, provider: ViewHolderProvider[A]){
 
-  def of(kind: DrawerMenuItemKind): TypedMenuLabel[A] = {
+  def of(kind: MenuItemKind): TypedMenuLabel[A] = {
     TypedMenuLabel(kind.body, provider, new OnClickListener {
       override def onClick(v: View): Unit = listener onClick kind
     })
   }
 }
-class DrawerMenuTitleFactory[A](
+class MenuTitleFactory[A](
   provider: ViewHolderProvider[A]){
 
   def of(body: String): TypedMenuTitle[A] = {
@@ -63,19 +63,19 @@ class DrawerMenuTitleFactory[A](
 
 trait MenuItemsContainer[+A] {
   def length: Int
-  def itemAt(position: Int): DrawerMenuItem[A]
+  def itemAt(position: Int): MenuItem[A]
   def viewHolderProviders: Seq[ViewHolderProvider[_ <: A]]
 }
 
 class MenuItemSeparator[A](
   viewHolderProvider0: ViewHolderProvider[A]) extends MenuItemsContainer[A] {
 
-  private lazy val separator = new DrawerMenuItem[A] {
+  private lazy val separator = new MenuItem[A] {
     override def viewHolderProvider = viewHolderProvider0
   }
   override def length: Int = 1
 
-  override def itemAt(position: Int): DrawerMenuItem[A] = separator
+  override def itemAt(position: Int): MenuItem[A] = separator
 
   override lazy val viewHolderProviders = Seq(viewHolderProvider0)
 }
@@ -84,7 +84,7 @@ class MenuItemsBox[A](label: TypedMenuTitle[A], items: TypedMenuLabel[A]*) exten
 
   override def length: Int = 1 + items.size
 
-  override def itemAt(position: Int): DrawerMenuItem[A] = position match {
+  override def itemAt(position: Int): MenuItem[A] = position match {
     case 0 => label
     case n => items(n - 1)
   }
@@ -99,7 +99,7 @@ case class MenuItemsBoxes[A](containers: MenuItemsContainer[A]*){
 
   def count: Int = containers.foldLeft(0){_ + _.length}
 
-  def findItemAt(position: Int): Option[DrawerMenuItem[A]] = {
+  def findItemAt(position: Int): Option[MenuItem[A]] = {
     @tailrec
     def loop(
       boxes: Seq[MenuItemsContainer[A]],
@@ -124,8 +124,8 @@ case class MenuItemsBoxes[A](containers: MenuItemsContainer[A]*){
   }
 }
 
-trait OnDrawerMenuClickListener {
-  def onClick(kind: DrawerMenuItemKind): Unit
+trait OnMenuItemClickListener {
+  def onClick(kind: MenuItemKind): Unit
 }
 
 private class ViewHolderProviders[A](providers: ViewHolderProvider[_ <: A]*){
