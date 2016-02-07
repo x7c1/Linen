@@ -13,7 +13,6 @@ public class @(parts.prefix.ofClass) extends @(parts.parentClass) {
     @parts.fields
 
     public @(parts.prefix.ofClass)(
-        View itemView,
         @parts.arguments
     ){
         super(itemView);

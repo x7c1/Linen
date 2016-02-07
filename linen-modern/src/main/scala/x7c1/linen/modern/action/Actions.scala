@@ -7,6 +7,7 @@ import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 
 class Actions (
+  val drawer: DrawerAction,
   val container: ContainerAction,
   val sourceArea: SourceAreaAction,
   val entryArea: EntryAreaAction,

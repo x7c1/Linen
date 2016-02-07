@@ -31,7 +31,13 @@ trait Pane {
   }
 }
 
-class PaneContainer(view: ViewGroup, displayWidth: Int) {
+class PaneContainer(
+  view: ViewGroup,
+  displayWidth: Int,
+  val sourceArea: SourceArea,
+  val entryArea: EntryArea,
+  val entryDetailArea: EntryDetailArea
+) {
   private lazy val scroller = new Scroller(view.getContext)
 
   private lazy val width = {
@@ -46,7 +52,6 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
     val diff = min(width - current, max(x, -current))
     view.scrollBy(diff, 0)
   }
-
   def scrollTo(pane: Pane): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
       _ <- task {
@@ -59,6 +64,19 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
       }
     } yield ()
   }
+  def findPreviousPane(): Option[Pane] = {
+    val current = view.getScrollX
+    panes.reverse find (_.displayPosition < current)
+  }
+  def findCurrentPane(): Option[Pane] = {
+    val current = view.getScrollX
+    panes.reverse find (_.displayPosition == current)
+  }
+  private def panes = Seq(
+    sourceArea,
+    entryArea,
+    entryDetailArea
+  )
   private class ContainerScroller(done: OnFinish) extends Runnable {
     override def run(): Unit = {
       val more = scroller.computeScrollOffset()
@@ -76,7 +94,7 @@ class PaneContainer(view: ViewGroup, displayWidth: Int) {
 class PaneDragStoppedEvent (
   override val distance: Float,
   override val direction: DragDirection,
-  val from: PaneLabel,
+  val from: Pane,
   thresholdPixel: Int ) extends DragStoppedEvent {
 
   private def back = {
@@ -88,7 +106,7 @@ class PaneDragStoppedEvent (
   def rejected = back || near
 }
 
-class PaneDragStoppedEventFactory(from: PaneLabel, thresholdPixel: Int)
+class PaneDragStoppedEventFactory(from: Pane, thresholdPixel: Int)
   extends DragStoppedEventFactory[PaneDragStoppedEvent] {
 
   override def createEvent(distance: Float, direction: DragDirection) = {
@@ -99,18 +117,18 @@ class PaneDragStoppedEventFactory(from: PaneLabel, thresholdPixel: Int)
 object PaneDragDetector {
   def create(
     context: Context,
-    label: PaneLabel,
+    from: Pane,
     actions: Actions,
     onTouch: OnTouchListener): HorizontalDragDetector[PaneDragStoppedEvent] = {
 
     val threshold = {
-      val dp = 30
+      val dp = 15
       val metrics = context.getResources.getDisplayMetrics
       TypedValue.applyDimension(COMPLEX_UNIT_DIP, dp, metrics)
     }
     new HorizontalDragDetector(
       context = context,
-      stoppedEventFactory = new PaneDragStoppedEventFactory(label, threshold.toInt),
+      stoppedEventFactory = new PaneDragStoppedEventFactory(from, threshold.toInt),
       onTouch = onTouch,
       onDrag = actions.container.onPaneDragging,
       onDragStopped = actions.container.onPaneDragStopped

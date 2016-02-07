@@ -1,6 +1,7 @@
 package x7c1.linen;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import x7c1.linen.glue.res.layout.MainLayout;
 import x7c1.linen.modern.init.ContainerInitializer;
@@ -9,6 +10,7 @@ import x7c1.linen.res.layout.EntryRowProvider;
 import x7c1.linen.res.layout.MainLayoutProvider;
 import x7c1.linen.res.layout.MenuRowItemProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
+import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.SourceRowProvider;
 
 
@@ -25,7 +27,10 @@ public class MainActivity extends BaseActivity {
 		layout.sourceToolbar.setNavigationIcon(R.drawable.ic_action_menu);
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);
 
+		layout.entryToolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		layout.entryToolbar.inflateMenu(R.menu.menu_main);
+
+		layout.entryDetailToolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		layout.entryDetailToolbar.inflateMenu(R.menu.menu_main);
 
 		setContentView(layout.itemView);
@@ -35,6 +40,7 @@ public class MainActivity extends BaseActivity {
 			layout,
 			new MenuRowLabelProvider(this),
 			new MenuRowItemProvider(this),
+			new MenuRowSeparatorProvider(this),
 			new SourceRowProvider(this),
 			new EntryRowProvider(this),
 			new EntryDetailRowProvider(this)
@@ -48,4 +54,9 @@ public class MainActivity extends BaseActivity {
 		initializer.close();
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		return initializer.onKeyDown(keyCode, event) ||
+				super.onKeyDown(keyCode, event);
+	}
 }

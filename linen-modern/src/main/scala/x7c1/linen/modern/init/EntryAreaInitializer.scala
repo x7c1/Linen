@@ -1,25 +1,23 @@
 package x7c1.linen.modern.init
 
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.glue.res.layout.{EntryRow, MainLayout}
 import x7c1.linen.modern.action.observer.{EntryFocusedObserver, EntrySelectedObserver, EntrySkipStoppedObserver, EntrySkippedObserver}
-import x7c1.linen.modern.action.{Actions, EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.{EntryRowAdapter, PaneDragDetector, PaneLabel}
-import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.linen.modern.action.{EntryFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
+import x7c1.linen.modern.display.{EntryRowAdapter, PaneDragDetector}
+import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait EntryAreaInitializer {
-  def layout: MainLayout
-  def accessors: Accessors
-  def actions: Actions
-  def entryRowProvider: ViewHolderProvider[EntryRow]
-  def widthWithMargin: Int
+  self: ContainerInitializer =>
 
   def setupEntryArea(): Unit = {
     layout.entryArea setLayoutParams {
       val params = layout.entryArea.getLayoutParams
       params.width = widthWithMargin
       params
+    }
+    layout.entryToolbar onClickNavigation { _ =>
+      actions.container.onBack()
     }
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
@@ -35,11 +33,11 @@ trait EntryAreaInitializer {
     )
     layout.entryList addOnItemTouchListener PaneDragDetector.create(
       context = layout.entryList.getContext,
-      label = PaneLabel.EntryArea,
+      from = container.entryArea,
       actions = actions,
       onTouch = forFocus
     )
-    layout.entryToNext setOnTouchListener SkipDetector.createListener(
+    val forSkip = SkipDetector.createListener(
       context = layout.entryToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
       skippedEventFactory = new EntrySkippedEventFactory(accessors.entryOutline),
@@ -47,5 +45,7 @@ trait EntryAreaInitializer {
       onSkippedListener = new EntrySkippedObserver(actions),
       onSkipDoneListener = new EntrySkipStoppedObserver(actions)
     )
+    layout.entryToNext setOnTouchListener forSkip
+    layout.entryBottomBar setOnTouchListener forSkip
   }
 }

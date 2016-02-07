@@ -1,5 +1,7 @@
 package x7c1.linen.modern.init.updater
 
+import java.util.concurrent.Executors
+
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -12,13 +14,23 @@ import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 import x7c1.wheat.modern.patch.TaskAsync.async
 
+import scala.concurrent.Future
+
+object LinenService {
+  object Implicits {
+    import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+    private lazy val pool = Executors.newCachedThreadPool()
+    implicit def executor: ExecutionContextExecutor = ExecutionContext fromExecutor pool
+  }
+}
+
 object UpdaterServiceDelegatee {
   val ActionTypeSample = "hoge"
 }
 
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
-
   private lazy val helper = new LinenOpenHelper(service)
+  private lazy val queue = new SourceUpdaterQueue(service, helper)
 
   def onBind(intent: Intent): Option[IBinder] = {
     Log info "[init]"
@@ -28,7 +40,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
   def onStartCommand(intent: Intent, flags: Int, startId: Int): CommandStartType = {
     Log info s"[init] start:$startId, $intent"
 
-    new UpdaterMethods(service, helper, startId) execute intent
+    new UpdaterMethods(service, helper, queue, startId) execute intent
     NotSticky
   }
   def onDestroy(): Unit = {
@@ -40,6 +52,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 class UpdaterMethods(
   service: Service with ServiceControl,
   helper: LinenOpenHelper,
+  queue: SourceUpdaterQueue,
   startId: Int){
 
   def execute(intent: Intent) = IntentExpander findFrom intent match {
@@ -60,9 +73,18 @@ class UpdaterMethods(
     Log info "[init]"
     new PresetFactory(service, helper).createPreset()
   }
-  def loadSource(sourceId: Long): Unit = async {
+  def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"
-    new SourceLoader(service, helper, startId, sourceId).start()
+
+    import LinenService.Implicits._
+    val inspector = SourceInspector(helper)
+    val future = Future { inspector inspectSource sourceId } map {
+      case Right(source) => queue enqueue source
+      case Left(error) => Log error error.message
+    }
+    future onFailure {
+      case e => Log error e.getMessage
+    }
   }
 }
 

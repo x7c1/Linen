@@ -10,35 +10,33 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
-import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.EntryRow;
+import x7c1.linen.glue.res.layout.MenuRowSeparator;
 
-public class EntryRowProvider implements ViewHolderProvider<EntryRow> {
+public class MenuRowSeparatorProvider implements ViewHolderProvider<MenuRowSeparator> {
 
     private final LayoutInflater inflater;
 
-    public EntryRowProvider(Context context){
+    public MenuRowSeparatorProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int layoutId(){
-        return R.layout.entry_row;
+        return R.layout.menu_row__separator;
     }
 
     @Override
-    public EntryRow inflateOn(ViewGroup parent){
+    public MenuRowSeparator inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public EntryRow inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.entry_row, parent, attachToRoot);
-        return new EntryRow(
-            view,
-            (TextView) view.findViewById(R.id.entry_row__title)
+    public MenuRowSeparator inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.menu_row__separator, parent, attachToRoot);
+        return new MenuRowSeparator(
+            view
         );
     }
 }

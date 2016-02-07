@@ -17,13 +17,13 @@
             android:paddingBottom="10dp"
             android:lineSpacingExtra="4dp"
             android:lineSpacingMultiplier="1.1"
-            android:textColor="@color/rouiro"
+            android:textColor="@color/text_primary"
             />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="@color/text_secondary"
+            android:background="@color/text_tertiary"
             />
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#4b4b4b"
+            android:textColor="@color/text_secondary"
             android:textColorLink="@color/to_next_button_background"
             android:lineSpacingExtra="4dp"
             android:lineSpacingMultiplier="1.2"
@@ -45,7 +45,9 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_tertiary"
+            />
 
     </LinearLayout>
 

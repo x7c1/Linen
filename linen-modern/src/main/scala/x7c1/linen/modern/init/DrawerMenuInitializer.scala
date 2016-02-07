@@ -4,23 +4,15 @@ import java.lang.Math.min
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Point
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MainLayout, MenuRowItem, MenuRowLabel}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
 import x7c1.linen.modern.display.DrawerMenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
-import x7c1.linen.modern.display.{DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
-import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.linen.modern.display.{MenuItemSeparator, DrawerMenuItemFactory, DrawerMenuItemKind, DrawerMenuLabelFactory, DrawerMenuRowAdapter, MenuItemsBox, MenuItemsBoxes, OnDrawerMenuClickListener}
 import x7c1.wheat.macros.logger.Log
 
 trait DrawerMenuInitializer {
-  def activity: Activity with ActivityControl
-  def layout: MainLayout
-  def menuLabelProvider: ViewHolderProvider[MenuRowLabel]
-  def menuItemProvider: ViewHolderProvider[MenuRowItem]
-  def displaySize: Point
-  def dipToPixel(dip: Int): Int
+  self: ContainerInitializer =>
 
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
@@ -28,6 +20,7 @@ trait DrawerMenuInitializer {
     layout.menuList setAdapter new DrawerMenuRowAdapter(
       menuLabelProvider,
       menuItemProvider,
+      menuSeparatorProvider,
       menuItemsBoxes
     )
     layout.menuArea setLayoutParams {
@@ -42,18 +35,21 @@ trait DrawerMenuInitializer {
     val onClick = new OnDrawerMenuClick(activity)
     val label = new DrawerMenuLabelFactory(menuLabelProvider)
     val item = new DrawerMenuItemFactory(onClick, menuItemProvider)
+    val separator = new MenuItemSeparator(menuSeparatorProvider)
 
     MenuItemsBoxes(
       new MenuItemsBox(
         label of "Unread Channels",
         item of NoChannel("(all articles browsed)")
       ),
+      separator,
       new MenuItemsBox(
         label of "Settings",
         item of Channels("Channels"),
         item of ChannelSources("Channel Sources"),
         item of UpdaterSchedule("Updater Schedule")
       ),
+      separator,
       new MenuItemsBox(
         label of "Developer Menu",
         item of DevCreateDummies("Create Records"),
