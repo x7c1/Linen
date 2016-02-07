@@ -15,12 +15,8 @@ import x7c1.wheat.ancient.resource.ViewHolderProvider
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
   val layout: MainLayout,
-  val menuLabelProvider: ViewHolderProvider[MenuRowLabel],
-  val menuItemProvider: ViewHolderProvider[MenuRowItem],
-  val menuSeparatorProvider: ViewHolderProvider[MenuRowSeparator],
-  val sourceRowProvider: ViewHolderProvider[UnreadSourceRow],
-  val entryRowProvider: ViewHolderProvider[UnreadOutlineRow],
-  val entryDetailRowProvider: ViewHolderProvider[UnreadDetailRow]
+  val menuRowProviders: MenuRowProviders,
+  val unreadRowProviders: UnreadRowProviders
 ) extends ActionsInitializer
   with DrawerMenuInitializer
   with SourceAreaInitializer
@@ -107,4 +103,16 @@ class Accessors(
   val entryOutline: EntryAccessor[EntryOutline],
   val entryDetail: EntryAccessor[EntryDetail],
   val rawSource: RawSourceAccessor
+)
+
+class MenuRowProviders(
+  val forLabel: ViewHolderProvider[MenuRowLabel],
+  val forItem: ViewHolderProvider[MenuRowItem],
+  val forSeparator: ViewHolderProvider[MenuRowSeparator]
+)
+
+class UnreadRowProviders(
+  val forSource: ViewHolderProvider[UnreadSourceRow],
+  val forOutline: ViewHolderProvider[UnreadOutlineRow],
+  val forDetail: ViewHolderProvider[UnreadDetailRow]
 )

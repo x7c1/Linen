@@ -18,9 +18,9 @@ trait DrawerMenuInitializer {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuList setAdapter new DrawerMenuRowAdapter(
-      menuLabelProvider,
-      menuItemProvider,
-      menuSeparatorProvider,
+      menuRowProviders.forLabel,
+      menuRowProviders.forItem,
+      menuRowProviders.forSeparator,
       menuItemsBoxes
     )
     layout.menuArea setLayoutParams {
@@ -33,9 +33,9 @@ trait DrawerMenuInitializer {
   }
   protected def menuItemsBoxes = {
     val onClick = new OnDrawerMenuClick(activity)
-    val label = new DrawerMenuLabelFactory(menuLabelProvider)
-    val item = new DrawerMenuItemFactory(onClick, menuItemProvider)
-    val separator = new MenuItemSeparator(menuSeparatorProvider)
+    val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel)
+    val item = new DrawerMenuItemFactory(onClick, menuRowProviders.forItem)
+    val separator = new MenuItemSeparator(menuRowProviders.forSeparator)
 
     MenuItemsBoxes(
       new MenuItemsBox(

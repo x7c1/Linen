@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import x7c1.linen.glue.res.layout.MainLayout;
+import x7c1.linen.modern.init.unread.MenuRowProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
+import x7c1.linen.modern.init.unread.UnreadRowProviders;
 import x7c1.linen.res.layout.MainLayoutProvider;
 import x7c1.linen.res.layout.MenuRowItemProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
@@ -38,12 +40,16 @@ public class MainActivity extends BaseActivity {
 		this.initializer = new UnreadItemsDelegatee(
 			this,
 			layout,
-			new MenuRowLabelProvider(this),
-			new MenuRowItemProvider(this),
-			new MenuRowSeparatorProvider(this),
-			new UnreadSourceRowProvider(this),
-			new UnreadOutlineRowProvider(this),
-			new UnreadDetailRowProvider(this)
+			new MenuRowProviders(
+				new MenuRowLabelProvider(this),
+				new MenuRowItemProvider(this),
+				new MenuRowSeparatorProvider(this)
+			),
+			new UnreadRowProviders(
+				new UnreadSourceRowProvider(this),
+				new UnreadOutlineRowProvider(this),
+				new UnreadDetailRowProvider(this)
+			)
 		);
 		initializer.setup();
 	}

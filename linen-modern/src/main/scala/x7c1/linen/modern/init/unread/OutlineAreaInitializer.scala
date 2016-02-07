@@ -24,7 +24,7 @@ trait OutlineAreaInitializer {
     layout.entryList setAdapter new OutlineRowAdapter(
       accessors.entryOutline,
       new OutlineSelectedObserver(actions),
-      entryRowProvider
+      unreadRowProviders.forOutline
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,

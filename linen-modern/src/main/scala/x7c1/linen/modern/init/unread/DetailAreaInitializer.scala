@@ -24,7 +24,7 @@ trait DetailAreaInitializer {
     layout.entryDetailList setAdapter new DetailRowAdapter(
       accessors.entryDetail,
       new DetailSelectedObserver(actions),
-      entryDetailRowProvider
+      unreadRowProviders.forDetail
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,
