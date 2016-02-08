@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/AppCardView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
     >
 
-    <LinearLayout
+    <RelativeLayout
         style="@style/AppCardViewRow"
-        android:orientation="vertical"
         >
         <TextView
             android:id="@+id/unread_detail_row__title"
@@ -21,8 +23,10 @@
             />
 
         <View
+            android:id="@+id/border1"
             android:layout_width="match_parent"
             android:layout_height="1px"
+            android:layout_below="@id/unread_detail_row__title"
             android:background="@color/text_tertiary"
             />
 
@@ -32,6 +36,7 @@
             android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/border1"
             android:textColor="@color/text_secondary"
             android:textColorLink="@color/to_next_button_background"
             android:lineSpacingExtra="4dp"
@@ -43,12 +48,45 @@
             android:textSize="12sp"
             android:textAlignment="textEnd"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/unread_detail_row__content"
             android:textColor="@color/text_tertiary"
             />
 
-    </LinearLayout>
+        <View
+            android:id="@+id/border2"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/unread_detail_row__created_at"
+            android:background="@color/text_tertiary"
+            />
+
+        <ImageView
+            android:id="@+id/visit"
+            android:src="@drawable/ic_call_made_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_alignParentEnd="true"
+            android:foregroundGravity="center_vertical"
+            android:contentDescription="visit"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__visit"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_toStartOf="@id/visit"
+            android:gravity="center_vertical"
+            android:paddingEnd="2dp"
+            android:paddingStart="0dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:text="VISIT"
+            />
+
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>
