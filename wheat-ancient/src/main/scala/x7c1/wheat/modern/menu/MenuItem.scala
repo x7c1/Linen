@@ -53,8 +53,19 @@ class MenuItems[A] private (items: MenuItem[A]*) extends MenuItem[A] {
   override def viewHolderProviders = {
     items.flatMap(_.viewHolderProviders)
   }
-  def inflateOn(parent: ViewGroup, viewType: Int): A = {
+  def inflate(parent: ViewGroup, viewType: Int): A = {
     providers get viewType inflateOn parent
+  }
+  def bind[B <: A]
+    (holder: B, position: Int)
+    (block: ((B, SingleMenuItem[A])) => Unit) = {
+
+    findItemAt(position) map (holder -> _) foreach block
+  }
+  def viewTypeAt(position: Int): Int = {
+    findItemAt(position) map (_.viewType) getOrElse {
+      throw new IllegalArgumentException(s"invalid position: $position")
+    }
   }
   private def providers: ViewHolderProviders[A] = {
     new ViewHolderProviders(viewHolderProviders:_*)

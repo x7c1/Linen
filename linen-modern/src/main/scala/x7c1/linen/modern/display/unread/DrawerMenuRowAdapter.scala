@@ -11,30 +11,26 @@ class DrawerMenuRowAdapter(
 
   override def getItemCount: Int = items.length
 
-  override def onBindViewHolder(row: MenuRow, position: Int): Unit = {
-    row match {
-      case holder: MenuRowLabel =>
-        items findItemAt position foreach { case (x: DrawerMenuLabel) =>
-          holder.text setText x.text
-          holder.itemView setOnClickListener x.onClick
-        }
-      case holder: MenuRowTitle =>
-        items findItemAt position foreach { case (x: MenuText) =>
-          holder.text setText x.text
-        }
-      case holder: MenuRowSeparator =>
-      case holder =>
-        Log error s"unknown row: $holder"
+  override def onBindViewHolder(holder: MenuRow, position: Int): Unit = {
+    items.bind(holder, position){
+      case (row: MenuRowLabel, item: DrawerMenuLabel) =>
+        row.text setText item.text
+        row.itemView setOnClickListener item.onClick
+
+      case (row: MenuRowTitle, item: MenuText) =>
+        row.text setText item.text
+
+      case (row: MenuRowSeparator, _) =>
+      case (row, item) =>
+        Log error s"unknown row:$row, item:$item, position:$position"
     }
   }
 
   override def getItemViewType(position: Int): Int = {
-    items findItemAt position map (_.viewType) getOrElse {
-      throw new IllegalArgumentException(s"invalid position: $position")
-    }
+    items.viewTypeAt(position)
   }
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuRow = {
-    items.inflateOn(parent, viewType)
+    items.inflate(parent, viewType)
   }
 }
