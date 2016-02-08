@@ -2,9 +2,9 @@ package x7c1.linen.modern.display.unread
 
 import android.view.View
 import android.view.View.OnClickListener
-import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle}
+import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowTitle}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.modern.menu.{SingleMenuText, SingleMenuItem}
+import x7c1.wheat.modern.menu.SingleMenuText
 
 sealed trait MenuItemKind {
   def body: String
@@ -20,12 +20,10 @@ object MenuItemKind {
   case class DevShowRecords(body: String) extends MenuItemKind
 }
 
-class DrawerMenuTitle(
-  text: String,
-  provider: ViewHolderProvider[MenuRowTitle]) extends SingleMenuText(text, provider)
-
 class DrawerMenuTitleFactory(provider: ViewHolderProvider[MenuRowTitle]){
-  def of(text: String): DrawerMenuTitle = new DrawerMenuTitle(text, provider)
+  def of(text: String): SingleMenuText[MenuRowTitle] = {
+    new SingleMenuText(text, provider)
+  }
 }
 
 class DrawerMenuLabel(
@@ -41,9 +39,6 @@ class DrawerMenuLabelFactory(
       override def onClick(v: View): Unit = listener onClick kind
     })
 }
-
-class DrawerMenuSeparator(
-  provider: ViewHolderProvider[MenuRowSeparator]) extends SingleMenuItem(provider)
 
 trait OnMenuItemClickListener {
   def onClick(kind: MenuItemKind): Unit

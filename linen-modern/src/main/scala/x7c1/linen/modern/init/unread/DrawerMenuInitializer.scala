@@ -9,9 +9,9 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
 import x7c1.linen.glue.res.layout.MenuRow
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
-import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuSeparator, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
+import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.MenuItems
+import x7c1.wheat.modern.menu.{MenuItems, SingleMenuItem}
 
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
@@ -33,7 +33,7 @@ trait DrawerMenuInitializer {
     val onClick = new OnMenuItemClick(activity)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
-    val ----- = new DrawerMenuSeparator(menuRowProviders.forSeparator)
+    val ----- = new SingleMenuItem(menuRowProviders.forSeparator)
 
     MenuItems(
       MenuItems(

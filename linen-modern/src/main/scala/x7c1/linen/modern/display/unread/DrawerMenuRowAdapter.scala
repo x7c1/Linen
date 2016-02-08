@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel, MenuRowSeparator, MenuRowTitle}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.MenuItems
+import x7c1.wheat.modern.menu.{MenuItems, MenuText}
 
 class DrawerMenuRowAdapter(
   items: MenuItems[MenuRow]) extends Adapter[MenuRow]{
@@ -19,7 +19,7 @@ class DrawerMenuRowAdapter(
           holder.itemView setOnClickListener x.onClick
         }
       case holder: MenuRowTitle =>
-        items findItemAt position foreach { case (x: DrawerMenuTitle) =>
+        items findItemAt position foreach { case (x: MenuText) =>
           holder.text setText x.text
         }
       case holder: MenuRowSeparator =>

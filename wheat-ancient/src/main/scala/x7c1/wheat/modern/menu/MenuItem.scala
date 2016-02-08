@@ -11,6 +11,10 @@ trait MenuItem[+A] {
   def viewHolderProviders: Seq[ViewHolderProvider[_ <: A]]
 }
 
+trait MenuText {
+  def text: String
+}
+
 class SingleMenuItem[+A](
   provider: ViewHolderProvider[A]) extends MenuItem[A] {
 
@@ -24,8 +28,8 @@ class SingleMenuItem[+A](
 }
 
 class SingleMenuText[A](
-  val text: String,
-  provider: ViewHolderProvider[A]) extends SingleMenuItem(provider)
+  override val text: String,
+  provider: ViewHolderProvider[A]) extends SingleMenuItem(provider) with MenuText
 
 class MenuItems[A] private (items: MenuItem[A]*) extends MenuItem[A] {
 
