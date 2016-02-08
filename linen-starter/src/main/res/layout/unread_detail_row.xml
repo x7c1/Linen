@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/border1"
             android:textColor="@color/text_secondary"
-            android:textColorLink="@color/to_next_button_background"
+            android:textColorLink="@color/ruriiro"
             android:lineSpacingExtra="4dp"
             android:lineSpacingMultiplier="1.2"
             />
