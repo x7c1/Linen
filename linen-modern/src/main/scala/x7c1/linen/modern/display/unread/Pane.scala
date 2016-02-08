@@ -35,8 +35,8 @@ class PaneContainer(
   view: ViewGroup,
   displayWidth: Int,
   val sourceArea: SourceArea,
-  val entryArea: OutlineArea,
-  val entryDetailArea: DetailArea
+  val outlineArea: OutlineArea,
+  val detailArea: DetailArea
 ) {
   private lazy val scroller = new Scroller(view.getContext)
 
@@ -74,8 +74,8 @@ class PaneContainer(
   }
   private def panes = Seq(
     sourceArea,
-    entryArea,
-    entryDetailArea
+    outlineArea,
+    detailArea
   )
   private class ContainerScroller(done: OnFinish) extends Runnable {
     override def run(): Unit = {

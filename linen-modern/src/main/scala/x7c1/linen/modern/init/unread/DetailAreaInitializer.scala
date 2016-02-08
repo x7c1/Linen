@@ -33,7 +33,7 @@ trait DetailAreaInitializer {
     )
     layout.entryDetailList addOnItemTouchListener PaneDragDetector.create(
       context = layout.entryDetailList.getContext,
-      from = container.entryDetailArea,
+      from = container.detailArea,
       actions = actions,
       onTouch = forFocus
     )

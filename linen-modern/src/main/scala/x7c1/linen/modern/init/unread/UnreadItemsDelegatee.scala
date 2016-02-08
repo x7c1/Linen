@@ -58,14 +58,14 @@ class UnreadItemsDelegatee(
       recyclerView = layout.sourceList,
       getPosition = () => 0
     ),
-    entryArea = new OutlineArea(
+    outlineArea = new OutlineArea(
       toolbar = layout.entryToolbar,
       recyclerView = layout.entryList,
       getPosition = () => {
         layout.sourceArea.getWidth
       }
     ),
-    entryDetailArea = new DetailArea(
+    detailArea = new DetailArea(
       toolbar = layout.entryDetailToolbar,
       recyclerView = layout.entryDetailList,
       getPosition = () => {

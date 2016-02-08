@@ -11,13 +11,13 @@ trait ActionsInitializer {
       new ContainerAction(container),
       new SourceAreaAction(container.sourceArea, accessors.source),
       new OutlineAreaAction(
-        outlineArea = container.entryArea,
+        outlineArea = container.outlineArea,
         sourceAccessor = accessors.source,
         rawSourceAccessor = accessors.rawSource,
         entryAccessor = accessors.entryOutline
       ),
       new DetailAreaAction(
-        container.entryDetailArea,
+        container.detailArea,
         accessors.source,
         accessors.rawSource,
         accessors.entryDetail

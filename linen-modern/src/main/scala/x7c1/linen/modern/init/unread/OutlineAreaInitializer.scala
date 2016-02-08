@@ -33,7 +33,7 @@ trait OutlineAreaInitializer {
     )
     layout.entryList addOnItemTouchListener PaneDragDetector.create(
       context = layout.entryList.getContext,
-      from = container.entryArea,
+      from = container.outlineArea,
       actions = actions,
       onTouch = forFocus
     )
