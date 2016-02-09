@@ -1,9 +1,13 @@
 package x7c1.linen.modern.init.unread
 
+import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSkipStoppedObserver}
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.unread.{OnDetailVisitListener, DetailRowAdapter, PaneDragDetector}
+import x7c1.linen.modern.display.unread.{DetailRowAdapter, OnEntryVisitListener, PaneDragDetector}
+import x7c1.linen.modern.struct.Entry
+import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.action.SiteVisitor
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -24,7 +28,7 @@ trait DetailAreaInitializer {
     layout.entryDetailList setAdapter new DetailRowAdapter(
       accessors.entryDetail,
       new DetailSelectedObserver(actions),
-      OnDetailVisitListener.toOpenUrl(activity),
+      new OnEntryVisit(activity),
       unreadRowProviders.forDetail
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
@@ -48,5 +52,12 @@ trait DetailAreaInitializer {
     )
     layout.detailToNext setOnTouchListener forSkip
     layout.detailBottomBar setOnTouchListener forSkip
+  }
+}
+
+class OnEntryVisit[A <: Entry](context: Context) extends OnEntryVisitListener[A]{
+  override def onVisit(target: A): Unit = {
+    Log info target.url
+    SiteVisitor(context) open target
   }
 }
