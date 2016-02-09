@@ -62,28 +62,18 @@
             android:background="@color/text_tertiary"
             />
 
-        <ImageView
-            android:id="@+id/visit"
-            android:src="@drawable/ic_call_made_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:layout_below="@id/border2"
-            android:layout_alignParentEnd="true"
-            android:foregroundGravity="center_vertical"
-            android:contentDescription="visit"
-            />
-
         <TextView
             android:id="@+id/unread_detail_row__visit"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_below="@id/border2"
-            android:layout_toStartOf="@id/visit"
+            android:layout_alignParentEnd="true"
             android:gravity="center_vertical"
-            android:paddingEnd="2dp"
-            android:paddingStart="0dp"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableEnd="@drawable/ic_call_made_24dp"
             android:text="VISIT"
             />
 
