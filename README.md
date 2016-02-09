@@ -28,6 +28,7 @@ Library layer, which is independent from concrete application.
    * Scala library which provides, for instance, some decorators to hide redundant Java API.
  * wheat-ancient
    * Java library called by Java projects like `linen-glue`.
+ * wheat-macros
 
 ## Tips
 
