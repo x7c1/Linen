@@ -1,9 +1,9 @@
 package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.modern.action.observer.{EntryDetailFocusedObserver, DetailSelectedObserver, EntryDetailSkipStoppedObserver, DetailSkippedObserver}
+import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSkipStoppedObserver}
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.unread.{PaneDragDetector, DetailRowAdapter}
+import x7c1.linen.modern.display.unread.{OnDetailVisitListener, DetailRowAdapter, PaneDragDetector}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -24,6 +24,7 @@ trait DetailAreaInitializer {
     layout.entryDetailList setAdapter new DetailRowAdapter(
       accessors.entryDetail,
       new DetailSelectedObserver(actions),
+      OnDetailVisitListener.toOpenUrl(activity),
       unreadRowProviders.forDetail
     )
     val forFocus = FocusDetector.forLinearLayoutManager(

@@ -40,7 +40,8 @@ public class UnreadDetailRowProvider implements ViewHolderProvider<UnreadDetailR
             view,
             (TextView) view.findViewById(R.id.unread_detail_row__title),
             (TextView) view.findViewById(R.id.unread_detail_row__content),
-            (TextView) view.findViewById(R.id.unread_detail_row__created_at)
+            (TextView) view.findViewById(R.id.unread_detail_row__created_at),
+            (TextView) view.findViewById(R.id.unread_detail_row__visit)
         );
     }
 }

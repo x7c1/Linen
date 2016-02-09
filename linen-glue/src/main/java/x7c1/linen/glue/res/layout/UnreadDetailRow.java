@@ -15,16 +15,19 @@ public class UnreadDetailRow extends RecyclerView.ViewHolder {
     public final TextView title;
     public final TextView content;
     public final TextView createdAt;
+    public final TextView visit;
 
     public UnreadDetailRow(
         View itemView,
         TextView title,
         TextView content,
-        TextView createdAt
+        TextView createdAt,
+        TextView visit
     ){
         super(itemView);
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
+        this.visit = visit;
     }
 }

@@ -84,7 +84,7 @@ class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[EntryOutline] 
     EntryOutline(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
-      url = "dummy",
+      url = cursor.url,
       shortTitle = cursor.title,
       shortContent = cursor.content,
       createdAt = cursor.created_at.typed
@@ -99,7 +99,7 @@ class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[EntryDetail] {
     EntryDetail(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
-      url = "dummy",
+      url = cursor.url,
       fullTitle = cursor.title,
       fullContent = cursor.content,
       createdAt = cursor.created_at.typed
@@ -138,6 +138,7 @@ object EntryAccessor {
         |  _id AS entry_id,
         |  source_id,
         |  title,
+        |  url,
         |  $content,
         |  created_at
         |FROM entries
