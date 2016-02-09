@@ -6,15 +6,15 @@ import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.UnreadDetailRow
 import x7c1.linen.modern.accessor.EntryAccessor
-import x7c1.linen.modern.struct.{Entry, EntryDetail}
+import x7c1.linen.modern.struct.{UnreadEntry, UnreadDetail}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
 
 class DetailRowAdapter(
-  entryAccessor: EntryAccessor[EntryDetail],
+  entryAccessor: EntryAccessor[UnreadDetail],
   selectedListener: OnDetailSelectedListener,
-  visitSelectedListener: OnEntryVisitListener[EntryDetail],
+  visitSelectedListener: OnEntryVisitListener[UnreadDetail],
   viewHolderProvider: ViewHolderProvider[UnreadDetailRow]) extends Adapter[UnreadDetailRow] {
 
   override def getItemCount: Int = entryAccessor.length
@@ -44,10 +44,10 @@ trait OnDetailSelectedListener {
   def onEntryDetailSelected(event: DetailSelectedEvent): Unit
 }
 
-case class DetailSelectedEvent(position: Int, entry: EntryDetail){
+case class DetailSelectedEvent(position: Int, entry: UnreadDetail){
   def dump: String = s"position:$position, entry:$entry"
 }
 
-trait OnEntryVisitListener[A <: Entry]{
+trait OnEntryVisitListener[A <: UnreadEntry]{
   def onVisit(target: A): Unit
 }

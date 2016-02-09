@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSkipStoppedObserver}
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
 import x7c1.linen.modern.display.unread.{DetailRowAdapter, OnEntryVisitListener, PaneDragDetector}
-import x7c1.linen.modern.struct.Entry
+import x7c1.linen.modern.struct.UnreadEntry
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.action.SiteVisitor
 import x7c1.wheat.modern.decorator.Imports._
@@ -55,7 +55,7 @@ trait DetailAreaInitializer {
   }
 }
 
-class OnEntryVisit[A <: Entry](context: Context) extends OnEntryVisitListener[A]{
+class OnEntryVisit[A <: UnreadEntry](context: Context) extends OnEntryVisitListener[A]{
   override def onVisit(target: A): Unit = {
     Log info target.url
     SiteVisitor(context) open target

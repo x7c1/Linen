@@ -4,13 +4,13 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.UnreadOutlineRow
 import x7c1.linen.modern.accessor.EntryAccessor
-import x7c1.linen.modern.struct.EntryOutline
+import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
 
 class OutlineRowAdapter(
-  entryAccessor: EntryAccessor[EntryOutline],
+  entryAccessor: EntryAccessor[UnreadOutline],
   entrySelectedListener: OnOutlineSelectedListener,
   provider: ViewHolderProvider[UnreadOutlineRow]) extends Adapter[UnreadOutlineRow] {
 
@@ -35,6 +35,6 @@ trait OnOutlineSelectedListener {
   def onEntrySelected(event: OutlineSelectedEvent): Unit
 }
 
-case class OutlineSelectedEvent(position: Int, entry: EntryOutline){
+case class OutlineSelectedEvent(position: Int, entry: UnreadOutline){
   def dump: String = s"entryId:${entry.entryId}, position:$position"
 }

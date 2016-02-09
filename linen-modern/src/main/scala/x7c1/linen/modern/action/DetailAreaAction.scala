@@ -2,7 +2,7 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{RawSourceAccessor, UnreadSourceAccessor, EntryAccessor}
 import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, DetailArea, SourceSelectedEvent}
-import x7c1.linen.modern.struct.EntryDetail
+import x7c1.linen.modern.struct.UnreadDetail
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 
@@ -10,7 +10,7 @@ class DetailAreaAction(
   detailArea: DetailArea,
   sourceAccessor: UnreadSourceAccessor,
   rawSourceAccessor: RawSourceAccessor,
-  entryAccessor: EntryAccessor[EntryDetail]
+  entryAccessor: EntryAccessor[UnreadDetail]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
   with OnOutlineSelected with OnOutlineFocused with OnOutlineSkipStopped
   with OnDetailSelected with OnDetailFocused with OnDetailSkipped {

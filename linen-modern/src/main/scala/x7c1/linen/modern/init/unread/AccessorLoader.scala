@@ -8,7 +8,7 @@ import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
 import SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -24,8 +24,8 @@ class AccessorLoader(
   layout: MainLayout,
   loaderManager: LoaderManager ){
 
-  private val outlineAccessors = ListBuffer[EntryAccessor[EntryOutline]]()
-  private val detailAccessors = ListBuffer[EntryAccessor[EntryDetail]]()
+  private val outlineAccessors = ListBuffer[EntryAccessor[UnreadOutline]]()
+  private val detailAccessors = ListBuffer[EntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
     context = layout.itemView.context,
     loaderManager = loaderManager,
@@ -45,10 +45,10 @@ class AccessorLoader(
       override def length: Int = currentSourceLength
     }
 
-  def createOutlineAccessor: EntryAccessor[EntryOutline] =
+  def createOutlineAccessor: EntryAccessor[UnreadOutline] =
     new EntryAccessorBinder(outlineAccessors)
 
-  def createDetailAccessor: EntryAccessor[EntryDetail] =
+  def createDetailAccessor: EntryAccessor[UnreadDetail] =
     new EntryAccessorBinder(detailAccessors)
 
   def startLoading(): Unit = {

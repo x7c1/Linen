@@ -2,7 +2,7 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, OutlineArea, SourceSelectedEvent}
-import x7c1.linen.modern.struct.EntryOutline
+import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 
@@ -10,7 +10,7 @@ class OutlineAreaAction(
   outlineArea: OutlineArea,
   sourceAccessor: UnreadSourceAccessor,
   rawSourceAccessor: RawSourceAccessor,
-  entryAccessor: EntryAccessor[EntryOutline]
+  entryAccessor: EntryAccessor[UnreadOutline]
 ) extends OnSourceSelected with OnSourceFocused with OnSourceSkipStopped
   with OnOutlineSelected with OnOutlineFocused with OnOutlineSkipped
   with OnDetailSelected with OnDetailFocused with OnDetailSkipStopped {

@@ -2,7 +2,7 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.{EntryAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline, UnreadSource}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 
@@ -94,9 +94,9 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
 
 case class OutlineFocusedEvent(
   override val position: Int,
-  entry: EntryOutline) extends ItemFocusedEvent
+  entry: UnreadOutline) extends ItemFocusedEvent
 
-class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
+class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends FocusedEventFactory[OutlineFocusedEvent] {
 
   override def createAt(position: Int) = {
@@ -108,9 +108,9 @@ class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
 
 case class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: EntryOutline ) extends ItemSkippedEvent
+  nextEntry: UnreadOutline ) extends ItemSkippedEvent
 
-class EntrySkippedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
+class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends ItemSkippedEventFactory[EntrySkippedEvent]{
 
   override def createAt(nextPosition: Int) = {
@@ -122,9 +122,9 @@ class EntrySkippedEventFactory(entryAccessor: EntryAccessor[EntryOutline])
 
 case class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: EntryOutline ) extends SkipStoppedEvent
+  currentEntry: UnreadOutline ) extends SkipStoppedEvent
 
-class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[EntryOutline])
+class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends SkipStoppedEventFactory[EntrySkipStopped]{
 
   override def createAt(position: Int) = {
@@ -136,9 +136,9 @@ class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[EntryOutline])
 
 case class DetailFocusedEvent(
   override val position: Int,
-  entry: EntryDetail ) extends ItemFocusedEvent
+  entry: UnreadDetail ) extends ItemFocusedEvent
 
-class DetailFocusedEventFactory(entryAccessor: EntryAccessor[EntryDetail])
+class DetailFocusedEventFactory(entryAccessor: EntryAccessor[UnreadDetail])
   extends FocusedEventFactory[DetailFocusedEvent]{
 
   override def createAt(position: Int) = {

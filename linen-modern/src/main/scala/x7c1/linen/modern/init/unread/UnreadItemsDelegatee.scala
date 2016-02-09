@@ -9,7 +9,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadOutlineRow, MainLayout, MenuRowLabel, MenuRowTitle, MenuRowSeparator, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
-import x7c1.linen.modern.struct.{EntryDetail, EntryOutline}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
 class UnreadItemsDelegatee(
@@ -100,8 +100,8 @@ class UnreadItemsDelegatee(
 
 class Accessors(
   val source: UnreadSourceAccessor,
-  val entryOutline: EntryAccessor[EntryOutline],
-  val entryDetail: EntryAccessor[EntryDetail],
+  val entryOutline: EntryAccessor[UnreadOutline],
+  val entryDetail: EntryAccessor[UnreadDetail],
   val rawSource: RawSourceAccessor
 )
 
