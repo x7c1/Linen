@@ -29,6 +29,7 @@ Library layer, which is independent from concrete application.
  * wheat-ancient
    * Java library dependent on Android SDK and Scala codes using it.
  * wheat-macros
+   * Compile-time library to avoid reflections on runtime.
 
 ## Tips
 
