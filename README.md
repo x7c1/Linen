@@ -27,7 +27,7 @@ Library layer, which is independent from concrete application.
  * wheat-modern
    * Scala library which provides, for instance, some decorators to hide redundant Java API.
  * wheat-ancient
-   * Java library called by Java projects like `linen-glue`.
+   * Java library dependent on Android SDK and Scala codes using it.
  * wheat-macros
 
 ## Tips
