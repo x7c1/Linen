@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    >
+
+    <RelativeLayout
+        style="@style/AppCardViewRow"
+        >
+        <TextView
+            android:id="@+id/unread_detail_row__title"
+            android:textSize="17sp"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:lineSpacingExtra="4dp"
+            android:lineSpacingMultiplier="1.1"
+            android:textColor="@color/text_primary"
+            />
+
+        <View
+            android:id="@+id/border1"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/unread_detail_row__title"
+            android:background="@color/text_tertiary"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__content"
+            android:textSize="15sp"
+            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/border1"
+            android:textColor="@color/text_secondary"
+            android:textColorLink="@color/ruriiro"
+            android:lineSpacingExtra="4dp"
+            android:lineSpacingMultiplier="1.2"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__created_at"
+            android:textSize="12sp"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/unread_detail_row__content"
+            android:textColor="@color/text_tertiary"
+            />
+
+        <View
+            android:id="@+id/border2"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/unread_detail_row__created_at"
+            android:background="@color/text_tertiary"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__visit"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_alignParentEnd="true"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableEnd="@drawable/ic_call_made_24dp"
+            android:text="VISIT"
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

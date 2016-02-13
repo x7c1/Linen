@@ -3,12 +3,12 @@ package x7c1.linen.modern.accessor
 import android.content.ContentValues
 import android.database.{SQLException, Cursor}
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.{Date, Entry, EntryDetail, EntryOutline}
+import x7c1.linen.modern.struct.{Date, UnreadEntry, UnreadDetail, UnreadOutline}
 import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 import scala.annotation.tailrec
 
-trait EntryAccessor[+A <: Entry]{
+trait EntryAccessor[+A <: UnreadEntry]{
 
   def findAt(position: Int): Option[A]
 
@@ -17,7 +17,7 @@ trait EntryAccessor[+A <: Entry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
-class EntryAccessorBinder[A <: Entry](
+class EntryAccessorBinder[A <: UnreadEntry](
   accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
 
   override def findAt(position: Int): Option[A] = {
@@ -55,7 +55,7 @@ class EntryAccessorBinder[A <: Entry](
   }
 }
 
-class EntryAccessorImpl[A <: Entry](
+class EntryAccessorImpl[A <: UnreadEntry](
   factory: EntryFactory[A],
   cursor: Cursor,
   positions: Map[Long, Int]) extends EntryAccessor[A] {
@@ -73,18 +73,18 @@ class EntryAccessorImpl[A <: Entry](
   }
 }
 
-trait EntryFactory[A <: Entry]{
+trait EntryFactory[A <: UnreadEntry]{
   def createEntry(): A
 }
 
-class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[EntryOutline] {
+class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline] {
   private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
 
-  override def createEntry(): EntryOutline = {
-    EntryOutline(
+  override def createEntry(): UnreadOutline = {
+    UnreadOutline(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
-      url = "dummy",
+      url = cursor.url,
       shortTitle = cursor.title,
       shortContent = cursor.content,
       createdAt = cursor.created_at.typed
@@ -92,14 +92,14 @@ class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[EntryOutline] 
   }
 }
 
-class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[EntryDetail] {
+class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
   private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
 
-  override def createEntry(): EntryDetail = {
-    EntryDetail(
+  override def createEntry(): UnreadDetail = {
+    UnreadDetail(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
-      url = "dummy",
+      url = cursor.url,
       fullTitle = cursor.title,
       fullContent = cursor.content,
       createdAt = cursor.created_at.typed
@@ -111,7 +111,7 @@ object EntryAccessor {
 
   def forEntryOutline(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positionMap: Map[Long, Int]): EntryAccessor[EntryOutline] = {
+    positionMap: Map[Long, Int]): EntryAccessor[UnreadOutline] = {
 
     val cursor = createOutlineCursor(db, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
@@ -119,7 +119,7 @@ object EntryAccessor {
   }
   def forEntryDetail(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positionMap: Map[Long, Int]): EntryAccessor[EntryDetail] = {
+    positionMap: Map[Long, Int]): EntryAccessor[UnreadDetail] = {
 
     val cursor = createDetailCursor(db, sourceIds)
     val factory = new EntryDetailFactory(cursor)
@@ -138,6 +138,7 @@ object EntryAccessor {
         |  _id AS entry_id,
         |  source_id,
         |  title,
+        |  url,
         |  $content,
         |  created_at
         |FROM entries

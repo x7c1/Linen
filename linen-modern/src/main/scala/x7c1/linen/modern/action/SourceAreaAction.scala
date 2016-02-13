@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.UnreadSourceAccessor
-import x7c1.linen.modern.display.{EntryDetailSelectedEvent, EntrySelectedEvent, SourceArea, SourceSelectedEvent}
+import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent, SourceArea}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 
@@ -9,8 +9,8 @@ class SourceAreaAction(
   sourceArea: SourceArea,
   sourceAccessor: UnreadSourceAccessor
 ) extends OnSourceSelected with OnSourceSkipped
-  with OnEntrySelected with OnEntryFocused with OnEntrySkipStopped
-  with OnEntryDetailSelected with OnEntryDetailFocused with OnEntryDetailSkipStopped {
+  with OnOutlineSelected with OnOutlineFocused with OnOutlineSkipStopped
+  with OnDetailSelected with OnDetailFocused with OnDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
     sourceArea scrollTo event.position
@@ -18,28 +18,28 @@ class SourceAreaAction(
   override def onSourceSkipped(event: SourceSkippedEvent) = {
     sourceArea skipTo event.nextPosition
   }
-  override def onEntrySelected(event: EntrySelectedEvent) = {
+  override def onOutlineSelected(event: OutlineSelectedEvent) = {
     skipTo(event.entry.sourceId)
   }
-  override def onEntryFocused(event: EntryFocusedEvent) = for {
+  override def onOutlineFocused(event: OutlineFocusedEvent) = for {
     _ <- await(300)
     _ <- skipTo(event.entry.sourceId)
   } yield ()
 
-  override def onEntrySkipStopped(event: EntrySkipStopped) = for {
+  override def onOutlineSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
     _ <- skipTo(event.currentEntry.sourceId)
   } yield ()
 
-  override def onEntryDetailSelected(event: EntryDetailSelectedEvent) = {
+  override def onDetailSelected(event: DetailSelectedEvent) = {
     skipTo(event.entry.sourceId)
   }
-  override def onEntryDetailFocused(event: EntryDetailFocusedEvent) = for {
+  override def onDetailFocused(event: DetailFocusedEvent) = for {
     _ <- await(300)
     _ <- skipTo(event.entry.sourceId)
   } yield()
 
-  override def onEntryDetailSkipStopped(event: EntrySkipStopped) = for {
+  override def onDetailSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
     _ <- skipTo(event.currentEntry.sourceId)
   } yield ()
