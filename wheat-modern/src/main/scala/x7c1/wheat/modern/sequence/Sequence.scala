@@ -20,7 +20,7 @@ class SequenceHeadline[A] private (
   override def mergeWith[B](sequence2: Sequence[B]): Sequence[Either[A, B]] = {
     new Sequence[Either[A, B]] {
 
-      override def length: Int = sequence1.length + sequence2.length
+      override def length: Int = intervals.last
 
       override def findAt(position: Int): Option[Either[A, B]] = {
         @tailrec
