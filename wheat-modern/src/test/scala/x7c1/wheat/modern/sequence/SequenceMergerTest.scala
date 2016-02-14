@@ -10,10 +10,10 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
 
   it can "merge sequence" in {
     val integers = IntegerSequence(10 to 12)
-    val separator = new SequenceSeparator(integers, Seq(1, 2, 3))
+    val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
 
     // 10 a 11 b c 12 d e f
-    val sequence = separator.mergeWith(strings)
+    val sequence = headline mergeWith strings
     sequence.length shouldBe 9
 
     sequence.findAt(0) shouldBe Some(Left(10))
@@ -35,7 +35,7 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
     val integers = IntegerSequence(10 to 14)
 
     intercept[IllegalArgumentException]{
-      new SequenceSeparator(integers, Seq(1, 2, 3))
+      SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
     }
   }
 
