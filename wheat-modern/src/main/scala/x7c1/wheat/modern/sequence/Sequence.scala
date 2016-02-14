@@ -8,22 +8,37 @@ trait Sequence[A]{
 }
 
 trait SequenceMerger[A] {
-  def mergeWith[B](accessor2: Sequence[B]): Sequence[Either[A, B]]
+  def mergeWith[B](sequence: Sequence[B]): Sequence[Either[A, B]]
 }
 
-class Inserter[A](
-  accessor1: Sequence[A],
+class SequenceSeparator[A](
+  sequence1: Sequence[A],
   interval: Seq[Int]) extends SequenceMerger[A]{
 
-  override def mergeWith[B](accessor2: Sequence[B]): Sequence[Either[A, B]] = {
+  override def mergeWith[B](sequence2: Sequence[B]): Sequence[Either[A, B]] = {
     new Sequence[Either[A, B]] {
-      override def length: Int = accessor1.length + accessor2.length
-      override def findAt(position: Int): Option[Either[A, B]] = {
-        val xs = interval.scanLeft(0){ (n, sum) => n + sum + 1 }
-        println(xs)
 
-        ???
+      override def length: Int = sequence1.length + sequence2.length
+
+      override def findAt(position: Int): Option[Either[A, B]] = {
+        @tailrec
+        def loop(inf: Int, sup: Int): Option[Either[A, B]] = {
+          val mid = (inf + sup) / 2
+          //println(s"ys:$ys, inf:$inf, sup:$sup, mid:$mid")
+
+          intervals match {
+            case _ if sup == inf => position - intervals(inf) match {
+              case x if x > 0 => None
+              case 0 => sequence1 findAt inf map Left.apply
+              case _ => sequence2 findAt (position - inf) map Right.apply
+            }
+            case _ if intervals(mid) < position  => loop(mid + 1, sup)
+            case _ => loop(inf, mid)
+          }
+        }
+        loop(0, intervals.length - 1)
       }
+      private lazy val intervals = interval.scanLeft(0){ _ + _ + 1 }
     }
   }
 }
@@ -34,7 +49,9 @@ object IntegerSequence {
 
 private class IntegerSequence(range: Range) extends Sequence[Int] {
   override def length: Int = range.length
-  override def findAt(position: Int): Option[Int] = range.drop(position).headOption
+  override def findAt(position: Int): Option[Int] =
+    if (range.isDefinedAt(position)) Some(range(position))
+    else None
 }
 
 object StringSequence {
@@ -43,5 +60,7 @@ object StringSequence {
 
 private class StringSequence(strings: String*) extends Sequence[String]{
   override def length: Int = strings.length
-  override def findAt(position: Int): Option[String] = strings.drop(position).headOption
+  override def findAt(position: Int): Option[String] =
+    if (strings.isDefinedAt(position)) Some(strings(position))
+    else None
 }
