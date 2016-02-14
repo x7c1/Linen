@@ -15,6 +15,8 @@ class SequenceSeparator[A](
   sequence1: Sequence[A],
   interval: Seq[Int]) extends SequenceMerger[A]{
 
+  require(sequence1.length == interval.length)
+
   override def mergeWith[B](sequence2: Sequence[B]): Sequence[Either[A, B]] = {
     new Sequence[Either[A, B]] {
 
