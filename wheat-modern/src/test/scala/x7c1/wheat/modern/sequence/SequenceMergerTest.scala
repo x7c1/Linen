@@ -4,15 +4,15 @@ import org.scalatest.{Matchers, FlatSpecLike}
 
 class SequenceMergerTest extends FlatSpecLike with Matchers {
 
-  behavior of classOf[SequenceHeadline[_]].getSimpleName
+  behavior of classOf[SequenceHeadlines[_]].getSimpleName
 
   it can "generate headlined sequence" in {
     val integers = IntegerSequence(10 to 12)
-    val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
     val strings = StringSequence("a", "b", "c", "d", "e", "f")
 
     // 10 a 11 b c 12 d e f
-    val sequence = headline mergeWith strings
+    val sequence = headlines mergeWith strings
     sequence.length shouldBe 9
 
     sequence.findAt(0) shouldBe Some(Left(10))
@@ -33,17 +33,17 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
   it should "throw exception to inconsistent length" in {
     val integers = IntegerSequence(10 to 14)
     intercept[IllegalArgumentException]{
-      SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
+      SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
     }
   }
 
   it should "ignore extra items" in {
     val integers = IntegerSequence(10 to 12)
-    val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
     val strings = StringSequence("a", "b", "c", "d", "e", "f", "g", "h")
 
     // 10 a 11 b c 12 d e f
-    val sequence = headline mergeWith strings
+    val sequence = headlines mergeWith strings
     sequence.length shouldBe 9
 
     sequence.findAt(0) shouldBe Some(Left(10))
@@ -63,9 +63,9 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
 
   it should "throw exception to short sequence" in {
     val integers = IntegerSequence(10 to 12)
-    val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
     intercept[IllegalArgumentException]{
-      headline mergeWith StringSequence("a", "b", "c", "d", "e")
+      headlines mergeWith StringSequence("a", "b", "c", "d", "e")
     }
   }
 

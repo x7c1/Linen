@@ -11,7 +11,7 @@ trait SequenceMerger[A] {
   def mergeWith[B](sequence: Sequence[B]): Sequence[Either[A, B]]
 }
 
-class SequenceHeadline[A] private (
+class SequenceHeadlines[A] private (
   sequence1: Sequence[A],
   interval: Seq[Int]) extends SequenceMerger[A]{
 
@@ -47,9 +47,9 @@ class SequenceHeadline[A] private (
   private lazy val intervals = interval.scanLeft(0){ _ + _ + 1 }
 }
 
-object SequenceHeadline {
-  def atInterval[A](sequence: Sequence[A], interval: Seq[Int]): SequenceHeadline[A] = {
-    new SequenceHeadline(sequence, interval)
+object SequenceHeadlines {
+  def atInterval[A](sequence: Sequence[A], interval: Seq[Int]): SequenceHeadlines[A] = {
+    new SequenceHeadlines(sequence, interval)
   }
 }
 
