@@ -92,58 +92,66 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
   }
 }
 
-case class OutlineFocusedEvent(
+class OutlineFocusedEvent(
   override val position: Int,
-  entry: UnreadOutline) extends ItemFocusedEvent
+  entry: UnreadOutline) extends ItemFocusedEvent {
+  val sourceId: Long = entry.sourceId
+}
 
 class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends FocusedEventFactory[OutlineFocusedEvent] {
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      OutlineFocusedEvent(position, entry)
+      new OutlineFocusedEvent(position, entry)
     }
   }
 }
 
-case class EntrySkippedEvent(
+class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: UnreadOutline ) extends ItemSkippedEvent
+  nextEntry: UnreadOutline ) extends ItemSkippedEvent {
+  val nextSourceId: Long = nextEntry.sourceId
+}
 
 class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends ItemSkippedEventFactory[EntrySkippedEvent]{
 
   override def createAt(nextPosition: Int) = {
     entryAccessor findAt nextPosition map { entry =>
-      EntrySkippedEvent(nextPosition, entry)
+      new EntrySkippedEvent(nextPosition, entry)
     }
   }
 }
 
-case class EntrySkipStopped(
+class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: UnreadOutline ) extends SkipStoppedEvent
+  currentEntry: UnreadOutline ) extends SkipStoppedEvent {
+  val currentSourceId: Long = currentEntry.sourceId
+}
 
 class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
   extends SkipStoppedEventFactory[EntrySkipStopped]{
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      EntrySkipStopped(position, entry)
+      new EntrySkipStopped(position, entry)
     }
   }
 }
 
-case class DetailFocusedEvent(
+class DetailFocusedEvent(
   override val position: Int,
-  entry: UnreadDetail ) extends ItemFocusedEvent
+  entry: UnreadDetail ) extends ItemFocusedEvent {
+  val sourceId: Long = entry.sourceId
+}
 
 class DetailFocusedEventFactory(entryAccessor: EntryAccessor[UnreadDetail])
   extends FocusedEventFactory[DetailFocusedEvent]{
 
   override def createAt(position: Int) = {
     entryAccessor findAt position map { entry =>
-      DetailFocusedEvent(position, entry)
+      new DetailFocusedEvent(position, entry)
     }
   }
 }

@@ -23,12 +23,12 @@ class SourceAreaAction(
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = for {
     _ <- await(300)
-    _ <- skipTo(event.entry.sourceId)
+    _ <- skipTo(event.sourceId)
   } yield ()
 
   override def onOutlineSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
-    _ <- skipTo(event.currentEntry.sourceId)
+    _ <- skipTo(event.currentSourceId)
   } yield ()
 
   override def onDetailSelected(event: DetailSelectedEvent) = {
@@ -36,12 +36,12 @@ class SourceAreaAction(
   }
   override def onDetailFocused(event: DetailFocusedEvent) = for {
     _ <- await(300)
-    _ <- skipTo(event.entry.sourceId)
+    _ <- skipTo(event.sourceId)
   } yield()
 
   override def onDetailSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
-    _ <- skipTo(event.currentEntry.sourceId)
+    _ <- skipTo(event.currentSourceId)
   } yield ()
 
   private def skipTo(sourceId: Long) = for {

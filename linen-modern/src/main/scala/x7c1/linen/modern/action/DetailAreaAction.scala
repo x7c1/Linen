@@ -39,10 +39,10 @@ class DetailAreaAction(
     fastScrollTo(event.position, event.entry.sourceId)
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
-    fastScrollTo(event.position, event.entry.sourceId)
+    fastScrollTo(event.position, event.sourceId)
   }
   override def onOutlineSkipStopped(event: EntrySkipStopped) = {
-    skipTo(event.currentPosition, event.currentEntry.sourceId)
+    skipTo(event.currentPosition, event.currentSourceId)
   }
   override def onDetailSelected(event: DetailSelectedEvent) = for {
     _ <- detailArea scrollTo event.position
@@ -50,10 +50,10 @@ class DetailAreaAction(
   } yield ()
 
   override def onDetailFocused(event: DetailFocusedEvent) =
-    updateToolbar(event.entry.sourceId)
+    updateToolbar(event.sourceId)
 
   override def onDetailSkipped(event: EntrySkippedEvent) = {
-    skipTo(event.nextPosition, event.nextEntry.sourceId)
+    skipTo(event.nextPosition, event.nextSourceId)
   }
 
   private def skipTo(position: Int, sourceId: Long) = for {
