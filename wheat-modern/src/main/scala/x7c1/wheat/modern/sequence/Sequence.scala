@@ -18,10 +18,11 @@ class SequenceHeadline[A] private (
   require(sequence1.length == interval.length)
 
   override def mergeWith[B](sequence2: Sequence[B]): Sequence[Either[A, B]] = {
+    require(
+      requirement = (sequence1.length + sequence2.length) >= intervals.last,
+      message = "sequence.length too short"
+    )
     new Sequence[Either[A, B]] {
-
-      override def length: Int = intervals.last
-
       override def findAt(position: Int): Option[Either[A, B]] = {
         @tailrec
         def loop(inf: Int, sup: Int): Option[Either[A, B]] = {
@@ -40,9 +41,10 @@ class SequenceHeadline[A] private (
         }
         loop(0, intervals.length - 1)
       }
-      private lazy val intervals = interval.scanLeft(0){ _ + _ + 1 }
+      override def length: Int = intervals.last
     }
   }
+  private lazy val intervals = interval.scanLeft(0){ _ + _ + 1 }
 }
 
 object SequenceHeadline {

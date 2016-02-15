@@ -4,10 +4,9 @@ import org.scalatest.{Matchers, FlatSpecLike}
 
 class SequenceMergerTest extends FlatSpecLike with Matchers {
 
-  behavior of classOf[SequenceMerger[_]].getName
+  behavior of classOf[SequenceHeadline[_]].getSimpleName
 
-
-  it can "merge sequence" in {
+  it can "generate headlined sequence" in {
     val integers = IntegerSequence(10 to 12)
     val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
     val strings = StringSequence("a", "b", "c", "d", "e", "f")
@@ -33,7 +32,6 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
 
   it should "throw exception to inconsistent length" in {
     val integers = IntegerSequence(10 to 14)
-
     intercept[IllegalArgumentException]{
       SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
     }
@@ -62,4 +60,13 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
     sequence.findAt(100) shouldBe None
     sequence.findAt(-1)  shouldBe None
   }
+
+  it should "throw exception to short sequence" in {
+    val integers = IntegerSequence(10 to 12)
+    val headline = SequenceHeadline.atInterval(integers, Seq(1, 2, 3))
+    intercept[IllegalArgumentException]{
+      headline mergeWith StringSequence("a", "b", "c", "d", "e")
+    }
+  }
+
 }
