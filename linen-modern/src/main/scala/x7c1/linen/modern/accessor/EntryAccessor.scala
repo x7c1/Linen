@@ -1,26 +1,34 @@
 package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
-import android.database.{SQLException, Cursor}
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.{Date, UnreadEntry, UnreadDetail, UnreadOutline}
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import android.database.{Cursor, SQLException}
+import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 import scala.annotation.tailrec
 
 trait EntryAccessor[+A <: UnreadEntry]{
 
-  def findAt(position: Int): Option[A]
+  def findAt(position: Int): Option[EntryRow[A]]
 
   def length: Int
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 }
 
+case class EntryRow[+A <: UnreadEntry](content: Either[EntrySource, A]){
+  val sourceId: Long = content match {
+    case Left(source) => source.sourceId
+    case Right(entry) => entry.sourceId
+  }
+}
+
 class EntryAccessorBinder[A <: UnreadEntry](
   accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
 
-  override def findAt(position: Int): Option[A] = {
+  override def findAt(position: Int) = {
     @tailrec
     def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[(EntryAccessor[A], Int)] =
       accessors match {
@@ -56,20 +64,19 @@ class EntryAccessorBinder[A <: UnreadEntry](
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
-  factory: EntryFactory[A],
-  cursor: Cursor,
-  positions: Map[Long, Int]) extends EntryAccessor[A] {
+  entrySequence: EntrySequence[A],
+  positions: SourcePositions) extends EntryAccessor[A] {
 
-  override def findAt(position: Int) = synchronized {
-    if (cursor moveToPosition position){
-      Some apply factory.createEntry()
-    } else None
+  private lazy val sequence = positions.toHeadlines mergeWith entrySequence
+
+  override def findAt(position: Int) = {
+    sequence.findAt(position).map(new EntryRow(_))
   }
   override lazy val length = {
-    cursor.getCount
+    sequence.length
   }
   override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
-    positions.get(sourceId)
+    positions.findEntryPositionOf(sourceId)
   }
 }
 
@@ -111,19 +118,21 @@ object EntryAccessor {
 
   def forEntryOutline(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positionMap: Map[Long, Int]): EntryAccessor[UnreadOutline] = {
+    positions: SourcePositions): EntryAccessor[UnreadOutline] = {
 
     val cursor = createOutlineCursor(db, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
-    new EntryAccessorImpl(factory, cursor, positionMap)
+    val sequence = new EntrySequence(factory, cursor)
+    new EntryAccessorImpl(sequence, positions)
   }
   def forEntryDetail(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positionMap: Map[Long, Int]): EntryAccessor[UnreadDetail] = {
+    positions: SourcePositions): EntryAccessor[UnreadDetail] = {
 
     val cursor = createDetailCursor(db, sourceIds)
     val factory = new EntryDetailFactory(cursor)
-    new EntryAccessorImpl(factory, cursor, positionMap)
+    val sequence = new EntrySequence(factory, cursor)
+    new EntryAccessorImpl(sequence, positions)
   }
 
   def createOutlineCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
@@ -167,7 +176,7 @@ object EntryAccessor {
 
     db.rawQuery(union, sourceIds.map(_.toString).toArray)
   }
-  def createPositionMap(db: SQLiteDatabase, sourceIds: Seq[Long]): Map[Long, Int] = {
+  def createPositionMap(db: SQLiteDatabase, sourceIds: Seq[Long]): SourcePositions = {
     val cursor = createPositionCursor(db, sourceIds)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
@@ -177,15 +186,60 @@ object EntryAccessor {
     }
     val pairs = list.scanLeft(0L -> (0, 0)){
       case ((_, (previous, sum)), (sourceId, count)) =>
-        sourceId -> (count, previous + sum)
+        sourceId -> (count + 1, previous + sum)
     } map {
       case (sourceId, (count, position)) =>
-        sourceId -> position
+        sourceId -> (position + 1)
     }
-    cursor.close()
-    pairs.toMap
+    new SourcePositions(cursor, pairs.toMap)
   }
 }
+
+class EntrySequence[A <: UnreadEntry](
+  factory: EntryFactory[A],
+  cursor: Cursor ) extends Sequence[A]{
+
+  override lazy val length: Int = cursor.getCount
+
+  override def findAt(position: Int): Option[A] = synchronized {
+    cursor moveToPosition position match {
+      case true => Some(factory.createEntry())
+      case false => None
+    }
+  }
+}
+
+class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[EntrySource] {
+
+  def toHeadlines: SequenceHeadlines[EntrySource] = {
+    val countIndex = cursor getColumnIndex "count"
+    val list = (0 to cursor.getCount - 1) map { i =>
+      cursor moveToPosition i
+      cursor.getInt(countIndex)
+    }
+    SequenceHeadlines.atInterval(this, list)
+  }
+  def findEntryPositionOf(sourceId: Long): Option[Int] = countMap.get(sourceId)
+
+  override lazy val length: Int = cursor.getCount
+
+  override def findAt(position: Int): Option[EntrySource] = {
+    val sourceIdIndex = cursor getColumnIndex "source_id"
+    cursor moveToPosition position match {
+      case true =>
+        val id = cursor getLong sourceIdIndex
+        Some(new EntrySource(
+          sourceId = id,
+          title = s"dummy-title-$id"
+        ))
+      case false => None
+    }
+  }
+}
+class EntrySource(
+  val sourceId: Long,
+  val title: String
+)
 
 trait EntryRecordColumn extends TypedFields {
   def entry_id: Long

@@ -48,7 +48,7 @@ class SequenceHeadlines[A] private (
 }
 
 object SequenceHeadlines {
-  def atInterval[A](sequence: Sequence[A], interval: Seq[Int]): SequenceHeadlines[A] = {
+  def atInterval[A](sequence: Sequence[A], interval: IndexedSeq[Int]): SequenceHeadlines[A] = {
     new SequenceHeadlines(sequence, interval)
   }
 }

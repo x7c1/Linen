@@ -55,8 +55,18 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
-    assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
-    assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
+    assertEquals(true, entries.exists {
+      case EntryRow(Right(entry)) =>
+        entry.shortTitle == "5-1 entry title"
+      case _ =>
+        false
+    })
+    assertEquals(false, entries.exists {
+      case EntryRow(Right(entry)) =>
+        entry.shortTitle == "3-1 entry title"
+      case _ =>
+        false
+    })
   }
 
   def showTable(tableName: String) = {

@@ -3,9 +3,10 @@ package x7c1.linen.modern.display.unread
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.UnreadOutlineRow
-import x7c1.linen.modern.accessor.EntryAccessor
+import x7c1.linen.modern.accessor.{EntryRow, EntryAccessor}
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 
@@ -21,12 +22,17 @@ class OutlineRowAdapter(
     provider inflateOn parent
   }
   override def onBindViewHolder(holder: UnreadOutlineRow, position: Int) = {
-    entryAccessor findAt position foreach { entry =>
-      holder.title.text = entry.shortTitle
-      holder.itemView onClick { _ =>
-        val event = OutlineSelectedEvent(position, entry)
-        entrySelectedListener onEntrySelected event
-      }
+    entryAccessor findAt position foreach {
+      case EntryRow(Right(entry)) =>
+        holder.title.text = entry.shortTitle
+        holder.itemView onClick { _ =>
+          val event = OutlineSelectedEvent(position, entry)
+          entrySelectedListener onEntrySelected event
+        }
+      case EntryRow(Left(source)) =>
+        holder.title.text = source.title
+
+        Log info s"source $source"
     }
   }
 }
