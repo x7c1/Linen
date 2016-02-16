@@ -6,15 +6,14 @@
 
 package x7c1.linen.glue.res.layout;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-public class UnreadOutlineRow extends RecyclerView.ViewHolder {
+public class UnreadOutlineEntry extends UnreadOutline {
 
     public final TextView title;
 
-    public UnreadOutlineRow(
+    public UnreadOutlineEntry(
         View itemView,
         TextView title
     ){
