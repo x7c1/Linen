@@ -8,7 +8,7 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
 
   it can "generate headlined sequence" in {
     val integers = IntegerSequence(10 to 12)
-    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, IndexedSeq(1, 2, 3))
     val strings = StringSequence("a", "b", "c", "d", "e", "f")
 
     // 10 a 11 b c 12 d e f
@@ -33,13 +33,13 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
   it should "throw exception to inconsistent length" in {
     val integers = IntegerSequence(10 to 14)
     intercept[IllegalArgumentException]{
-      SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
+      SequenceHeadlines.atInterval(integers, IndexedSeq(1, 2, 3))
     }
   }
 
   it should "ignore extra items" in {
     val integers = IntegerSequence(10 to 12)
-    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, IndexedSeq(1, 2, 3))
     val strings = StringSequence("a", "b", "c", "d", "e", "f", "g", "h")
 
     // 10 a 11 b c 12 d e f
@@ -63,7 +63,7 @@ class SequenceMergerTest extends FlatSpecLike with Matchers {
 
   it should "throw exception to short sequence" in {
     val integers = IntegerSequence(10 to 12)
-    val headlines = SequenceHeadlines.atInterval(integers, Seq(1, 2, 3))
+    val headlines = SequenceHeadlines.atInterval(integers, IndexedSeq(1, 2, 3))
     intercept[IllegalArgumentException]{
       headlines mergeWith StringSequence("a", "b", "c", "d", "e")
     }

@@ -16,6 +16,8 @@ trait EntryAccessor[+A <: UnreadEntry]{
   def length: Int
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
+
+  def findKindAt(position: Int): Option[UnreadRowKind]
 }
 
 case class EntryRow[+A <: UnreadEntry](content: Either[EntrySource, A]){
@@ -29,17 +31,7 @@ class EntryAccessorBinder[A <: UnreadEntry](
   accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
 
   override def findAt(position: Int) = {
-    @tailrec
-    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[(EntryAccessor[A], Int)] =
-      accessors match {
-        case x +: xs => x.length + prev match {
-          case sum if sum > position => Some(x -> prev)
-          case sum => loop(xs, sum)
-        }
-        case Seq() => None
-      }
-
-    loop(accessors, 0) flatMap { case (accessor, prev) =>
+    findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
       accessor.findAt(position - prev)
     }
   }
@@ -61,6 +53,28 @@ class EntryAccessorBinder[A <: UnreadEntry](
 
     loop(accessors, 0)
   }
+
+  override def findKindAt(position: Int) = {
+    findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
+      accessor.findKindAt(position - prev)
+    }
+  }
+
+  @tailrec
+  private def findAccessor(
+    accessors: Seq[EntryAccessor[A]],
+    position: Int,
+    prev: Int): Option[(EntryAccessor[A], Int)] = {
+
+    accessors match {
+      case x +: xs => x.length + prev match {
+        case sum if sum > position => Some(x -> prev)
+        case sum => findAccessor(xs, position, sum)
+      }
+      case Seq() => None
+    }
+  }
+
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
@@ -77,6 +91,10 @@ class EntryAccessorImpl[A <: UnreadEntry](
   }
   override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
     positions.findEntryPositionOf(sourceId)
+  }
+  override def findKindAt(position: Int): Option[UnreadRowKind] = {
+    val kind = if (positions isSource position) SourceKind else EntryKind
+    Some(kind)
   }
 }
 
@@ -211,8 +229,25 @@ class EntrySequence[A <: UnreadEntry](
 
 class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[EntrySource] {
 
+  private lazy val countIndex = cursor getColumnIndex "count"
+  private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
+
+  private lazy val positionMap: Map[Int, Boolean] = {
+    val counts = (0 to cursor.getCount - 1) map { i =>
+      cursor moveToPosition i
+      cursor.getInt(countIndex)
+    }
+    val pairs = counts.scanLeft(0 -> true){
+      case ((position, bool), count) =>
+        (position + count + 1) -> true
+    }
+    pairs.toMap
+  }
+  def isSource(position: Int): Boolean = {
+    positionMap.getOrElse(position, false)
+  }
+
   def toHeadlines: SequenceHeadlines[EntrySource] = {
-    val countIndex = cursor getColumnIndex "count"
     val list = (0 to cursor.getCount - 1) map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
@@ -224,7 +259,6 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
   override lazy val length: Int = cursor.getCount
 
   override def findAt(position: Int): Option[EntrySource] = {
-    val sourceIdIndex = cursor getColumnIndex "source_id"
     cursor moveToPosition position match {
       case true =>
         val id = cursor getLong sourceIdIndex

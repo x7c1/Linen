@@ -68,6 +68,21 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
         false
     })
   }
+  @Test
+  def testUnreadRowKind() = {
+
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val sourceIds = sourceAccessor.sourceIds
+    val positions = EntryAccessor.createPositionMap(db, sourceIds)
+    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+
+    assertEquals(Some(SourceKind), accessor.findKindAt(0))
+    assertEquals(Some(EntryKind), accessor.findKindAt(1))
+  }
 
   def showTable(tableName: String) = {
     println(s"====== tableName : $tableName")

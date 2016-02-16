@@ -13,6 +13,7 @@ import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowProvider;
 import x7c1.linen.res.layout.UnreadOutlineEntryProvider;
+import x7c1.linen.res.layout.UnreadOutlineSourceProvider;
 import x7c1.linen.res.layout.UnreadSourceRowProvider;
 
 
@@ -47,6 +48,7 @@ public class MainActivity extends BaseActivity {
 			),
 			new UnreadRowProviders(
 				new UnreadSourceRowProvider(this),
+				new UnreadOutlineSourceProvider(this),
 				new UnreadOutlineEntryProvider(this),
 				new UnreadDetailRowProvider(this)
 			)
