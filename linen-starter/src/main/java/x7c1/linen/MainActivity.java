@@ -48,8 +48,8 @@ public class MainActivity extends BaseActivity {
 			),
 			new UnreadRowProviders(
 				new UnreadSourceRowProvider(this),
-				new UnreadOutlineSourceProvider(this),
-				new UnreadOutlineEntryProvider(this),
+				new UnreadOutlineRowSourceProvider(this),
+				new UnreadOutlineRowEntryProvider(this),
 				new UnreadDetailRowProvider(this)
 			)
 		);

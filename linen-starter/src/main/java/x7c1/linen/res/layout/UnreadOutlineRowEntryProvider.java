@@ -13,32 +13,32 @@ import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.UnreadOutlineEntry;
+import x7c1.linen.glue.res.layout.UnreadOutlineRowEntry;
 
-public class UnreadOutlineEntryProvider implements ViewHolderProvider<UnreadOutlineEntry> {
+public class UnreadOutlineRowEntryProvider implements ViewHolderProvider<UnreadOutlineRowEntry> {
 
     private final LayoutInflater inflater;
 
-    public UnreadOutlineEntryProvider(Context context){
+    public UnreadOutlineRowEntryProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int layoutId(){
-        return R.layout.unread_outline__entry;
+        return R.layout.unread_outline_row__entry;
     }
 
     @Override
-    public UnreadOutlineEntry inflateOn(ViewGroup parent){
+    public UnreadOutlineRowEntry inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public UnreadOutlineEntry inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.unread_outline__entry, parent, attachToRoot);
-        return new UnreadOutlineEntry(
+    public UnreadOutlineRowEntry inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.unread_outline_row__entry, parent, attachToRoot);
+        return new UnreadOutlineRowEntry(
             view,
-            (TextView) view.findViewById(R.id.unread_outline__entry__title)
+            (TextView) view.findViewById(R.id.unread_outline_row__entry__title)
         );
     }
 }

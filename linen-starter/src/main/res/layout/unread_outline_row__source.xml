@@ -8,7 +8,7 @@
     android:paddingBottom="4dp"
     >
     <TextView
-        android:id="@+id/unread_outline__source__title"
+        android:id="@+id/unread_outline_row__source__title"
         android:textSize="13sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -13,32 +13,32 @@ import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.UnreadOutlineSource;
+import x7c1.linen.glue.res.layout.UnreadOutlineRowSource;
 
-public class UnreadOutlineSourceProvider implements ViewHolderProvider<UnreadOutlineSource> {
+public class UnreadOutlineRowSourceProvider implements ViewHolderProvider<UnreadOutlineRowSource> {
 
     private final LayoutInflater inflater;
 
-    public UnreadOutlineSourceProvider(Context context){
+    public UnreadOutlineRowSourceProvider(Context context){
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int layoutId(){
-        return R.layout.unread_outline__source;
+        return R.layout.unread_outline_row__source;
     }
 
     @Override
-    public UnreadOutlineSource inflateOn(ViewGroup parent){
+    public UnreadOutlineRowSource inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public UnreadOutlineSource inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.unread_outline__source, parent, attachToRoot);
-        return new UnreadOutlineSource(
+    public UnreadOutlineRowSource inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.unread_outline_row__source, parent, attachToRoot);
+        return new UnreadOutlineRowSource(
             view,
-            (TextView) view.findViewById(R.id.unread_outline__source__title)
+            (TextView) view.findViewById(R.id.unread_outline_row__source__title)
         );
     }
 }

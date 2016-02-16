@@ -9,11 +9,11 @@ package x7c1.linen.glue.res.layout;
 import android.view.View;
 import android.widget.TextView;
 
-public class UnreadOutlineSource extends UnreadOutline {
+public class UnreadOutlineRowSource extends UnreadOutlineRow {
 
     public final TextView title;
 
-    public UnreadOutlineSource(
+    public UnreadOutlineRowSource(
         View itemView,
         TextView title
     ){
