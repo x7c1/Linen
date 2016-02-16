@@ -264,7 +264,7 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
         val id = cursor getLong sourceIdIndex
         Some(new EntrySource(
           sourceId = id,
-          title = s"dummy-title-$id"
+          title = s"dummy-title-$id 日本語 タイトル"
         ))
       case false => None
     }

@@ -12,8 +12,8 @@ import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowProvider;
-import x7c1.linen.res.layout.UnreadOutlineEntryProvider;
-import x7c1.linen.res.layout.UnreadOutlineSourceProvider;
+import x7c1.linen.res.layout.UnreadOutlineRowEntryProvider;
+import x7c1.linen.res.layout.UnreadOutlineRowSourceProvider;
 import x7c1.linen.res.layout.UnreadSourceRowProvider;
 
 
