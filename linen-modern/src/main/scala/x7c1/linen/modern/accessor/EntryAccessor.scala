@@ -3,8 +3,10 @@ package x7c1.linen.modern.accessor
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
+import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 import scala.annotation.tailrec
@@ -18,6 +20,19 @@ trait EntryAccessor[+A <: UnreadEntry]{
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
   def findKindAt(position: Int): Option[UnreadRowKind]
+
+  def bindViewHolder[B <: ViewHolder]
+    (holder: B, position: Int)
+    (block: PartialFunction[(B, Either[EntrySource, A]), Unit]) = {
+
+    findAt(position) -> holder match {
+      case (Some(EntryRow(item)), _) if block isDefinedAt (holder, item) =>
+        block(holder, item)
+      case (item, _) =>
+        Log error s"unknown item:$item, holder:$holder"
+    }
+  }
+
 }
 
 case class EntryRow[+A <: UnreadEntry](content: Either[EntrySource, A]){

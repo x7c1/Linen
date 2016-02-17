@@ -3,7 +3,7 @@ package x7c1.linen.modern.display.unread
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowSource}
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow, SourceKind}
+import x7c1.linen.modern.accessor.{EntryAccessor, SourceKind}
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -26,20 +26,16 @@ class OutlineRowAdapter(
     provider inflateOn parent
   }
   override def onBindViewHolder(holder: UnreadOutlineRow, position: Int) = {
-    entryAccessor.findAt(position) -> holder match {
-      case (Some(EntryRow(Right(entry))), holder: UnreadOutlineRowEntry) =>
-        holder.title.text = entry.shortTitle
-        holder.itemView onClick { _ =>
+    entryAccessor.bindViewHolder(holder, position){
+      case (row: UnreadOutlineRowEntry, Right(entry)) =>
+        row.title.text = entry.shortTitle
+        row.itemView onClick { _ =>
           val event = OutlineSelectedEvent(position, entry)
           entrySelectedListener onEntrySelected event
         }
-
-      case (Some(EntryRow(Left(source))), holder: UnreadOutlineRowSource) =>
-        holder.title.text = source.title
+      case (row: UnreadOutlineRowSource, Left(source)) =>
+        row.title.text = source.title
         Log info s"source $source"
-
-      case (outline, row) =>
-        Log error s"unknown outline:$outline, holder:$row"
     }
   }
   override def getItemViewType(position: Int): Int = {
