@@ -178,7 +178,7 @@ object EntryAccessor {
 
     db.rawQuery(union, sourceIds.map(_.toString).toArray)
   }
-  def createPositionCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+  def createPositionQuery(sourceIds: Seq[Long]): Query = {
     val count =
       s"""SELECT
          |  _id AS entry_id,
@@ -187,12 +187,23 @@ object EntryAccessor {
          |WHERE source_id = ?
          |LIMIT 20""".stripMargin
 
-    val sql = s"SELECT source_id, COUNT(entry_id) AS count FROM ($count) AS c1"
+    val sql =
+      s"""SELECT
+         | source_id,
+         | title,
+         | COUNT(entry_id) AS count
+         |FROM ($count) AS c1
+         |INNER JOIN sources as s1 ON s1._id = c1.source_id""".stripMargin
+
     val union = sourceIds.
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    db.rawQuery(union, sourceIds.map(_.toString).toArray)
+    new Query(union, sourceIds.map(_.toString).toArray)
+  }
+  def createPositionCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
+    val query = createPositionQuery(sourceIds)
+    db.rawQuery(query.sql, query.selectionArgs)
   }
   def createPositionMap(db: SQLiteDatabase, sourceIds: Seq[Long]): SourcePositions = {
     val cursor = createPositionCursor(db, sourceIds)
@@ -231,6 +242,7 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
 
   private lazy val countIndex = cursor getColumnIndex "count"
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
+  private lazy val titleIndex = cursor getColumnIndex "title"
 
   private lazy val positionMap: Map[Int, Boolean] = {
     val counts = (0 to cursor.getCount - 1) map { i =>
@@ -264,15 +276,15 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
         val id = cursor getLong sourceIdIndex
         Some(new EntrySource(
           sourceId = id,
-          title = s"dummy-title-$id 日本語 タイトル"
+          title = cursor getString titleIndex
         ))
       case false => None
     }
   }
 }
-class EntrySource(
-  val sourceId: Long,
-  val title: String
+case class EntrySource(
+  sourceId: Long,
+  title: String
 )
 
 trait EntryRecordColumn extends TypedFields {

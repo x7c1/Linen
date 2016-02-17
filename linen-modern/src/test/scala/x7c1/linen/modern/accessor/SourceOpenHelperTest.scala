@@ -43,7 +43,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
   @Test
   def testQueryForEntryArea() = {
-
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
@@ -68,6 +67,24 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
         false
     })
   }
+  @Test
+  def testQueryPlanForEntryPosition() = {
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val sourceIds = sourceAccessor.sourceIds
+    val query = EntryAccessor.createPositionQuery(sourceIds)
+    val plans = QueryExplainer(db).explain(query)
+
+//    println(query.sql)
+//    plans foreach println
+
+    assertEquals("USE TEMP B-TREE",
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
+  }
+
   @Test
   def testUnreadRowKind() = {
 
