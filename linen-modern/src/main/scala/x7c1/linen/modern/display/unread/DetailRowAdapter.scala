@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.UnreadDetailRow
+import x7c1.linen.glue.res.layout.UnreadDetailRowEntry
 import x7c1.linen.modern.accessor.{EntryRow, EntryAccessor}
 import x7c1.linen.modern.struct.{UnreadEntry, UnreadDetail}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -16,14 +16,14 @@ class DetailRowAdapter(
   entryAccessor: EntryAccessor[UnreadDetail],
   selectedListener: OnDetailSelectedListener,
   visitSelectedListener: OnEntryVisitListener[UnreadDetail],
-  viewHolderProvider: ViewHolderProvider[UnreadDetailRow]) extends Adapter[UnreadDetailRow] {
+  viewHolderProvider: ViewHolderProvider[UnreadDetailRowEntry]) extends Adapter[UnreadDetailRowEntry] {
 
   override def getItemCount: Int = entryAccessor.length
 
-  override def onCreateViewHolder(viewGroup: ViewGroup, i: Int): UnreadDetailRow = {
+  override def onCreateViewHolder(viewGroup: ViewGroup, i: Int): UnreadDetailRowEntry = {
     viewHolderProvider.inflateOn(viewGroup)
   }
-  override def onBindViewHolder(holder: UnreadDetailRow, position: Int): Unit = {
+  override def onBindViewHolder(holder: UnreadDetailRowEntry, position: Int): Unit = {
     entryAccessor findAt position foreach {
       case EntryRow(Right(entry)) =>
         holder.title.text = entry.fullTitle
