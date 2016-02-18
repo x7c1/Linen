@@ -2,9 +2,10 @@ package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
-import x7c1.linen.modern.action.{OutlineFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.unread.{PaneDragDetector, OutlineRowAdapter}
+import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
+import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.observer.recycler.VerticalDragDetector
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait OutlineAreaInitializer {
@@ -38,6 +39,8 @@ trait OutlineAreaInitializer {
       actions = actions,
       onTouch = forFocus
     )
+    layout.entryList addOnItemTouchListener new VerticalDragDetector(context = activity)
+
     val forSkip = SkipDetector.createListener(
       context = layout.entryToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,
