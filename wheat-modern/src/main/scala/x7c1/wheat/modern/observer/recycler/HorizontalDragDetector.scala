@@ -97,7 +97,7 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
   }
 }
 
-case class FlingEvent(direction: DragDirection)
+case class FlingEvent(direction: DragDirection, velocityY: Float)
 
 case class DragEvent(distance: Float)
 
