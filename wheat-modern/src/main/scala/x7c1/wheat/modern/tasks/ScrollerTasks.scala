@@ -56,15 +56,14 @@ class ScrollerTasks private (
       }
     } yield ()
   }
-
-  def scrollTo(position: Int): CallbackTask[Unit] = task of {
+  def scrollTo(position: Int, timePerInch: Float = 45F): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
       ui <- task {
         UiThread via recyclerView
       }
       scroller <- task {
         new SmoothScroller(
-          recyclerView.getContext, timePerInch = 45F, layoutManager,
+          recyclerView.getContext, timePerInch, layoutManager,
           done.unwrap
         )
       }

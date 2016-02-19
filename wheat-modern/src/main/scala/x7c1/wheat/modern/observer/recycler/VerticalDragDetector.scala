@@ -10,14 +10,36 @@ import android.view.View.OnTouchListener
 import android.view.{GestureDetector, MotionEvent, View}
 import x7c1.wheat.macros.logger.Log
 
+object VerticalDragDetector {
+  def create(
+    context: Context,
+    onDrag: DragEvent => Unit,
+    onDragStopped: DragStoppedEvent => Unit
+  ): VerticalDragDetector[DragStoppedEvent] = {
 
-class VerticalDragDetector[A <: DragStoppedEvent](
-  context: Context
-//  ,
-//  stoppedEventFactory: DragStoppedEventFactory[A],
+    val factory = new DragStoppedEventFactory[DragStoppedEvent] {
+      override def createEvent(distance0: Float, direction0: DragDirection) = {
+        new DragStoppedEvent {
+          override def distance: Float = distance0
+          override def direction: DragDirection = direction0
+        }
+      }
+    }
+    new VerticalDragDetector[DragStoppedEvent](
+      context = context,
+      stoppedEventFactory = factory,
+      onDrag = onDrag,
+      onDragStopped = onDragStopped
+    )
+  }
+}
+
+class VerticalDragDetector[A <: DragStoppedEvent] private (
+  context: Context,
+  stoppedEventFactory: DragStoppedEventFactory[A],
 //  onTouch: OnTouchListener,
-//  onDrag: DragEvent => Unit,
-//  onDragStopped: A => Unit
+  onDrag: DragEvent => Unit,
+  onDragStopped: A => Unit
 ) extends SimpleOnItemTouchListener{
 
   private val detector = new GestureDetector(context, new VerticalFilter)
@@ -34,33 +56,34 @@ class VerticalDragDetector[A <: DragStoppedEvent](
         for {
           dir <- direction
           start <- startPosition
-          distance = e.getRawX - start
-//          event = stoppedEventFactory.createEvent(distance, dir)
+          distance = e.getRawY - start
+          event = stoppedEventFactory.createEvent(distance, dir)
         } yield {
           Log info s"$e"
-//          onDragStopped(event)
+          onDragStopped(event)
         }
       case _ if direction.nonEmpty =>
         listenerToDrag.onTouch(rv, e)
       case _ =>
     }
-    if (!(previous contains e.getRawX)){
-      direction = previous map (e.getRawX - _) flatMap DragDirection.create
-      previous = Some(e.getRawX)
+    if (!(previous contains e.getRawY)){
+      direction = previous map (e.getRawY - _) flatMap DragDirection.create
+      previous = Some(e.getRawY)
     }
   }
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
     val isVertical = detector onTouchEvent e
-    Log info s"$isVertical"
+//    Log info s"$isVertical"
     isVertical match {
       case false =>
-        listenerToDrag updateCurrentPosition e.getRawX
+        listenerToDrag updateCurrentPosition e.getRawY
 
       case _ if direction.nonEmpty =>
         Log error s"$direction, $e"
         listenerToDrag.onTouch(rv, e)
       case _ =>
     }
+    Log error s"$isVertical $e"
     isVertical
   }
   private class VerticalFilter extends SimpleOnGestureListener {
@@ -77,29 +100,30 @@ class VerticalDragDetector[A <: DragStoppedEvent](
         horizontalCount += 1
       }
       Log info s"h:$horizontalCount, v:$verticalCount"
-      val accepted = verticalCount > 0 && horizontalCount < 3
+//      val accepted = verticalCount > 0 && horizontalCount < 3
+      val accepted = verticalCount > 0
       accepted
     }
     override def onDown(e: MotionEvent): Boolean = {
       horizontalCount = 0
       verticalCount = 0
-      startPosition = Some(e.getRawX)
+      startPosition = Some(e.getRawY)
       false
     }
   }
   private class OnTouchToDrag extends OnTouchListener {
     private var currentPosition = Some(0F)
 
-    def updateCurrentPosition(x: Float) = {
-      currentPosition = Some(x)
+    def updateCurrentPosition(y: Float) = {
+      currentPosition = Some(y)
     }
     override def onTouch(v: View, event: MotionEvent): Boolean = {
-      currentPosition foreach { x =>
-        val diff = event.getRawX - x
+      currentPosition foreach { y =>
+        val diff = event.getRawY - y
         Log info s"$event"
-//        onDrag apply DragEvent(diff)
+        onDrag apply DragEvent(diff)
       }
-      updateCurrentPosition(event.getRawX)
+      updateCurrentPosition(event.getRawY)
       true
     }
   }

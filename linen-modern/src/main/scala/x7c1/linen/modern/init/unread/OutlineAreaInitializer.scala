@@ -5,7 +5,7 @@ import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelecte
 import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
 import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.observer.recycler.VerticalDragDetector
+import x7c1.wheat.modern.observer.recycler.{Previous, Next, VerticalDragDetector}
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait OutlineAreaInitializer {
@@ -39,8 +39,21 @@ trait OutlineAreaInitializer {
       actions = actions,
       onTouch = forFocus
     )
-    layout.entryList addOnItemTouchListener new VerticalDragDetector(context = activity)
-
+    layout.entryList addOnItemTouchListener VerticalDragDetector.create(
+      context = activity,
+      onDrag = e => {
+        layout.entryList.scrollBy(0, - e.distance.toInt)
+      },
+      onDragStopped = e => {
+        val position = e.direction match {
+          case Next =>
+            manager.findFirstCompletelyVisibleItemPosition()
+          case Previous =>
+            manager.findFirstVisibleItemPosition()
+        }
+        container.outlineArea.scrollTo(position, timePerInch = 100).execute()
+      }
+    )
     val forSkip = SkipDetector.createListener(
       context = layout.entryToNext.getContext,
       positionFinder = SkipPositionFinder createBy manager,

@@ -23,8 +23,8 @@ trait Pane {
   def fastScrollTo(position: Int): CallbackTask[Unit] = {
     scrollerTasks fastScrollTo position
   }
-  def scrollTo(position: Int): CallbackTask[Unit] = {
-    scrollerTasks scrollTo position
+  def scrollTo(position: Int, timePerInch: Float = 45F): CallbackTask[Unit] = {
+    scrollerTasks.scrollTo(position, timePerInch)
   }
   def skipTo(position: Int): CallbackTask[Unit] = {
     scrollerTasks skipTo position
