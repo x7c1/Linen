@@ -13,6 +13,10 @@ import x7c1.wheat.macros.logger.Log
 object VerticalDragDetector {
   def create(
     context: Context,
+    flingVelocityThreshold: Int,
+    flingDistanceThreshold: Int,
+    onFling: FlingEvent => Unit,
+    onDragStart: () => Unit,
     onDrag: DragEvent => Unit,
     onDragStopped: DragStoppedEvent => Unit
   ): VerticalDragDetector[DragStoppedEvent] = {
@@ -28,6 +32,10 @@ object VerticalDragDetector {
     new VerticalDragDetector[DragStoppedEvent](
       context = context,
       stoppedEventFactory = factory,
+      flingVelocityThreshold = flingVelocityThreshold,
+      flingDistanceThreshold = flingDistanceThreshold,
+      onFlingListener = onFling,
+      onDragStart = onDragStart,
       onDrag = onDrag,
       onDragStopped = onDragStopped
     )
@@ -38,11 +46,17 @@ class VerticalDragDetector[A <: DragStoppedEvent] private (
   context: Context,
   stoppedEventFactory: DragStoppedEventFactory[A],
 //  onTouch: OnTouchListener,
+
+  flingVelocityThreshold: Int,
+  flingDistanceThreshold: Int,
+  onFlingListener: FlingEvent => Unit,
+  onDragStart: () => Unit,
   onDrag: DragEvent => Unit,
   onDragStopped: A => Unit
 ) extends SimpleOnItemTouchListener{
 
   private val detector = new GestureDetector(context, new VerticalFilter)
+  private val flingDetector = new GestureDetector(context, new FlingFilter)
   private val listenerToDrag = new OnTouchToDrag
 
   private var previous: Option[Float] = None
@@ -59,13 +73,14 @@ class VerticalDragDetector[A <: DragStoppedEvent] private (
           distance = e.getRawY - start
           event = stoppedEventFactory.createEvent(distance, dir)
         } yield {
-          Log info s"$e"
           onDragStopped(event)
         }
       case _ if direction.nonEmpty =>
         listenerToDrag.onTouch(rv, e)
       case _ =>
     }
+    flingDetector.onTouchEvent(e)
+
     if (!(previous contains e.getRawY)){
       direction = previous map (e.getRawY - _) flatMap DragDirection.create
       previous = Some(e.getRawY)
@@ -73,18 +88,42 @@ class VerticalDragDetector[A <: DragStoppedEvent] private (
   }
   override def onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean = {
     val isVertical = detector onTouchEvent e
-//    Log info s"$isVertical"
+    flingDetector.onTouchEvent(e)
+
     isVertical match {
       case false =>
         listenerToDrag updateCurrentPosition e.getRawY
 
       case _ if direction.nonEmpty =>
-        Log error s"$direction, $e"
         listenerToDrag.onTouch(rv, e)
       case _ =>
     }
-    Log error s"$isVertical $e"
     isVertical
+  }
+  private class FlingFilter extends SimpleOnGestureListener {
+    override def onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = {
+
+      val distance = for {
+        y1 <- Option(e1) map (_.getRawY)
+        y2 <- Option(e2) map (_.getRawY)
+      } yield {
+        abs(y2 - y1)
+      }
+
+//      Log info s"$velocityY, $flingVelocityThreshold, $distance, ${Option(e1).map(_.getRawY)}, ${Option(e2).map(_.getRawY)}"
+
+      val shouldFling =
+        (abs(velocityY) > flingVelocityThreshold) &&
+        (distance exists (_ > flingDistanceThreshold))
+
+      if (shouldFling){
+        DragDirection create velocityY foreach { direction =>
+          onFlingListener(FlingEvent(direction))
+        }
+      }
+
+      false
+    }
   }
   private class VerticalFilter extends SimpleOnGestureListener {
     private var horizontalCount = 0
@@ -94,13 +133,17 @@ class VerticalDragDetector[A <: DragStoppedEvent] private (
       e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = {
 
       val isVertical = abs(distanceY) > abs(2 * distanceX)
+
+      if (isVertical && verticalCount == 0) {
+        onDragStart()
+      }
+
       if (isVertical){
         verticalCount += 1
       } else {
         horizontalCount += 1
       }
       Log info s"h:$horizontalCount, v:$verticalCount"
-//      val accepted = verticalCount > 0 && horizontalCount < 3
       val accepted = verticalCount > 0
       accepted
     }
@@ -120,7 +163,6 @@ class VerticalDragDetector[A <: DragStoppedEvent] private (
     override def onTouch(v: View, event: MotionEvent): Boolean = {
       currentPosition foreach { y =>
         val diff = event.getRawY - y
-        Log info s"$event"
         onDrag apply DragEvent(diff)
       }
       updateCurrentPosition(event.getRawY)

@@ -97,6 +97,8 @@ class HorizontalDragDetector[A <: DragStoppedEvent](
   }
 }
 
+case class FlingEvent(direction: DragDirection)
+
 case class DragEvent(distance: Float)
 
 trait DragStoppedEvent {
