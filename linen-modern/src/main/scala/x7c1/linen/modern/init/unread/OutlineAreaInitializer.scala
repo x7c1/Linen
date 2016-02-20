@@ -1,9 +1,11 @@
 package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View.OnTouchListener
+import android.view.{MotionEvent, View}
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
-import x7c1.linen.modern.action.{OutlineFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.unread.{PaneDragDetector, OutlineRowAdapter}
+import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
+import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -24,7 +26,8 @@ trait OutlineAreaInitializer {
     layout.entryList setAdapter new OutlineRowAdapter(
       accessors.entryOutline,
       new OutlineSelectedObserver(actions),
-      unreadRowProviders.forOutline
+      unreadRowProviders.forOutlineSource,
+      unreadRowProviders.forOutlineEntry
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,

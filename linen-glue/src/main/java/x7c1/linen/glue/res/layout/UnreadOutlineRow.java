@@ -8,17 +8,9 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 
 public class UnreadOutlineRow extends RecyclerView.ViewHolder {
-
-    public final TextView title;
-
-    public UnreadOutlineRow(
-        View itemView,
-        TextView title
-    ){
+    public UnreadOutlineRow(View itemView) {
         super(itemView);
-        this.title = title;
     }
 }

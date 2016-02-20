@@ -43,7 +43,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
   @Test
   def testQueryForEntryArea() = {
-
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
@@ -55,8 +54,51 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
-    assertEquals(true, entries.exists(_.shortTitle == "5-1 entry title"))
-    assertEquals(false, entries.exists(_.shortTitle == "3-1 entry title"))
+    assertEquals(true, entries.exists {
+      case EntryRow(Right(entry)) =>
+        entry.shortTitle == "5-1 entry title"
+      case _ =>
+        false
+    })
+    assertEquals(false, entries.exists {
+      case EntryRow(Right(entry)) =>
+        entry.shortTitle == "3-1 entry title"
+      case _ =>
+        false
+    })
+  }
+  @Test
+  def testQueryPlanForEntryPosition() = {
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val sourceIds = sourceAccessor.sourceIds
+    val query = EntryAccessor.createPositionQuery(sourceIds)
+    val plans = QueryExplainer(db).explain(query)
+
+//    println(query.sql)
+//    plans foreach println
+
+    assertEquals("USE TEMP B-TREE",
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
+  }
+
+  @Test
+  def testUnreadRowKind() = {
+
+    val context = RuntimeEnvironment.application
+    DummyFactory.createDummies(context)(5)
+
+    val db = new LinenOpenHelper(context).getReadableDatabase
+    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val sourceIds = sourceAccessor.sourceIds
+    val positions = EntryAccessor.createPositionMap(db, sourceIds)
+    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+
+    assertEquals(Some(SourceKind), accessor.findKindAt(0))
+    assertEquals(Some(EntryKind), accessor.findKindAt(1))
   }
 
   def showTable(tableName: String) = {

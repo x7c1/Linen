@@ -11,7 +11,7 @@
     android:paddingBottom="16dp"
     >
     <TextView
-        android:id="@+id/unread_outline_row__title"
+        android:id="@+id/unread_outline_row__entry__title"
         android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
