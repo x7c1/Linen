@@ -73,6 +73,9 @@ class UpdaterMethods(
     Log info "[init]"
     new PresetFactory(service, helper).createPreset()
   }
+  def createDummySources(channelIds: Seq[Long]) = async {
+    Log info s"$channelIds"
+  }
   def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"
 

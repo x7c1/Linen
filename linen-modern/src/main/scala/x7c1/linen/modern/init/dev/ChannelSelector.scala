@@ -33,7 +33,7 @@ class ChannelSelector private (
     ).
     setPositiveButton("OK", new OnClickListener {
       override def onClick(dialog: DialogInterface, which: Int): Unit = {
-        onSelect onSelectPositive ChannelSelectedEvent(selectedTitles)
+        onSelect onSelectPositive ChannelSelectedEvent(selectedChannelNames)
       }
     }).
     setNegativeButton("Cancel", new OnClickListener {
@@ -45,7 +45,10 @@ class ChannelSelector private (
 
   def showDialog() = dialog.show()
 
-  def selectedTitles: Seq[String] = {
+  def selectedChannelIds: Seq[Long] = {
+    selectedItems.keys.map(items).toSeq.map(_.channelId)
+  }
+  def selectedChannelNames: Seq[String] = {
     selectedItems.keys.map(items).toSeq.map(_.name)
   }
 }

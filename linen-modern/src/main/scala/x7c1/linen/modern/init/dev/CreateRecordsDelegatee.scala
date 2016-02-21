@@ -47,9 +47,10 @@ class CreateRecordsDelegatee (
       selector.showDialog()
     }
     layout.createDummySources onClick { _ =>
-      selector.selectedTitles.foreach { title =>
-        Log info s"channel-title:$title"
-      }
+      ServiceCaller.using[UpdaterMethods].
+        startService(activity, activity getClassOf Updater){
+          _ createDummySources selector.selectedChannelIds
+        }
     }
     layout.createPreset onClick { _ =>
       ServiceCaller.using[UpdaterMethods].
