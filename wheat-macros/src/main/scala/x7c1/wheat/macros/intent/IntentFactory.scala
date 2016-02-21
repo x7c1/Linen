@@ -63,7 +63,11 @@ private trait IntentTreeFactory {
     }
   }
   def putExtras(intent: TermName): List[Tree] = extras map { extra =>
-    q"$intent.putExtra(${extra.key}, ${extra.value})"
+    val value = extra.value match {
+      case x if x.tpe =:= typeOf[Seq[Long]] => q"$x.toArray"
+      case x => x
+    }
+    q"$intent.putExtra(${extra.key}, $value)"
   }
   def newIntent(androidContext: Tree, klass: Tree): Tree = {
     val intent = TermName(context freshName "intent")
