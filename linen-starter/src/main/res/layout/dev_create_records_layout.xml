@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,49 +22,57 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="sources"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:text="Sources"
         android:textColor="@color/text_tertiary"
         />
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/label_target_channels"
+        android:layout_height="wrap_content"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        >
+        <Button
+            android:id="@+id/dev_create_records_layout__select_channels"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="target channel(s)"
+            android:textSize="12sp"
+            android:text="TARGET CHANNELS"
             />
 
         <TextView
             android:id="@+id/dev_create_records_layout__selected_channels"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/label_target_channels"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/dev_create_records_layout__select_channels"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="13sp"
+            android:lineSpacingExtra="3dp"
+            android:lineSpacingMultiplier="1.1"
             />
 
         <Button
-            android:id="@+id/dev_create_records_layout__select_channels"
-            android:layout_below="@id/dev_create_records_layout__selected_channels"
-            android:layout_alignStart="@id/dev_create_records_layout__selected_channels"
+            android:id="@+id/dev_create_records_layout__create_dummy_sources"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="select"
+            android:layout_below="@id/dev_create_records_layout__select_channels"
+            android:textSize="12sp"
+            android:text="CREATE"
             />
 
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/dev_create_records_layout__create_dummy_sources"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="create dummy sources"
-        />
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/text_tertiary"
         />
 

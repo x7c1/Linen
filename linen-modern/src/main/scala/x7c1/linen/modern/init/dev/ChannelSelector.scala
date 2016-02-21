@@ -24,7 +24,7 @@ class ChannelSelector private (context: Context, onSelect: OnSelectChannels){
     }).
     setPositiveButton("OK", new OnClickListener {
       override def onClick(dialog: DialogInterface, which: Int): Unit = {
-        onSelect onSelect ChannelSelectedEvent(selectedTitles)
+        onSelect onSelectPositive ChannelSelectedEvent(selectedTitles)
       }
     }).
     setNegativeButton("Cancel", new OnClickListener {
@@ -42,13 +42,13 @@ class ChannelSelector private (context: Context, onSelect: OnSelectChannels){
 object ChannelSelector {
   def apply(context: Context)(f: ChannelSelectedEvent => Unit): ChannelSelector = {
     new ChannelSelector(context, new OnSelectChannels {
-      override def onSelect(e: ChannelSelectedEvent): Unit = f(e)
+      override def onSelectPositive(e: ChannelSelectedEvent): Unit = f(e)
     })
   }
 }
 
 trait OnSelectChannels {
-  def onSelect(e: ChannelSelectedEvent)
+  def onSelectPositive(e: ChannelSelectedEvent)
 }
 
 case class ChannelSelectedEvent(
