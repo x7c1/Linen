@@ -7,7 +7,7 @@ import android.widget.Toast
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.modern.accessor.LinenDatabase
+import x7c1.linen.modern.accessor.{LinenOpenHelper, LinenDatabase}
 import x7c1.linen.modern.init.updater.{UpdaterMethods, UpdaterServiceDelegatee}
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
@@ -18,11 +18,13 @@ class CreateRecordsDelegatee (
   activity: Activity with ServiceControl,
   layout: DevCreateRecordsLayout){
 
-  lazy val receiver = new BroadcastReceiver {
+  private lazy val receiver = new BroadcastReceiver {
     override def onReceive(context: Context, intent: Intent): Unit = {
       Log info s"${intent.getExtras}"
     }
   }
+  private lazy val helper = new LinenOpenHelper(activity)
+
   def getBroadcastManager = LocalBroadcastManager.getInstance(activity)
 
   def setup(): Unit = {
@@ -38,7 +40,7 @@ class CreateRecordsDelegatee (
           _.createDummies(25)
         }
     }
-    val selector = ChannelSelector(activity){ e =>
+    val selector = ChannelSelector(activity, helper){ e =>
       layout.selectedChannels.text = e.channelTitles mkString "\n"
     }
     layout.selectChannels onClick { _ =>
@@ -63,5 +65,6 @@ class CreateRecordsDelegatee (
   def close(): Unit = {
     Log info "[done]"
     getBroadcastManager unregisterReceiver receiver
+    helper.close()
   }
 }
