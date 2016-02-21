@@ -1,8 +1,6 @@
 package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View.OnTouchListener
-import android.view.{MotionEvent, View}
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
 import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
 import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}

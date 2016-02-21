@@ -9,11 +9,15 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 import android.widget.Button;
 
 public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
+    public final TextView selectedChannels;
+    public final Button selectChannels;
+    public final Button createDummySources;
     public final Button createDummies;
     public final Button createPreset;
     public final Button deleteDatabase;
@@ -21,12 +25,18 @@ public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
     public DevCreateRecordsLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
+        TextView selectedChannels,
+        Button selectChannels,
+        Button createDummySources,
         Button createDummies,
         Button createPreset,
         Button deleteDatabase
     ){
         super(itemView);
         this.toolbar = toolbar;
+        this.selectedChannels = selectedChannels;
+        this.selectChannels = selectChannels;
+        this.createDummySources = createDummySources;
         this.createDummies = createDummies;
         this.createPreset = createPreset;
         this.deleteDatabase = deleteDatabase;

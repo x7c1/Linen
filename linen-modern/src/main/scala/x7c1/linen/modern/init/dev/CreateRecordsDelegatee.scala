@@ -38,6 +38,17 @@ class CreateRecordsDelegatee (
           _.createDummies(25)
         }
     }
+    val selector = ChannelSelector(activity){ e =>
+      layout.selectedChannels.text = e.channelTitles mkString "\n"
+    }
+    layout.selectChannels onClick { _ =>
+      selector.showDialog()
+    }
+    layout.createDummySources onClick { _ =>
+      selector.selectedTitles.foreach { title =>
+        Log info s"channel-title:$title"
+      }
+    }
     layout.createPreset onClick { _ =>
       ServiceCaller.using[UpdaterMethods].
         startService(activity, activity getClassOf Updater){

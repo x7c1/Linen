@@ -18,6 +18,55 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sources"
+        android:textColor="@color/text_tertiary"
+        />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/label_target_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="target channel(s)"
+            />
+
+        <TextView
+            android:id="@+id/dev_create_records_layout__selected_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/label_target_channels"
+            />
+
+        <Button
+            android:id="@+id/dev_create_records_layout__select_channels"
+            android:layout_below="@id/dev_create_records_layout__selected_channels"
+            android:layout_alignStart="@id/dev_create_records_layout__selected_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select"
+            />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/dev_create_records_layout__create_dummy_sources"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="create dummy sources"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/text_tertiary"
+        />
+
     <Button
         android:id="@+id/dev_create_records_layout__create_dummies"
         android:layout_width="wrap_content"
