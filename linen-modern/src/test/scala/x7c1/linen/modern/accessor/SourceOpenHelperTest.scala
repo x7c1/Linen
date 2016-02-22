@@ -26,11 +26,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase
-    val cursor3 = UnreadSourceAccessor.createCursor(
-      db,
-      fixture.channel1.channelId,
-      fixture.account1.accountId
-    )
     val Success(accessor) = UnreadSourceAccessor.create(
       db,
       fixture.channel1.channelId,
@@ -51,7 +46,6 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase
-
     val plans = QueryExplainer(db).
       explain(
         UnreadSourceAccessor.createQuery(
@@ -59,7 +53,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
           fixture.account1.accountId
         ))
 
-    plans foreach println
+//    plans foreach println
     assertEquals("USE TEMP B-TREE",
       false, plans.exists(_.detail contains "USE TEMP B-TREE"))
   }

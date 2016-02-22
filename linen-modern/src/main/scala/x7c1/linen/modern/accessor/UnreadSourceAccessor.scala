@@ -56,21 +56,22 @@ object UnreadSourceAccessor {
 
     Try {
       val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
-
-      val typed = TypedCursor[UnreadSourceColumn](cursor)
-      val sorted = (0 to cursor.getCount - 1) flatMap {
-        n => typed.moveToFind(n)(n -> (typed.rating, typed.source_id))
-      } sortWith {
-        case ((n1, (rating1, _)), (n2, (rating2, _))) => rating1 >= rating2
-      }
-      val (positionMap, sourceIdMap) = {
-        val indexed = sorted.zipWithIndex
-        val pairs1 = indexed map { case ((n, _), index) => index -> n }
-        val pairs2 = indexed map { case ((n, (_, sourceId)), index) => sourceId -> index }
-        pairs1.toMap -> pairs2.toMap
-      }
+      val (positionMap, sourceIdMap) = createMaps(cursor)
       new UnreadSourceAccessorImpl(cursor, positionMap, sourceIdMap)
     }
+  }
+  private def createMaps(rawCursor: Cursor) = {
+    val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
+    val sorted = (0 to rawCursor.getCount - 1) flatMap { n =>
+      cursor.moveToFind(n)((n, cursor.rating, cursor.source_id))
+    } sortWith {
+      case ((_, rating1, _), (_, rating2, _)) =>
+        rating1 >= rating2
+    }
+    val indexed = sorted.zipWithIndex
+    val pairs1 = indexed map { case ((n, _, _), index) => index -> n }
+    val pairs2 = indexed map { case ((_, _, sourceId), index) => sourceId -> index }
+    pairs1.toMap -> pairs2.toMap
   }
   def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {
     val query = createQuery(channelId, accountId)
