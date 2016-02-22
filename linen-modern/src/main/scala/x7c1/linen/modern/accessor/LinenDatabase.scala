@@ -42,7 +42,8 @@ class LinenOpenHelper(context: Context)
          |url TEXT NOT NULL,
          |title TEXT NOT NULL,
          |description TEXT NOT NULL,
-         |created_at INTEGER NOT NULL
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(url)
          |)""".stripMargin,
 
       s"""CREATE INDEX sources_created_at ON sources (
