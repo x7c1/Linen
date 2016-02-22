@@ -127,7 +127,7 @@ object UnreadSourceAccessor {
         |  p1.rating AS rating
         |FROM ($sql4) AS p4
         |LEFT JOIN source_ratings AS p1 ON p1.source_id = p4.source_id
-        |WHERE p1.owner_account_id = ?
+        |WHERE p1.account_id = ?
        """.stripMargin
 
     new Query(sql5,
@@ -223,7 +223,7 @@ object SourceStatusAsStarted {
 
 case class SourceRatingParts(
   sourceId: Long,
-  ownerAccountId: Long,
+  accountId: Long,
   rating: Int,
   createdAt: Date
 )
@@ -233,7 +233,7 @@ object SourceRatingParts {
     override def toContentValues(target: SourceRatingParts): ContentValues = {
       val values = new ContentValues()
       values.put("source_id", target.sourceId: java.lang.Long)
-      values.put("owner_account_id", target.ownerAccountId: java.lang.Long)
+      values.put("account_id", target.accountId: java.lang.Long)
       values.put("rating", target.rating: java.lang.Integer)
       values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
       values

@@ -68,7 +68,7 @@ object DummyFactory {
       )
       writable insert SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId1,
+        accountId = accountId1,
         rating = generateRating(),
         createdAt = Date.current()
       )
@@ -79,7 +79,7 @@ object DummyFactory {
       )
       writable insert SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId2,
+        accountId = accountId2,
         rating = generateRating(),
         createdAt = Date.current()
       )

@@ -52,16 +52,16 @@ class LinenOpenHelper(context: Context)
     val sourceRatings = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_ratings (
          |source_id INTEGER NOT NULL,
-         |owner_account_id INTEGER NOT NULL,
+         |account_id INTEGER NOT NULL,
          |rating INTEGER NOT NULL,
          |created_at INTEGER NOT NULL,
-         |UNIQUE(owner_account_id, source_id),
+         |UNIQUE(account_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(owner_account_id) REFERENCES accounts(_id) ON DELETE CASCADE
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin,
 
       s"""CREATE INDEX source_ratings_id ON source_ratings (
-         |owner_account_id, rating, source_id)""".stripMargin
+         |account_id, rating, source_id)""".stripMargin
     )
     val entries = Seq(
       s"""CREATE TABLE IF NOT EXISTS entries (
