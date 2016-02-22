@@ -81,7 +81,7 @@ object UnreadSourceAccessor {
   def createQuery(channelId: Long, accountId: Long) = {
     val sql = UnreadSourceAccessorQueries.sql5
     new Query(sql,
-      Array(channelId.toString, accountId.toString, accountId.toString))
+      Array(accountId.toString, channelId.toString, accountId.toString))
   }
 }
 
