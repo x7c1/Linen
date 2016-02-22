@@ -49,13 +49,6 @@ private class UnreadSourceAccessorImpl(
   }
 }
 
-class UnreadSourceAccessorFactory(db: SQLiteDatabase){
-  def create(channelId: Long, accountId: Long): UnreadSourceAccessor = {
-    val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
-    new UnreadSourceAccessorImpl(cursor)
-  }
-}
-
 object UnreadSourceAccessor {
   def create(
     db: SQLiteDatabase,
