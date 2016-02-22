@@ -10,6 +10,8 @@ import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
 
+import scala.util.Success
+
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
 class SourceOpenHelperTest extends JUnitSuiteLike {
@@ -29,16 +31,37 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       fixture.channel1.channelId,
       fixture.account1.accountId
     )
-    val rows = toMaps(cursor3)
-//    rows.map(prettyPrint) foreach println
-
-    assertEquals(Seq("33", "11"), rows.map(_("rating")))
-    assertEquals(Seq("description1", "description2"), rows.map(_("description")))
-
-    assertEquals(
-      Seq(fixture.entryId1_2, fixture.entryId2_1),
-      rows.map(_("latest_entry_id")).map(_.toLong)
+    val Success(accessor) = UnreadSourceAccessor.create(
+      db,
+      fixture.channel1.channelId,
+      fixture.account1.accountId
     )
+    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt)
+    assertEquals(Seq(33, 11), sources.map(_.rating))
+    assertEquals(Seq("description2", "description1"), sources.map(_.description))
+    assertEquals(
+      Seq(fixture.entryId2_1, fixture.entryId1_2),
+      sources.map(_.latestEntryId)
+    )
+  }
+  @Test
+  def testExplain() = {
+    val context = RuntimeEnvironment.application
+    val helper = new LinenOpenHelper(context)
+    val fixture = new UnreadSourceFixture(helper)
+
+    val db = helper.getWritableDatabase
+
+    val plans = QueryExplainer(db).
+      explain(
+        UnreadSourceAccessor.createQuery(
+          fixture.channel1.channelId,
+          fixture.account1.accountId
+        ))
+
+    plans foreach println
+    assertEquals("USE TEMP B-TREE",
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
   }
 
   @Test

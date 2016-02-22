@@ -16,13 +16,13 @@ class UnreadSourceFixture(helper: LinenOpenHelper) {
     url = "http://example.com/1",
     title = "title1",
     description = "description1",
-    rating = 33
+    rating = 11
   )
   val Right(sourceId2) = channelOwner1 addSource ChannelSourceParts(
     url = "http://example.com/2",
     title = "title2",
     description = "description2",
-    rating = 11
+    rating = 33
   )
   val Right(sourceWithoutEntry) = channelOwner1 addSource ChannelSourceParts(
     url = "http://example.com/3",

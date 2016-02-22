@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.struct.{Date, UnreadSource}
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 import scala.util.Try
 
@@ -13,7 +13,6 @@ trait UnreadSourceAccessor {
   def sourceIds: Seq[Long] = {
     (0 to length - 1).map(findAt).flatMap(_.map(_.id))
   }
-
   def findAt(position: Int): Option[UnreadSource]
 
   def length: Int
@@ -21,17 +20,23 @@ trait UnreadSourceAccessor {
   def positionOf(sourceId: Long): Option[Int]
 }
 
-private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAccessor {
+private class UnreadSourceAccessorImpl(
+  rawCursor: Cursor,
+  positionMap: Map[Int, Int],
+  sourceIdMap: Map[Long, Int]) extends UnreadSourceAccessor {
+
   private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
   override def findAt(position: Int) = synchronized {
-    cursor.moveToFind(position){
+    val n = positionMap(position)
+    cursor.moveToFind(n){
       UnreadSource(
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,
         description = cursor.description,
         rating = cursor.rating,
+        latestEntryId = cursor.latest_entry_id,
         startEntryId = cursor.start_entry_id
       )
     }
@@ -40,9 +45,7 @@ private class UnreadSourceAccessorImpl(rawCursor: Cursor) extends UnreadSourceAc
     rawCursor.getCount
   }
   override def positionOf(sourceId: Long): Option[Int] = {
-    (0 to length - 1) find { n =>
-      findAt(n).exists(_.id == sourceId)
-    }
+    sourceIdMap.get(sourceId)
   }
 }
 
@@ -60,10 +63,27 @@ object UnreadSourceAccessor {
 
     Try {
       val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
-      new UnreadSourceAccessorImpl(cursor)
+
+      val typed = TypedCursor[UnreadSourceColumn](cursor)
+      val sorted = (0 to cursor.getCount - 1) flatMap {
+        n => typed.moveToFind(n)(n -> (typed.rating, typed.source_id))
+      } sortWith {
+        case ((n1, (rating1, _)), (n2, (rating2, _))) => rating1 >= rating2
+      }
+      val (positionMap, sourceIdMap) = {
+        val indexed = sorted.zipWithIndex
+        val pairs1 = indexed map { case ((n, _), index) => index -> n }
+        val pairs2 = indexed map { case ((n, (_, sourceId)), index) => sourceId -> index }
+        pairs1.toMap -> pairs2.toMap
+      }
+      new UnreadSourceAccessorImpl(cursor, positionMap, sourceIdMap)
     }
   }
   def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {
+    val query = createQuery(channelId, accountId)
+    db.rawQuery(query.sql, query.selectionArgs)
+  }
+  def createQuery(channelId: Long, accountId: Long) = {
     val sql1 =
       """SELECT
         |   source_id,
@@ -111,13 +131,12 @@ object UnreadSourceAccessor {
         |  p4.start_entry_id AS start_entry_id,
         |  p4.latest_entry_id AS latest_entry_id,
         |  p1.rating AS rating
-        |FROM source_ratings AS p1
-        |INNER JOIN ($sql4) AS p4 ON p1.source_id = p4.source_id
+        |FROM ($sql4) AS p4
+        |LEFT JOIN source_ratings AS p1 ON p1.source_id = p4.source_id
         |WHERE p1.owner_account_id = ?
-        |ORDER BY p1.rating DESC, p1.source_id DESC
        """.stripMargin
 
-    db.rawQuery(sql5,
+    new Query(sql5,
       Array(channelId.toString, accountId.toString, accountId.toString))
   }
 }
@@ -128,6 +147,7 @@ trait UnreadSourceColumn extends TypedFields {
   def description: String
   def rating: Int
   def start_entry_id: Option[Long]
+  def latest_entry_id: Long
 }
 
 trait SourceRecordColumn extends TypedFields {
