@@ -49,10 +49,11 @@ object DummyFactory {
       )
       id
     }
+    val timestamp = Date.timestamp
     (1 to n) foreach { i =>
       val Right(sourceId) = writable insert SourceParts(
         title = s"$i-title",
-        url = s"http://example.com/source$i",
+        url = s"http://example.com/source-$i/$timestamp",
         description = s"description-$i " + words(1,15),
         createdAt = Date.current()
       )
@@ -95,7 +96,7 @@ object DummyFactory {
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
           content = s"$sourceId-$j entry content " + words(100,500),
-          url = EntryUrl(s"http://example.com/entry-$j"),
+          url = EntryUrl(s"http://example.com/entry-$sourceId-$j"),
           createdAt = Date.current()
         )
         if (i == 3){
