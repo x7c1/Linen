@@ -33,19 +33,19 @@ class UnreadSourceFixture(helper: LinenOpenHelper) {
   val Right(entryId1_1) = new SourceEntryUpdater(db, sourceId1) addEntry RetrievedEntry(
     title = "sample-entry1-1",
     content = "sample-content",
-    url = "sample-url",
+    url = EntryUrl("http://sample-url"),
     createdAt = Date.current()
   )
   val Right(entryId1_2) = new SourceEntryUpdater(db, sourceId1) addEntry RetrievedEntry(
     title = "sample-entry1-2",
     content = "sample-content2",
-    url = "sample-url2",
+    url = EntryUrl("http://sample-url2"),
     createdAt = Date.current()
   )
   val Right(entryId2_1) = new SourceEntryUpdater(db, sourceId2) addEntry RetrievedEntry(
     title = "sample-entry2-1",
     content = "sample-content2-1",
-    url = "sample-url2-1",
+    url = EntryUrl("http://sample-url2-1"),
     createdAt = Date.current()
   )
 }

@@ -315,7 +315,7 @@ case class EntryParts(
   sourceId: Long,
   title: String,
   content: String,
-  url: String,
+  url: EntryUrl,
   createdAt: Date
 )
 object EntryParts {
@@ -327,7 +327,7 @@ object EntryParts {
         column.source_id -> target.sourceId,
         column.title -> target.title,
         column.content -> target.content,
-        column.url -> target.url,
+        column.url -> target.url.raw,
         column.created_at -> target.createdAt
       )
     }
@@ -337,7 +337,7 @@ object EntryParts {
 case class RetrievedEntry(
   title: String,
   content: String,
-  url: String,
+  url: EntryUrl,
   createdAt: Date
 )
 

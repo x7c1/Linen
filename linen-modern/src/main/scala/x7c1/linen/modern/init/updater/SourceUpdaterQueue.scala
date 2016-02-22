@@ -59,8 +59,13 @@ class SourceUpdaterQueue(
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
-        Log debug entry.title
-        helper.writableDatabase insert entry
+        helper.writableDatabase insert entry match {
+          case Left(e) =>
+            Log error s"$index,${entry.url.host},${e.getMessage}"
+          case Right(b) =>
+            Log debug s"$index,${entry.url.host},${entry.title}"
+        }
+
 //        notifier.notifyProgress(index)
     }
 //    notifier.notifyDone()

@@ -5,7 +5,7 @@ import java.net.{HttpURLConnection, URL}
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.modern.accessor.{EntryParts, LinenOpenHelper, SourceRecordColumn}
+import x7c1.linen.modern.accessor.{EntryUrl, EntryParts, LinenOpenHelper, SourceRecordColumn}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.{task, using}
@@ -56,7 +56,7 @@ class SourceInspector private (helper: LinenOpenHelper){
       sourceId = sourceId,
       title = Option(entry.getTitle) getOrElse "",
       content = Option(entry.getDescription.getValue) getOrElse "",
-      url = url,
+      url = EntryUrl(url),
       createdAt = Date(published)
     ) catch {
       case e: Exception => Left(Abort(e))

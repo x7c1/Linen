@@ -2,7 +2,7 @@ package x7c1.linen.modern.init.dev
 
 import android.content.Context
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, EntryUrl, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 
@@ -95,7 +95,7 @@ object DummyFactory {
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
           content = s"$sourceId-$j entry content " + words(100,500),
-          url = s"http://example.com/entry-$j",
+          url = EntryUrl(s"http://example.com/entry-$j"),
           createdAt = Date.current()
         )
         if (i == 3){
