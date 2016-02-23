@@ -3,6 +3,7 @@ package x7c1.linen.modern.init.updater
 import java.lang.System.currentTimeMillis
 
 import android.app.Service
+import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.wheat.macros.logger.Log
@@ -60,6 +61,8 @@ class SourceUpdaterQueue(
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
         helper.writableDatabase insert entry match {
+          case Left(e: SQLiteConstraintException) =>
+            // nop, entry already exists
           case Left(e) =>
             Log error s"$index,${entry.url.host},${e.getMessage}"
           case Right(b) =>

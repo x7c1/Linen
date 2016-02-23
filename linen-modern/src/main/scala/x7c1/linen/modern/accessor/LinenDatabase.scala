@@ -71,6 +71,7 @@ class LinenOpenHelper(context: Context)
          |title TEXT NOT NULL,
          |content TEXT NOT NULL,
          |created_at INTEGER NOT NULL,
+         |UNIQUE(url, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE
          |)""".stripMargin,
 
