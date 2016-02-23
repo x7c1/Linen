@@ -1,13 +1,6 @@
 package x7c1.linen.modern.accessor.unread
 
 object UnreadSourceAccessorQueries {
-  val sql1 =
-    """SELECT
-      |  source_id,
-      |  Max(_id) as latest_entry_id
-      |FROM entries
-      |GROUP BY source_id
-    """.stripMargin
 
   val sql2 =
     """SELECT
@@ -26,7 +19,7 @@ object UnreadSourceAccessorQueries {
       |  t1.start_entry_id AS start_entry_id,
       |  t2.latest_entry_id AS latest_entry_id
       |FROM ($sql2) AS t1
-      |INNER JOIN ($sql1) AS t2 ON t1.source_id = t2.source_id
+      |INNER JOIN retrieved_source_marks AS t2 ON t1.source_id = t2.source_id
       |WHERE t2.latest_entry_id > IFNULL(t1.start_entry_id, 0)
     """.stripMargin
 

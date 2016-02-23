@@ -104,6 +104,28 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
+    val retrievedSourceMarks = Seq(
+      s"""CREATE TABLE IF NOT EXISTS retrieved_source_marks (
+         |source_id INTEGER NOT NULL,
+         |latest_entry_id INTEGER NOT NULL,
+         |updated_at INTEGER NOT NULL,
+         |UNIQUE(source_id),
+         |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
+         |FOREIGN KEY(latest_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX retrieved_source_marks_created_at ON retrieved_source_marks (
+         |updated_at)""".stripMargin,
+
+      s"""CREATE TRIGGER update_source_marks AFTER INSERT ON entries
+         |BEGIN
+         |  INSERT OR REPLACE INTO retrieved_source_marks
+         |      (source_id, latest_entry_id, updated_at)
+         |    VALUES
+         |      (new.source_id, new._id, strftime("%s", CURRENT_TIMESTAMP));
+         |END
+       """.stripMargin
+    )
     val sourceStatuses = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
          |source_id INTEGER NOT NULL,
@@ -123,6 +145,7 @@ class LinenOpenHelper(context: Context)
       entries,
       channels,
       channelSourceMap,
+      retrievedSourceMarks,
       sourceStatuses
     ).flatten foreach db.execSQL
 

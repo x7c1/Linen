@@ -214,3 +214,21 @@ object ChannelSourceMapParts {
     }
   }
 }
+
+trait retrieved_source_marks extends TypedFields {
+  def source_id: Long
+  def latest_entry_id: Long
+  def updated_at: Int --> Date
+}
+object retrieved_source_marks {
+  val table = "retrieved_source_marks"
+
+  implicit object selectable extends SingleSelectable[retrieved_source_marks, Long] {
+    override def tableName: String = table
+    override def where(id: Long) = Seq("source_id" -> id.toString)
+    override def fromCursor(cursor: Cursor) = {
+      val typed = TypedCursor[retrieved_source_marks](cursor)
+      typed.freezeAt(0)
+    }
+  }
+}

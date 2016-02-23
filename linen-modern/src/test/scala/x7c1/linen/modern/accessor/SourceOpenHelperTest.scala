@@ -149,9 +149,7 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
       sources.map(_.latestEntryId)
     )
   }
-
   private def showProcess(db: SQLiteDatabase, fixture: UnreadSourceFixture): Unit = {
-    dump(db, UnreadSourceAccessorQueries.sql1, Array())
     dump(db, UnreadSourceAccessorQueries.sql2,
       Array(
         fixture.channel1.channelId,
