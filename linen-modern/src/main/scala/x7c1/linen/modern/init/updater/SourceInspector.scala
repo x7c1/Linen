@@ -71,6 +71,12 @@ case class InspectedSource(
 )
 
 class LoadedEntries(entries: Seq[Either[InvalidEntry, EntryParts]]){
-  lazy val validEntries = entries collect { case Right(x) => x }
+  lazy val validEntries = {
+    entries collect {
+      case Right(x) => x
+    } sortWith {
+      _.createdAt.timestamp > _.createdAt.timestamp
+    }
+  }
   lazy val invalidEntries = entries collect { case Left(x) => x }
 }
