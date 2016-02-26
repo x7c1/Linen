@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
 import x7c1.linen.glue.res.layout.MenuRow
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelSources, Channels, DevCreateDummies, DevShowRecords, NoChannel, UpdaterSchedule}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.menu.{MenuItems, SingleMenuItem}
@@ -43,15 +43,15 @@ trait DrawerMenuInitializer {
       -----,
       MenuItems(
         title of "Settings",
-        label of Channels("Channels"),
-        label of ChannelSources("Channel Sources"),
+        label of MyChannels("My Channels"),
+        label of PresetChannels("Preset Channels"),
+        label of ChannelOrder("Channel Order"),
         label of UpdaterSchedule("Updater Schedule")
       ),
       -----,
       MenuItems(
         title of "Developer Menu",
-        label of DevCreateDummies("Create Records"),
-        label of DevShowRecords("Show Records")
+        label of DevCreateDummies("Create Records")
       )
     )
   }
@@ -64,18 +64,17 @@ class OnMenuItemClick(
   override def onClick(kind: MenuItemKind): Unit = kind match {
     case _: NoChannel =>
       Log info s"$kind"
-    case _: Channels =>
+    case _: MyChannels =>
       Log info s"$kind"
 
       activity startActivityBy new Intent(
         activity, activity getClassOf SettingChannels)
 
-    case _: ChannelSources =>
+    case _: PresetChannels =>
+      Log info s"$kind"
+    case _: ChannelOrder =>
       Log info s"$kind"
     case _: UpdaterSchedule =>
-      Log info s"$kind"
-
-    case _: DevShowRecords =>
       Log info s"$kind"
     case _: DevCreateDummies =>
       activity startActivityBy new Intent(

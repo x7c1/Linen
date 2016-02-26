@@ -12,12 +12,12 @@ sealed trait MenuItemKind {
 
 object MenuItemKind {
   case class NoChannel(body: String) extends MenuItemKind
-  case class Channels(body: String) extends MenuItemKind
-  case class ChannelSources(body: String) extends MenuItemKind
+  case class MyChannels(body: String) extends MenuItemKind
+  case class PresetChannels(body: String) extends MenuItemKind
+  case class ChannelOrder(body: String) extends MenuItemKind
   case class UpdaterSchedule(body: String) extends MenuItemKind
 
   case class DevCreateDummies(body: String) extends MenuItemKind
-  case class DevShowRecords(body: String) extends MenuItemKind
 }
 
 class DrawerMenuTitleFactory(provider: ViewHolderProvider[MenuRowTitle]){
