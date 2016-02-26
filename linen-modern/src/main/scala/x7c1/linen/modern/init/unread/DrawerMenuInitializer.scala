@@ -6,7 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.MenuRow
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
@@ -72,6 +72,9 @@ class OnMenuItemClick(
 
     case _: PresetChannels =>
       Log info s"$kind"
+      activity startActivityBy new Intent(
+        activity, activity getClassOf SettingPresetChannels)
+
     case _: ChannelOrder =>
       Log info s"$kind"
     case _: UpdaterSchedule =>

@@ -29,6 +29,8 @@
             >
         </activity>
 
+        <activity android:name=".settings.PresetChannelsActivity" />
+
         <activity
             android:name=".dev.CreateRecordsActivity"
             android:label="create dummies">
