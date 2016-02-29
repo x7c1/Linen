@@ -6,8 +6,11 @@ import android.support.v4.app.FragmentActivity;
 import x7c1.linen.ChildActivityDelegatee;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
-import x7c1.linen.modern.init.settings.PresetChannelsDelegatee;
+import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
+import x7c1.linen.modern.init.settings.preset.ProviderFactories;
 import x7c1.linen.res.layout.SettingPresetChannelsLayoutProvider;
+import x7c1.linen.res.layout.SettingPresetTabAllProvider;
+import x7c1.linen.res.layout.SettingPresetTabSelectedProvider;
 
 public class PresetChannelsActivity extends FragmentActivity {
 	private PresetChannelsDelegatee delegatee = null;
@@ -22,7 +25,14 @@ public class PresetChannelsActivity extends FragmentActivity {
 		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		setContentView(layout.itemView);
 
-		this.delegatee = new PresetChannelsDelegatee(this, layout);
+		this.delegatee = new PresetChannelsDelegatee(
+				this,
+				layout,
+				new ProviderFactories(
+						SettingPresetTabSelectedProvider.factory(),
+						SettingPresetTabAllProvider.factory()
+				)
+		);
 		this.delegatee.onCreate();
 	}
 

@@ -6,9 +6,9 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{UnreadDetailRowSource, UnreadOutlineRowSource, UnreadDetailRowEntry, UnreadOutlineRowEntry, MainLayout, MenuRowLabel, MenuRowTitle, MenuRowSeparator, UnreadSourceRow}
+import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
+import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 
