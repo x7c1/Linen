@@ -1,7 +1,6 @@
 package x7c1.linen.settings;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 
 import x7c1.linen.BaseActivity;
 import x7c1.linen.R;
@@ -30,10 +29,9 @@ public class SettingChannelsActivity extends BaseActivity {
 		);
 		this.delegatee.setup();
 	}
-
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event){
-		return onKeyDownFromChild(keyCode, event);
+	public void onBackPressed() {
+		onBackPressedAtChild();
 	}
 	@Override
 	protected void onDestroy() {
