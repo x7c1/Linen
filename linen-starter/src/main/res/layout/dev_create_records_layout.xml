@@ -14,34 +14,21 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/dev_create_records_layout__toolbar"
             style="@style/AppToolbar"
-            app:title="Create Dummies"
+            app:title="Create Records"
             />
 
     </android.support.design.widget.AppBarLayout>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="12dp"
-        android:paddingStart="16dp"
         android:text="Sources"
-        android:textColor="@color/text_tertiary"
+        style="@style/DevCreateRecordsMenuLabel"
         />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="24dp"
-        android:paddingStart="24dp"
-        >
+    <RelativeLayout style="@style/DevCreateRecordsMenuBox">
         <Button
             android:id="@+id/dev_create_records_layout__select_channels"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
             android:text="TARGET CHANNELS"
+            style="@style/DevCreateRecordsMenuButton"
             />
 
         <TextView
@@ -59,27 +46,21 @@
 
         <Button
             android:id="@+id/dev_create_records_layout__create_dummy_sources"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_below="@id/dev_create_records_layout__select_channels"
-            android:textSize="12sp"
             android:text="CREATE"
+            style="@style/DevCreateRecordsMenuButton"
             />
 
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/text_tertiary"
-        />
+    <View style="@style/DevCreateRecordsMenuSeparator" />
+
 
     <Button
         android:id="@+id/dev_create_records_layout__create_dummies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="create dummies"
         />
 
