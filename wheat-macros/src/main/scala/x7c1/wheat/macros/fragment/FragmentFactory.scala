@@ -56,6 +56,16 @@ private trait BundleBuilderFactory {
 
   def buildBundle: Tree = {
     val Seq(arg, bundle, fragment) = createTermNames("arg", "bundle", "fragment")
+
+    val targetType = appliedType(
+      typeOf[TypedFragment[_]].typeConstructor,
+      argTree.tpe
+    )
+    if (! (fragmentType <:< targetType)){
+      val x1 = fragmentType.typeSymbol.name
+      val x2 = argTree.tpe.typeSymbol.name
+      throw new IllegalArgumentException(s"type inconsistent: [$x1] cannot accept [$x2]")
+    }
     val assign = argTree.tpe.members.
       filter(_.isConstructor).map(_.asMethod).
       filter(_.paramLists exists (_.nonEmpty)).
