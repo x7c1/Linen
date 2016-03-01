@@ -1,11 +1,10 @@
 package x7c1.linen.modern.init.settings.preset
 
-import android.os.Bundle
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
-import android.view.{View, ViewGroup, LayoutInflater}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingPresetTab, SettingPresetTabSelected, SettingPresetTabAll, SettingPresetChannelsLayout}
+import x7c1.linen.glue.res.layout.{SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
+import x7c1.wheat.macros.fragment.FragmentFactory.create
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -41,44 +40,21 @@ class PresetPagerAdapter(
   manager: FragmentManager,
   factories: ProviderFactories) extends FragmentPagerAdapter(manager) {
 
-  override def getItem(position: Int): Fragment = {
-    val factory = position match {
-      case 0 => factories.forSelected
-      case _ => factories.forAll
+  lazy val fragments = Seq(
+    "SELECTED" -> {
+      create[SelectedChannelsFragment] by
+        new ArgumentsForSelected(factories.forSelected)
+    },
+    "ALL" -> {
+      create[AllPresetsFragment] by
+        new ArgumentsForAll(factories.forAll)
     }
-    PresetFragment.newInstance(position + 1, factory)
+  )
+  override def getItem(position: Int): Fragment = {
+    fragments(position)._2
   }
   override def getPageTitle(position: Int): CharSequence = {
-    s"tab ${position + 1}"
+    fragments(position)._1
   }
-  override def getCount: Int = 2
+  override def getCount: Int = fragments.length
 }
-
-class PresetFragment extends Fragment {
-
-  override def onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup,
-    savedInstanceState: Bundle): View = {
-
-    val page = getArguments.getInt("page")
-    val factory = getArguments.
-      getSerializable("factory").asInstanceOf[ViewHolderProviderFactory[SettingPresetTab]]
-
-    val view = factory.create(inflater).inflateOn(container)
-    view.itemView
-  }
-}
-
-object PresetFragment {
-  def newInstance[A](page: Int, factory: ViewHolderProviderFactory[A]): PresetFragment = {
-    val fragment = new PresetFragment
-    val bundle = new Bundle
-    bundle.putInt("page", page)
-    bundle.putSerializable("factory", factory)
-    fragment.setArguments(bundle)
-    fragment
-  }
-}
-
-class PresetFragmentDelegatee()
