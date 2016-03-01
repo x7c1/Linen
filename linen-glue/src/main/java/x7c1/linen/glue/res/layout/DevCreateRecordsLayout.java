@@ -9,36 +9,42 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
-    public final TextView selectedChannels;
     public final Button selectChannels;
+    public final TextView selectedChannels;
     public final Button createDummySources;
     public final Button createDummies;
     public final Button createPreset;
     public final Button deleteDatabase;
+    public final Button createPresetJp;
+    public final Button createPresetEn;
 
     public DevCreateRecordsLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
-        TextView selectedChannels,
         Button selectChannels,
+        TextView selectedChannels,
         Button createDummySources,
         Button createDummies,
         Button createPreset,
-        Button deleteDatabase
+        Button deleteDatabase,
+        Button createPresetJp,
+        Button createPresetEn
     ){
         super(itemView);
         this.toolbar = toolbar;
-        this.selectedChannels = selectedChannels;
         this.selectChannels = selectChannels;
+        this.selectedChannels = selectedChannels;
         this.createDummySources = createDummySources;
         this.createDummies = createDummies;
         this.createPreset = createPreset;
         this.deleteDatabase = deleteDatabase;
+        this.createPresetJp = createPresetJp;
+        this.createPresetEn = createPresetEn;
     }
 }

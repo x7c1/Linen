@@ -55,6 +55,9 @@
 
     <View style="@style/DevCreateRecordsMenuSeparator" />
 
+    <include layout="@layout/dev_create_records_preset" />
+
+    <View style="@style/DevCreateRecordsMenuSeparator" />
 
     <Button
         android:id="@+id/dev_create_records_layout__create_dummies"

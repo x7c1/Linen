@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
 import android.widget.Button;
+import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
@@ -41,12 +41,14 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
         return new DevCreateRecordsLayout(
             view,
             (android.support.v7.widget.Toolbar) view.findViewById(R.id.dev_create_records_layout__toolbar),
-            (TextView) view.findViewById(R.id.dev_create_records_layout__selected_channels),
             (Button) view.findViewById(R.id.dev_create_records_layout__select_channels),
+            (TextView) view.findViewById(R.id.dev_create_records_layout__selected_channels),
             (Button) view.findViewById(R.id.dev_create_records_layout__create_dummy_sources),
             (Button) view.findViewById(R.id.dev_create_records_layout__create_dummies),
             (Button) view.findViewById(R.id.dev_create_records_layout__create_preset),
-            (Button) view.findViewById(R.id.dev_create_records_layout__delete_database)
+            (Button) view.findViewById(R.id.dev_create_records_layout__delete_database),
+            (Button) view.findViewById(R.id.dev_create_records_preset__create_preset_jp),
+            (Button) view.findViewById(R.id.dev_create_records_preset__create_preset_en)
         );
     }
 }
