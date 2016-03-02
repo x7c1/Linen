@@ -11,9 +11,6 @@ import x7c1.wheat.macros.fragment.TypedFragment
 class ArgumentsForSelected(
   val providerFactory: ViewHolderProviderFactory[SettingPresetTabSelected]
 )
-class SampleInvalidArguments(
-  val providerFactory: ViewHolderProviderFactory[SettingPresetTabSelected]
-)
 class SelectedChannelsFragment extends TypedFragment[ArgumentsForSelected] {
   private lazy val args = getTypedArguments
 
@@ -24,4 +21,3 @@ class SelectedChannelsFragment extends TypedFragment[ArgumentsForSelected] {
     tab.itemView
   }
 }
-

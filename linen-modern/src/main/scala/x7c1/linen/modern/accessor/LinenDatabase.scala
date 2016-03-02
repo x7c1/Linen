@@ -15,6 +15,7 @@ class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
   lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
+
   lazy val readable = new ReadableDatabase(getReadableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
@@ -35,6 +36,30 @@ class LinenOpenHelper(context: Context)
 
       s"""CREATE INDEX accounts_created_at ON accounts (
          |created_at)""".stripMargin
+    )
+    val accountTags = Seq(
+      s"""CREATE TABLE IF NOT EXISTS account_tags (
+         |account_tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+         |tag_label TEXT NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(tag_label)
+         |)""".stripMargin,
+
+      s"""INSERT INTO account_tags (tag_label, created_at)
+         |  VALUES ("preset", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin
+    )
+    val accountTagMap = Seq(
+      s"""CREATE TABLE IF NOT EXISTS account_tag_map (
+         |account_id INTEGER NOT NULL,
+         |account_tag_id INTEGER NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(account_id, account_tag_id),
+         |FOREIGN KEY(account_tag_id) REFERENCES account_tags(account_tag_id) ON DELETE CASCADE,
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX account_tag_map_tag_id ON account_tag_map (
+         |account_tag_id)""".stripMargin
     )
     val sources = Seq(
       s"""CREATE TABLE IF NOT EXISTS sources (
@@ -140,6 +165,8 @@ class LinenOpenHelper(context: Context)
     )
     Seq(
       accounts,
+      accountTags,
+      accountTagMap,
       sources,
       sourceRatings,
       entries,
@@ -158,9 +185,9 @@ trait Insertable[A] {
 }
 
 object WritableDatabase {
-  def transaction[A]
+  def transaction[A, ERROR]
     (db: SQLiteDatabase)
-    (writable: WritableDatabase => Either[SQLException, A]): Either[SQLException, A] = {
+    (writable: WritableDatabase => Either[ERROR, A]): Either[ERROR, A] = {
 
     try {
       db.beginTransaction()
@@ -220,10 +247,18 @@ trait Updatable[A] {
 
 class ReadableDatabase(db: SQLiteDatabase) {
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
+
+}
+
+trait SingleQuerySelectable[A, ID]{
+  def query(id: ID): Query
+  def fromCursor(cursor: Cursor): Option[A]
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
   private type Selectable[X] = SingleSelectable[A, X]
+  private type QuerySelectable[X] = SingleQuerySelectable[A, X]
+  private type QuerySelectable0[X] = SingleQuerySelectable[A, Unit]
 
   def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
     try {
@@ -238,6 +273,21 @@ class SingleSelector[A](db: SQLiteDatabase){
       case e: SQLException => Left(e)
     }
   }
+  def byQuery[B: QuerySelectable0](): Either[SQLException, Option[A]] = {
+    byQuery({})
+  }
+  def byQuery[B: QuerySelectable](id: B): Either[SQLException, Option[A]] = {
+    try {
+      val i = implicitly[QuerySelectable[B]]
+      val query = i.query(id)
+      val cursor = db.rawQuery(query.sql, query.selectionArgs)
+      try Right apply i.fromCursor(cursor)
+      finally cursor.close()
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
+
 }
 
 trait SingleSelectable[A, ID] {

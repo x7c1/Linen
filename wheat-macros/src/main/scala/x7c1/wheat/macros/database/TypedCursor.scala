@@ -13,10 +13,16 @@ object TypedCursor {
 }
 
 trait TypedCursor[X] {
+  self: X =>
+
   def moveTo(n: Int): Boolean
 
   def moveToFind[A](n: Int)(f: => A): Option[A] = {
     if (moveTo(n)) Some(f)
+    else None
+  }
+  def moveToHead[A](f: X => A): Option[A] = {
+    if (moveTo(0)) Some(f(this))
     else None
   }
   def freezeAt(n: Int): Option[X]
