@@ -298,7 +298,7 @@ trait SingleSelectable[A, ID] {
 
 class Query(
   val sql: String,
-  val selectionArgs: Array[String]){
+  val selectionArgs: Array[String] = Array()){
 
   def toExplain: Query = new Query(
     "EXPLAIN QUERY PLAN " + sql,
@@ -311,7 +311,11 @@ class Query(
 trait QueryPlanColumn extends TypedFields {
   def detail: String
 }
-case class QueryPlan(detail: String)
+case class QueryPlan(detail: String){
+  def useTempBtree: Boolean = {
+    detail contains "USE TEMP B-TREE"
+  }
+}
 
 class QueryExplainer(db: SQLiteDatabase){
   def explain(query: Query): Seq[QueryPlan] = {

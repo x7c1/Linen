@@ -44,7 +44,7 @@ class PresetAccountAccessor(helper: LinenOpenHelper){
     case Right(None) => Left(NoPresetTag())
     case Right(Some(tag)) => Right(tag.account_tag_id)
   }
-  def insertAccountTagMap(writable: WritableDatabase,  accountId: Long, tagId: Long) = {
+  def insertAccountTagMap(writable: WritableDatabase, accountId: Long, tagId: Long) = {
     val either = writable insert AccountTagMapParts(
       accountId = accountId,
       accountTagId = tagId,
@@ -53,11 +53,3 @@ class PresetAccountAccessor(helper: LinenOpenHelper){
     either.left map UnexpectedException
   }
 }
-
-sealed trait PresetAccountError
-
-case class UnexpectedException(cause: Exception) extends PresetAccountError
-
-case class NoPresetAccount() extends PresetAccountError
-
-case class NoPresetTag() extends PresetAccountError
