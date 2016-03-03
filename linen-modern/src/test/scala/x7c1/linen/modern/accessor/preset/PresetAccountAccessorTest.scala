@@ -20,11 +20,11 @@ class PresetAccountAccessorTest extends JUnitSuiteLike {
     val factory = new SampleFactory(helper)
     val firstAccount = factory.createAccount()
 
-    val Right(accountId1) = PresetAccountAccessor(helper).setupAccountId()
-    val Right(accountId2) = PresetAccountAccessor(helper).setupAccountId()
-    assertEquals(true, accountId1 == accountId2)
+    val Right(account1) = PresetAccountAccessor(helper).setupAccount()
+    val Right(account2) = PresetAccountAccessor(helper).setupAccount()
+    assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map].by(accountId1)
+    val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId
     val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id)
     assertEquals("preset", tag.tag_label)
 
@@ -37,11 +37,11 @@ class PresetAccountAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
 
-    val Right(accountId1) = PresetAccountAccessor(helper).setupAccountId()
-    val Right(accountId2) = PresetAccountAccessor(helper).setupAccountId()
-    assertEquals(true, accountId1 == accountId2)
+    val Right(account1) = PresetAccountAccessor(helper).setupAccount()
+    val Right(account2) = PresetAccountAccessor(helper).setupAccount()
+    assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map].by(accountId1)
+    val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId
     val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id)
     assertEquals("preset", tag.tag_label)
 

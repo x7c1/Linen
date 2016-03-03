@@ -116,6 +116,7 @@ class LinenOpenHelper(context: Context)
          |name TEXT NOT NULL,
          |description TEXT NOT NULL,
          |created_at INTEGER NOT NULL,
+         |UNIQUE(account_id, name),
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )

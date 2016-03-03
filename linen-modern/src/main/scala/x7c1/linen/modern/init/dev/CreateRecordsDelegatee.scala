@@ -52,10 +52,16 @@ class CreateRecordsDelegatee (
           _ createDummySources selector.selectedChannelIds
         }
     }
+    layout.createPresetJp onClick { _ =>
+      ServiceCaller.using[UpdaterMethods].
+        startService(activity, activity getClassOf Updater){
+          _.createPresetJp()
+        }
+    }
     layout.createPreset onClick { _ =>
       ServiceCaller.using[UpdaterMethods].
         startService(activity, activity getClassOf Updater){
-          _.createPreset()
+          _.createPresetJp()
         }
     }
     layout.deleteDatabase onClick { _ =>

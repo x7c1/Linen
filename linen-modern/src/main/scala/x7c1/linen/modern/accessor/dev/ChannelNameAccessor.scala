@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.dev
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.ChannelRecordColumn
+import x7c1.linen.modern.accessor.ChannelRecord
 import x7c1.wheat.macros.database.TypedCursor
 
 trait ChannelNameAccessor {
@@ -22,7 +22,7 @@ private class ChannelNameAccessorImpl(db: SQLiteDatabase) extends ChannelNameAcc
     val sql = s"SELECT _id, name FROM channels ORDER BY _id DESC"
     db.rawQuery(sql, Array())
   }
-  private lazy val cursor = TypedCursor[ChannelRecordColumn](rawCursor) 
+  private lazy val cursor = TypedCursor[ChannelRecord](rawCursor)
 
   override def findAt(position: Int) =
     cursor.moveToFind(position){

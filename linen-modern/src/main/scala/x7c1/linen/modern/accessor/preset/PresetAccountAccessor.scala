@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.preset
 
 import x7c1.linen.modern.accessor.database.{AccountTagMapParts, Preset, account_tags}
-import x7c1.linen.modern.accessor.{WritableDatabase, AccountParts, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{ChannelParts, AccountParts, LinenOpenHelper, WritableDatabase}
 import x7c1.linen.modern.struct.Date
 
 object PresetAccountAccessor {
@@ -10,44 +10,82 @@ object PresetAccountAccessor {
   }
 }
 class PresetAccountAccessor(helper: LinenOpenHelper){
-  def setupAccountId(): Either[PresetAccountError, Long] = {
+  def setupAccount(): Either[PresetRecordError, PresetAccount] = {
     helper.readable.find[PresetAccount]() match {
-      case Right(Some(account)) => Right(account.accountId)
+      case Right(Some(account)) => Right(account)
       case Right(None) => createPresetAccount()
       case Left(error) => Left(UnexpectedException(error))
     }
   }
-  def setupChannelId(accountId: Long): Either[PresetAccountError, Long] = {
-    ???
+  def setupChannel(
+    account: PresetAccount,
+    piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] = {
+
+    helper.readable.find[PresetChannel] by (account -> piece) match {
+      case Right(Some(x)) => Right(x)
+      case Right(None) => createPresetChannel(account, piece)
+      case Left(error) => Left(UnexpectedException(error))
+    }
   }
-  def createPresetAccount(): Either[PresetAccountError, Long] =
+  private def createPresetChannel(
+    account: PresetAccount,
+    piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] =
+
     WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
+      val factory = new PresetChannelFactory(writable, account)
       for {
-        accountId <- insertAccount(writable).right
+        channelId <- factory.insertChannel(piece).right
+      } yield PresetChannel (
+        channelId = channelId,
+        accountId = account.accountId,
+        name = piece.name
+      )
+    }
+
+  private def createPresetAccount(): Either[PresetRecordError, PresetAccount] =
+    WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
+      val factory = new PresetAccountFactory(writable)
+      for {
+        accountId <- factory.insertAccount().right
         tagId <- findPresetTagId.right
-        _ <- insertAccountTagMap(writable, accountId, tagId).right
+        _ <- factory.insertTagMap(accountId, tagId).right
       } yield {
-        accountId
+        PresetAccount(accountId)
       }
     }
 
-  def insertAccount(writable: WritableDatabase) = {
-    val either = writable insert AccountParts(
-      nickname = "preset user",
-      biography = "preset maker",
-      createdAt = Date.current()
-    )
-    either.left map UnexpectedException
-  }
-  def findPresetTagId = helper.readable.find[account_tags] by Preset match {
+  private def findPresetTagId = helper.readable.find[account_tags] by Preset match {
     case Left(a) => Left(UnexpectedException(a))
     case Right(None) => Left(NoPresetTag())
     case Right(Some(tag)) => Right(tag.account_tag_id)
   }
-  def insertAccountTagMap(writable: WritableDatabase, accountId: Long, tagId: Long) = {
+}
+
+class PresetAccountFactory(writable: WritableDatabase){
+  def insertAccount(): Either[PresetRecordError, Long] = {
+    val either = writable insert AccountParts(
+      nickname = "Preset User",
+      biography = "manage preset channels",
+      createdAt = Date.current()
+    )
+    either.left map UnexpectedException
+  }
+  def insertTagMap(accountId: Long, tagId: Long): Either[PresetRecordError, Long] = {
     val either = writable insert AccountTagMapParts(
       accountId = accountId,
       accountTagId = tagId,
+      createdAt = Date.current()
+    )
+    either.left map UnexpectedException
+  }
+}
+
+class PresetChannelFactory(writable: WritableDatabase, account: PresetAccount){
+  def insertChannel(piece: PresetChannelPiece): Either[PresetRecordError, Long] = {
+    val either = writable insert ChannelParts(
+      accountId = account.accountId,
+      name = piece.name,
+      description = piece.description,
       createdAt = Date.current()
     )
     either.left map UnexpectedException

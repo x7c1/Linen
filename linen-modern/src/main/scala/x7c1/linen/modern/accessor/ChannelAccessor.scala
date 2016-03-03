@@ -34,7 +34,7 @@ object ChannelAccessor {
 
       db.rawQuery(sql1, Array(accountId.toString))
     }
-    private lazy val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
+    private lazy val cursor = TypedCursor[ChannelRecord](rawCursor)
 
     override def findAt(position: Int) =
       cursor.moveToFind(position){
@@ -59,7 +59,7 @@ case class ChannelParts(
   createdAt: Date
 )
 
-trait ChannelRecordColumn extends TypedFields {
+trait ChannelRecord extends TypedFields {
   def _id: Long
   def name: String
   def description: String
@@ -73,7 +73,7 @@ object ChannelParts {
     override def tableName = "channels"
 
     override def toContentValues(parts: ChannelParts) = {
-      val column = TypedFields.expose[ChannelRecordColumn]
+      val column = TypedFields.expose[ChannelRecord]
       TypedFields toContentValues (
         column.name -> parts.name,
         column.description -> parts.description,

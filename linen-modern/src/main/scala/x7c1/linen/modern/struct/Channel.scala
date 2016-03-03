@@ -1,7 +1,7 @@
 package x7c1.linen.modern.struct
 
 import android.database.Cursor
-import x7c1.linen.modern.accessor.{ChannelRecordColumn, SingleWhere}
+import x7c1.linen.modern.accessor.{ChannelRecord, SingleWhere}
 import x7c1.wheat.macros.database.TypedCursor
 
 case class Channel(
@@ -17,7 +17,7 @@ object Channel {
   implicit object singleSelectable extends SingleWhere[Channel, Long](table){
     override def where(id: Long) = Seq("_id" -> id.toString)
     override def fromCursor(rawCursor: Cursor) = {
-      val cursor = TypedCursor[ChannelRecordColumn](rawCursor)
+      val cursor = TypedCursor[ChannelRecord](rawCursor)
       cursor.moveToFind(0){
         Channel(
           channelId = cursor._id,

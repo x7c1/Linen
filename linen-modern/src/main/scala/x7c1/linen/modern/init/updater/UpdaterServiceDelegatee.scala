@@ -69,9 +69,9 @@ class UpdaterMethods(
     notifier.notifyDone()
     service stopSelf startId
   }
-  def createPreset(): Unit = async {
+  def createPresetJp(): Unit = async {
     Log info "[init]"
-    new PresetFactory(service, helper).createPreset()
+    new PresetFactory(service, helper).setupJapanesePresets()
   }
   def createDummySources(channelIds: Seq[Long]) = async {
     Log info s"$channelIds"

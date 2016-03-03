@@ -6,8 +6,7 @@ import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 
 case class PresetAccount(
-  accountId: Long,
-  tagLabel: String
+  accountId: Long
 )
 
 object PresetAccount {
@@ -18,8 +17,7 @@ object PresetAccount {
   }
   private def reify(record: PresetAccountRecord): PresetAccount = {
     PresetAccount(
-      accountId = record.account_id,
-      tagLabel = record.tag_label
+      accountId = record.account_id
     )
   }
   def select = new Query(
