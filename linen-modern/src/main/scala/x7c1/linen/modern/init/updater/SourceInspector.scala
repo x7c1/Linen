@@ -5,7 +5,8 @@ import java.net.{HttpURLConnection, URL}
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.modern.accessor.{EntryUrl, EntryParts, LinenOpenHelper, SourceRecordColumn}
+import x7c1.linen.modern.accessor.database.SourceRecord
+import x7c1.linen.modern.accessor.{EntryParts, EntryUrl, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.{task, using}
@@ -19,7 +20,7 @@ object SourceInspector {
 class SourceInspector private (helper: LinenOpenHelper){
 
   def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
-    helper.readable.find[SourceRecordColumn].by(sourceId) match {
+    helper.readable.find[SourceRecord].by(sourceId) match {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
       case Right(Some(source)) => Right(InspectedSource(sourceId, new URL(source.url)))

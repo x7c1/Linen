@@ -94,46 +94,6 @@ trait UnreadSourceColumn extends TypedFields {
   def latest_entry_id: Long
 }
 
-trait SourceRecordColumn extends TypedFields {
-  def _id: Long
-  def title: String
-  def description: String
-  def url: String
-  def created_at: Int --> Date
-}
-object SourceRecordColumn {
-  def table = "sources"
-  implicit object selectable extends SingleWhere[SourceRecordColumn, Long](table){
-    override def where(id: Long): Seq[(String, String)] = Seq(
-      "_id" -> id.toString
-    )
-    override def fromCursor(rawCursor: Cursor): Option[SourceRecordColumn] = {
-      TypedCursor[SourceRecordColumn](rawCursor) freezeAt 0
-    }
-  }
-}
-
-case class SourceParts(
-  title: String,
-  url: String,
-  description: String,
-  createdAt: Date
-)
-object SourceParts {
-  implicit object insertable extends Insertable[SourceParts] {
-    override def tableName: String = "sources"
-    override def toContentValues(target: SourceParts): ContentValues = {
-      val column = TypedFields.expose[SourceRecordColumn]
-      TypedFields toContentValues (
-        column.title -> target.title,
-        column.url -> target.url,
-        column.description -> target.description,
-        column.created_at -> target.createdAt
-      )
-    }
-  }
-}
-
 case class SourceStatusParts(
   sourceId: Long,
   accountId: Long,

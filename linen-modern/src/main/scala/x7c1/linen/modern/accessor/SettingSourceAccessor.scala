@@ -2,6 +2,7 @@ package x7c1.linen.modern.accessor
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
+import x7c1.linen.modern.accessor.database.SourceParts
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
