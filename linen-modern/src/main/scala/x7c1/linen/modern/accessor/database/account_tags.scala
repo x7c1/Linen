@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.database
 
 import android.database.Cursor
-import x7c1.linen.modern.accessor.SingleSelectable
+import x7c1.linen.modern.accessor.SingleWhere
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
@@ -9,15 +9,13 @@ object account_tags {
 
   def table = "account_tags"
 
-  implicit def tagSelectable[A <: AccountTagLabel]: SingleSelectable[account_tags, A] =
-    new SingleSelectable[account_tags, A]{
-      override def tableName = table
+  implicit def tagSelectable[A <: AccountTagLabel]: SingleWhere[account_tags, A] =
+    new SingleWhere[account_tags, A](table){
       override def where(label: A) = Seq("tag_label" -> label.text)
       override def fromCursor(raw: Cursor) = TypedCursor[account_tags](raw) freezeAt 0
     }
 
-  implicit object idSelectable extends SingleSelectable[account_tags, Long] {
-    override def tableName = table
+  implicit object idSelectable extends SingleWhere[account_tags, Long](table){
     override def where(id: Long) = Seq("account_tag_id" -> id.toString)
     override def fromCursor(raw: Cursor) = TypedCursor[account_tags](raw) freezeAt 0
   }

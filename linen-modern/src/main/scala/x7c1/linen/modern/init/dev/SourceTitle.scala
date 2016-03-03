@@ -2,7 +2,8 @@ package x7c1.linen.modern.init.dev
 
 import android.content.ContentValues
 import android.database.Cursor
-import x7c1.linen.modern.accessor.{SingleSelectable, SourceRecordColumn, Updatable}
+import x7c1.linen.modern.accessor.SourceRecordColumn.table
+import x7c1.linen.modern.accessor.{SingleWhere, SourceRecordColumn, Updatable}
 import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
 case class SourceTitle(
@@ -24,11 +25,8 @@ object SourceTitle {
       "_id" -> target.sourceId.toString
     )
   }
-  implicit object selectable extends SingleSelectable[SourceTitle, Long] {
-    override def tableName = "sources"
-
+  implicit object selectable extends SingleWhere[SourceTitle, Long](table){
     override def where(id: Long) = Seq("_id" -> id.toString)
-
     override def fromCursor(rawCursor: Cursor) = {
       val cursor = TypedCursor[SourceRecordColumn](rawCursor)
       cursor.moveToFind(0){

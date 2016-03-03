@@ -102,8 +102,8 @@ trait SourceRecordColumn extends TypedFields {
   def created_at: Int --> Date
 }
 object SourceRecordColumn {
-  implicit object selectable extends SingleSelectable[SourceRecordColumn, Long]{
-    override def tableName: String = "sources"
+  def table = "sources"
+  implicit object selectable extends SingleWhere[SourceRecordColumn, Long](table){
     override def where(id: Long): Seq[(String, String)] = Seq(
       "_id" -> id.toString
     )
@@ -223,8 +223,7 @@ trait retrieved_source_marks extends TypedFields {
 object retrieved_source_marks {
   val table = "retrieved_source_marks"
 
-  implicit object selectable extends SingleSelectable[retrieved_source_marks, Long] {
-    override def tableName: String = table
+  implicit object selectable extends SingleWhere[retrieved_source_marks, Long](table){
     override def where(id: Long) = Seq("source_id" -> id.toString)
     override def fromCursor(cursor: Cursor) = {
       val typed = TypedCursor[retrieved_source_marks](cursor)

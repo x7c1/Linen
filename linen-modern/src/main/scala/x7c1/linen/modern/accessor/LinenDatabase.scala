@@ -250,33 +250,19 @@ class ReadableDatabase(db: SQLiteDatabase) {
 
 }
 
-trait SingleQuerySelectable[A, ID]{
+trait SingleSelectable[A, ID]{
   def query(id: ID): Query
   def fromCursor(cursor: Cursor): Option[A]
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
-  private type Selectable[X] = SingleSelectable[A, X]
-  private type QuerySelectable[X] = SingleQuerySelectable[A, X]
-  private type QuerySelectable0[X] = SingleQuerySelectable[A, Unit]
+  private type QuerySelectable[X] = SingleSelectable[A, X]
+  private type ZeroAritySelectable[_] = SingleSelectable[A, Unit]
 
-  def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
-    try {
-      val i = implicitly[Selectable[B]]
-      val clause = i.where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
-      val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
-      val args = i.where(id) map { case (_, value) => value }
-      val cursor = db.rawQuery(sql, args.toArray)
-      try Right apply i.fromCursor(cursor)
-      finally cursor.close()
-    } catch {
-      case e: SQLException => Left(e)
-    }
+  def apply[_: ZeroAritySelectable](): Either[SQLException, Option[A]] = {
+    by({})
   }
-  def byQuery[B: QuerySelectable0](): Either[SQLException, Option[A]] = {
-    byQuery({})
-  }
-  def byQuery[B: QuerySelectable](id: B): Either[SQLException, Option[A]] = {
+  def by[B: QuerySelectable](id: B): Either[SQLException, Option[A]] = {
     try {
       val i = implicitly[QuerySelectable[B]]
       val query = i.query(id)
@@ -290,10 +276,16 @@ class SingleSelector[A](db: SQLiteDatabase){
 
 }
 
-trait SingleSelectable[A, ID] {
-  def tableName: String
+abstract class SingleWhere[A, ID](table: String) extends SingleSelectable[A, ID]{
+
   def where(id: ID): Seq[(String, String)]
-  def fromCursor(cursor: Cursor): Option[A]
+
+  override def query(id: ID): Query = {
+    val clause = where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
+    val sql = s"SELECT * FROM $table WHERE $clause"
+    val args = where(id) map { case (_, value) => value }
+    new Query(sql, args.toArray)
+  }
 }
 
 class Query(

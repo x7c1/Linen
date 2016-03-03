@@ -94,7 +94,7 @@ class SampleFactory (helper: LinenOpenHelper){
       description = s"sample channel description",
       createdAt = Date.current()
     )
-    val Right(Some(channel)) = readable.find[Channel](id)
+    val Right(Some(channel)) = readable.find[Channel].by(id)
     channel
   }
 }

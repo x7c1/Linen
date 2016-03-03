@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.preset
 
 import android.database.Cursor
-import x7c1.linen.modern.accessor.{Query, SingleQuerySelectable}
+import x7c1.linen.modern.accessor.{Query, SingleSelectable}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 
@@ -11,15 +11,17 @@ case class PresetAccount(
 )
 
 object PresetAccount {
-  implicit object selectable extends SingleQuerySelectable[PresetAccount, Unit]{
+  implicit object selectable extends SingleSelectable[PresetAccount, Unit]{
     override def query(id: Unit) = select
-    override def fromCursor(raw: Cursor) =
-      TypedCursor[PresetAccountColumn](raw) moveToHead { cursor =>
-        PresetAccount(
-          accountId = cursor.account_id,
-          tagLabel = cursor.tag_label
-        )
-      }
+    override def fromCursor(cursor: Cursor) = {
+      TypedCursor[PresetAccountRecord](cursor) moveToHead reify
+    }
+  }
+  def reify(record: PresetAccountRecord): PresetAccount = {
+    PresetAccount(
+      accountId = record.account_id,
+      tagLabel = record.tag_label
+    )
   }
   def select = new Query(
     s"""SELECT
@@ -35,7 +37,7 @@ object PresetAccount {
 
 }
 
-trait PresetAccountColumn extends TypedFields {
+trait PresetAccountRecord extends TypedFields {
   def account_id: Long
   def tag_label: String
 }

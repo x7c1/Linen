@@ -31,7 +31,7 @@ class EntryPartsTest extends JUnitSuiteLike {
 //    x1.left.foreach(println)
     assertEquals(true, x1.isRight)
 
-    val Right(Some(mark1)) = helper.readable.find[retrieved_source_marks](sourceId)
+    val Right(Some(mark1)) = helper.readable.find[retrieved_source_marks].by(sourceId)
     val Right(newEntryId) = x1
     assertEquals(newEntryId, mark1.latest_entry_id)
     assertEquals(sourceId, mark1.source_id)
@@ -46,7 +46,7 @@ class EntryPartsTest extends JUnitSuiteLike {
 //    x2.left.foreach(println)
     assertEquals(false, x2.isRight)
 
-    val Right(Some(mark2)) = helper.readable.find[retrieved_source_marks](sourceId)
+    val Right(Some(mark2)) = helper.readable.find[retrieved_source_marks].by(sourceId)
     assertEquals(newEntryId, mark2.latest_entry_id)
   }
 }

@@ -19,7 +19,7 @@ object SourceInspector {
 class SourceInspector private (helper: LinenOpenHelper){
 
   def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
-    helper.readable.find[SourceRecordColumn](sourceId) match {
+    helper.readable.find[SourceRecordColumn].by(sourceId) match {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
       case Right(Some(source)) => Right(InspectedSource(sourceId, new URL(source.url)))

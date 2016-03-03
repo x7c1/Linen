@@ -11,7 +11,7 @@ object PresetAccountAccessor {
 }
 class PresetAccountAccessor(helper: LinenOpenHelper){
   def setupAccountId(): Either[PresetAccountError, Long] = {
-    helper.readable.find[PresetAccount].byQuery() match {
+    helper.readable.find[PresetAccount]() match {
       case Right(Some(account)) => Right(account.accountId)
       case Right(None) => createPresetAccount()
       case Left(error) => Left(UnexpectedException(error))
@@ -39,7 +39,7 @@ class PresetAccountAccessor(helper: LinenOpenHelper){
     )
     either.left map UnexpectedException
   }
-  def findPresetTagId = helper.readable.find[account_tags](Preset) match {
+  def findPresetTagId = helper.readable.find[account_tags] by Preset match {
     case Left(a) => Left(UnexpectedException(a))
     case Right(None) => Left(NoPresetTag())
     case Right(Some(tag)) => Right(tag.account_tag_id)
