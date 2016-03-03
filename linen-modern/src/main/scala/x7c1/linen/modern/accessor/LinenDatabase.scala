@@ -288,6 +288,10 @@ abstract class SingleWhere[A, ID](table: String) extends SingleSelectable[A, ID]
   }
 }
 
+abstract class ZeroAritySingle[A](select: Query) extends SingleSelectable[A, Unit]{
+  override def query(id: Unit): Query = select
+}
+
 class Query(
   val sql: String,
   val selectionArgs: Array[String] = Array()){
