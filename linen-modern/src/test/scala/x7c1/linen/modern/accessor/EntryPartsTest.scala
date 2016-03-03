@@ -17,7 +17,7 @@ class EntryPartsTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
     val fixture = new UnreadSourceFixture(helper)
-    val writable = helper.writableDatabase
+    val writable = helper.writable
     val sourceId = fixture.sourceId1
     val url = EntryUrl("http://example.com/entry-111")
 

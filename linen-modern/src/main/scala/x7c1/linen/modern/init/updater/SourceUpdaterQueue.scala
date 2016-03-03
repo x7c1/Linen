@@ -60,7 +60,7 @@ class SourceUpdaterQueue(
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
-        helper.writableDatabase insert entry match {
+        helper.writable insert entry match {
           case Left(e: SQLiteConstraintException) =>
             // nop, entry already exists
           case Left(e) =>

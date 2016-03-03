@@ -14,7 +14,7 @@ object LinenDatabase {
 class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
-  lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
+  lazy val writable = new WritableDatabase(getWritableDatabase)
 
   lazy val readable = new ReadableDatabase(getReadableDatabase)
 

@@ -16,7 +16,7 @@ object DummyFactory {
   def createDummies0(context: Context)(n: Int)(callback: Int => Unit): Unit = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val writable = helper.writableDatabase
+    val writable = helper.writable
 
     val accountId1 = AccountAccessor.create(db) findAt 0 map (_.accountId) getOrElse {
       val Right(id) = writable insert AccountParts(
