@@ -19,7 +19,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
 
-    val factory = new PresetFactory(context, helper)
+    val factory = new PresetFactory(helper)
     factory.setupJapanesePresets()
 
     val Right(client) = ClientAccountSetup(helper).findOrCreate()

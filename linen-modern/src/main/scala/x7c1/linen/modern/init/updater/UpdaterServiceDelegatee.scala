@@ -71,7 +71,7 @@ class UpdaterMethods(
   }
   def createPresetJp(): Unit = async {
     Log info "[init]"
-    new PresetFactory(service, helper).setupJapanesePresets()
+    new PresetFactory(helper).setupJapanesePresets()
   }
   def createDummySources(channelIds: Seq[Long]) = async {
     Log info s"$channelIds"
