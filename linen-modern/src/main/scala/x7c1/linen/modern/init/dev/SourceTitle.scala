@@ -13,10 +13,11 @@ case class SourceTitle(
 )
 
 object SourceTitle {
+  import SourceRecord.column
+
   implicit object updatable extends Updatable[SourceTitle]{
     override def tableName = table
     override def toContentValues(target: SourceTitle): ContentValues = {
-      val column = TypedFields.expose[SourceRecord]
       TypedFields toContentValues (
         column._id -> target.sourceId,
         column.title -> target.title

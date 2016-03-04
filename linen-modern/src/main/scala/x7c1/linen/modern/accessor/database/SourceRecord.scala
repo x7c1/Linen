@@ -10,6 +10,8 @@ object SourceRecord {
 
   def table: String = "sources"
 
+  def column = TypedFields.expose[SourceRecord]
+
   implicit object selectable extends SingleWhere[SourceRecord, Long](table){
     override def where(id: Long): Seq[(String, String)] = Seq(
       "_id" -> id.toString

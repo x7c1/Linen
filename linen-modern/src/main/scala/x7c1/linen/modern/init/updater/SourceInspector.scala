@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.updater
 import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
-import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.SyndEntry
+import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.modern.accessor.database.SourceRecord
 import x7c1.linen.modern.accessor.{EntryParts, EntryUrl, LinenOpenHelper}
@@ -23,18 +23,25 @@ class SourceInspector private (helper: LinenOpenHelper){
     helper.readable.find[SourceRecord].by(sourceId) match {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
-      case Right(Some(source)) => Right(InspectedSource(sourceId, new URL(source.url)))
+      case Right(Some(source)) => Right(InspectedSource(source))
     }
 
-  def loadEntries(source: InspectedSource): Future[LoadedEntries] = {
-    val callback = loadRawEntries(source.feedUrl)
-    val entries = callback.toFuture
+  def loadSource(source: InspectedSource): Future[LoadedSource] = {
+    import LinenService.Implicits.executor
 
-    import LinenService.Implicits._
-    entries map (_ map convertEntry(source.sourceId)) map (new LoadedEntries(_))
-  }
-  private def loadRawEntries(feedUrl: URL): CallbackTask[Seq[SyndEntry]] = {
     import scala.collection.JavaConversions._
+
+    loadRawFeed(source.feedUrl).toFuture map { feed =>
+      val entries = feed.getEntries map { case x: SyndEntry => x }
+      new LoadedSource(
+        sourceId = source.sourceId,
+        title = Option(feed.getTitle) getOrElse "",
+        description = Option(feed.getDescription) getOrElse "",
+        entries = entries map convertEntry(source.sourceId)
+      )
+    }
+  }
+  private def loadRawFeed(feedUrl: URL): CallbackTask[SyndFeed] = {
     for {
       connection <- task {
         val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
@@ -44,8 +51,7 @@ class SourceInspector private (helper: LinenOpenHelper){
       stream <- using(new BufferedInputStream(connection.getInputStream))
       reader <- using(new InputStreamReader(stream))
     } yield {
-      val feed = new SyndFeedInput().build(reader)
-      feed.getEntries map { case x: SyndEntry => x }
+      new SyndFeedInput().build(reader)
     }
   }
 
@@ -68,16 +74,17 @@ class SourceInspector private (helper: LinenOpenHelper){
 
 case class InspectedSource(
   sourceId: Long,
+  title: String,
+  description: String,
   feedUrl: URL
 )
-
-class LoadedEntries(entries: Seq[Either[InvalidEntry, EntryParts]]){
-  lazy val validEntries = {
-    entries collect {
-      case Right(x) => x
-    } sortWith {
-      _.createdAt.timestamp > _.createdAt.timestamp
-    }
+object InspectedSource {
+  def apply(source: SourceRecord): InspectedSource = {
+    InspectedSource(
+      sourceId = source._id,
+      title = source.title,
+      description = source.description,
+      feedUrl = new URL(source.url)
+    )
   }
-  lazy val invalidEntries = entries collect { case Left(x) => x }
 }

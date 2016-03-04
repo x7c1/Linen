@@ -35,9 +35,13 @@ class SourceUpdaterQueue(
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start
 
-    val future = inspector.loadEntries(source) map { entries =>
+    val future = inspector.loadSource(source) map { loadedSource =>
       Log info s"[loaded] msec:${elapsed()}, source:$source"
-      insertEntries(entries)
+
+      if (loadedSource isModifiedFrom source){
+        updateSource(loadedSource)
+      }
+      insertEntries(loadedSource)
     }
     future onFailure {
       case e => Log error s"[error] source:$source, ${e.getMessage}"
@@ -55,8 +59,15 @@ class SourceUpdaterQueue(
       }
     }
   }
-  private def insertEntries(entries: LoadedEntries): Unit = {
-    val loadedEntries = entries.validEntries
+  private def updateSource(source: LoadedSource): Unit = {
+    helper.writable update source match {
+      case Left(error) => Log error error.getMessage
+      case Right(0) => Log info s"not updated: ${source.title}"
+      case Right(_) => Log info s"updated: ${source.title}"
+    }
+  }
+  private def insertEntries(source: LoadedSource): Unit = {
+    val loadedEntries = source.validEntries
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
