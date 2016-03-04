@@ -1,26 +1,28 @@
 package x7c1.linen.modern.init.updater
 
-import android.content.Context
 import x7c1.linen.modern.accessor.preset.{PresetAccountSetup, PresetChannelPiece, PresetChannelSetup, PresetRecordError}
 import x7c1.linen.modern.accessor.{ChannelOwner, ChannelSourceParts, LinenOpenHelper}
 import x7c1.wheat.macros.logger.Log
 
-class PresetFactory (context: Context, helper: LinenOpenHelper){
+class PresetFactory (helper: LinenOpenHelper){
 
   def setupJapanesePresets() = {
-    setupChannel(Tech)
-    setupChannel(Game)
+    val sets = Seq(
+      Tech,
+      Game
+    )
+    sets.reverse map SetupStarter(helper) foreach {_.start()}
   }
 
-  def setupChannel(set: PresetChannelSet) = {
-    setupChannelOwner(set.channel) match {
-      case Left(error) => Log error error.toString
-      case Right(owner) => setupSources(owner, set.sources)
-    }
-  }
+}
+private case class SetupStarter(helper: LinenOpenHelper)(set: PresetChannelSet){
 
-  def setupSources(owner: ChannelOwner, sourcePieces: PresetSourcePieces) = {
-    val partsList = sourcePieces.list.map {
+  def start(): Unit = setupChannelOwner() match {
+    case Left(error) => Log error error.toString
+    case Right(owner) => setupSources(owner)
+  }
+  private def setupSources(owner: ChannelOwner) = {
+    val partsList = set.sources.list.reverse map {
       piece => ChannelSourceParts(
         url = piece.url,
         title = piece.title,
@@ -31,23 +33,22 @@ class PresetFactory (context: Context, helper: LinenOpenHelper){
     val addSource: ChannelSourceParts => Unit = parts =>
       owner addSource parts match {
         case Left(e) => Log error s"url:${parts.url} ${e.getMessage}"
-        case Right(b) => Log info s"inserted: ${parts.url}"
+        case Right(b) => Log info s"inserted: ${set.channel.name} ${parts.url}"
       }
 
     partsList foreach addSource
   }
-  def setupChannelOwner(
-    channelPiece: PresetChannelPiece): Either[PresetRecordError, ChannelOwner] = {
-
+  private def setupChannelOwner(): Either[PresetRecordError, ChannelOwner] = {
     for {
       account <- PresetAccountSetup(helper).findOrCreate().right
-      channel <- PresetChannelSetup(helper, account).getOrCreate(channelPiece).right
+      channel <- PresetChannelSetup(helper, account).getOrCreate(set.channel).right
     } yield new ChannelOwner(
       db = helper.getWritableDatabase,
       channelId = channel.channelId,
       accountId = account.accountId
     )
   }
+
 }
 
 case class PresetSourcePiece(
