@@ -11,6 +11,7 @@ import x7c1.linen.glue.res.layout.MenuRow
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
+import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
@@ -73,8 +74,14 @@ class OnMenuItemClick(
     case _: MyChannels =>
       Log info s"$kind"
 
-      activity startActivityBy new Intent(
-        activity, activity getClassOf SettingChannels)
+      val intent = IntentFactory.using[SettingChannelsDelegatee].
+        create(activity, activity getClassOf SettingChannels){
+          _.showMyChannels(accountId)
+        }
+      activity startActivityBy intent
+
+//      activity startActivityBy new Intent(
+//        activity, activity getClassOf SettingChannels)
 
     case _: PresetChannels =>
       Log info s"$kind"
