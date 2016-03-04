@@ -7,15 +7,17 @@
 package x7c1.linen.glue.res.layout;
 
 import android.view.View;
+import android.support.v7.widget.RecyclerView;
 
 public class SettingPresetTabAll extends SettingPresetTab {
 
-    
+    public final android.support.v7.widget.RecyclerView channelList;
 
     public SettingPresetTabAll(
-        View itemView
+        View itemView,
+        android.support.v7.widget.RecyclerView channelList
     ){
         super(itemView);
-        
+        this.channelList = channelList;
     }
 }

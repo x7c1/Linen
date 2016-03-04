@@ -9,6 +9,7 @@ import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
 import x7c1.linen.modern.init.settings.preset.ProviderFactories;
 import x7c1.linen.res.layout.SettingPresetChannelsLayoutProvider;
+import x7c1.linen.res.layout.SettingPresetRowProvider;
 import x7c1.linen.res.layout.SettingPresetTabAllProvider;
 import x7c1.linen.res.layout.SettingPresetTabSelectedProvider;
 
@@ -30,7 +31,8 @@ public class PresetChannelsActivity extends FragmentActivity {
 				layout,
 				new ProviderFactories(
 						SettingPresetTabSelectedProvider.factory(),
-						SettingPresetTabAllProvider.factory()
+						SettingPresetTabAllProvider.factory(),
+						SettingPresetRowProvider.factory()
 				)
 		);
 		this.delegatee.onCreate();

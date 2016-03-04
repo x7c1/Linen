@@ -46,7 +46,10 @@ class LinenOpenHelper(context: Context)
          |)""".stripMargin,
 
       s"""INSERT INTO account_tags (tag_label, created_at)
-         |  VALUES ("preset", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin
+         |  VALUES ("preset", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin,
+
+      s"""INSERT INTO account_tags (tag_label, created_at)
+         |  VALUES ("client", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin
     )
     val accountTagMap = Seq(
       s"""CREATE TABLE IF NOT EXISTS account_tag_map (
@@ -130,6 +133,20 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
+    val channelStatuses = Seq(
+      s"""CREATE TABLE IF NOT EXISTS channel_statuses (
+         |channel_id INTEGER NOT NULL,
+         |account_id INTEGER NOT NULL,
+         |subscribed INTEGER NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(channel_id, account_id),
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE,
+         |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX channel_statuses_account ON channel_statuses (
+         |account_id)""".stripMargin
+    )
     val retrievedSourceMarks = Seq(
       s"""CREATE TABLE IF NOT EXISTS retrieved_source_marks (
          |source_id INTEGER NOT NULL,
@@ -173,6 +190,7 @@ class LinenOpenHelper(context: Context)
       entries,
       channels,
       channelSourceMap,
+      channelStatuses,
       retrievedSourceMarks,
       sourceStatuses
     ).flatten foreach db.execSQL

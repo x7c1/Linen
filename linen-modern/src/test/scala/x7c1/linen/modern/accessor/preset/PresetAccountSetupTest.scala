@@ -11,7 +11,7 @@ import x7c1.linen.modern.accessor.{SampleFactory, LinenOpenHelper}
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
-class PresetAccountAccessorTest extends JUnitSuiteLike {
+class PresetAccountSetupTest extends JUnitSuiteLike {
 
   @Test
   def testSetup1() = {
@@ -20,8 +20,8 @@ class PresetAccountAccessorTest extends JUnitSuiteLike {
     val factory = new SampleFactory(helper)
     val firstAccount = factory.createAccount()
 
-    val Right(account1) = PresetAccountAccessor(helper).setupAccount()
-    val Right(account2) = PresetAccountAccessor(helper).setupAccount()
+    val Right(account1) = PresetAccountSetup(helper).findOrCreate()
+    val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
     val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId
@@ -37,8 +37,8 @@ class PresetAccountAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
 
-    val Right(account1) = PresetAccountAccessor(helper).setupAccount()
-    val Right(account2) = PresetAccountAccessor(helper).setupAccount()
+    val Right(account1) = PresetAccountSetup(helper).findOrCreate()
+    val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
     val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId

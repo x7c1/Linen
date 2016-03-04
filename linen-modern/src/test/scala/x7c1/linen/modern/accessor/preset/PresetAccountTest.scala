@@ -6,6 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
+import x7c1.linen.modern.accessor.database.PresetLabel
 import x7c1.linen.modern.accessor.{LinenOpenHelper, QueryExplainer}
 
 @Config(manifest=Config.NONE)
@@ -17,7 +18,7 @@ class PresetAccountTest extends JUnitSuiteLike {
     val helper = new LinenOpenHelper(context)
     val db = helper.getReadableDatabase
 
-    val query = PresetAccount.select
+    val query = TaggedAccountRecord select PresetLabel
     val plans = QueryExplainer(db).explain(query)
 
 //    plans foreach println

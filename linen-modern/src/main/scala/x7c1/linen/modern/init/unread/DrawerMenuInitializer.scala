@@ -8,8 +8,11 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.MenuRow
+import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
+import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
+import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.menu.{MenuItems, SingleMenuItem}
 
@@ -19,7 +22,6 @@ trait DrawerMenuInitializer {
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
-    layout.menuList setAdapter new DrawerMenuRowAdapter(menuItems)
     layout.menuArea setLayoutParams {
       val params = layout.menuArea.getLayoutParams
       val maxWidth = dipToPixel(320)
@@ -27,10 +29,13 @@ trait DrawerMenuInitializer {
       params.width = min(maxWidth, defaultWidth)
       params
     }
+    clientAccount foreach { account =>
+      layout.menuList setAdapter new DrawerMenuRowAdapter(menuItems(account))
+    }
   }
 
-  protected def menuItems: MenuItems[MenuRow] = {
-    val onClick = new OnMenuItemClick(activity)
+  protected def menuItems(account: ClientAccount): MenuItems[MenuRow] = {
+    val onClick = new OnMenuItemClick(activity, account.accountId)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
     val ----- = new SingleMenuItem(menuRowProviders.forSeparator)
@@ -59,7 +64,8 @@ trait DrawerMenuInitializer {
 }
 
 class OnMenuItemClick(
-  activity: Activity with ActivityControl) extends OnMenuItemClickListener {
+  activity: Activity with ActivityControl,
+  accountId: Long ) extends OnMenuItemClickListener {
 
   override def onClick(kind: MenuItemKind): Unit = kind match {
     case _: NoChannel =>
@@ -72,8 +78,13 @@ class OnMenuItemClick(
 
     case _: PresetChannels =>
       Log info s"$kind"
-      activity startActivityBy new Intent(
-        activity, activity getClassOf SettingPresetChannels)
+
+      val intent = IntentFactory.using[PresetChannelsDelegatee].
+        create(activity, activity getClassOf SettingPresetChannels){
+          _.showPresetChannels(accountId)
+        }
+
+      activity startActivityBy intent
 
     case _: ChannelOrder =>
       Log info s"$kind"

@@ -84,6 +84,8 @@ private trait BundleBuilderFactory {
   def toAssign(bundle: TermName, arg: TermName)(param: Symbol) = {
     val name = param.name.toString
     val tree = param.typeSignatureIn(argTree.tpe) match {
+      case x if x <:< typeOf[Long] =>
+        q"""$bundle.putLong($name, $arg.${TermName(name)})"""
       case x if x <:< typeOf[Serializable] =>
         q"""$bundle.putSerializable($name, $arg.${TermName(name)})"""
       case x =>
@@ -125,6 +127,8 @@ private trait BundleExpanderFactory {
   def toAssign(bundle: TermName)(param: Symbol) ={
     val name = param.name.toString
     val tree = param.typeSignatureIn(objectType) match {
+      case x if x <:< typeOf[Long] =>
+        q"""${TermName(name)} = $bundle.getLong($name)"""
       case x if x <:< typeOf[Serializable] =>
         q"""${TermName(name)} = $bundle.getSerializable($name).asInstanceOf[$x]"""
       case x =>

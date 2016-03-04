@@ -7,10 +7,12 @@ import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRow}
+import x7c1.linen.modern.accessor.preset.{ClientAccountSetup, ClientAccount}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -81,6 +83,17 @@ class UnreadItemsDelegatee(
   )
   lazy val actions = setupActions()
 
+  lazy val clientAccount: Option[ClientAccount] = setupClientAccount()
+
+  def setupClientAccount(): Option[ClientAccount] = {
+    ClientAccountSetup(helper).findOrCreate() match {
+      case Left(error) =>
+        Log error error.toString
+        None
+      case Right(account) =>
+        Some(account)
+    }
+  }
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
