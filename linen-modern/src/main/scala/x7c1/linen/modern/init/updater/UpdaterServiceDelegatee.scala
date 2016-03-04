@@ -90,18 +90,3 @@ class UpdaterMethods(
     }
   }
 }
-
-/*
-case class Hoge123(name: String)
-
-object Hoge123 {
-  implicit object convertible extends BundleConvertible[Hoge123] {
-    override def toBundle(target: Hoge123): Bundle = {
-      val x = new Bundle()
-      x.putString("name", target.name)
-      x
-    }
-  }
-}
-*/
-
