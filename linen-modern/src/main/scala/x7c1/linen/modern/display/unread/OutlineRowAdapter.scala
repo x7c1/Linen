@@ -6,7 +6,6 @@ import x7c1.linen.glue.res.layout.{UnreadOutlineRow, UnreadOutlineRowEntry, Unre
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceKind}
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 class OutlineRowAdapter(
@@ -35,7 +34,6 @@ class OutlineRowAdapter(
         }
       case (row: UnreadOutlineRowSource, Left(source)) =>
         row.title.text = source.title
-        Log info s"source $source"
     }
   }
   override def getItemViewType(position: Int): Int = {
