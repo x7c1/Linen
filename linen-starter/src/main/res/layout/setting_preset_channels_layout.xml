@@ -9,19 +9,25 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/dark_imperial_blue__lighter"
         >
         <android.support.v7.widget.Toolbar
             android:id="@+id/setting_preset_channels_layout__toolbar"
             style="@style/AppToolbar"
             app:title="Preset Channels"
             />
-    </android.support.design.widget.AppBarLayout>
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/setting_preset_channels_layout__tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        <android.support.design.widget.TabLayout
+            android:id="@+id/setting_preset_channels_layout__tabs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:tabMode="fixed"
+            app:tabTextColor="@color/transparent_white"
+            app:tabSelectedTextColor="@android:color/white"
+            app:tabIndicatorColor="@android:color/white"
+            />
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/setting_preset_channels_layout__pager"
