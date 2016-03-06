@@ -2,6 +2,7 @@ package x7c1.linen.modern.accessor
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
+import x7c1.linen.modern.accessor.database.SourceParts
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
 
@@ -62,7 +63,7 @@ class SettingSourceAccessorFactory(
         | s2.rating AS rating
         |FROM channel_source_map AS s1
         |INNER JOIN source_ratings AS s2 ON s1.source_id = s2.source_id
-        |WHERE s1.channel_id = ? AND s2.owner_account_id = ?
+        |WHERE s1.channel_id = ? AND s2.account_id = ?
       """.stripMargin
 
     val sql2 =
@@ -92,7 +93,7 @@ class ChannelOwner(db: SQLiteDatabase, channelId: Long, accountId: Long){
       )
       def insertRating(sourceId: Long) = writable insert SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId,
+        accountId = accountId,
         rating = source.rating,
         createdAt = createdAt
       )
@@ -116,7 +117,7 @@ class SourceSubscriber(db: SQLiteDatabase, accountId: Long, sourceId: Long){
     WritableDatabase.transaction(db){ writable =>
       writable replace SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId,
+        accountId = accountId,
         rating = rating,
         createdAt = Date.current()
       )

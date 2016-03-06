@@ -74,7 +74,7 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
 class SampleFactory (helper: LinenOpenHelper){
 
   lazy val db = helper.getWritableDatabase
-  lazy val writable = helper.writableDatabase
+  lazy val writable = helper.writable
   lazy val readable = helper.readable
 
   def createAccount(): Account = {
@@ -94,7 +94,7 @@ class SampleFactory (helper: LinenOpenHelper){
       description = s"sample channel description",
       createdAt = Date.current()
     )
-    val Right(Some(channel)) = readable.find[Channel](id)
+    val Right(Some(channel)) = readable.find[Channel].by(id)
     channel
   }
 }

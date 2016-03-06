@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:text="Presets"
+        style="@style/DevCreateRecordsMenuLabel"
+        />
+
+    <RelativeLayout style="@style/DevCreateRecordsMenuBox">
+        <Button
+            android:id="@+id/dev_create_records_preset__create_preset_jp"
+            android:text="JAPANESE"
+            style="@style/DevCreateRecordsMenuButton"
+            />
+        <Button
+            android:id="@+id/dev_create_records_preset__create_preset_en"
+            android:layout_below="@id/dev_create_records_preset__create_preset_jp"
+            android:text="ENGLISH"
+            style="@style/DevCreateRecordsMenuButton"
+            />
+
+    </RelativeLayout>
+
+</merge>

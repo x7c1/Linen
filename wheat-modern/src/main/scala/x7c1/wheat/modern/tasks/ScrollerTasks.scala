@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.PointF
 import android.support.v7.widget.{LinearLayoutManager, LinearSmoothScroller, RecyclerView}
 import android.util.{DisplayMetrics, TypedValue}
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.Imports._
 import x7c1.wheat.modern.callback.{CallbackTask, OnFinish}
@@ -101,7 +102,17 @@ class SmoothScroller(
   override def onStart() = {
   }
   override def onStop(): Unit = {
-    onFinish(new ScrollerStopEvent)
+    try {
+      onFinish(new ScrollerStopEvent)
+    } catch {
+      case e: Exception =>
+        /*
+          prevents application from crashing here
+            if exception is not handled to the end of onFinish
+            since the caller above onStop is inside SDK.
+         */
+        Log error e.getMessage
+    }
   }
   override def calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float = {
     timePerInch / displayMetrics.densityDpi

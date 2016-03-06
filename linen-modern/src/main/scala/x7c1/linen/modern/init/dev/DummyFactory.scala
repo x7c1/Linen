@@ -2,7 +2,8 @@ package x7c1.linen.modern.init.dev
 
 import android.content.Context
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
+import x7c1.linen.modern.accessor.database.SourceParts
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, ChannelSourceMapParts, EntryParts, EntryUrl, LinenOpenHelper, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 
@@ -15,7 +16,7 @@ object DummyFactory {
   def createDummies0(context: Context)(n: Int)(callback: Int => Unit): Unit = {
     val helper = new LinenOpenHelper(context)
     val db = helper.getWritableDatabase
-    val writable = helper.writableDatabase
+    val writable = helper.writable
 
     val accountId1 = AccountAccessor.create(db) findAt 0 map (_.accountId) getOrElse {
       val Right(id) = writable insert AccountParts(
@@ -49,10 +50,11 @@ object DummyFactory {
       )
       id
     }
+    val timestamp = Date.timestamp
     (1 to n) foreach { i =>
       val Right(sourceId) = writable insert SourceParts(
         title = s"$i-title",
-        url = s"http://example.com/source$i",
+        url = s"http://example.com/source-$i/$timestamp",
         description = s"description-$i " + words(1,15),
         createdAt = Date.current()
       )
@@ -67,7 +69,7 @@ object DummyFactory {
       )
       writable insert SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId1,
+        accountId = accountId1,
         rating = generateRating(),
         createdAt = Date.current()
       )
@@ -78,7 +80,7 @@ object DummyFactory {
       )
       writable insert SourceRatingParts(
         sourceId = sourceId,
-        ownerAccountId = accountId2,
+        accountId = accountId2,
         rating = generateRating(),
         createdAt = Date.current()
       )
@@ -95,7 +97,7 @@ object DummyFactory {
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
           content = s"$sourceId-$j entry content " + words(100,500),
-          url = s"http://example.com/entry-$j",
+          url = EntryUrl(s"http://example.com/entry-$sourceId-$j"),
           createdAt = Date.current()
         )
         if (i == 3){

@@ -8,7 +8,6 @@ import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, Unread
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceKind}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 
@@ -44,7 +43,6 @@ class DetailRowAdapter(
         }
       case (row: UnreadDetailRowSource, Left(source)) =>
         row.title.text = source.title
-        Log info s"source $source"
     }
   }
   override def getItemViewType(position: Int): Int = {

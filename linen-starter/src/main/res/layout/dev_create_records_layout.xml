@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -13,15 +14,56 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/dev_create_records_layout__toolbar"
             style="@style/AppToolbar"
-            app:title="Create Dummies"
+            app:title="Create Records"
             />
 
     </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:text="Sources"
+        style="@style/DevCreateRecordsMenuLabel"
+        />
+
+    <RelativeLayout style="@style/DevCreateRecordsMenuBox">
+        <Button
+            android:id="@+id/dev_create_records_layout__select_channels"
+            android:text="TARGET CHANNELS"
+            style="@style/DevCreateRecordsMenuButton"
+            />
+
+        <TextView
+            android:id="@+id/dev_create_records_layout__selected_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/dev_create_records_layout__select_channels"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="13sp"
+            android:lineSpacingExtra="3dp"
+            android:lineSpacingMultiplier="1.1"
+            />
+
+        <Button
+            android:id="@+id/dev_create_records_layout__create_dummy_sources"
+            android:layout_below="@id/dev_create_records_layout__select_channels"
+            android:text="CREATE"
+            style="@style/DevCreateRecordsMenuButton"
+            />
+
+    </RelativeLayout>
+
+    <View style="@style/DevCreateRecordsMenuSeparator" />
+
+    <include layout="@layout/dev_create_records_preset" />
+
+    <View style="@style/DevCreateRecordsMenuSeparator" />
 
     <Button
         android:id="@+id/dev_create_records_layout__create_dummies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="create dummies"
         />
 

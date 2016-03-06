@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="amaranth">#e52b50</color>
+    <color name="bdazzled_blue">#2E5894</color>
+    <color name="blue_sapphire">#126180</color>
     <color name="brandeis_blue">#0070FF</color>
     <color name="bright_navy_blue">#1974D2</color>
     <color name="cardinal">#C41E3A</color>
     <color name="carnelian">#B31B1B</color>
+    <color name="catalina_blue">#062A78</color>
     <color name="cerulean_blue">#2A52BE</color>
     <color name="dark_imperial_blue">#00416A</color>
     <color name="dark_midnight_blue">#003366</color>
@@ -12,30 +15,47 @@
     <color name="french_blue">#0072BB</color>
     <color name="generic_viridian">#007F66</color>
     <color name="honolulu_blue">#006DB0</color>
+    <color name="imperial_blue">#002395</color>
     <color name="lapis_lazuli">#26619C</color>
     <color name="medium_electric_blue">#035096</color>
+    <color name="medium_persian_blue">#0067A5</color>
     <color name="orange_crayola">#FF7538</color>
     <color name="persimmon">#EC5800</color>
     <color name="prussian_blue">#003153</color>
     <color name="pumpkin">#FF7518</color>
     <color name="saddle_brown">#8B4513</color>
     <color name="sapphire">#0F52BA</color>
+    <color name="sapphire_blue">#0067A5</color>
     <color name="sienna">#882D17</color>
     <color name="space_cadet">#1D2951</color>
+    <color name="spanish_blue">#0070BB</color>
     <color name="spanish_orange">#E86100</color>
+    <color name="usafa_blue">#004F98</color>
+
+    <!-- customized -->
+    <color name="dark_imperial_blue__lighter">#094D79</color>
 
     <!-- traditional Japanese colors -->
 
+    <color name="aiiro">#165e83</color><!-- 藍色 -->
+    <color name="ainezu">#6c848d</color><!-- 藍鼠 -->
     <color name="awafujiiro">#bbc8e6</color><!-- 淡藤色 -->
     <color name="benimidori">#8491c3</color><!-- 紅碧 -->
     <color name="kakiiro">#ed6d3d</color><!-- 柿色 -->
     <color name="koiai">#0f2350</color><!-- 濃藍 -->
+    <color name="konnezu">#44617b</color><!-- 紺鼠 -->
+    <color name="konruri">#164a84</color><!-- 紺瑠璃 -->
+    <color name="masuhanairo">#5b7e91</color><!-- 舛花色 -->
     <color name="niiro">#e45e32</color><!-- 丹色 -->
+    <color name="noshimehanairo">#426579</color><!-- 熨斗目花色 -->
     <color name="rouiro">#2b2b2b</color><!-- 蝋色 -->
     <color name="ruriiro">#1e50a2</color><!-- 瑠璃色 -->
+    <color name="sabinezu">#47585c</color><!-- 錆鼠 -->
     <color name="seiran">#274a78</color><!-- 青藍 -->
     <color name="shikkoku">#0d0015</color><!-- 漆黒 -->
     <color name="terigaki">#eb6238</color><!-- 照柿 -->
+    <color name="tomekon">#1c305c</color><!-- 留紺 -->
     <color name="usugunjou">#5383c3</color><!-- 薄群青 -->
+    <color name="usuhanada">#507ea4</color><!-- 薄縹 -->
 
 </resources>

@@ -1,14 +1,17 @@
 package x7c1.linen.modern.accessor
 
-import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
+import x7c1.linen.modern.accessor.unread.UnreadSourceAccessorQueries
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
+
+import scala.util.Success
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
@@ -24,21 +27,36 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase
-    val cursor3 = UnreadSourceAccessor.createCursor(
+    val Success(accessor) = UnreadSourceAccessor.create(
       db,
       fixture.channel1.channelId,
       fixture.account1.accountId
     )
-    val rows = toMaps(cursor3)
-//    rows.map(prettyPrint) foreach println
-
-    assertEquals(Seq("33", "11"), rows.map(_("rating")))
-    assertEquals(Seq("description1", "description2"), rows.map(_("description")))
-
+    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt)
+    assertEquals(Seq(33, 11), sources.map(_.rating))
+    assertEquals(Seq("description2", "description1"), sources.map(_.description))
     assertEquals(
-      Seq(fixture.entryId1_2, fixture.entryId2_1),
-      rows.map(_("latest_entry_id")).map(_.toLong)
+      Seq(fixture.entryId2_1, fixture.entryId1_2),
+      sources.map(_.latestEntryId)
     )
+  }
+  @Test
+  def testQueryPlanForSourceArea() = {
+    val context = RuntimeEnvironment.application
+    val helper = new LinenOpenHelper(context)
+    val fixture = new UnreadSourceFixture(helper)
+
+    val db = helper.getWritableDatabase
+    val plans = QueryExplainer(db).
+      explain(
+        UnreadSourceAccessor.createQuery(
+          fixture.channel1.channelId,
+          fixture.account1.accountId
+        ))
+
+//    plans foreach println
+    assertEquals("USE TEMP B-TREE",
+      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
   }
 
   @Test
@@ -100,41 +118,69 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     assertEquals(Some(SourceKind), accessor.findKindAt(0))
     assertEquals(Some(EntryKind), accessor.findKindAt(1))
   }
+}
 
-  def showTable(tableName: String) = {
-    println(s"====== tableName : $tableName")
+
+@Config(manifest=Config.NONE)
+@RunWith(classOf[RobolectricTestRunner])
+class UnreadSourceAccessorTest extends JUnitSuiteLike {
+  @Test
+  def testQueryForNotRatedSources() = {
     val context = RuntimeEnvironment.application
     val helper = new LinenOpenHelper(context)
-    val db = helper.getReadableDatabase
-    val cursor = db.rawQuery(s"SELECT * FROM $tableName LIMIT 100", Array())
-    dumpCursor(cursor)
+    val fixture = new UnreadSourceFixture(helper)
+
+    val db = helper.getWritableDatabase
+
+//    showProcess(db, fixture)
+
+    val Success(accessor) = UnreadSourceAccessor.create(
+      db,
+      fixture.account2.accountId,
+      fixture.channel1.channelId
+    )
+    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt)
+
+    // default rating is 100
+    assertEquals(Seq(100, 100), sources.map(_.rating))
+    assertEquals(Seq("description2", "description1"), sources.map(_.description))
+    assertEquals(
+      Seq(fixture.entryId2_1, fixture.entryId1_2),
+      sources.map(_.latestEntryId)
+    )
   }
-  def dumpCursor(cursor: Cursor) = {
-    println("=====")
-    while(cursor.moveToNext()){
-      println("-----")
-      (0 to cursor.getColumnCount - 1) foreach { i =>
-        val column = cursor.getColumnName(i)
-        val value = cursor.getString(i)
-        println(s"$column : $value")
-      }
-    }
+  private def showProcess(db: SQLiteDatabase, fixture: UnreadSourceFixture): Unit = {
+    dump(db, UnreadSourceAccessorQueries.sql2,
+      Array(
+        fixture.channel1.channelId,
+        fixture.account2.accountId
+      )
+    )
+    dump(db, UnreadSourceAccessorQueries.sql3,
+      Array(
+        fixture.channel1.channelId,
+        fixture.account2.accountId
+      )
+    )
+    dump(db, UnreadSourceAccessorQueries.sql4,
+      Array(
+        fixture.channel1.channelId,
+        fixture.account2.accountId
+      )
+    )
+    dump(db, UnreadSourceAccessorQueries.sql5,
+      Array(
+        fixture.channel1.channelId,
+        fixture.account2.accountId,
+        fixture.account2.accountId
+      )
+    )
   }
-  def toMaps(cursor: Cursor): Seq[Map[String, String]] = {
-    (0 to cursor.getCount - 1) map { i =>
-      cursor moveToPosition i
-      val pairs = (0 to cursor.getColumnCount - 1) map { i =>
-        val column = cursor.getColumnName(i)
-        val value = cursor.getString(i)
-        column -> value
-      }
-      pairs.toMap
-    }
-  }
-  def prettyPrint(target: Map[String, String]) = {
-    target.
-      map{ case (k, v) => s"$k -> $v" }.
-      map("  " + _).
-      mkString("Map(\n", ",\n", "\n)")
+
+  private def dump[A](db: SQLiteDatabase, sql: String, args: Array[A]) = {
+    println("-------")
+    println(sql)
+    val cursor0 = db.rawQuery(sql, args.map(_.toString))
+    DebugTools.toMaps(cursor0).foreach(println)
   }
 }

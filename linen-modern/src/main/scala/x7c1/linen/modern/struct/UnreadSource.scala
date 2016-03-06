@@ -6,5 +6,6 @@ case class UnreadSource(
   title: String,
   description: String,
   rating: Int,
+  latestEntryId: Long,
   startEntryId: Option[Long]
 )

@@ -6,11 +6,13 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{UnreadDetailRowSource, UnreadOutlineRowSource, UnreadDetailRowEntry, UnreadOutlineRowEntry, MainLayout, MenuRowLabel, MenuRowTitle, MenuRowSeparator, UnreadSourceRow}
+import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRow}
+import x7c1.linen.modern.accessor.preset.{PresetAccount, ClientAccount, ClientAccountSetup}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.unread.{PaneContainer, DetailArea, OutlineArea, SourceArea}
+import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.macros.logger.Log
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -29,7 +31,10 @@ class UnreadItemsDelegatee(
     setupEntryArea()
     setupEntryDetailArea()
 
-    loader.startLoading()
+    clientAccount match {
+      case Some(account) => loader.startLoading(account)
+      case None => Log error s"account not found"
+    }
   }
   def close(): Unit = {
     loader.close()
@@ -81,6 +86,26 @@ class UnreadItemsDelegatee(
   )
   lazy val actions = setupActions()
 
+  lazy val clientAccount: Option[ClientAccount] = setupClientAccount()
+
+  def setupClientAccount(): Option[ClientAccount] = {
+
+    // using preset account temporally to display channels
+    val tmp = helper.readable.find[PresetAccount]() match {
+      case Left(error) => None
+      case Right(None) => None
+      case Right(Some(account)) => Some(ClientAccount(account.accountId))
+    }
+
+    val account = ClientAccountSetup(helper).findOrCreate() match {
+      case Left(error) =>
+        Log error error.toString
+        None
+      case Right(account) =>
+        Some(account)
+    }
+    tmp orElse account
+  }
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt

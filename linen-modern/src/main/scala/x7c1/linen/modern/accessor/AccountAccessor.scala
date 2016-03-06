@@ -42,6 +42,10 @@ object AccountAccessor {
 
 case class Account (accountId: Long)
 
+trait AccountIdentifiable {
+  def accountId: Long
+}
+
 case class AccountParts(
   nickname: String,
   biography: String,

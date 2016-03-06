@@ -69,9 +69,12 @@ class UpdaterMethods(
     notifier.notifyDone()
     service stopSelf startId
   }
-  def createPreset(): Unit = async {
+  def createPresetJp(): Unit = async {
     Log info "[init]"
-    new PresetFactory(service, helper).createPreset()
+    new PresetFactory(helper).setupJapanesePresets()
+  }
+  def createDummySources(channelIds: Seq[Long]) = async {
+    Log info s"$channelIds"
   }
   def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"
@@ -87,18 +90,3 @@ class UpdaterMethods(
     }
   }
 }
-
-/*
-case class Hoge123(name: String)
-
-object Hoge123 {
-  implicit object convertible extends BundleConvertible[Hoge123] {
-    override def toBundle(target: Hoge123): Bundle = {
-      val x = new Bundle()
-      x.putString("name", target.name)
-      x
-    }
-  }
-}
-*/
-

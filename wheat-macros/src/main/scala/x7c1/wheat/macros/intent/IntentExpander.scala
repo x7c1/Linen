@@ -50,6 +50,7 @@ trait IntentExpanderTreeFactory {
       val tree = paramType match {
         case x if x =:= typeOf[Int] => q"$intentTree.getIntExtra($key, -1)"
         case x if x =:= typeOf[Long] => q"$intentTree.getLongExtra($key, -1)"
+        case x if x =:= typeOf[Seq[Long]] => q"$intentTree.getLongArrayExtra($key).toSeq"
         case x if x =:= typeOf[String] => q"$intentTree.getStringExtra($key)"
         case x =>
           throw new IllegalArgumentException(s"unsupported type : $x")

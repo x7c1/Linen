@@ -14,7 +14,8 @@ object LinenDatabase {
 class LinenOpenHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
-  lazy val writableDatabase = new WritableDatabase(getWritableDatabase)
+  lazy val writable = new WritableDatabase(getWritableDatabase)
+
   lazy val readable = new ReadableDatabase(getReadableDatabase)
 
   override def onConfigure(db: SQLiteDatabase) = {
@@ -36,13 +37,41 @@ class LinenOpenHelper(context: Context)
       s"""CREATE INDEX accounts_created_at ON accounts (
          |created_at)""".stripMargin
     )
+    val accountTags = Seq(
+      s"""CREATE TABLE IF NOT EXISTS account_tags (
+         |account_tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+         |tag_label TEXT NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(tag_label)
+         |)""".stripMargin,
+
+      s"""INSERT INTO account_tags (tag_label, created_at)
+         |  VALUES ("preset", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin,
+
+      s"""INSERT INTO account_tags (tag_label, created_at)
+         |  VALUES ("client", strftime("%s", CURRENT_TIMESTAMP))""".stripMargin
+    )
+    val accountTagMap = Seq(
+      s"""CREATE TABLE IF NOT EXISTS account_tag_map (
+         |account_id INTEGER NOT NULL,
+         |account_tag_id INTEGER NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(account_id, account_tag_id),
+         |FOREIGN KEY(account_tag_id) REFERENCES account_tags(account_tag_id) ON DELETE CASCADE,
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX account_tag_map_tag_id ON account_tag_map (
+         |account_tag_id)""".stripMargin
+    )
     val sources = Seq(
       s"""CREATE TABLE IF NOT EXISTS sources (
          |_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |url TEXT NOT NULL,
          |title TEXT NOT NULL,
          |description TEXT NOT NULL,
-         |created_at INTEGER NOT NULL
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(url)
          |)""".stripMargin,
 
       s"""CREATE INDEX sources_created_at ON sources (
@@ -51,16 +80,16 @@ class LinenOpenHelper(context: Context)
     val sourceRatings = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_ratings (
          |source_id INTEGER NOT NULL,
-         |owner_account_id INTEGER NOT NULL,
+         |account_id INTEGER NOT NULL,
          |rating INTEGER NOT NULL,
          |created_at INTEGER NOT NULL,
-         |UNIQUE(owner_account_id, source_id),
+         |UNIQUE(account_id, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(owner_account_id) REFERENCES accounts(_id) ON DELETE CASCADE
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin,
 
       s"""CREATE INDEX source_ratings_id ON source_ratings (
-         |owner_account_id, rating, source_id)""".stripMargin
+         |account_id, rating, source_id)""".stripMargin
     )
     val entries = Seq(
       s"""CREATE TABLE IF NOT EXISTS entries (
@@ -70,6 +99,7 @@ class LinenOpenHelper(context: Context)
          |title TEXT NOT NULL,
          |content TEXT NOT NULL,
          |created_at INTEGER NOT NULL,
+         |UNIQUE(url, source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE
          |)""".stripMargin,
 
@@ -89,6 +119,7 @@ class LinenOpenHelper(context: Context)
          |name TEXT NOT NULL,
          |description TEXT NOT NULL,
          |created_at INTEGER NOT NULL,
+         |UNIQUE(account_id, name),
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )
@@ -101,6 +132,42 @@ class LinenOpenHelper(context: Context)
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
          |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
          |)""".stripMargin
+    )
+    val channelStatuses = Seq(
+      s"""CREATE TABLE IF NOT EXISTS channel_statuses (
+         |channel_id INTEGER NOT NULL,
+         |account_id INTEGER NOT NULL,
+         |subscribed INTEGER NOT NULL,
+         |created_at INTEGER NOT NULL,
+         |UNIQUE(channel_id, account_id),
+         |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE,
+         |FOREIGN KEY(channel_id) REFERENCES channels(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX channel_statuses_account ON channel_statuses (
+         |account_id)""".stripMargin
+    )
+    val retrievedSourceMarks = Seq(
+      s"""CREATE TABLE IF NOT EXISTS retrieved_source_marks (
+         |source_id INTEGER NOT NULL,
+         |latest_entry_id INTEGER NOT NULL,
+         |updated_at INTEGER NOT NULL,
+         |UNIQUE(source_id),
+         |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
+         |FOREIGN KEY(latest_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
+         |)""".stripMargin,
+
+      s"""CREATE INDEX retrieved_source_marks_created_at ON retrieved_source_marks (
+         |updated_at)""".stripMargin,
+
+      s"""CREATE TRIGGER update_source_marks AFTER INSERT ON entries
+         |BEGIN
+         |  INSERT OR REPLACE INTO retrieved_source_marks
+         |      (source_id, latest_entry_id, updated_at)
+         |    VALUES
+         |      (new.source_id, new._id, strftime("%s", CURRENT_TIMESTAMP));
+         |END
+       """.stripMargin
     )
     val sourceStatuses = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
@@ -116,11 +183,15 @@ class LinenOpenHelper(context: Context)
     )
     Seq(
       accounts,
+      accountTags,
+      accountTagMap,
       sources,
       sourceRatings,
       entries,
       channels,
       channelSourceMap,
+      channelStatuses,
+      retrievedSourceMarks,
       sourceStatuses
     ).flatten foreach db.execSQL
 
@@ -133,9 +204,9 @@ trait Insertable[A] {
 }
 
 object WritableDatabase {
-  def transaction[A]
+  def transaction[A, ERROR]
     (db: SQLiteDatabase)
-    (writable: WritableDatabase => Either[SQLException, A]): Either[SQLException, A] = {
+    (writable: WritableDatabase => Either[ERROR, A]): Either[ERROR, A] = {
 
     try {
       db.beginTransaction()
@@ -195,35 +266,54 @@ trait Updatable[A] {
 
 class ReadableDatabase(db: SQLiteDatabase) {
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
+
+}
+
+trait SingleSelectable[A, ID]{
+  def query(id: ID): Query
+  def fromCursor(cursor: Cursor): Option[A]
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
-  private type Selectable[X] = SingleSelectable[A, X]
+  private type QuerySelectable[X] = SingleSelectable[A, X]
+  private type ZeroAritySelectable[_] = SingleSelectable[A, Unit]
 
-  def apply[B: Selectable](id: B): Either[SQLException, Option[A]] = {
+  def apply[_: ZeroAritySelectable](): Either[SQLException, Option[A]] = {
+    by({})
+  }
+  def by[B: QuerySelectable](id: B): Either[SQLException, Option[A]] = {
     try {
-      val i = implicitly[Selectable[B]]
-      val clause = i.where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
-      val sql = s"SELECT * FROM ${i.tableName} WHERE $clause"
-      val args = i.where(id) map { case (_, value) => value }
-      val cursor = db.rawQuery(sql, args.toArray)
+      val i = implicitly[QuerySelectable[B]]
+      val query = i.query(id)
+      val cursor = db.rawQuery(query.sql, query.selectionArgs)
       try Right apply i.fromCursor(cursor)
       finally cursor.close()
     } catch {
       case e: SQLException => Left(e)
     }
   }
+
 }
 
-trait SingleSelectable[A, ID] {
-  def tableName: String
+abstract class SingleWhere[A, ID](table: String) extends SingleSelectable[A, ID]{
+
   def where(id: ID): Seq[(String, String)]
-  def fromCursor(cursor: Cursor): Option[A]
+
+  override def query(id: ID): Query = {
+    val clause = where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
+    val sql = s"SELECT * FROM $table WHERE $clause"
+    val args = where(id) map { case (_, value) => value }
+    new Query(sql, args.toArray)
+  }
+}
+
+abstract class ZeroAritySingle[A](select: Query) extends SingleSelectable[A, Unit]{
+  override def query(id: Unit): Query = select
 }
 
 class Query(
   val sql: String,
-  val selectionArgs: Array[String]){
+  val selectionArgs: Array[String] = Array()){
 
   def toExplain: Query = new Query(
     "EXPLAIN QUERY PLAN " + sql,
@@ -236,7 +326,11 @@ class Query(
 trait QueryPlanColumn extends TypedFields {
   def detail: String
 }
-case class QueryPlan(detail: String)
+case class QueryPlan(detail: String){
+  def useTempBtree: Boolean = {
+    detail contains "USE TEMP B-TREE"
+  }
+}
 
 class QueryExplainer(db: SQLiteDatabase){
   def explain(query: Query): Seq[QueryPlan] = {

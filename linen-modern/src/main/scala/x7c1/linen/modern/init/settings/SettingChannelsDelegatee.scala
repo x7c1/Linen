@@ -5,10 +5,10 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingChannelSources
 import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingChannelsRow}
-import x7c1.linen.modern.accessor.{AccountAccessor, ChannelAccessor, LinenOpenHelper}
+import x7c1.linen.modern.accessor.{ChannelAccessor, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesEvent, OnChannelSourcesListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.intent.IntentFactory
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -27,16 +27,25 @@ class SettingChannelsDelegatee (
     val manager = new LinearLayoutManager(activity)
     layout.channelList setLayoutManager manager
 
-    AccountAccessor findCurrentAccountId database match {
-      case Some(accountId) =>
-        layout.channelList setAdapter new ChannelRowAdapter(
-          accessor = ChannelAccessor.create(database, accountId),
-          viewHolderProvider = channelRowProvider,
-          onSources = new OnChannelSources(activity)
-        )
-      case None =>
-        Log warn "account not found"
-    }
+    IntentExpander executeBy activity.getIntent
+
+//    AccountAccessor findCurrentAccountId database match {
+//      case Some(accountId) =>
+//        layout.channelList setAdapter new ChannelRowAdapter(
+//          accessor = ChannelAccessor.create(database, accountId),
+//          viewHolderProvider = channelRowProvider,
+//          onSources = new OnChannelSources(activity)
+//        )
+//      case None =>
+//        Log warn "account not found"
+//    }
+  }
+  def showMyChannels(accountId: Long) = {
+    layout.channelList setAdapter new ChannelRowAdapter(
+      accessor = ChannelAccessor.create(database, accountId),
+      viewHolderProvider = channelRowProvider,
+      onSources = new OnChannelSources(activity)
+    )
   }
   def close(): Unit = {
     database.close()

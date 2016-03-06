@@ -3,11 +3,10 @@ package x7c1.linen.modern.init.unread
 import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
-import x7c1.linen.modern.accessor.AccountAccessor.findCurrentAccountId
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable, EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
+import x7c1.linen.modern.init.unread.SourceNotLoaded.{AccountNotFound, Abort, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -51,9 +50,9 @@ class AccessorLoader(
   def createDetailAccessor: EntryAccessor[UnreadDetail] =
     new EntryAccessorBinder(detailAccessors)
 
-  def startLoading(): Unit = {
+  def startLoading(account: AccountIdentifiable): Unit = {
     val first = for {
-      sourceIds <- startLoadingSources()
+      sourceIds <- startLoadingSources(account.accountId)
       remaining <- loadSourceEntries(sourceIds)
       _ <- Future { notifyChanged() }
     } yield {
@@ -72,8 +71,8 @@ class AccessorLoader(
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources(): Future[Seq[Long]] = loaderFactory asFuture {
-    inspectSourceAccessor(database).toEither match {
+  private def startLoadingSources(accountId: Long): Future[Seq[Long]] = loaderFactory asFuture {
+    inspectSourceAccessor(database, accountId).toEither match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         Seq()
@@ -151,9 +150,15 @@ object AccessorLoader {
   import scalaz.\/.{left, right}
   import scalaz.syntax.std.option._
 
-  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor =
+  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor = {
+    for {
+      accountId <- AccountAccessor.findCurrentAccountId(db) \/> AccountNotFound
+      accessor <- inspectSourceAccessor(db, accountId)
+    } yield accessor
+  }
+
+  def inspectSourceAccessor(db: SQLiteDatabase, accountId: Long): SourceNotLoaded \/ UnreadSourceAccessor =
     try for {
-      accountId <- findCurrentAccountId(db) \/> AccountNotFound
       channelId <- findCurrentChannelId(db, accountId) \/> ChannelNotFound(accountId)
       accessor <- UnreadSourceAccessor.create(db, accountId, channelId) match {
         case Failure(exception) => left(Abort(exception))

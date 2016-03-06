@@ -3,6 +3,7 @@ package x7c1.linen.modern.init.updater
 import java.lang.System.currentTimeMillis
 
 import android.app.Service
+import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.wheat.macros.logger.Log
@@ -34,9 +35,13 @@ class SourceUpdaterQueue(
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start
 
-    val future = inspector.loadEntries(source) map { entries =>
+    val future = inspector.loadSource(source) map { loadedSource =>
       Log info s"[loaded] msec:${elapsed()}, source:$source"
-      insertEntries(entries)
+
+      if (loadedSource isModifiedFrom source){
+        updateSource(loadedSource)
+      }
+      insertEntries(loadedSource)
     }
     future onFailure {
       case e => Log error s"[error] source:$source, ${e.getMessage}"
@@ -54,13 +59,27 @@ class SourceUpdaterQueue(
       }
     }
   }
-  private def insertEntries(entries: LoadedEntries): Unit = {
-    val loadedEntries = entries.validEntries
+  private def updateSource(source: LoadedSource): Unit = {
+    helper.writable update source match {
+      case Left(error) => Log error error.getMessage
+      case Right(0) => Log info s"not updated: ${source.title}"
+      case Right(_) => Log info s"updated: ${source.title}"
+    }
+  }
+  private def insertEntries(source: LoadedSource): Unit = {
+    val loadedEntries = source.validEntries
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
-        Log debug entry.title
-        helper.writableDatabase insert entry
+        helper.writable insert entry match {
+          case Left(e: SQLiteConstraintException) =>
+            // nop, entry already exists
+          case Left(e) =>
+            Log error s"$index,${entry.url.host},${e.getMessage}"
+          case Right(b) =>
+            Log debug s"$index,${entry.url.host},${entry.title}"
+        }
+
 //        notifier.notifyProgress(index)
     }
 //    notifier.notifyDone()

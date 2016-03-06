@@ -1,7 +1,6 @@
 package x7c1.linen.dev;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 
 import x7c1.linen.BaseActivity;
 import x7c1.linen.R;
@@ -25,10 +24,9 @@ public class CreateRecordsActivity extends BaseActivity {
 		this.delegatee = new CreateRecordsDelegatee(this, layout);
 		this.delegatee.setup();
 	}
-
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		return onKeyDownFromChild(keyCode, event);
+	public void onBackPressed() {
+		onBackPressedAtChild();
 	}
 	@Override
 	protected void onDestroy() {
