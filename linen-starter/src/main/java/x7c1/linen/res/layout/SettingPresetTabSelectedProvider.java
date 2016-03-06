@@ -11,9 +11,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingPresetTabSelected;
-import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 
 public class SettingPresetTabSelectedProvider implements ViewHolderProvider<SettingPresetTabSelected> {
 
@@ -23,7 +23,7 @@ public class SettingPresetTabSelectedProvider implements ViewHolderProvider<Sett
         this.inflater = LayoutInflater.from(context);
     }
 
-    public SettingPresetTabSelectedProvider(LayoutInflater inflater) {
+    public SettingPresetTabSelectedProvider(LayoutInflater inflater){
         this.inflater = inflater;
     }
 
@@ -48,8 +48,12 @@ public class SettingPresetTabSelectedProvider implements ViewHolderProvider<Sett
     public static ViewHolderProviderFactory<SettingPresetTabSelected> factory(){
         return new ViewHolderProviderFactory<SettingPresetTabSelected>() {
             @Override
-            public ViewHolderProvider<SettingPresetTabSelected> create(LayoutInflater inflater) {
+            public ViewHolderProvider<SettingPresetTabSelected> create(LayoutInflater inflater){
                 return new SettingPresetTabSelectedProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<SettingPresetTabSelected> create(Context context){
+                return new SettingPresetTabSelectedProvider(context);
             }
         };
     }

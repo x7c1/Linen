@@ -22,10 +22,10 @@ public class SettingPresetRowProvider implements ViewHolderProvider<SettingPrese
     private final LayoutInflater inflater;
 
     public SettingPresetRowProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
     }
 
-    public SettingPresetRowProvider(LayoutInflater inflater) {
+    public SettingPresetRowProvider(LayoutInflater inflater){
         this.inflater = inflater;
     }
 
@@ -50,11 +50,16 @@ public class SettingPresetRowProvider implements ViewHolderProvider<SettingPrese
             (TextView) view.findViewById(R.id.setting_preset_row__sources)
         );
     }
+
     public static ViewHolderProviderFactory<SettingPresetRow> factory(){
         return new ViewHolderProviderFactory<SettingPresetRow>() {
             @Override
-            public ViewHolderProvider<SettingPresetRow> create(LayoutInflater inflater) {
+            public ViewHolderProvider<SettingPresetRow> create(LayoutInflater inflater){
                 return new SettingPresetRowProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<SettingPresetRow> create(Context context){
+                return new SettingPresetRowProvider(context);
             }
         };
     }
