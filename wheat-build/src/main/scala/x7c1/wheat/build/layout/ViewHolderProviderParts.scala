@@ -34,6 +34,7 @@ private class ViewHolderProviderPartsImpl(
     }
     val x2 = Seq(
       "import x7c1.wheat.ancient.resource.ViewHolderProvider;",
+      "import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;",
       s"import ${packages.starter}.R;",
       s"import ${packages.glueLayout}.${layout.prefix.ofClass};"
     )
