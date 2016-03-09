@@ -30,6 +30,7 @@ object PresetChannelsAccessor {
   def createQuery(clientAccountId: Long, presetAccountId: Long) = {
     val sql =
       s"""SELECT
+         |  c1._id AS channel_id,
          |  c1.name AS name,
          |  c1.description AS description,
          |  IFNULL(c2.subscribed, 0) AS subscribed
@@ -56,6 +57,7 @@ private class PresetChannelAccessorImpl(rawCursor: Cursor) extends PresetChannel
   override def findAt(position: Int) = {
     cursor.moveToFind(position){
       SettingPresetChannel(
+        channelId = cursor.channel_id,
         name = cursor.name,
         description = cursor.description,
         isSubscribed = cursor.subscribed == 1
@@ -65,12 +67,14 @@ private class PresetChannelAccessorImpl(rawCursor: Cursor) extends PresetChannel
 }
 
 trait SettingPresetChannelRecord extends TypedFields {
+  def channel_id: Long
   def name: String
   def description: String
   def subscribed: Int
 }
 
 case class SettingPresetChannel(
+  channelId: Long,
   name: String,
   description: String,
   isSubscribed: Boolean
