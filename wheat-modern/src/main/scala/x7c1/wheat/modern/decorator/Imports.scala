@@ -2,10 +2,13 @@ package x7c1.wheat.modern.decorator
 
 import android.support.v7.widget.{Toolbar, RecyclerView}
 import android.view.View
-import android.widget.TextView
+import android.widget.{CompoundButton, TextView}
 
 object Imports {
   import scala.language.implicitConversions
+
+  implicit def toRichCompoundView[A <: CompoundButton](view: A): RichCompoundButton[A]
+    = new RichCompoundButton(view)
 
   implicit def toRichView[A <: View](view: A): RichView[A]
     = new RichView(view)
