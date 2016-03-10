@@ -32,7 +32,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
       case Right(accessor) =>
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsAllAdapter(
-          listener = new OnChannelSubscribed(args.accountId, helper),
+          listener = new OnChannelSubscribed("hoge1", getContext, args.accountId, helper),
           accessor = accessor,
           provider = args.rowFactory create getContext
         )
@@ -40,6 +40,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
     tab.itemView
   }
   override def onDestroy(): Unit = {
+    Log info s"[start]"
     super.onDestroy()
     helper.close()
   }

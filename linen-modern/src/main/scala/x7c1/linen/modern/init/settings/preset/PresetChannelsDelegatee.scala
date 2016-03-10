@@ -1,6 +1,8 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.content.{IntentFilter, Intent, Context, BroadcastReceiver}
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
+import android.support.v4.content.LocalBroadcastManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -15,9 +17,25 @@ class PresetChannelsDelegatee(
   layout: SettingPresetChannelsLayout,
   factories: ProviderFactories ){
 
+  private lazy val receiver1 = new BroadcastReceiver {
+    override def onReceive(context: Context, intent: Intent): Unit = {
+      Log info s"$intent"
+    }
+  }
+  private lazy val receiver2 = new BroadcastReceiver {
+    override def onReceive(context: Context, intent: Intent): Unit = {
+      Log info s"$intent"
+    }
+  }
   def onCreate(): Unit = {
     Log info s"[start]"
 
+    LocalBroadcastManager.getInstance(activity).registerReceiver(
+      receiver1, new IntentFilter("hoge1")
+    )
+    LocalBroadcastManager.getInstance(activity).registerReceiver(
+      receiver2, new IntentFilter("hoge2")
+    )
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
@@ -33,6 +51,8 @@ class PresetChannelsDelegatee(
   }
   def onDestroy(): Unit = {
     Log info s"[start]"
+    LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver1)
+    LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver2)
   }
 }
 

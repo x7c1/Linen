@@ -1,6 +1,8 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.content.{Intent, Context}
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{LayoutInflater, View, ViewGroup}
@@ -35,7 +37,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
         val manager = new LinearLayoutManager(getContext)
         tab.channelList setLayoutManager manager
         tab.channelList setAdapter new PresetsAllAdapter(
-          listener = new OnChannelSubscribed(args.accountId, helper),
+          listener = new OnChannelSubscribed("hoge2", getContext, args.accountId, helper),
           accessor = accessor,
           provider = args.rowFactory create inflater
         )
@@ -44,12 +46,16 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
     tab.itemView
   }
   override def onDestroy(): Unit = {
+    Log info s"[start]"
     super.onDestroy()
     helper.close()
   }
 }
 
-class OnChannelSubscribed(accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
+class OnChannelSubscribed(
+  action: String, context: Context,
+  accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
+
   override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
     val account = new AccountIdentifiable {
       override def accountId: Long = accountId0
@@ -60,6 +66,9 @@ class OnChannelSubscribed(accountId0: Long, helper: LinenOpenHelper) extends Cha
     } else {
       subscriber unsubscribe event.channelId
     }
+    LocalBroadcastManager.
+      getInstance(context).
+      sendBroadcast(new Intent(action))
   }
 }
 
