@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -41,7 +42,8 @@ public class SettingPresetTabSelectedProvider implements ViewHolderProvider<Sett
     public SettingPresetTabSelected inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_preset_tab__selected, parent, attachToRoot);
         return new SettingPresetTabSelected(
-            view
+            view,
+            (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__selected__channel_list)
         );
     }
 
