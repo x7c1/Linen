@@ -2,16 +2,18 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.os.Bundle
 import android.view.{LayoutInflater, View, ViewGroup}
-import x7c1.linen.glue.res.layout.SettingPresetTabSelected
+import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabSelected}
 
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
 
 
 class ArgumentsForSelected(
-  val providerFactory: ViewHolderProviderFactory[SettingPresetTabSelected]
+  val accountId: Long,
+  val providerFactory: ViewHolderProviderFactory[SettingPresetTabSelected],
+  val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
 )
-class SelectedChannelsFragment extends TypedFragment[ArgumentsForSelected] {
+class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
   private lazy val args = getTypedArguments
 
   override def onCreateView(

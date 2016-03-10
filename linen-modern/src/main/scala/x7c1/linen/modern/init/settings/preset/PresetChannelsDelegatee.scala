@@ -49,15 +49,16 @@ class PresetPagerAdapter(
 
   lazy val fragments = Seq(
     "SELECTED" -> {
-      create[SelectedChannelsFragment] by
-        new ArgumentsForSelected(factories.forSelected)
+      create[PresetsSelectedFragment] by new ArgumentsForSelected(
+        accountId,
+        factories.forSelected,
+        factories.forRow )
     },
     "ALL" -> {
       create[PresetsAllFragment] by new ArgumentsForAll(
         accountId,
         factories.forAll,
-        factories.forRow
-      )
+        factories.forRow )
     }
   )
   override def getItem(position: Int): Fragment = {
