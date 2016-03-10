@@ -1,9 +1,10 @@
 package x7c1.linen.modern.accessor.database
 
-import android.database.{SQLException, Cursor}
+import android.database.{Cursor, SQLException}
 import x7c1.linen.modern.accessor.{AccountIdentifiable, Insertable, LinenOpenHelper, SingleWhere, Updatable, WritableDatabase}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.logger.Log
 
 
 trait ChannelStatusRecord extends TypedFields {
@@ -68,30 +69,36 @@ object ChannelStatusRecordParts {
 
 class ChannelSubscriber(account: AccountIdentifiable, helper: LinenOpenHelper){
   def subscribe(channelId: Long): Either[SQLException, Unit] = {
-    helper.readable.find[ChannelStatusRecord] by (account -> channelId) match {
-      case Right(Some(record)) => update(channelId)
-      case Right(None) => insert(channelId)
-      case Left(error) => Left(error)
-    }
+    Writer(subscribed = true) insertOrUpdate channelId
   }
-  private def update(channelId: Long) = {
-    val either = WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
-      writable update ChannelStatusRecordParts(
-        channelId = channelId,
-        accountId = account.accountId,
-        subscribed = true
-      )
-    }
-    either.right map (_ => {})
+  def unsubscribe(channelId: Long): Either[SQLException, Unit] = {
+    Writer(subscribed = false) insertOrUpdate channelId
   }
-  private def insert(channelId: Long) = {
-    val either = WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
-      writable insert ChannelStatusRecordParts(
-        channelId = channelId,
-        accountId = account.accountId,
-        subscribed = true
-      )
+  private case class Writer(subscribed: Boolean){
+    def insertOrUpdate(channelId: Long) = {
+      helper.readable.find[ChannelStatusRecord] by (account -> channelId) match {
+        case Right(Some(record)) => update(channelId)
+        case Right(None) => insert(channelId)
+        case Left(error) => Left(error)
+      }
     }
-    either.right map (_ => {})
+    private def execute[A, B](channelId: Long)(f: (WritableDatabase, ChannelStatusRecordParts) => Either[A, B]) = {
+      val either = WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
+        f(writable, ChannelStatusRecordParts(
+          channelId = channelId,
+          accountId = account.accountId,
+          subscribed = subscribed
+        ))
+      }
+      either.right map (_ => {})
+    }
+    private def update(channelId: Long) = {
+      Log info s"subscribed($subscribed), channel($channelId)"
+      execute(channelId){_ update _}
+    }
+    private def insert(channelId: Long) = {
+      Log info s"subscribed($subscribed), channel($channelId)"
+      execute(channelId){_ insert _}
+    }
   }
 }

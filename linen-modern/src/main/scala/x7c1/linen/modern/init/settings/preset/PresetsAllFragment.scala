@@ -5,8 +5,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
-import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
+import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
@@ -34,6 +35,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
         val manager = new LinearLayoutManager(getContext)
         tab.channelList setLayoutManager manager
         tab.channelList setAdapter new PresetsAllAdapter(
+          listener = new OnChannelSubscribed(args.accountId, helper),
           accessor = accessor,
           provider = args.rowFactory create inflater
         )
@@ -47,7 +49,22 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
   }
 }
 
+class OnChannelSubscribed(accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
+  override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
+    val account = new AccountIdentifiable {
+      override def accountId: Long = accountId0
+    }
+    val subscriber = new ChannelSubscriber(account, helper)
+    if (event.isChecked){
+      subscriber subscribe event.channelId
+    } else {
+      subscriber unsubscribe event.channelId
+    }
+  }
+}
+
 class PresetsAllAdapter(
+  listener: ChannelSubscribedListener,
   accessor: PresetChannelsAccessor,
   provider: ViewHolderProvider[SettingPresetRow]) extends Adapter[SettingPresetRow] {
 
@@ -62,9 +79,20 @@ class PresetsAllAdapter(
     accessor.findAt(position) foreach { channel =>
       holder.name.text = channel.name
       holder.description.text = channel.description
-      holder.switchSubscribe setChecked channel.isSubscribed
-
+      holder.switchSubscribe.checked = channel.isSubscribed
+      holder.switchSubscribe onCheckedChanged { e =>
+        listener onSubscribedChanged ChannelSubscribeEvent(channel.channelId, e.isChecked)
+      }
       Log info s"${channel.name}"
     }
   }
 }
+
+trait ChannelSubscribedListener {
+  def onSubscribedChanged(event: ChannelSubscribeEvent)
+}
+
+case class ChannelSubscribeEvent(
+  channelId: Long,
+  isChecked: Boolean
+)
