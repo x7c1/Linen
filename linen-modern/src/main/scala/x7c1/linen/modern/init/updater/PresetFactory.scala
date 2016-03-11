@@ -9,7 +9,8 @@ class PresetFactory (helper: LinenOpenHelper){
   def setupJapanesePresets() = {
     val sets = Seq(
       Tech,
-      Game
+      Game,
+      Column
     )
     sets.reverse map SetupStarter(helper) foreach {_.start()}
   }
@@ -135,6 +136,20 @@ object Game extends PresetChannelSet {
       PresetSourcePiece(
         title = "ASCII.jp － ゲーム・ホビー",
         url = "http://rss.rssad.jp/rss/ascii/hobby/rss.xml"
+      )
+    )
+  )
+}
+object Column extends PresetChannelSet {
+  override def channel: PresetChannelPiece = PresetChannelPiece(
+    name = "Column",
+    description = "コラム / ブログ / 日記 / 寄稿 / 読み物"
+  )
+  override def sources: PresetSourcePieces = PresetSourcePieces(
+    list = Seq(
+      PresetSourcePiece(
+        title = "Newsweek コラム＆ブログ",
+        url = "http://www.newsweekjapan.jp/column/rss.xml"
       )
     )
   )
