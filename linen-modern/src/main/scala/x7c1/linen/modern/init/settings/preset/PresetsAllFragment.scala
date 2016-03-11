@@ -63,7 +63,7 @@ class ChannelSubscriptionNotifier(
     LocalBroadcastManager.getInstance(context) sendBroadcast intent
 
     /*
-    EventDispatcher.from(context) dispatch event
+    LocalBroadcaster.from(context) dispatch event
     =>
     val intent = new Intent("com.example.foo.bar.ChannelSubscribeEvent")
     intent.putExtra("channelId", event.channelId)

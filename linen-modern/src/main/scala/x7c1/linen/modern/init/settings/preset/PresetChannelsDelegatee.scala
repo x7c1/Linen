@@ -28,12 +28,12 @@ class PresetChannelsDelegatee(
     }
   }
   /*
-  lazy val onSubscribe = EventReceiver.listen[ChannelSubscribeEvent]{
+  lazy val onSubscribe = LocalBroadcastListener[ChannelSubscribeEvent]{
     event => println(event.channelId)
   }
   =>
   lazy val onSubscribe = {
-    new EventReceiver[ChannelSubscribeEvent](
+    new LocalBroadcastListener[ChannelSubscribeEvent](
       callback = {
         event => println(event.channelId)
       },
