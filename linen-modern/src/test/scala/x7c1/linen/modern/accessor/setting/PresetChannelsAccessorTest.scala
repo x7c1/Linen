@@ -28,7 +28,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
       clientAccountId = client.accountId,
       helper = helper
     )
-    assertEquals(2, accessor.length)
+    assertEquals(3, accessor.length)
     assertEquals("Tech", accessor.findAt(0).get.name)
     assertEquals(false, accessor.findAt(0).get.isSubscribed)
   }
