@@ -17,7 +17,7 @@ class ChannelSelector private (
   private val selectedItems = collection.mutable.ListMap[Int, Boolean]()
 
   private val dialog = new AlertDialog.Builder(context).
-    setTitle("Channels to subscribe").
+    setTitle("Channels to add sources").
     setMultiChoiceItems(
       items.map(_.name).toArray[CharSequence],
       null,
