@@ -6,6 +6,7 @@ import android.app.Service
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -44,7 +45,7 @@ class SourceUpdaterQueue(
       insertEntries(loadedSource)
     }
     future onFailure {
-      case e => Log error s"[error] source:$source, ${e.getMessage}"
+      case e => Log error format(e)(s"[error] ${source.feedUrl}")
     }
     future onComplete { _ =>
       val host = source.feedUrl.getHost

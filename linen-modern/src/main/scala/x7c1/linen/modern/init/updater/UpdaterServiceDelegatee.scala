@@ -8,6 +8,7 @@ import android.os.IBinder
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.init.dev.DummyFactory
+import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
@@ -86,7 +87,13 @@ class UpdaterMethods(
       case Left(error) => Log error error.message
     }
     future onFailure {
-      case e => Log error e.getMessage
+      case e => Log error format(e)(s"[error] source(id:$sourceId)")
     }
+  }
+}
+
+object ThrowableFormatter {
+  def format[A <: Throwable](e: A)(message: String) = {
+    (message +: e.getMessage +: e.getStackTrace) take 15 mkString "\n"
   }
 }
