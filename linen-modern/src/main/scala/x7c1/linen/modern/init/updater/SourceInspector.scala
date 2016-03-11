@@ -31,7 +31,7 @@ class SourceInspector private (helper: LinenOpenHelper){
 
     import scala.collection.JavaConversions._
 
-    loadRawFeed(source.feedUrl).toFuture map { feed =>
+    Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
       val entries = feed.getEntries map { case x: SyndEntry => x }
       new LoadedSource(
         sourceId = source.sourceId,
