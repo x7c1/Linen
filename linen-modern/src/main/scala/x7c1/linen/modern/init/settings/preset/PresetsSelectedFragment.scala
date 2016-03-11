@@ -32,7 +32,9 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
       case Right(accessor) =>
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsAllAdapter(
-          listener = new OnChannelSubscribed("hoge1", getContext, args.accountId, helper),
+          listener =
+            new OnChannelSubscribed(args.accountId, helper) append
+            new ChannelSubscriptionNotifier(getContext, "hoge1"),
           accessor = accessor,
           provider = args.rowFactory create getContext
         )

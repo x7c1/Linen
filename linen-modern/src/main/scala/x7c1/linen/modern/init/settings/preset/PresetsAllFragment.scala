@@ -37,7 +37,9 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
         val manager = new LinearLayoutManager(getContext)
         tab.channelList setLayoutManager manager
         tab.channelList setAdapter new PresetsAllAdapter(
-          listener = new OnChannelSubscribed("hoge2", getContext, args.accountId, helper),
+          listener =
+            new OnChannelSubscribed(args.accountId, helper) append
+            new ChannelSubscriptionNotifier(getContext, "hoge2"),
           accessor = accessor,
           provider = args.rowFactory create inflater
         )
@@ -52,8 +54,25 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
   }
 }
 
+class ChannelSubscriptionNotifier(
+  context: Context,
+  action: String ) extends ChannelSubscribedListener {
+
+  override def onSubscribedChanged(event: ChannelSubscribeEvent) = {
+    val intent = new Intent(action)
+    LocalBroadcastManager.getInstance(context) sendBroadcast intent
+
+    /*
+    EventDispatcher.from(context) dispatch event
+    =>
+    val intent = new Intent("com.example.foo.bar.ChannelSubscribeEvent")
+    intent.putExtra("channelId", event.channelId)
+    intent.putExtra("isChecked", event.isChecked)
+    LocalBroadcastManager.getInstance(context) sendBroadcast intent
+     */
+  }
+}
 class OnChannelSubscribed(
-  action: String, context: Context,
   accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
 
   override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
@@ -66,9 +85,6 @@ class OnChannelSubscribed(
     } else {
       subscriber unsubscribe event.channelId
     }
-    LocalBroadcastManager.
-      getInstance(context).
-      sendBroadcast(new Intent(action))
   }
 }
 
@@ -97,8 +113,15 @@ class PresetsAllAdapter(
   }
 }
 
-trait ChannelSubscribedListener {
+trait ChannelSubscribedListener { self =>
   def onSubscribedChanged(event: ChannelSubscribeEvent)
+  def append(listener: ChannelSubscribedListener): ChannelSubscribedListener =
+    new ChannelSubscribedListener {
+      override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
+        self onSubscribedChanged event
+        listener onSubscribedChanged event
+      }
+    }
 }
 
 case class ChannelSubscribeEvent(
