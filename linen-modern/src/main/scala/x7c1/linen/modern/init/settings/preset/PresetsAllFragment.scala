@@ -1,19 +1,17 @@
 package x7c1.linen.modern.init.settings.preset
 
-import android.content.{Intent, Context}
+import android.content.{Context, Intent}
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
-import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
 
 
 class ArgumentsForAll(
@@ -36,12 +34,13 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
       case Right(accessor) =>
         val manager = new LinearLayoutManager(getContext)
         tab.channelList setLayoutManager manager
-        tab.channelList setAdapter new PresetsAllAdapter(
+        tab.channelList setAdapter new PresetsChannelsAdapter(
           listener =
-            new OnChannelSubscribed(args.accountId, helper) append
-            new ChannelSubscriptionNotifier(getContext, "hoge2"),
+            new SubscriptionChangedUpdater(args.accountId, helper) append
+            new SubscriptionChangedNotifier(getContext, "hoge2"),
           accessor = accessor,
-          provider = args.rowFactory create inflater
+          provider = args.rowFactory create inflater,
+          location = PresetTabAll
         )
       case Left(error) => Log error error.toString
     }
@@ -54,7 +53,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
   }
 }
 
-class ChannelSubscriptionNotifier(
+class SubscriptionChangedNotifier(
   context: Context,
   action: String ) extends ChannelSubscribedListener {
 
@@ -72,7 +71,7 @@ class ChannelSubscriptionNotifier(
      */
   }
 }
-class OnChannelSubscribed(
+class SubscriptionChangedUpdater(
   accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
 
   override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
@@ -84,31 +83,6 @@ class OnChannelSubscribed(
       subscriber subscribe event.channelId
     } else {
       subscriber unsubscribe event.channelId
-    }
-  }
-}
-
-class PresetsAllAdapter(
-  listener: ChannelSubscribedListener,
-  accessor: PresetChannelsAccessor,
-  provider: ViewHolderProvider[SettingPresetRow]) extends Adapter[SettingPresetRow] {
-
-  override def getItemCount = accessor.length
-
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    provider inflateOn parent
-  }
-  override def onBindViewHolder(holder: SettingPresetRow, position: Int) = {
-    Log info s"[start]"
-
-    accessor.findAt(position) foreach { channel =>
-      holder.name.text = channel.name
-      holder.description.text = channel.description
-      holder.switchSubscribe.checked = channel.isSubscribed
-      holder.switchSubscribe onCheckedChanged { e =>
-        listener onSubscribedChanged ChannelSubscribeEvent(channel.channelId, e.isChecked)
-      }
-      Log info s"${channel.name}"
     }
   }
 }
@@ -126,5 +100,6 @@ trait ChannelSubscribedListener { self =>
 
 case class ChannelSubscribeEvent(
   channelId: Long,
-  isChecked: Boolean
+  isChecked: Boolean,
+  from: PresetEventLocation
 )

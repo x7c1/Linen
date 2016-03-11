@@ -31,12 +31,13 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
       case Left(error) => Log error error.toString
       case Right(accessor) =>
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
-        tab.channelList setAdapter new PresetsAllAdapter(
+        tab.channelList setAdapter new PresetsChannelsAdapter(
           listener =
-            new OnChannelSubscribed(args.accountId, helper) append
-            new ChannelSubscriptionNotifier(getContext, "hoge1"),
+            new SubscriptionChangedUpdater(args.accountId, helper) append
+            new SubscriptionChangedNotifier(getContext, "hoge1"),
           accessor = accessor,
-          provider = args.rowFactory create getContext
+          provider = args.rowFactory create getContext,
+          location = PresetTabSelected
         )
     }
     tab.itemView
