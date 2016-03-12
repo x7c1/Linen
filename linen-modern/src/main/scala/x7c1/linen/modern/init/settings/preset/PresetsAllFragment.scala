@@ -11,6 +11,7 @@ import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
+import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
 
 
@@ -59,7 +60,11 @@ class SubscriptionChangedNotifier(
 
   override def onSubscribedChanged(event: ChannelSubscribeEvent) = {
     val intent = new Intent(action)
+
     LocalBroadcastManager.getInstance(context) sendBroadcast intent
+
+    LocalBroadcaster.dispatch(context, event)
+//    LocalBroadcaster.from(context) dispatch event
 
     /*
     LocalBroadcaster.from(context) dispatch event
