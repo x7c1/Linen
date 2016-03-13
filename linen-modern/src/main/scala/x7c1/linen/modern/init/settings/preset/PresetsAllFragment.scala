@@ -58,13 +58,12 @@ class SubscriptionChangedNotifier(
   context: Context,
   action: String ) extends ChannelSubscribedListener {
 
-  override def onSubscribedChanged(event: ChannelSubscribeEvent) = {
+  override def onSubscribedChanged(event: SubscribeChangedEvent) = {
     val intent = new Intent(action)
 
     LocalBroadcastManager.getInstance(context) sendBroadcast intent
 
-    LocalBroadcaster.dispatch(context, event)
-//    LocalBroadcaster.from(context) dispatch event
+    LocalBroadcaster of event dispatchFrom context
 
     /*
     LocalBroadcaster.from(context) dispatch event
@@ -79,7 +78,7 @@ class SubscriptionChangedNotifier(
 class SubscriptionChangedUpdater(
   accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
 
-  override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
+  override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
     val account = new AccountIdentifiable {
       override def accountId: Long = accountId0
     }
@@ -93,18 +92,12 @@ class SubscriptionChangedUpdater(
 }
 
 trait ChannelSubscribedListener { self =>
-  def onSubscribedChanged(event: ChannelSubscribeEvent)
+  def onSubscribedChanged(event: SubscribeChangedEvent)
   def append(listener: ChannelSubscribedListener): ChannelSubscribedListener =
     new ChannelSubscribedListener {
-      override def onSubscribedChanged(event: ChannelSubscribeEvent): Unit = {
+      override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
         self onSubscribedChanged event
         listener onSubscribedChanged event
       }
     }
 }
-
-case class ChannelSubscribeEvent(
-  channelId: Long,
-  isChecked: Boolean,
-  from: PresetEventLocation
-)

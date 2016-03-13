@@ -1,26 +1,37 @@
 package x7c1.wheat.macros.intent
 
-import android.content.Context
+import android.content.{Context, Intent}
 import android.support.v4.content.LocalBroadcastManager
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object LocalBroadcaster {
-  def dispatch[A](context: Context, event: A): Unit = macro LocalBroadcasterImpl.dispatch[A]
+  def of[A](event: A): LocalBroadcaster = macro LocalBroadcasterImpl.create
+}
+
+class LocalBroadcaster(toIntent: () => Intent){
+  def dispatchFrom(context: Context): Unit = {
+    val intent = toIntent()
+    LocalBroadcastManager.getInstance(context) sendBroadcast intent
+  }
 }
 
 private object LocalBroadcasterImpl {
-  def dispatch[A: c.WeakTypeTag]
-    (c: blackbox.Context)
-    (context: c.Tree, event: c.Tree): c.Tree = {
-
+  def create(c: blackbox.Context)(event: c.Tree): c.Tree = {
+    import c.universe._
     val factory = new ActionIntentTreeFactory {
       override val context: c.type = c
       override val eventTree = event
     }
-    val tree = factory.dispatch(context)
-    println(c.universe.showCode(tree))
+    val toIntent = factory.toIntent
+    val tree =
+      q"""
+        val toIntent = $toIntent
+        new ${typeOf[LocalBroadcaster]}(toIntent)
+      """
+
+    println(tree)
     tree
   }
 }
@@ -30,13 +41,13 @@ private trait ActionIntentTreeFactory {
   import context.universe._
   val eventTree: Tree
 
-  def dispatch(androidContext: Tree):  Tree = {
-    val intent = TermName(context freshName "intent")
-    val manager = TermName(context freshName "manager")
+  def toIntent: Tree = {
+    println(eventTree.tpe)
     q"""
-      val $intent = new Intent()
-      val $manager = ${typeOf[LocalBroadcastManager].companion}.getInstance($androidContext)
-      $manager.sendBroadcast($intent)
-     """
+      () => {
+        val intent = new ${typeOf[Intent]}()
+        intent
+      }
+    """
   }
 }

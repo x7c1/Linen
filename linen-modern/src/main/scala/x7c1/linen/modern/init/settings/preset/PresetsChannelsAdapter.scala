@@ -27,7 +27,7 @@ class PresetsChannelsAdapter(
       holder.description.text = channel.description
       holder.switchSubscribe.checked = channel.isSubscribed
       holder.switchSubscribe onCheckedChanged { e =>
-        listener onSubscribedChanged ChannelSubscribeEvent(
+        listener onSubscribedChanged SubscribeChangedEvent(
           channel.channelId,
           e.isChecked,
           location )
