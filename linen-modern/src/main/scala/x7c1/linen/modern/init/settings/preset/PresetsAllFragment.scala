@@ -63,16 +63,7 @@ class SubscriptionChangedNotifier(
 
     LocalBroadcastManager.getInstance(context) sendBroadcast intent
 
-    LocalBroadcaster of event dispatchFrom context
-
-    /*
-    LocalBroadcaster.from(context) dispatch event
-    =>
-    val intent = new Intent("com.example.foo.bar.ChannelSubscribeEvent")
-    intent.putExtra("channelId", event.channelId)
-    intent.putExtra("isChecked", event.isChecked)
-    LocalBroadcastManager.getInstance(context) sendBroadcast intent
-     */
+    LocalBroadcaster(event) dispatchFrom context
   }
 }
 class SubscriptionChangedUpdater(

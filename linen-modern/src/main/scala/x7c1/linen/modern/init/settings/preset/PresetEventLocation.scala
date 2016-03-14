@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.settings.preset
 
-sealed trait PresetEventLocation
+sealed trait PresetEventLocation extends Serializable
 
 case object PresetTabSelected extends PresetEventLocation
 
