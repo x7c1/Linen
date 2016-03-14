@@ -7,7 +7,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
-import x7c1.wheat.macros.intent.IntentExpander
+import x7c1.wheat.macros.intent.{LocalBroadcastListener, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -27,6 +27,13 @@ class PresetChannelsDelegatee(
       Log info s"$intent"
     }
   }
+
+  lazy val onSubscribe = LocalBroadcastListener[SubscribeChangedEvent]{
+    event =>
+      Log info s"${event.channelId}"
+      println(event.channelId)
+  }
+
   /*
   lazy val onSubscribe = LocalBroadcastListener[ChannelSubscribeEvent]{
     event => println(event.channelId)

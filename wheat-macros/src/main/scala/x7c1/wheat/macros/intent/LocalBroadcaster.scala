@@ -7,6 +7,7 @@ import x7c1.wheat.macros.base.TreeContext
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
+
 object LocalBroadcaster {
   def apply[A](event: A): LocalBroadcaster = macro LocalBroadcasterImpl.create
 }
