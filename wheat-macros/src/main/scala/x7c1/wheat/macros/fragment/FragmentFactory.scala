@@ -4,6 +4,7 @@ import java.io.Serializable
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import x7c1.wheat.macros.base.TreeContext
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -46,9 +47,7 @@ private object TypedFragmentImpl {
   }
 }
 
-private trait BundleBuilderFactory {
-  val context: blackbox.Context
-
+private trait BundleBuilderFactory extends TreeContext {
   import context.universe._
 
   val fragmentType: Type
@@ -93,9 +92,6 @@ private trait BundleBuilderFactory {
     }
     //    println(tree)
     tree
-  }
-  def createTermNames(names: String*): Seq[TermName] = {
-    names map (x => TermName(context freshName x))
   }
 }
 
