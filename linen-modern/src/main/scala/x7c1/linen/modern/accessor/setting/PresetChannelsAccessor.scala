@@ -3,7 +3,6 @@ package x7c1.linen.modern.accessor.setting
 import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
 import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.macros.logger.Log
 
 trait PresetChannelsAccessor {
   def length: Int
@@ -70,7 +69,6 @@ private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) e
     raw -> typed
   }
   override def reload(): Unit = synchronized {
-    Log info s"[start]"
     init() match { case (raw, typed) =>
       rawCursor = raw
       cursor = typed
