@@ -63,13 +63,14 @@ private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) e
       )
     }
   }
-  def init() = {
+  private def init() = {
     val raw = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
     val typed = TypedCursor[SettingPresetChannelRecord](raw)
     raw -> typed
   }
   override def reload(): Unit = synchronized {
     init() match { case (raw, typed) =>
+      rawCursor.close()
       rawCursor = raw
       cursor = typed
     }
