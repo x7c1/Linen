@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.SettingPresetRow
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 class PresetsChannelsAdapter(
@@ -20,8 +19,6 @@ class PresetsChannelsAdapter(
     provider inflateOn parent
   }
   override def onBindViewHolder(holder: SettingPresetRow, position: Int) = {
-    Log info s"[start]"
-
     accessor.findAt(position) foreach { channel =>
       holder.name.text = channel.name
       holder.description.text = channel.description
@@ -32,7 +29,6 @@ class PresetsChannelsAdapter(
           e.isChecked,
           location )
       }
-      Log info s"${channel.name}"
     }
   }
 }
