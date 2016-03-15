@@ -9,7 +9,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class PresetsChannelsAdapter(
   location: PresetEventLocation,
-  listener: ChannelSubscribedListener,
+  listener: OnChannelSubscribedListener,
   accessor: PresetChannelsAccessor,
   provider: ViewHolderProvider[SettingPresetRow]) extends Adapter[SettingPresetRow] {
 
