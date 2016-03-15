@@ -42,13 +42,7 @@ public class SettingPresetRowProvider implements ViewHolderProvider<SettingPrese
     @Override
     public SettingPresetRow inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_preset_row, parent, attachToRoot);
-        return new SettingPresetRow(
-            view,
-            (TextView) view.findViewById(R.id.setting_preset_row__name),
-            (TextView) view.findViewById(R.id.setting_preset_row__description),
-            (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_preset_row__switch_subscribe),
-            (TextView) view.findViewById(R.id.setting_preset_row__sources)
-        );
+        return factory().createViewHolder(view);
     }
 
     public static ViewHolderProviderFactory<SettingPresetRow> factory(){
@@ -60,6 +54,17 @@ public class SettingPresetRowProvider implements ViewHolderProvider<SettingPrese
             @Override
             public ViewHolderProvider<SettingPresetRow> create(Context context){
                 return new SettingPresetRowProvider(context);
+            }
+
+            @Override
+            public SettingPresetRow createViewHolder(View view) {
+                return new SettingPresetRow(
+                        view,
+                        (TextView) view.findViewById(R.id.setting_preset_row__name),
+                        (TextView) view.findViewById(R.id.setting_preset_row__description),
+                        (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_preset_row__switch_subscribe),
+                        (TextView) view.findViewById(R.id.setting_preset_row__sources)
+                );
             }
         };
     }

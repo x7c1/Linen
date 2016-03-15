@@ -15,11 +15,19 @@ class PresetChannelsDelegatee(
   layout: SettingPresetChannelsLayout,
   factories: ProviderFactories ){
 
-  lazy val onSubscribe = LocalBroadcastListener[SubscribeChangedEvent]{
-    event =>
-      Log info s"${event.channelId}"
+  lazy val onSubscribe = LocalBroadcastListener[SubscribeChangedEvent]{ event =>
+    Log info s"$event"
+    val reloadable: PartialFunction[Fragment, ReloadableFragment] = event.from match {
+      case PresetTabSelected => { case f: PresetsAllFragment => f }
+      case PresetTabAll => { case f: PresetsSelectedFragment => f }
+    }
+    allFragments collect reloadable foreach (_ reload event.channelId)
   }
-
+  def allFragments = {
+    (0 to layout.pager.getAdapter.getCount - 1).view map { n =>
+      layout.pager.getAdapter.instantiateItem(layout.pager, n).asInstanceOf[Fragment]
+    }
+  }
   def onCreate(): Unit = {
     Log info s"[start]"
     onSubscribe registerTo activity

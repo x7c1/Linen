@@ -1,13 +1,14 @@
 package x7c1.linen.modern.accessor.setting
 
-import android.database.Cursor
-import x7c1.linen.modern.accessor.{Query, LinenOpenHelper}
-import x7c1.linen.modern.accessor.preset.{PresetRecordError, NoPresetAccount, UnexpectedException, PresetAccount}
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
+import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.logger.Log
 
 trait PresetChannelsAccessor {
   def length: Int
   def findAt(position: Int): Option[SettingPresetChannel]
+  def reload(): Unit
 }
 
 object PresetChannelsAccessor {
@@ -23,8 +24,7 @@ object PresetChannelsAccessor {
     }
     either.right map { presetAccountId =>
       val query = createQuery(clientAccountId, presetAccountId)
-      val cursor = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
-      new PresetChannelAccessorImpl(cursor)
+      new PresetChannelAccessorImpl(helper, query)
     }
   }
   def createQuery(clientAccountId: Long, presetAccountId: Long) = {
@@ -48,9 +48,9 @@ object PresetChannelsAccessor {
   }
 }
 
-private class PresetChannelAccessorImpl(rawCursor: Cursor) extends PresetChannelsAccessor {
+private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) extends PresetChannelsAccessor {
 
-  private lazy val cursor = TypedCursor[SettingPresetChannelRecord](rawCursor)
+  private var (rawCursor, cursor) = init()
 
   override def length = rawCursor.getCount
 
@@ -62,6 +62,18 @@ private class PresetChannelAccessorImpl(rawCursor: Cursor) extends PresetChannel
         description = cursor.description,
         isSubscribed = cursor.subscribed == 1
       )
+    }
+  }
+  def init() = {
+    val raw = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
+    val typed = TypedCursor[SettingPresetChannelRecord](raw)
+    raw -> typed
+  }
+  override def reload(): Unit = synchronized {
+    Log info s"[start]"
+    init() match { case (raw, typed) =>
+      rawCursor = raw
+      cursor = typed
     }
   }
 }

@@ -16,18 +16,27 @@ class ArgumentsForSelected(
   val tabFactory: ViewHolderProviderFactory[SettingPresetTabSelected],
   val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
 )
-class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
+class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with ReloadableFragment {
   private lazy val args = getTypedArguments
 
   private lazy val helper = new LinenOpenHelper(getContext)
 
+  private lazy val presetsAccessor = SelectedChannelsAccessor.create(args.accountId, helper)
+
+  private lazy val layout = args.tabFactory.createViewHolder(getView)
+
+  override def reload(channelId: Long) = {
+    Log info s"[start] $channelId"
+    presetsAccessor.right.foreach(_.reload())
+    layout.channelList.getAdapter.notifyDataSetChanged()
+  }
   override def onCreateView(
     inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
 
     Log info s"[start]"
 
     val tab = args.tabFactory.create(inflater) inflateOn container
-    SelectedChannelsAccessor.create(args.accountId, helper) match {
+    presetsAccessor match {
       case Left(error) => Log error error.toString
       case Right(accessor) =>
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)

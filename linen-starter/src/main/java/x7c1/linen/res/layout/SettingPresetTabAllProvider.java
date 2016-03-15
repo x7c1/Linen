@@ -57,6 +57,13 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
             public ViewHolderProvider<SettingPresetTabAll> create(Context context){
                 return new SettingPresetTabAllProvider(context);
             }
+            @Override
+            public SettingPresetTabAll createViewHolder(View view) {
+                return new SettingPresetTabAll(
+                        view,
+                        (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
+                );
+            }
         };
     }
 }
