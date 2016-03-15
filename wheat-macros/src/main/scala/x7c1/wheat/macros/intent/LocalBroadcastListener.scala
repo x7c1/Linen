@@ -34,6 +34,7 @@ lazy val listener = {
       f(event)
     } catch {
       case e: ExtraNotFoundException =>
+        Log.e("com.example.FooActivity", s"[${e.key}] not found in received Intent")
     }
   }
   val filter = new IntentFilter("com.example.SomeEvent")
@@ -88,8 +89,8 @@ private trait LocalBroadcastListenerFactory
     """
   }
   def createReceiver = {
-    val Seq(context, intent, event, f, e) =
-      createTermNames("context", "intent", "event", "f", "e")
+    val Seq(context, intent, event, f, e, message) =
+      createTermNames("context", "intent", "event", "f", "e", "message")
 
     q"""
       new ${typeOf[BroadcastReceiver]}{
@@ -99,8 +100,12 @@ private trait LocalBroadcastListenerFactory
             val $f = $blockTree
             $f($event)
           } catch {
-            case e: ${typeOf[ExtraNotFoundException]} =>
-              ${typeOf[Log].companion}.i("hoge", "fuga")
+            case $e: ${typeOf[ExtraNotFoundException]} =>
+              val $message =
+                s"[$${$e.key}] not found in received Intent" +:
+                $e.getStackTrace take 10 mkString "\n"
+
+              ${typeOf[Log].companion}.e(${enclosing.fullName}, $message)
           }
         }
       }
