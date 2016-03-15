@@ -16,6 +16,20 @@ class RichCompoundButton[A <: CompoundButton](view: A){
         f(CheckedChangeEvent(view, isChecked))
     }
 
+  def onChangedManually(f: CheckedChangeEvent[A] => Unit): Unit = {
+    import Imports._
+    var isTouched = false
+    view onTouch { (view, e) =>
+      isTouched = true
+      false
+    }
+    onCheckedChanged { e =>
+      if (isTouched){
+        isTouched = false
+        f(e)
+      }
+    }
+  }
 }
 
 object RichCompoundButton {
