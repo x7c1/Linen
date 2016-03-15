@@ -1,13 +1,13 @@
 package x7c1.linen.modern.accessor.setting
 
-import android.database.Cursor
-import x7c1.linen.modern.accessor.{Query, LinenOpenHelper}
-import x7c1.linen.modern.accessor.preset.{PresetRecordError, NoPresetAccount, UnexpectedException, PresetAccount}
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
+import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 trait PresetChannelsAccessor {
   def length: Int
   def findAt(position: Int): Option[SettingPresetChannel]
+  def reload(): Unit
 }
 
 object PresetChannelsAccessor {
@@ -23,13 +23,13 @@ object PresetChannelsAccessor {
     }
     either.right map { presetAccountId =>
       val query = createQuery(clientAccountId, presetAccountId)
-      val cursor = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
-      new PresetChannelAccessorImpl(cursor)
+      new PresetChannelAccessorImpl(helper, query)
     }
   }
   def createQuery(clientAccountId: Long, presetAccountId: Long) = {
     val sql =
       s"""SELECT
+         |  c1._id AS channel_id,
          |  c1.name AS name,
          |  c1.description AS description,
          |  IFNULL(c2.subscribed, 0) AS subscribed
@@ -47,30 +47,45 @@ object PresetChannelsAccessor {
   }
 }
 
-private class PresetChannelAccessorImpl(rawCursor: Cursor) extends PresetChannelsAccessor {
+private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) extends PresetChannelsAccessor {
 
-  private lazy val cursor = TypedCursor[SettingPresetChannelRecord](rawCursor)
+  private var (rawCursor, cursor) = init()
 
   override def length = rawCursor.getCount
 
   override def findAt(position: Int) = {
     cursor.moveToFind(position){
       SettingPresetChannel(
+        channelId = cursor.channel_id,
         name = cursor.name,
         description = cursor.description,
         isSubscribed = cursor.subscribed == 1
       )
     }
   }
+  private def init() = {
+    val raw = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
+    val typed = TypedCursor[SettingPresetChannelRecord](raw)
+    raw -> typed
+  }
+  override def reload(): Unit = synchronized {
+    init() match { case (raw, typed) =>
+      rawCursor.close()
+      rawCursor = raw
+      cursor = typed
+    }
+  }
 }
 
 trait SettingPresetChannelRecord extends TypedFields {
+  def channel_id: Long
   def name: String
   def description: String
   def subscribed: Int
 }
 
 case class SettingPresetChannel(
+  channelId: Long,
   name: String,
   description: String,
   isSubscribed: Boolean

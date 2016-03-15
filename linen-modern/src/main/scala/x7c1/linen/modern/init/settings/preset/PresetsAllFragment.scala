@@ -1,16 +1,17 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
-import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
-import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
+import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
+import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
 
 
 class ArgumentsForAll(
@@ -18,53 +19,82 @@ class ArgumentsForAll(
   val tabFactory: ViewHolderProviderFactory[SettingPresetTabAll],
   val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
 )
-class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
+
+trait ReloadableFragment {
+  def reload(channelId: Long): Unit
+}
+
+class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableFragment {
   private lazy val args = getTypedArguments
 
   private lazy val helper = new LinenOpenHelper(getContext)
 
+  private lazy val presetsAccessor = PresetChannelsAccessor.create(args.accountId, helper)
+
+  private lazy val layout = args.tabFactory.createViewHolder(getView)
+
+  override def reload(channelId: Long) = {
+    Log info s"[start] $channelId"
+    presetsAccessor.right.foreach(_.reload())
+    layout.channelList.getAdapter.notifyDataSetChanged()
+  }
   override def onCreateView(
     inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
 
     Log info s"[start]"
 
     val tab = args.tabFactory.create(inflater).inflateOn(container)
-    PresetChannelsAccessor.create(args.accountId, helper) match {
+    presetsAccessor match {
       case Right(accessor) =>
         val manager = new LinearLayoutManager(getContext)
         tab.channelList setLayoutManager manager
-        tab.channelList setAdapter new PresetsAllAdapter(
+        tab.channelList setAdapter new PresetsChannelsAdapter(
+          listener =
+            new SubscriptionChangedUpdater(args.accountId, helper) append
+            new SubscriptionChangedNotifier(getContext),
           accessor = accessor,
-          provider = args.rowFactory create inflater
+          provider = args.rowFactory create inflater,
+          location = PresetTabAll
         )
       case Left(error) => Log error error.toString
     }
     tab.itemView
   }
   override def onDestroy(): Unit = {
+    Log info s"[start]"
     super.onDestroy()
     helper.close()
   }
 }
 
-class PresetsAllAdapter(
-  accessor: PresetChannelsAccessor,
-  provider: ViewHolderProvider[SettingPresetRow]) extends Adapter[SettingPresetRow] {
-
-  override def getItemCount = accessor.length
-
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    provider inflateOn parent
+class SubscriptionChangedNotifier(context: Context) extends ChannelSubscribedListener {
+  override def onSubscribedChanged(event: SubscribeChangedEvent) = {
+    LocalBroadcaster(event) dispatchFrom context
   }
-  override def onBindViewHolder(holder: SettingPresetRow, position: Int) = {
-    Log info s"[start]"
+}
+class SubscriptionChangedUpdater(
+  accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
 
-    accessor.findAt(position) foreach { channel =>
-      holder.name.text = channel.name
-      holder.description.text = channel.description
-      holder.switchSubscribe setChecked channel.isSubscribed
-
-      Log info s"${channel.name}"
+  override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
+    val account = new AccountIdentifiable {
+      override def accountId: Long = accountId0
+    }
+    val subscriber = new ChannelSubscriber(account, helper)
+    if (event.isChecked){
+      subscriber subscribe event.channelId
+    } else {
+      subscriber unsubscribe event.channelId
     }
   }
+}
+
+trait ChannelSubscribedListener { self =>
+  def onSubscribedChanged(event: SubscribeChangedEvent)
+  def append(listener: ChannelSubscribedListener): ChannelSubscribedListener =
+    new ChannelSubscribedListener {
+      override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
+        self onSubscribedChanged event
+        listener onSubscribedChanged event
+      }
+    }
 }

@@ -2,6 +2,7 @@ package x7c1.wheat.macros.intent
 
 import android.content.Intent
 import android.util.Log
+import x7c1.wheat.macros.base.TreeContext
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
@@ -36,8 +37,7 @@ private object IntentExpanderImpl {
   }
 }
 
-trait IntentExpanderTreeFactory {
-  val context: blackbox.Context
+trait IntentExpanderTreeFactory extends TreeContext {
   import context.universe._
   val intentTree: Tree
 
@@ -126,9 +126,6 @@ trait IntentExpanderTreeFactory {
       }
       Method(method.name.encodedName.toString, method.fullName, params)
     }
-  }
-  def createTermNames(names: String*): Seq[TermName] = {
-    names map (x => TermName(context freshName x))
   }
   def findCallee = {
     val methods = createMethods

@@ -1,5 +1,7 @@
 package x7c1.wheat.macros.logger
 
+import x7c1.wheat.macros.base.TreeContext
+
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
@@ -31,17 +33,11 @@ private object LogImpl {
   }
 }
 
-private class TreeFactory[C <: blackbox.Context](val context: C){
+private class TreeFactory[C <: blackbox.Context](val context: C) extends TreeContext {
   import context.universe._
-
-  def traverse(x: context.Symbol): String = {
-    if (x.isMethod || x.isClass || x.isPackage) x.fullName
-    else traverse(x.owner)
-  }
-  def enclosing: String = traverse(context.internal.enclosingOwner)
 
   def create[A: context.WeakTypeTag](message: context.Expr[A], method: String) = {
     val logger = weakTypeOf[android.util.Log].companion
-    q"""$logger.${TermName(method)}($enclosing, $message)"""
+    q"""$logger.${TermName(method)}(${enclosing.fullName}, $message)"""
   }
 }

@@ -71,7 +71,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   }
 
   it can "generate parent ViewHolder" in {
-    val Right(layout) = loader load "menu_row__item.xml"
+    val Right(layout) = loader load "menu_row__label.xml"
     val sources = new ViewHolderSourcesFactory(locations).createFrom(layout)
     val Some(source) = sources.find(_.file.getName.endsWith("MenuRow.java"))
     source.code should include("public class MenuRow extends RecyclerView.ViewHolder")

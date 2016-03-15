@@ -21,9 +21,10 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
     private final LayoutInflater inflater;
 
     public SettingPresetTabAllProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
     }
-    public SettingPresetTabAllProvider(LayoutInflater inflater) {
+
+    public SettingPresetTabAllProvider(LayoutInflater inflater){
         this.inflater = inflater;
     }
 
@@ -45,11 +46,23 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
             (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
         );
     }
+
     public static ViewHolderProviderFactory<SettingPresetTabAll> factory(){
         return new ViewHolderProviderFactory<SettingPresetTabAll>() {
             @Override
-            public ViewHolderProvider<SettingPresetTabAll> create(LayoutInflater inflater) {
+            public ViewHolderProvider<SettingPresetTabAll> create(LayoutInflater inflater){
                 return new SettingPresetTabAllProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<SettingPresetTabAll> create(Context context){
+                return new SettingPresetTabAllProvider(context);
+            }
+            @Override
+            public SettingPresetTabAll createViewHolder(View view) {
+                return new SettingPresetTabAll(
+                        view,
+                        (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
+                );
             }
         };
     }
