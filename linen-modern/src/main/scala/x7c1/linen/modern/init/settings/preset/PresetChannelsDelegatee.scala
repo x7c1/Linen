@@ -20,32 +20,6 @@ class PresetChannelsDelegatee(
       Log info s"${event.channelId}"
   }
 
-  /*
-  lazy val onSubscribe = LocalBroadcastListener[ChannelSubscribeEvent]{
-    event => println(event.channelId)
-  }
-  =>
-  lazy val onSubscribe = {
-    new LocalBroadcastListener[ChannelSubscribeEvent](
-      callback = {
-        event => println(event.channelId)
-      },
-      receiver = new BroadcastReceiver {
-        override def onReceive(context: Context, intent: Intent): Unit = {
-          val event = ChannelSubscribeEvent(
-            channelId = intent.getLongExtra("channelId", 0),
-            isChecked = intent.getBooleanExtra("isChecked", false)
-          )
-          callback(event)
-        }
-      },
-      intentFilter = {
-        new IntentFilter("com.example.foo.bar.ChannelSubscribeEvent")
-      }
-    )
-  }
-  */
-
   def onCreate(): Unit = {
     Log info s"[start]"
     onSubscribe registerTo activity

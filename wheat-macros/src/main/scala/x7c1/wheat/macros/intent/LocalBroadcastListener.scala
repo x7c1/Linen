@@ -8,6 +8,38 @@ import x7c1.wheat.macros.base.TreeContext
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
+/*
+case class SomeEvent(foo: Long)
+
+lazy val listener = LocalBroadcastListener[SomeEvent]{
+  event => println(event.foo)
+}
+
+is expanded like below:
+
+lazy val listener = {
+  val receiver = new BroadcastReceiver {
+    override def onReceive(context: Context, intent: Intent) = try {
+      val event = {
+        val x1 = if (intent.hasExtra(""com.example.SomeEvent.foo"")) {
+          intent.getLongExtra("com.example.SomeEvent.foo", -1)
+        } else {
+          throw new ExtraNotFoundException("com.example.SomeEvent.foo")
+        }
+        new SomeEvent(x1)
+      }
+      val f = (event: com.example.SomeEvent) => {
+        println(event.foo)
+      }
+      f(event)
+    } catch {
+      case e: ExtraNotFoundException =>
+    }
+  }
+  val filter = new IntentFilter("com.example.SomeEvent")
+  new LocalBroadcastListener(receiver, filter)
+}
+*/
 
 object LocalBroadcastListener {
   def apply[A](block: A => Unit): LocalBroadcastListener =
