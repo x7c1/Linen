@@ -1,8 +1,7 @@
 package x7c1.linen.modern.init.settings.preset
 
-import android.content.{Context, Intent}
+import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
@@ -38,7 +37,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener =
             new SubscriptionChangedUpdater(args.accountId, helper) append
-            new SubscriptionChangedNotifier(getContext, "hoge2"),
+            new SubscriptionChangedNotifier(getContext),
           accessor = accessor,
           provider = args.rowFactory create inflater,
           location = PresetTabAll
@@ -54,15 +53,8 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll]{
   }
 }
 
-class SubscriptionChangedNotifier(
-  context: Context,
-  action: String ) extends ChannelSubscribedListener {
-
+class SubscriptionChangedNotifier(context: Context) extends ChannelSubscribedListener {
   override def onSubscribedChanged(event: SubscribeChangedEvent) = {
-    val intent = new Intent(action)
-
-    LocalBroadcastManager.getInstance(context) sendBroadcast intent
-
     LocalBroadcaster(event) dispatchFrom context
   }
 }

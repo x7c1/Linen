@@ -34,7 +34,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] {
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener =
             new SubscriptionChangedUpdater(args.accountId, helper) append
-            new SubscriptionChangedNotifier(getContext, "hoge1"),
+            new SubscriptionChangedNotifier(getContext),
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected

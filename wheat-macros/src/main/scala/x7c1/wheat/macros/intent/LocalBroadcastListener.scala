@@ -32,7 +32,7 @@ object LocalBroadcastListenerImpl {
       override val eventType = weakTypeOf[A]
     }
     val tree = factory.instantiate()
-    println(tree)
+//    println(tree)
     tree
   }
 }
@@ -78,15 +78,21 @@ private trait LocalBroadcastListenerFactory
     q"""new ${typeOf[IntentFilter]}(${eventType.typeSymbol.fullName})"""
   }
   def createEvent(intent: TermName): Tree = {
-    val putExtras = findConstructorOf(eventType).
+    val pairs = findConstructorOf(eventType).
       map(_.paramLists flatMap {_ map toGet(intent)}).
-      getOrElse(List())
+      getOrElse(List()).
+      map { TermName(context freshName "x") -> _ }
 
-    q"new $eventType(..$putExtras)"
+    val tmps = pairs map { case (x, get) => q"val $x = $get" }
+    val args = pairs map { _._1 }
+    q"""
+      ..$tmps
+      new $eventType(..$args)
+    """
   }
   def toGet(intent: TermName)(param: Symbol): Tree = {
-    val key = param.name.toString
-    param.typeSignatureIn(eventType) match {
+    val key = param.fullName
+    val tree = param.typeSignatureIn(eventType) match {
       case x if x =:= typeOf[Long] =>
         q"$intent.getLongExtra($key, -1)"
       case x if x =:= typeOf[Boolean] =>
@@ -96,6 +102,13 @@ private trait LocalBroadcastListenerFactory
       case x =>
         throw new IllegalArgumentException(s"unsupported type : $x")
     }
+    q"""
+      if ($intent.hasExtra($key)){
+        $tree
+      } else {
+        throw new ${typeOf[ExtraNotFoundException]}($key)
+      }
+    """
   }
 }
 
