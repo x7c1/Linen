@@ -28,17 +28,6 @@ class SettingChannelsDelegatee (
     layout.channelList setLayoutManager manager
 
     IntentExpander executeBy activity.getIntent
-
-//    AccountAccessor findCurrentAccountId database match {
-//      case Some(accountId) =>
-//        layout.channelList setAdapter new ChannelRowAdapter(
-//          accessor = ChannelAccessor.create(database, accountId),
-//          viewHolderProvider = channelRowProvider,
-//          onSources = new OnChannelSources(activity)
-//        )
-//      case None =>
-//        Log warn "account not found"
-//    }
   }
   def showMyChannels(accountId: Long) = {
     layout.channelList setAdapter new ChannelRowAdapter(

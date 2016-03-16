@@ -31,21 +31,6 @@ class PresetChannelsDelegatee(
     Log info s"[start]"
     onSubscribe registerTo activity
 
-    /*
-    onSubscribe registerTo activity
-    =>
-    LocalBroadcastManager.getInstance(activity).registerReceiver(
-      onSubscribe.receiver,
-      onSubscribe.intentFilter
-    )
-
-    onSubscribe unregisterFrom activity
-    =>
-    LocalBroadcastManager.getInstance(activity).unregisterReceiver(
-      onSubscribe.receiver
-    )
-    */
-
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
