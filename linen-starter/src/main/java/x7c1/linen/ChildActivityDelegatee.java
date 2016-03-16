@@ -10,7 +10,7 @@ public class ChildActivityDelegatee {
 	}
 
 	public void start(){
-		activity.overridePendingTransition(R.animator.h_slide_in, R.animator.slide_out);
+		activity.overridePendingTransition(R.animator.h_slide_in, R.animator.h_slide_out);
 	}
 	public void finish(){
 		activity.overridePendingTransition(R.animator.back_slide_in, R.animator.back_slide_out);
