@@ -31,6 +31,13 @@ trait DrawerMenuInitializer {
       params
     }
     clientAccount foreach { account =>
+      /*
+      val loader = new UnreadChannelLoader(helper, account)
+      val menuItems = createMenuItems(account, loader.accessor)
+      val adapter = new DrawerMenuRowAdapter(menuItems)
+      layout.menuList setAdapter adapter
+      loader startLoading { e => adapter.notifyDataSetChanged }
+      */
       layout.menuList setAdapter new DrawerMenuRowAdapter(menuItems(account))
     }
   }
