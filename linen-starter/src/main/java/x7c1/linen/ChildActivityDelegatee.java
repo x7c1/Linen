@@ -13,6 +13,6 @@ public class ChildActivityDelegatee {
 		activity.overridePendingTransition(R.animator.h_slide_in, R.animator.h_slide_out);
 	}
 	public void finish(){
-		activity.overridePendingTransition(R.animator.back_slide_in, R.animator.h_back_slide_out);
+		activity.overridePendingTransition(R.animator.h_back_slide_in, R.animator.h_back_slide_out);
 	}
 }
