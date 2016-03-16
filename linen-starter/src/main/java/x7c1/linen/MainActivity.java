@@ -3,6 +3,8 @@ package x7c1.linen;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import x7c1.linen.base.TransitAnimation;
+import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.MainLayout;
 import x7c1.linen.modern.init.unread.MenuRowProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
@@ -68,5 +70,10 @@ public class MainActivity extends BaseActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		return initializer.onKeyDown(keyCode, event) ||
 				super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected TransitAnimation createTransitAnimation() {
+		return TransitAnimations.forRoot(this);
 	}
 }

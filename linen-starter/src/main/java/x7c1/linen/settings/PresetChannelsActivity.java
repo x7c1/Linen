@@ -3,8 +3,8 @@ package x7c1.linen.settings;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import x7c1.linen.ChildActivityDelegatee;
 import x7c1.linen.R;
+import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
 import x7c1.linen.modern.init.settings.preset.ProviderFactories;
@@ -47,12 +47,12 @@ public class PresetChannelsActivity extends FragmentActivity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		new ChildActivityDelegatee(this).finish();
+		TransitAnimations.forDirectChild(this).finish();
 	}
 
 	@Override
 	public void finish() {
 		super.finish();
-		new ChildActivityDelegatee(this).finish();
+		TransitAnimations.forDirectChild(this).finish();
 	}
 }

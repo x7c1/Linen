@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import x7c1.linen.BaseActivity;
 import x7c1.linen.R;
+import x7c1.linen.base.TransitAnimation;
+import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingChannelsLayout;
 import x7c1.linen.modern.init.settings.SettingChannelsDelegatee;
 import x7c1.linen.res.layout.SettingChannelsLayoutProvider;
@@ -41,5 +43,10 @@ public class SettingChannelsActivity extends BaseActivity {
 	@Override
 	public void finish() {
 		finishFromChild();
+	}
+
+	@Override
+	protected TransitAnimation createTransitAnimation() {
+		return TransitAnimations.forDirectChild(this);
 	}
 }
