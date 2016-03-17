@@ -5,17 +5,8 @@
     <set
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"
         >
-        <scale
-            android:fromXScale="1.0"
-            android:toXScale="0.95"
-            android:fromYScale="1.0"
-            android:toYScale="0.95"
-            android:duration="350"
-            android:pivotY="50%"
-            android:pivotX="50%"
-            />
         <alpha
-            android:duration="350"
+            android:duration="300"
             android:fromAlpha="1.0"
             android:toAlpha="0.5"
             />
@@ -23,12 +14,16 @@
 
     <set
         android:interpolator="@android:anim/accelerate_interpolator"
-        android:startOffset="100"
+        android:startOffset="50"
         >
-        <translate
-            android:duration="250"
-            android:fromXDelta="0%"
-            android:toXDelta="0%"
+        <scale
+            android:fromXScale="1.0"
+            android:toXScale="0.95"
+            android:fromYScale="1.0"
+            android:toYScale="0.95"
+            android:duration="200"
+            android:pivotY="50%"
+            android:pivotX="50%"
             />
     </set>
 
