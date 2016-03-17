@@ -9,7 +9,8 @@ import x7c1.linen.modern.accessor.database.SourceRecord
 import x7c1.linen.modern.accessor.{EntryParts, EntryUrl, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.CallbackTask.{task, using}
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.TaskProvider.using
 
 import scala.concurrent.Future
 
