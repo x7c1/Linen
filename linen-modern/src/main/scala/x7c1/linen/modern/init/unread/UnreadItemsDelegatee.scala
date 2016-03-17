@@ -49,7 +49,7 @@ class UnreadItemsDelegatee(
         false
     }
   }
-  private lazy val helper = new LinenOpenHelper(activity)
+  protected lazy val helper = new LinenOpenHelper(activity)
 
   private lazy val database = helper.getReadableDatabase
 

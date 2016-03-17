@@ -1,11 +1,15 @@
 package x7c1.wheat.modern.callback
 
+import x7c1.wheat.modern.tasks.Async
+
 
 object TaskProvider {
 
   def apply[A](f: => A): CallbackTask[A] = CallbackTask(_(f))
 
   def of[A, B](f: A)(implicit builder: TaskBuilder[A, B]): CallbackTask[B] = builder build f
+
+  def async[A](f: => A): CallbackTask[A] = Async.await(0).map(_ => f)
 }
 
 trait TaskBuilder[A, B]{

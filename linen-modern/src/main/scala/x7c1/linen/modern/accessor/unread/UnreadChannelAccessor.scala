@@ -1,29 +1,69 @@
 package x7c1.linen.modern.accessor.unread
 
+import android.database.Cursor
 import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.modern.accessor.unread.ChannelAccessorError.UnexpectedError
+import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.CallbackTask
+import x7c1.wheat.modern.callback.TaskProvider.async
 
 trait UnreadChannelAccessor {
   def findAt(position: Int): Option[UnreadChannel]
   def length: Int
 }
 
-object UnreadChannelAccessor {
+private object UnreadChannelAccessor {
   def create(
-    clientAccountId: Long,
-    helper: LinenOpenHelper): Either[UnreadChannelAccessorError, UnreadChannelAccessor] = {
+    helper: LinenOpenHelper,
+    clientAccountId: Long ): Either[ChannelAccessorError, UnreadChannelAccessor] = {
 
-    ???
+    try {
+      val query = createQuery(clientAccountId)
+      val raw = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
+      Right apply new UnreadChannelAccessorImpl(raw)
+    } catch {
+      case e: Exception =>
+        Left apply UnexpectedError(e)
+    }
   }
   def createQuery(clientAccountId: Long): Query = {
-    val sql = ""
-    new Query(sql)
+    // TODO: select only unread channels
+    val sql =
+      """SELECT
+        | c1._id AS channel_id,
+        | c1.name AS name
+        |FROM channels AS c1
+        |LEFT JOIN channel_statuses AS c2 ON
+        | c2.account_id = ? AND
+        | c1._id = c2.channel_id
+        |WHERE
+        | c1.account_id = ? AND
+        | c2.subscribed = 1
+        |ORDER BY c1.created_at DESC
+      """.stripMargin
+
+    new Query(sql, Array(
+      clientAccountId.toString,
+      clientAccountId.toString
+    ))
   }
 }
 
-private class UnreadChannelAccessorImpl() extends UnreadChannelAccessor {
-  override def findAt(position: Int): Option[UnreadChannel] = ???
-  override def length: Int = ???
+private class UnreadChannelAccessorImpl(raw: Cursor) extends UnreadChannelAccessor {
+  lazy val cursor = TypedCursor[UnreadChannelRecord](raw)
+
+  override def findAt(position: Int) = cursor.moveToFind(position){
+    UnreadChannel(cursor.channel_id, cursor.name)
+  }
+  override def length = raw.getCount
+}
+
+trait UnreadChannelRecord extends TypedFields {
+  def channel_id: Long
+  def name: String
 }
 
 case class UnreadChannel(
@@ -31,15 +71,34 @@ case class UnreadChannel(
   name: String
 )
 
-class UnreadChannelLoader(helper: LinenOpenHelper, account: ClientAccount){
-  def startLoading(callback: ChannelLoadedEvent => Unit): Unit = {
-    ???
+class UnreadChannelLoader(helper: LinenOpenHelper, client: ClientAccount){
+  private lazy val holder = new AccessorHolder
+
+  lazy val accessor: UnreadChannelAccessor = holder
+
+  def startLoading(): CallbackTask[ChannelLoaderEvent] = async {
+    Log info s"[start]"
+    UnreadChannelAccessor.create(helper, client.accountId)
+  } map {
+    case Right(loadedAccessor) =>
+      Log info s"[done]"
+      holder updateAccessor loadedAccessor
+      new Done(client)
+    case Left(error) =>
+      Log info s"[failed]"
+      new AccessorError(error)
   }
-  lazy val accessor: UnreadChannelAccessor = {
-    ???
+  private class AccessorHolder extends UnreadChannelAccessor {
+    private var underlying: Option[UnreadChannelAccessor] = None
+
+    def updateAccessor(accessor: UnreadChannelAccessor): Unit = {
+      underlying = Some(accessor)
+    }
+    override def findAt(position: Int): Option[UnreadChannel] = {
+      underlying flatMap (_ findAt position)
+    }
+    override def length: Int = {
+      underlying map (_.length) getOrElse 0
+    }
   }
 }
-
-case class ChannelLoadedEvent()
-
-sealed trait UnreadChannelAccessorError
