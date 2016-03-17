@@ -3,12 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
     <set
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+        >
+        <scale
+            android:fromXScale="1.0"
+            android:toXScale="0.95"
+            android:fromYScale="1.0"
+            android:toYScale="0.95"
+            android:duration="350"
+            android:pivotY="50%"
+            android:pivotX="50%"
+            />
+        <alpha
+            android:duration="350"
+            android:fromAlpha="1.0"
+            android:toAlpha="0.5"
+            />
+    </set>
+
+    <set
         android:interpolator="@android:anim/accelerate_interpolator"
+        android:startOffset="100"
         >
         <translate
-            android:duration="300"
+            android:duration="250"
             android:fromXDelta="0%"
-            android:toXDelta="-50%"
+            android:toXDelta="0%"
             />
     </set>
 

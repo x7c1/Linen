@@ -7,17 +7,17 @@
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"
         >
         <translate
-            android:duration="300"
+            android:duration="250"
             android:fromXDelta="100%"
             android:toXDelta="0%"
             />
     </set>
     <set
-        android:startOffset="400"
+        android:startOffset="350"
         android:interpolator="@android:anim/decelerate_interpolator"
         >
         <scale
-            android:duration="200"
+            android:duration="150"
             android:fromXScale="1.02"
             android:toXScale="1.0"
             android:fromYScale="1.02"
