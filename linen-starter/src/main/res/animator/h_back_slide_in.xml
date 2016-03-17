@@ -5,9 +5,9 @@
     <scale
         android:startOffset="375"
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-        android:fromXScale="0.96"
+        android:fromXScale="0.97"
         android:toXScale="1.0"
-        android:fromYScale="0.96"
+        android:fromYScale="0.97"
         android:toYScale="1.0"
         android:duration="200"
         android:pivotY="50%"
