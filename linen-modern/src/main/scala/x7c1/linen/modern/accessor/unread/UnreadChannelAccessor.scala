@@ -15,15 +15,15 @@ trait UnreadChannelAccessor {
   def length: Int
 }
 
-private object UnreadChannelAccessor {
+private object InternalChannelAccessor {
   def create(
     helper: LinenOpenHelper,
-    clientAccountId: Long ): Either[ChannelAccessorError, UnreadChannelAccessor] = {
+    clientAccountId: Long ): Either[ChannelAccessorError, InternalChannelAccessor] = {
 
     try {
       val query = createQuery(clientAccountId)
       val raw = helper.getReadableDatabase.rawQuery(query.sql, query.selectionArgs)
-      Right apply new UnreadChannelAccessorImpl(raw)
+      Right apply new InternalChannelAccessor(raw)
     } catch {
       case e: Exception =>
         Left apply UnexpectedError(e)
@@ -52,13 +52,15 @@ private object UnreadChannelAccessor {
   }
 }
 
-private class UnreadChannelAccessorImpl(raw: Cursor) extends UnreadChannelAccessor {
+private class InternalChannelAccessor(raw: Cursor) extends UnreadChannelAccessor {
   lazy val cursor = TypedCursor[UnreadChannelRecord](raw)
 
   override def findAt(position: Int) = cursor.moveToFind(position){
     UnreadChannel(cursor.channel_id, cursor.name)
   }
   override def length = raw.getCount
+
+  def closeCursor(): Unit = raw.close()
 }
 
 trait UnreadChannelRecord extends TypedFields {
@@ -78,7 +80,7 @@ class UnreadChannelLoader(helper: LinenOpenHelper, client: ClientAccount){
 
   def startLoading(): CallbackTask[ChannelLoaderEvent] = async {
     Log info s"[start]"
-    UnreadChannelAccessor.create(helper, client.accountId)
+    InternalChannelAccessor.create(helper, client.accountId)
   } map {
     case Right(loadedAccessor) =>
       Log info s"[done]"
@@ -89,9 +91,10 @@ class UnreadChannelLoader(helper: LinenOpenHelper, client: ClientAccount){
       new AccessorError(error)
   }
   private class AccessorHolder extends UnreadChannelAccessor {
-    private var underlying: Option[UnreadChannelAccessor] = None
+    private var underlying: Option[InternalChannelAccessor] = None
 
-    def updateAccessor(accessor: UnreadChannelAccessor): Unit = {
+    def updateAccessor(accessor: InternalChannelAccessor): Unit = synchronized {
+      underlying foreach {_.closeCursor()}
       underlying = Some(accessor)
     }
     override def findAt(position: Int): Option[UnreadChannel] = {
