@@ -46,7 +46,7 @@ private class ViewHolderProviderPartsImpl(
     val x1 = layout.elements map { x =>
       s"(${x.tag}) view.findViewById(R.id.${x.key})"
     }
-    (x0 +: x1) mkString indent(",", 3)
+    (x0 +: x1) mkString indent(",", 5)
   }
 
   override def prefix = layout.prefix
