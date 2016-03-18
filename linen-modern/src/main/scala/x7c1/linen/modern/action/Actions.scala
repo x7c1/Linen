@@ -1,5 +1,7 @@
 package x7c1.linen.modern.action
 
+import java.lang.Math.min
+
 import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
@@ -58,8 +60,9 @@ class SourceFocusedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
-    sourceAccessor findAt position map { source =>
-      SourceFocusedEvent(position, source)
+    val x = min(position, sourceAccessor.length - 1)
+    sourceAccessor findAt x map { source =>
+      SourceFocusedEvent(x, source)
     }
   }
 }

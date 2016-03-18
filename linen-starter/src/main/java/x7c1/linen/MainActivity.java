@@ -17,6 +17,7 @@ import x7c1.linen.res.layout.UnreadDetailRowEntryProvider;
 import x7c1.linen.res.layout.UnreadDetailRowSourceProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowEntryProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowSourceProvider;
+import x7c1.linen.res.layout.UnreadSourceRowFooterProvider;
 import x7c1.linen.res.layout.UnreadSourceRowItemProvider;
 
 
@@ -51,6 +52,7 @@ public class MainActivity extends BaseActivity {
 			),
 			new UnreadRowProviders(
 				new UnreadSourceRowItemProvider(this),
+				new UnreadSourceRowFooterProvider(this),
 				new UnreadOutlineRowSourceProvider(this),
 				new UnreadOutlineRowEntryProvider(this),
 				new UnreadDetailRowSourceProvider(this),
