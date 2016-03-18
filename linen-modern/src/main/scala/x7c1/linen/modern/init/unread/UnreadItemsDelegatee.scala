@@ -6,8 +6,8 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRow}
-import x7c1.linen.modern.accessor.preset.{PresetAccount, ClientAccount, ClientAccountSetup}
+import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRowItem}
+import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
 import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
@@ -138,7 +138,7 @@ class MenuRowProviders(
 )
 
 class UnreadRowProviders(
-  val forSource: ViewHolderProvider[UnreadSourceRow],
+  val forSourceItem: ViewHolderProvider[UnreadSourceRowItem],
   val forOutlineSource: ViewHolderProvider[UnreadOutlineRowSource],
   val forOutlineEntry: ViewHolderProvider[UnreadOutlineRowEntry],
   val forDetailSource: ViewHolderProvider[UnreadDetailRowSource],
