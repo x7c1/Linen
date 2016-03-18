@@ -14,8 +14,10 @@ import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowEntryProvider;
+import x7c1.linen.res.layout.UnreadDetailRowFooterProvider;
 import x7c1.linen.res.layout.UnreadDetailRowSourceProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowEntryProvider;
+import x7c1.linen.res.layout.UnreadOutlineRowFooterProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowSourceProvider;
 import x7c1.linen.res.layout.UnreadSourceRowFooterProvider;
 import x7c1.linen.res.layout.UnreadSourceRowItemProvider;
@@ -55,8 +57,10 @@ public class MainActivity extends BaseActivity {
 				new UnreadSourceRowFooterProvider(this),
 				new UnreadOutlineRowSourceProvider(this),
 				new UnreadOutlineRowEntryProvider(this),
+				new UnreadOutlineRowFooterProvider(this),
 				new UnreadDetailRowSourceProvider(this),
-				new UnreadDetailRowEntryProvider(this)
+				new UnreadDetailRowEntryProvider(this),
+				new UnreadDetailRowFooterProvider(this)
 			)
 		);
 		initializer.setup();

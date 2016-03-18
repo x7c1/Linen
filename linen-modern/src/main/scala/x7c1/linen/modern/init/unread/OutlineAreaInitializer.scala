@@ -21,12 +21,16 @@ trait OutlineAreaInitializer {
     }
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
-    layout.entryList setAdapter new OutlineRowAdapter(
-      accessors.entryOutline,
-      new OutlineSelectedObserver(actions),
-      unreadRowProviders.forOutlineSource,
-      unreadRowProviders.forOutlineEntry
-    )
+    layout.entryList setAdapter {
+      lazy val footerHeight = layout.entryList.getHeight - dipToPixel(10)
+      new OutlineRowAdapter(
+        accessors.entryOutline,
+        new OutlineSelectedObserver(actions),
+        unreadRowProviders.forOutlineSource,
+        unreadRowProviders.forOutlineEntry,
+        unreadRowProviders.forOutlineFooter, footerHeight
+      )
+    }
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,
       focusedEventFactory = new OutlineFocusedEventFactory(accessors.entryOutline),
