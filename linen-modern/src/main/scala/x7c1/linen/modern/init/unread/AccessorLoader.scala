@@ -4,7 +4,7 @@ import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterKind, UnreadEntryRow, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{FooterContent, EntryAccessor, EntryAccessorBinder, FooterKind, UnreadEntryRow, UnreadSourceAccessor}
 import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
@@ -45,12 +45,14 @@ class AccessorLoader(
       override def length: Int = currentSourceLength
     }
 
-  def createOutlineAccessor: EntryAccessor[UnreadOutline] =
-    new EntryAccessorBinder(outlineAccessors)
-
-  def createDetailAccessor: EntryAccessor[UnreadDetail] =
-    new EntryAccessorBinder(detailAccessors)
-
+  def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
+    val underlying = new EntryAccessorBinder(outlineAccessors)
+    new EntriesFooterAppender(underlying)
+  }
+  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
+    val underlying = new EntryAccessorBinder(detailAccessors)
+    new EntriesFooterAppender(underlying)
+  }
   def startLoading(account: AccountIdentifiable): Unit = {
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -176,4 +178,31 @@ object AccessorLoader {
     } yield accessor catch {
       case e: Exception => left(Abort(e))
     }
+}
+
+private class EntriesFooterAppender[A <: UnreadEntry](
+  accessor: EntryAccessor[A]) extends EntryAccessor[A]{
+
+  override def findAt(position: Int) = {
+    if (isLast(position)){
+      Some(UnreadEntryRow(FooterContent()))
+    } else {
+      accessor.findAt(position)
+    }
+  }
+  override def length = {
+    // +1 to append Footer
+    accessor.length + 1
+  }
+  override def findKindAt(position: Int) = {
+    if (isLast(position)){
+      Some(FooterKind)
+    } else {
+      accessor findKindAt position
+    }
+  }
+  override def firstEntryPositionOf(sourceId: Long) = {
+    accessor firstEntryPositionOf sourceId
+  }
+  private def isLast(position: Int) = position == accessor.length
 }

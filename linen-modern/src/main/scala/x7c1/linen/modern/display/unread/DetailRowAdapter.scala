@@ -5,7 +5,7 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, SourceKind, EntryContent, SourceHeadlineContent}
+import x7c1.linen.modern.accessor.unread.{FooterKind, EntryKind, EntryAccessor, SourceKind, EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -21,10 +21,7 @@ class DetailRowAdapter(
   footerProvider: ViewHolderProvider[UnreadDetailRowFooter],
   footerHeight: => Int ) extends Adapter[UnreadDetailRow] {
 
-  override def getItemCount: Int = {
-    // +1 to include footer
-    entryAccessor.length + 1
-  }
+  override def getItemCount = entryAccessor.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     viewType match {
@@ -63,14 +60,12 @@ class DetailRowAdapter(
     }
   }
   override def getItemViewType(position: Int): Int = {
-    val provider = position match {
-      case x if x == entryAccessor.length => footerProvider
-      case _ => entryAccessor findKindAt position match {
-        case Some(SourceKind) => sourceProvider
-        case _ => entryProvider
-      }
-    }
-    provider.layoutId
+    providerAt(position).layoutId
+  }
+  private lazy val providerAt = entryAccessor createPositionMap {
+    case SourceKind => sourceProvider
+    case EntryKind => entryProvider
+    case FooterKind => footerProvider
   }
 }
 

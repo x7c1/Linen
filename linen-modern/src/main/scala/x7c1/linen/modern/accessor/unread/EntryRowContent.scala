@@ -10,3 +10,5 @@ case class SourceHeadlineContent(
 
 case class EntryContent[+A <: UnreadEntry](
   entry: A) extends EntryRowContent[A]
+
+case class FooterContent() extends EntryRowContent[Nothing]

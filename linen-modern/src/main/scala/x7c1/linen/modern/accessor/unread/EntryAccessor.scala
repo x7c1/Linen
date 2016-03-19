@@ -33,12 +33,20 @@ trait EntryAccessor[+A <: UnreadEntry]{
         Log error s"unknown item:$item, holder:$holder"
     }
   }
+  def createPositionMap[B](f: UnreadRowKind => B): Int => B = {
+    position => findKindAt(position) match {
+      case Some(kind) => f(kind)
+      case None =>
+        throw new IllegalArgumentException(s"row-kind not defined at $position")
+    }
+  }
 }
 
 case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
   def sourceId: Option[Long] = content match {
     case SourceHeadlineContent(sourceId, title) => Some(sourceId)
     case EntryContent(entry) => Some(entry.sourceId)
+    case FooterContent() => None
   }
 }
 

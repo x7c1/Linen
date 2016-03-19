@@ -3,7 +3,7 @@ package x7c1.linen.modern.display.unread
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, SourceKind, EntryContent, SourceHeadlineContent}
+import x7c1.linen.modern.accessor.unread.{FooterKind, EntryKind, EntryAccessor, SourceKind, EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
@@ -17,10 +17,8 @@ class OutlineRowAdapter(
   footerProvider: ViewHolderProvider[UnreadOutlineRowFooter],
   footerHeight: => Int) extends Adapter[UnreadOutlineRow] {
 
-  override def getItemCount = {
-    // +1 to include footer
-    entryAccessor.length + 1
-  }
+  override def getItemCount = entryAccessor.length
+
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     viewType match {
       case x if x == sourceProvider.layoutId =>
@@ -52,19 +50,12 @@ class OutlineRowAdapter(
     }
   }
   override def getItemViewType(position: Int): Int = {
-//    val provider = entryAccessor findKindAt position match {
-//      case Some(SourceKind) => sourceProvider
-//      case Some(EntryKind) => entryProvider
-//      case _ => footerProvider
-//    }
-    val provider = position match {
-      case x if x == entryAccessor.length => footerProvider
-      case _ => entryAccessor findKindAt position match {
-        case Some(SourceKind) => sourceProvider
-        case _ => entryProvider
-      }
-    }
-    provider.layoutId
+    providerAt(position).layoutId
+  }
+  private lazy val providerAt = entryAccessor createPositionMap {
+    case SourceKind => sourceProvider
+    case EntryKind => entryProvider
+    case FooterKind => footerProvider
   }
 }
 
