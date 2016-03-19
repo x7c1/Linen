@@ -1,9 +1,9 @@
-package x7c1.linen.modern.accessor
+package x7c1.linen.modern.accessor.unread
 
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.unread.UnreadSourceAccessorQueries
+import x7c1.linen.modern.accessor.{SingleWhere, Updatable, Insertable, Query}
 import x7c1.linen.modern.struct.{Date, UnreadSource}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 

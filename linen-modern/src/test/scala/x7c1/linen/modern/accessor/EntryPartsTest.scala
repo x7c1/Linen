@@ -6,6 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
+import x7c1.linen.modern.accessor.unread.retrieved_source_marks
 import x7c1.linen.modern.struct.Date
 
 @Config(manifest=Config.NONE)

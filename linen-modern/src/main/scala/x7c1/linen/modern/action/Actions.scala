@@ -2,7 +2,8 @@ package x7c1.linen.modern.action
 
 import java.lang.Math.min
 
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
+import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow}
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
 import x7c1.wheat.modern.callback.CallbackTask
