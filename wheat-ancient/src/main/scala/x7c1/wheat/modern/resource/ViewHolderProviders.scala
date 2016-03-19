@@ -8,20 +8,10 @@ trait ViewHolderProviders [A <: ViewHolder]{
 
   protected def all: Seq[ViewHolderProvider[_ <: A]]
 
-  def getWithLayoutParams
-    (parent: ViewGroup, viewType: Int)
-    (f: PartialFunction[(A, ViewGroup.LayoutParams), Unit]): A = {
-
-    val holder = all find (_.layoutId == viewType) map {
-      _ inflateOn parent
-    } getOrElse {
+  def createViewHolder(parent: ViewGroup, viewType: Int): A = {
+    val provider = all find (_.layoutId == viewType) getOrElse {
       throw new IllegalArgumentException(s"unknown viewType: $viewType")
     }
-    val params = holder.itemView.getLayoutParams
-    if (f isDefinedAt (holder, params)){
-      f(holder, params)
-      holder.itemView setLayoutParams params
-    }
-    holder
+    provider inflateOn parent
   }
 }

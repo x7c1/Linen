@@ -22,10 +22,7 @@ class DetailRowAdapter(
   override def getItemCount = entryAccessor.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    providers.getWithLayoutParams(parent, viewType){
-      case (_: UnreadDetailRowFooter, params) =>
-        params.height = footerHeight
-    }
+    providers.createViewHolder(parent, viewType)
   }
   override def onBindViewHolder(holder: UnreadDetailRow, position: Int): Unit = {
     entryAccessor.bindViewHolder(holder, position){
@@ -44,6 +41,11 @@ class DetailRowAdapter(
       case (row: UnreadDetailRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadDetailRowFooter, _) =>
+        row.itemView setLayoutParams {
+          val params = row.itemView.getLayoutParams
+          params.height = footerHeight
+          params
+        }
         Log info s"footer"
     }
   }

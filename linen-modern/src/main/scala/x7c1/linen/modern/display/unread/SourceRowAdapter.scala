@@ -17,10 +17,7 @@ class SourceRowAdapter(
   footerHeight: => Int ) extends Adapter[UnreadSourceRow]{
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    providers.getWithLayoutParams(parent, viewType){
-      case (_: UnreadSourceRowFooter, params) =>
-        params.height = footerHeight
-    }
+    providers.createViewHolder(parent, viewType)
   }
   override def onBindViewHolder(row: UnreadSourceRow, position: Int) = {
     sourceAccessor.findAt(position) -> row match {
@@ -30,6 +27,12 @@ class SourceRowAdapter(
         holder.itemView onClick { view =>
           val event = SourceSelectedEvent(position, source)
           sourceSelectedListener onSourceSelected event
+        }
+      case (_, holder: UnreadSourceRowFooter) =>
+        holder.itemView setLayoutParams {
+          val params = row.itemView.getLayoutParams
+          params.height = footerHeight
+          params
         }
       case _ =>
         Log error s"unknown row: $row"

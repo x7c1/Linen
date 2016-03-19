@@ -18,10 +18,7 @@ class OutlineRowAdapter(
   override def getItemCount = entryAccessor.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    providers.getWithLayoutParams(parent, viewType){
-      case (_: UnreadOutlineRowFooter, params) =>
-        params.height = footerHeight
-    }
+    providers.createViewHolder(parent, viewType)
   }
   override def onBindViewHolder(holder: UnreadOutlineRow, position: Int) = {
     entryAccessor.bindViewHolder(holder, position){
@@ -34,6 +31,12 @@ class OutlineRowAdapter(
       case (row: UnreadOutlineRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadOutlineRowFooter, _) =>
+        row.itemView setLayoutParams {
+          val params = row.itemView.getLayoutParams
+          params.height = footerHeight
+          params
+        }
+
         Log info s"footer"
     }
   }
