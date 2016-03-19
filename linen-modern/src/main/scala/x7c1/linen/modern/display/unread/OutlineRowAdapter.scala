@@ -3,7 +3,7 @@ package x7c1.linen.modern.display.unread
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, EntryKind, FooterKind, SourceHeadlineContent, SourceKind}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.init.unread.OutlineListProviders
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.macros.logger.Log
@@ -37,14 +37,9 @@ class OutlineRowAdapter(
         Log info s"footer"
     }
   }
-  override def getItemViewType(position: Int): Int = {
-    providerAt(position).layoutId
-  }
-  private lazy val providerAt = entryAccessor createPositionMap {
-    case SourceKind => providers.forSource
-    case EntryKind => providers.forEntry
-    case FooterKind => providers.forFooter
-  }
+  override def getItemViewType(position: Int): Int = viewTypeAt(position)
+
+  private lazy val viewTypeAt = providers createViewTyper entryAccessor
 }
 
 trait OnOutlineSelectedListener {

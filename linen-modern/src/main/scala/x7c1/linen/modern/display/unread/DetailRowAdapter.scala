@@ -5,7 +5,7 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, EntryKind, FooterKind, SourceHeadlineContent, SourceKind}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.init.unread.DetailListProviders
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
 import x7c1.wheat.macros.logger.Log
@@ -47,14 +47,9 @@ class DetailRowAdapter(
         Log info s"footer"
     }
   }
-  override def getItemViewType(position: Int): Int = {
-    providerAt(position).layoutId
-  }
-  private lazy val providerAt = entryAccessor createPositionMap {
-    case SourceKind => providers.forSource
-    case EntryKind => providers.forEntry
-    case FooterKind => providers.forFooter
-  }
+  override def getItemViewType(position: Int) = viewTypeAt(position)
+
+  private lazy val viewTypeAt = providers createViewTyper entryAccessor
 }
 
 trait OnDetailSelectedListener {

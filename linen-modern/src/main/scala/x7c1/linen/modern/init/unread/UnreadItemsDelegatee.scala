@@ -9,9 +9,9 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{FooterKind, EntryKind, SourceKind, EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
+import x7c1.linen.modern.struct.{UnreadEntry, UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.ViewHolderProviders
@@ -158,11 +158,28 @@ class SourceListProviders(
   )
 }
 
+trait EntryRowProviders{
+  self: ViewHolderProviders[_] =>
+
+  def forSource: ViewHolderProvider[_]
+  def forEntry: ViewHolderProvider[_]
+  def forFooter: ViewHolderProvider[_]
+
+  def createViewTyper[A <: UnreadEntry](accessor: EntryAccessor[A]): Int => Int = {
+    val map = accessor createPositionMap {
+      case SourceKind => forSource
+      case EntryKind => forEntry
+      case FooterKind => forFooter
+    }
+    position => map(position).layoutId
+  }
+}
+
 class OutlineListProviders(
   val forSource: ViewHolderProvider[UnreadOutlineRowSource],
   val forEntry: ViewHolderProvider[UnreadOutlineRowEntry],
   val forFooter: ViewHolderProvider[UnreadOutlineRowFooter]
-) extends ViewHolderProviders[UnreadOutlineRow]{
+) extends ViewHolderProviders[UnreadOutlineRow] with EntryRowProviders {
 
   override protected val all = Seq(
     forSource,
@@ -175,7 +192,7 @@ class DetailListProviders(
   val forSource: ViewHolderProvider[UnreadDetailRowSource],
   val forEntry: ViewHolderProvider[UnreadDetailRowEntry],
   val forFooter: ViewHolderProvider[UnreadDetailRowFooter]
-) extends ViewHolderProviders[UnreadDetailRow]{
+) extends ViewHolderProviders[UnreadDetailRow] with EntryRowProviders {
 
   override protected val all = Seq(
     forSource,
