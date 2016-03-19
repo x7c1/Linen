@@ -150,27 +150,3 @@ object SourceRatingParts {
     }
   }
 }
-
-trait ChannelSourceMapColumn extends TypedFields {
-  def source_id: Long
-  def channel_id: Long
-  def created_at: Int --> Date
-}
-case class ChannelSourceMapParts(
-  channelId: Long,
-  sourceId: Long,
-  createdAt: Date
-)
-object ChannelSourceMapParts {
-  implicit object insertable extends Insertable[ChannelSourceMapParts] {
-    override def tableName: String = "channel_source_map"
-    override def toContentValues(target: ChannelSourceMapParts): ContentValues = {
-      val column = TypedFields.expose[ChannelSourceMapColumn]
-      TypedFields toContentValues (
-        column.source_id -> target.sourceId,
-        column.channel_id -> target.channelId,
-        column.created_at -> target.createdAt
-      )
-    }
-  }
-}
