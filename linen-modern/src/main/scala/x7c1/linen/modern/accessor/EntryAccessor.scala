@@ -1,12 +1,12 @@
 package x7c1.linen.modern.accessor
 
-import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
 import android.support.v7.widget.RecyclerView.ViewHolder
-import x7c1.linen.modern.accessor.unread.{SourceHeadlineContent, EntryContent, EntryRowContent}
+import x7c1.linen.modern.accessor.database.{EntryParts, EntryRecord}
+import x7c1.linen.modern.accessor.unread.{EntryContent, EntryRowContent, SourceHeadlineContent}
 import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
@@ -121,7 +121,7 @@ trait EntryFactory[A <: UnreadEntry]{
 }
 
 class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline] {
-  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
+  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
 
   override def createEntry(): UnreadOutline = {
     UnreadOutline(
@@ -136,7 +136,7 @@ class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline]
 }
 
 class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
-  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
+  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
 
   override def createEntry(): UnreadDetail = {
     UnreadDetail(
@@ -297,38 +297,6 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
           title = cursor getString titleIndex
         ))
       case false => None
-    }
-  }
-}
-
-trait EntryRecordColumn extends TypedFields {
-  def entry_id: Long
-  def source_id: Long
-  def title: String
-  def content: String
-  def url: String
-  def created_at: Int --> Date
-}
-
-case class EntryParts(
-  sourceId: Long,
-  title: String,
-  content: String,
-  url: EntryUrl,
-  createdAt: Date
-)
-object EntryParts {
-  implicit object insertable extends Insertable[EntryParts] {
-    override def tableName: String = "entries"
-    override def toContentValues(target: EntryParts): ContentValues = {
-      val column = TypedFields.expose[EntryRecordColumn]
-      TypedFields toContentValues (
-        column.source_id -> target.sourceId,
-        column.title -> target.title,
-        column.content -> target.content,
-        column.url -> target.url.raw,
-        column.created_at -> target.createdAt
-      )
     }
   }
 }
