@@ -5,6 +5,12 @@ import x7c1.linen.modern.accessor.SingleWhere
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
+trait account_tags extends TypedFields {
+  def account_tag_id: Long
+  def tag_label: String
+  def created_at: Int --> Date
+}
+
 object account_tags {
 
   def table = "account_tags"
@@ -20,10 +26,4 @@ object account_tags {
     override def fromCursor(raw: Cursor) = TypedCursor[account_tags](raw) freezeAt 0
   }
 
-}
-
-trait account_tags extends TypedFields {
-  def account_tag_id: Long
-  def tag_label: String
-  def created_at: Int --> Date
 }
