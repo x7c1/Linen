@@ -6,7 +6,10 @@ import android.view.KeyEvent;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.MainLayout;
+import x7c1.linen.modern.init.unread.DetailListProviders;
 import x7c1.linen.modern.init.unread.MenuRowProviders;
+import x7c1.linen.modern.init.unread.OutlineListProviders;
+import x7c1.linen.modern.init.unread.SourceListProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
 import x7c1.linen.modern.init.unread.UnreadRowProviders;
 import x7c1.linen.res.layout.MainLayoutProvider;
@@ -53,14 +56,20 @@ public class MainActivity extends BaseActivity {
 				new MenuRowSeparatorProvider(this)
 			),
 			new UnreadRowProviders(
-				new UnreadSourceRowItemProvider(this),
-				new UnreadSourceRowFooterProvider(this),
-				new UnreadOutlineRowSourceProvider(this),
-				new UnreadOutlineRowEntryProvider(this),
-				new UnreadOutlineRowFooterProvider(this),
-				new UnreadDetailRowSourceProvider(this),
-				new UnreadDetailRowEntryProvider(this),
-				new UnreadDetailRowFooterProvider(this)
+				new SourceListProviders(
+						new UnreadSourceRowItemProvider(this),
+						new UnreadSourceRowFooterProvider(this)
+				),
+				new OutlineListProviders(
+						new UnreadOutlineRowSourceProvider(this),
+						new UnreadOutlineRowEntryProvider(this),
+						new UnreadOutlineRowFooterProvider(this)
+				),
+				new DetailListProviders(
+						new UnreadDetailRowSourceProvider(this),
+						new UnreadDetailRowEntryProvider(this),
+						new UnreadDetailRowFooterProvider(this)
+				)
 			)
 		);
 		initializer.setup();

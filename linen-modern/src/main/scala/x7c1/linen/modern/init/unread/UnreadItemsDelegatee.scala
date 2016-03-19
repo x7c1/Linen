@@ -6,14 +6,15 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{UnreadDetailRowFooter, UnreadOutlineRowFooter, UnreadSourceRowFooter, MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRowItem}
-import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
+import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.resource.ViewHolderProviders
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -140,12 +141,45 @@ class MenuRowProviders(
 )
 
 class UnreadRowProviders(
-  val forSourceItem: ViewHolderProvider[UnreadSourceRowItem],
-  val forSourceFooter: ViewHolderProvider[UnreadSourceRowFooter],
-  val forOutlineSource: ViewHolderProvider[UnreadOutlineRowSource],
-  val forOutlineEntry: ViewHolderProvider[UnreadOutlineRowEntry],
-  val forOutlineFooter: ViewHolderProvider[UnreadOutlineRowFooter],
-  val forDetailSource: ViewHolderProvider[UnreadDetailRowSource],
-  val forDetailEntry: ViewHolderProvider[UnreadDetailRowEntry],
-  val forDetailFooter: ViewHolderProvider[UnreadDetailRowFooter]
+  val forSourceArea: SourceListProviders,
+  val forOutlineArea: OutlineListProviders,
+  val forDetailArea: DetailListProviders
 )
+
+
+class SourceListProviders(
+  val forItem: ViewHolderProvider[UnreadSourceRowItem],
+  val forFooter: ViewHolderProvider[UnreadSourceRowFooter]
+) extends ViewHolderProviders[UnreadSourceRow]{
+
+  override protected val all = Seq(
+    forItem,
+    forFooter
+  )
+}
+
+class OutlineListProviders(
+  val forSource: ViewHolderProvider[UnreadOutlineRowSource],
+  val forEntry: ViewHolderProvider[UnreadOutlineRowEntry],
+  val forFooter: ViewHolderProvider[UnreadOutlineRowFooter]
+) extends ViewHolderProviders[UnreadOutlineRow]{
+
+  override protected val all = Seq(
+    forSource,
+    forEntry,
+    forFooter
+  )
+}
+
+class DetailListProviders(
+  val forSource: ViewHolderProvider[UnreadDetailRowSource],
+  val forEntry: ViewHolderProvider[UnreadDetailRowEntry],
+  val forFooter: ViewHolderProvider[UnreadDetailRowFooter]
+) extends ViewHolderProviders[UnreadDetailRow]{
+
+  override protected val all = Seq(
+    forSource,
+    forEntry,
+    forFooter
+  )
+}

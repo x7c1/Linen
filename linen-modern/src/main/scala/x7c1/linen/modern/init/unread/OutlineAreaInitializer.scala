@@ -26,9 +26,8 @@ trait OutlineAreaInitializer {
       new OutlineRowAdapter(
         accessors.entryOutline,
         new OutlineSelectedObserver(actions),
-        unreadRowProviders.forOutlineSource,
-        unreadRowProviders.forOutlineEntry,
-        unreadRowProviders.forOutlineFooter, footerHeight
+        unreadRowProviders.forOutlineArea,
+        footerHeight
       )
     }
     val forFocus = FocusDetector.forLinearLayoutManager(

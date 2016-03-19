@@ -28,8 +28,7 @@ trait SourceAreaInitializer {
       new SourceRowAdapter(
         accessors.source,
         new SourceSelectedObserver(actions),
-        unreadRowProviders.forSourceItem,
-        unreadRowProviders.forSourceFooter,
+        unreadRowProviders.forSourceArea,
         footerHeight
       )
     }

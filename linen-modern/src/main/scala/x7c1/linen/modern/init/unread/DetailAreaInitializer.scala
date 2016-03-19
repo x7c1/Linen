@@ -31,9 +31,8 @@ trait DetailAreaInitializer {
         accessors.entryDetail,
         new DetailSelectedObserver(actions),
         new OnEntryVisit(activity),
-        unreadRowProviders.forDetailSource,
-        unreadRowProviders.forDetailEntry,
-        unreadRowProviders.forDetailFooter, footerHeight
+        unreadRowProviders.forDetailArea,
+        footerHeight
       )
     }
     val forFocus = FocusDetector.forLinearLayoutManager(

@@ -5,9 +5,9 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
-import x7c1.linen.modern.accessor.unread.{FooterKind, EntryKind, EntryAccessor, SourceKind, EntryContent, SourceHeadlineContent}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, EntryKind, FooterKind, SourceHeadlineContent, SourceKind}
+import x7c1.linen.modern.init.unread.DetailListProviders
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
-import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -16,27 +16,15 @@ class DetailRowAdapter(
   entryAccessor: EntryAccessor[UnreadDetail],
   selectedListener: OnDetailSelectedListener,
   visitSelectedListener: OnEntryVisitListener[UnreadDetail],
-  sourceProvider: ViewHolderProvider[UnreadDetailRowSource],
-  entryProvider: ViewHolderProvider[UnreadDetailRowEntry],
-  footerProvider: ViewHolderProvider[UnreadDetailRowFooter],
+  providers: DetailListProviders,
   footerHeight: => Int ) extends Adapter[UnreadDetailRow] {
 
   override def getItemCount = entryAccessor.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    viewType match {
-      case x if x == sourceProvider.layoutId =>
-        sourceProvider inflateOn parent
-      case x if x == entryProvider.layoutId =>
-        entryProvider inflateOn parent
-      case _ =>
-        val holder = footerProvider inflateOn parent
-        holder.itemView setLayoutParams {
-          val params = holder.itemView.getLayoutParams
-          params.height = footerHeight
-          params
-        }
-        holder
+    providers.getWithLayoutParams(parent, viewType){
+      case (_: UnreadDetailRowFooter, params) =>
+        params.height = footerHeight
     }
   }
   override def onBindViewHolder(holder: UnreadDetailRow, position: Int): Unit = {
@@ -63,9 +51,9 @@ class DetailRowAdapter(
     providerAt(position).layoutId
   }
   private lazy val providerAt = entryAccessor createPositionMap {
-    case SourceKind => sourceProvider
-    case EntryKind => entryProvider
-    case FooterKind => footerProvider
+    case SourceKind => providers.forSource
+    case EntryKind => providers.forEntry
+    case FooterKind => providers.forFooter
   }
 }
 
