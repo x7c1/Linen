@@ -29,11 +29,7 @@ class SourceRowAdapter(
           sourceSelectedListener onSourceSelected event
         }
       case (_, holder: UnreadSourceRowFooter) =>
-        holder.itemView setLayoutParams {
-          val params = row.itemView.getLayoutParams
-          params.height = footerHeight
-          params
-        }
+        holder.itemView updateLayoutParams { _.height = footerHeight }
       case _ =>
         Log error s"unknown row: $row"
     }

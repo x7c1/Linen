@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.decorator
 
 import android.content.Context
-import android.view.{MotionEvent, View}
+import android.view.{ViewGroup, MotionEvent, View}
 import android.view.View.{OnTouchListener, OnClickListener}
 
 class RichView[A <: View](view: A){
@@ -20,7 +20,13 @@ class RichView[A <: View](view: A){
         f(v.asInstanceOf[A], event)
     }
   )
-
+  def updateLayoutParams(f: ViewGroup.LayoutParams => Unit): Unit = {
+    view setLayoutParams {
+      val params = view.getLayoutParams
+      f(params)
+      params
+    }
+  }
   def runUi[B](f: A => B): Unit = {
     view post runnable(f)
   }

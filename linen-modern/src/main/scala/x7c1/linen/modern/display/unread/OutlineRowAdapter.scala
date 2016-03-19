@@ -31,12 +31,7 @@ class OutlineRowAdapter(
       case (row: UnreadOutlineRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadOutlineRowFooter, _) =>
-        row.itemView setLayoutParams {
-          val params = row.itemView.getLayoutParams
-          params.height = footerHeight
-          params
-        }
-
+        row.itemView updateLayoutParams { _.height = footerHeight }
         Log info s"footer"
     }
   }

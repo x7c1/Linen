@@ -41,11 +41,7 @@ class DetailRowAdapter(
       case (row: UnreadDetailRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadDetailRowFooter, _) =>
-        row.itemView setLayoutParams {
-          val params = row.itemView.getLayoutParams
-          params.height = footerHeight
-          params
-        }
+        row.itemView updateLayoutParams { _.height = footerHeight }
         Log info s"footer"
     }
   }
