@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.unread.{EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
+import x7c1.linen.modern.accessor.unread.{UnreadEntryRow, EntryAccessor, SourceKind, EntryKind, EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
 

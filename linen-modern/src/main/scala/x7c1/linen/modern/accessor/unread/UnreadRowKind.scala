@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor
+package x7c1.linen.modern.accessor.unread
 
 sealed trait UnreadRowKind
 

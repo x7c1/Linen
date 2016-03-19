@@ -4,8 +4,8 @@ import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable, EntryAccessor, EntryAccessorBinder, UnreadEntryRow, FooterKind}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterKind, UnreadEntryRow, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline, UnreadSource}
