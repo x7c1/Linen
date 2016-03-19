@@ -34,19 +34,31 @@ class OutlineAreaAction(
     } yield ()
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
-    updateToolbar(event.sourceId)
+    for {
+      Some(sourceId) <- task(event.sourceId)
+      _ <- updateToolbar(sourceId)
+    } yield ()
   }
   override def onOutlineSkipped(event: EntrySkippedEvent) = {
-    skipTo(event.nextPosition, event.nextSourceId)
+    for {
+      Some(sourceId) <- task(event.nextSourceId)
+      _ <- skipTo(event.nextPosition, sourceId)
+    } yield ()
   }
   override def onDetailSelected(event: DetailSelectedEvent) = {
     fastScrollTo(event.position, event.entry.sourceId)
   }
   override def onDetailFocused(event: DetailFocusedEvent) = {
-    fastScrollTo(event.position, event.sourceId)
+    for {
+      Some(sourceId) <- task(event.sourceId)
+      _ <- fastScrollTo(event.position, sourceId)
+    } yield ()
   }
   override def onDetailSkipStopped(event: EntrySkipStopped) = {
-    skipTo(event.currentPosition, event.currentSourceId)
+    for {
+      Some(sourceId) <- task(event.currentSourceId)
+      _ <- skipTo(event.currentPosition, sourceId)
+    } yield ()
   }
   private def fastScrollTo(position: Int, sourceId: Long) = for {
     _ <- outlineArea fastScrollTo position

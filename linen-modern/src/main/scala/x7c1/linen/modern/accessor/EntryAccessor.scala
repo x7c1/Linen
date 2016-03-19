@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
 import android.support.v7.widget.RecyclerView.ViewHolder
+import x7c1.linen.modern.accessor.unread.{SourceHeadlineContent, EntryContent, EntryRowContent}
 import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
@@ -13,7 +14,7 @@ import scala.annotation.tailrec
 
 trait EntryAccessor[+A <: UnreadEntry]{
 
-  def findAt(position: Int): Option[EntryRow[A]]
+  def findAt(position: Int): Option[UnreadEntryRow[A]]
 
   def length: Int
 
@@ -23,22 +24,21 @@ trait EntryAccessor[+A <: UnreadEntry]{
 
   def bindViewHolder[B <: ViewHolder]
     (holder: B, position: Int)
-    (block: PartialFunction[(B, Either[EntrySource, A]), Unit]) = {
+    (block: PartialFunction[(B, EntryRowContent[A]), Unit]) = {
 
     findAt(position) -> holder match {
-      case (Some(EntryRow(item)), _) if block isDefinedAt (holder, item) =>
+      case (Some(UnreadEntryRow(item)), _) if block isDefinedAt (holder, item) =>
         block(holder, item)
       case (item, _) =>
         Log error s"unknown item:$item, holder:$holder"
     }
   }
-
 }
 
-case class EntryRow[+A <: UnreadEntry](content: Either[EntrySource, A]){
-  val sourceId: Long = content match {
-    case Left(source) => source.sourceId
-    case Right(entry) => entry.sourceId
+case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
+  def sourceId: Option[Long] = content match {
+    case SourceHeadlineContent(sourceId, title) => Some(sourceId)
+    case EntryContent(entry) => Some(entry.sourceId)
   }
 }
 
@@ -99,7 +99,10 @@ class EntryAccessorImpl[A <: UnreadEntry](
   private lazy val sequence = positions.toHeadlines mergeWith entrySequence
 
   override def findAt(position: Int) = {
-    sequence.findAt(position).map(new EntryRow(_))
+    sequence.findAt(position) map {
+      case Left(source) => UnreadEntryRow(source)
+      case Right(entry) => UnreadEntryRow(EntryContent(entry))
+    }
   }
   override lazy val length = {
     sequence.length
@@ -253,7 +256,7 @@ class EntrySequence[A <: UnreadEntry](
   }
 }
 
-class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[EntrySource] {
+class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[SourceHeadlineContent] {
 
   private lazy val countIndex = cursor getColumnIndex "count"
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
@@ -274,7 +277,7 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
     positionMap.getOrElse(position, false)
   }
 
-  def toHeadlines: SequenceHeadlines[EntrySource] = {
+  def toHeadlines: SequenceHeadlines[SourceHeadlineContent] = {
     val list = (0 to cursor.getCount - 1) map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
@@ -285,11 +288,11 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
 
   override lazy val length: Int = cursor.getCount
 
-  override def findAt(position: Int): Option[EntrySource] = {
+  override def findAt(position: Int): Option[SourceHeadlineContent] = {
     cursor moveToPosition position match {
       case true =>
         val id = cursor getLong sourceIdIndex
-        Some(new EntrySource(
+        Some(new SourceHeadlineContent(
           sourceId = id,
           title = cursor getString titleIndex
         ))
@@ -297,10 +300,6 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
     }
   }
 }
-case class EntrySource(
-  sourceId: Long,
-  title: String
-)
 
 trait EntryRecordColumn extends TypedFields {
   def entry_id: Long

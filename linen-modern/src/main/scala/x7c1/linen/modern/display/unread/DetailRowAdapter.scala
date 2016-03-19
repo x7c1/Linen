@@ -4,7 +4,8 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.{UnreadDetailRowFooter, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowSource}
+import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
+import x7c1.linen.modern.accessor.unread.{EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceKind}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -44,7 +45,7 @@ class DetailRowAdapter(
   }
   override def onBindViewHolder(holder: UnreadDetailRow, position: Int): Unit = {
     entryAccessor.bindViewHolder(holder, position){
-      case (row: UnreadDetailRowEntry, Right(entry)) =>
+      case (row: UnreadDetailRowEntry, EntryContent(entry)) =>
         row.title.text = entry.fullTitle
         row.content.text = Html.fromHtml(entry.fullContent)
         row.content setMovementMethod LinkMovementMethod.getInstance()
@@ -56,7 +57,7 @@ class DetailRowAdapter(
         row.visit onClick { _ =>
           visitSelectedListener onVisit entry
         }
-      case (row: UnreadDetailRowSource, Left(source)) =>
+      case (row: UnreadDetailRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadDetailRowFooter, _) =>
         Log info s"footer"

@@ -1,9 +1,7 @@
 package x7c1.linen.modern.action
 
-import java.lang.Math.min
-
 import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow}
+import x7c1.linen.modern.accessor.{EntryAccessor, UnreadEntryRow}
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
 import x7c1.wheat.modern.callback.CallbackTask
@@ -61,9 +59,8 @@ class SourceFocusedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
-    val x = min(position, sourceAccessor.length - 1)
-    sourceAccessor findAt x map { source =>
-      SourceFocusedEvent(x, source)
+    sourceAccessor findAt position map { source =>
+      SourceFocusedEvent(position, source)
     }
   }
 }
@@ -98,8 +95,8 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
 
 class OutlineFocusedEvent(
   override val position: Int,
-  entry: EntryRow[UnreadOutline]) extends ItemFocusedEvent {
-  val sourceId: Long = entry.sourceId
+  entry: UnreadEntryRow[UnreadOutline]) extends ItemFocusedEvent {
+  val sourceId: Option[Long] = entry.sourceId
 }
 
 class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -114,8 +111,8 @@ class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: EntryRow[UnreadOutline] ) extends ItemSkippedEvent {
-  val nextSourceId: Long = nextEntry.sourceId
+  nextEntry: UnreadEntryRow[UnreadOutline] ) extends ItemSkippedEvent {
+  val nextSourceId: Option[Long] = nextEntry.sourceId
 }
 
 class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -130,8 +127,8 @@ class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: EntryRow[UnreadOutline] ) extends SkipStoppedEvent {
-  val currentSourceId: Long = currentEntry.sourceId
+  currentEntry: UnreadEntryRow[UnreadOutline] ) extends SkipStoppedEvent {
+  val currentSourceId: Option[Long] = currentEntry.sourceId
 }
 
 class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -146,8 +143,8 @@ class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class DetailFocusedEvent(
   override val position: Int,
-  entry: EntryRow[UnreadDetail] ) extends ItemFocusedEvent {
-  val sourceId: Long = entry.sourceId
+  entry: UnreadEntryRow[UnreadDetail] ) extends ItemFocusedEvent {
+  val sourceId: Option[Long] = entry.sourceId
 }
 
 class DetailFocusedEventFactory(entryAccessor: EntryAccessor[UnreadDetail])

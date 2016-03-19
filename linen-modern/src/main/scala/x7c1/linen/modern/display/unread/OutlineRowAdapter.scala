@@ -2,7 +2,8 @@ package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.{UnreadOutlineRowFooter, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowSource}
+import x7c1.linen.glue.res.layout.{UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource}
+import x7c1.linen.modern.accessor.unread.{EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.accessor.{EntryAccessor, SourceKind}
 import x7c1.linen.modern.struct.UnreadOutline
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -39,19 +40,24 @@ class OutlineRowAdapter(
   }
   override def onBindViewHolder(holder: UnreadOutlineRow, position: Int) = {
     entryAccessor.bindViewHolder(holder, position){
-      case (row: UnreadOutlineRowEntry, Right(entry)) =>
+      case (row: UnreadOutlineRowEntry, EntryContent(entry)) =>
         row.title.text = entry.shortTitle
         row.itemView onClick { _ =>
           val event = OutlineSelectedEvent(position, entry)
           entrySelectedListener onEntrySelected event
         }
-      case (row: UnreadOutlineRowSource, Left(source)) =>
+      case (row: UnreadOutlineRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
       case (row: UnreadOutlineRowFooter, _) =>
         Log info s"footer"
     }
   }
   override def getItemViewType(position: Int): Int = {
+//    val provider = entryAccessor findKindAt position match {
+//      case Some(SourceKind) => sourceProvider
+//      case Some(EntryKind) => entryProvider
+//      case _ => footerProvider
+//    }
     val provider = position match {
       case x if x == entryAccessor.length => footerProvider
       case _ => entryAccessor findKindAt position match {

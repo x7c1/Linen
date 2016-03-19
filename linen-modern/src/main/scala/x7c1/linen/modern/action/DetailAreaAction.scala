@@ -40,7 +40,10 @@ class DetailAreaAction(
     fastScrollTo(event.position, event.entry.sourceId)
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
-    fastScrollTo(event.position, event.sourceId)
+    for {
+      Some(sourceId) <- task(event.sourceId)
+      _ <- fastScrollTo(event.position, sourceId)
+    } yield ()
   }
   override def onOutlineSkipStopped(event: EntrySkipStopped) = {
     skipTo(event.currentPosition, event.currentSourceId)
@@ -51,22 +54,23 @@ class DetailAreaAction(
   } yield ()
 
   override def onDetailFocused(event: DetailFocusedEvent) =
-    updateToolbar(event.sourceId)
+    updateToolbarIfExist(event.sourceId)
 
   override def onDetailSkipped(event: EntrySkippedEvent) = {
     skipTo(event.nextPosition, event.nextSourceId)
   }
 
-  private def skipTo(position: Int, sourceId: Long) = for {
-    _ <- detailArea skipTo position
-    _ <- updateToolbar(sourceId)
-  } yield ()
-
+  private def skipTo(position: Int, sourceId: Option[Long]) = {
+    for {
+      _ <- detailArea skipTo position
+      _ <- updateToolbarIfExist(sourceId)
+    } yield ()
+  }
   private def skipTo(sourceId: Long) = for {
     Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
     Some(entry) <- task { entryAccessor findAt entryPosition }
     _ <- detailArea skipTo entryPosition
-    _ <- updateToolbar(entry.sourceId)
+    _ <- updateToolbarIfExist(entry.sourceId)
   } yield ()
 
   private def fastScrollTo(entryPosition: Int, sourceId: Long) = for {
@@ -76,5 +80,11 @@ class DetailAreaAction(
 
   private def updateToolbar(sourceId: Long) = task {
     rawSourceAccessor.findTitleOf(sourceId) foreach detailArea.updateToolbar
+  }
+  private def updateToolbarIfExist(sourceId: Option[Long]) = {
+    for {
+      Some(id) <- task(sourceId)
+      _ <- updateToolbar(id)
+    } yield ()
   }
 }

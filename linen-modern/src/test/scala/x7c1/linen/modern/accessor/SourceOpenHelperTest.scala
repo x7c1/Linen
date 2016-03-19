@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.unread.{UnreadSourceAccessor, UnreadSourceAccessorQueries}
+import x7c1.linen.modern.accessor.unread.{EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
 
@@ -73,13 +73,13 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
     assertEquals(true, entries.exists {
-      case EntryRow(Right(entry)) =>
+      case UnreadEntryRow(EntryContent(entry)) =>
         entry.shortTitle == "5-1 entry title"
       case _ =>
         false
     })
     assertEquals(false, entries.exists {
-      case EntryRow(Right(entry)) =>
+      case UnreadEntryRow(EntryContent(entry)) =>
         entry.shortTitle == "3-1 entry title"
       case _ =>
         false
