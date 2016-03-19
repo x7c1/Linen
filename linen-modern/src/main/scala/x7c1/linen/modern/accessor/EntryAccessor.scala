@@ -1,11 +1,11 @@
 package x7c1.linen.modern.accessor
 
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.{Cursor, SQLException}
 import android.support.v7.widget.RecyclerView.ViewHolder
-import x7c1.linen.modern.accessor.database.{EntryParts, EntryRecord}
+import x7c1.linen.modern.accessor.database.EntryRecord
 import x7c1.linen.modern.accessor.unread.{EntryContent, EntryRowContent, SourceHeadlineContent}
-import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
@@ -298,25 +298,5 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
         ))
       case false => None
     }
-  }
-}
-
-case class RetrievedEntry(
-  title: String,
-  content: String,
-  url: EntryUrl,
-  createdAt: Date
-)
-
-class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
-  def addEntry(entry: RetrievedEntry): Either[SQLException, Long] = {
-    val parts = EntryParts(
-      sourceId = sourceId,
-      title = entry.title,
-      content = entry.content,
-      url = entry.url,
-      createdAt = entry.createdAt
-    )
-    new WritableDatabase(db).insert(parts)
   }
 }
