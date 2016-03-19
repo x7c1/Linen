@@ -1,10 +1,9 @@
 package x7c1.linen.modern.accessor.unread
 
-import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.{Insertable, Query, Updatable}
-import x7c1.linen.modern.struct.{Date, UnreadSource}
+import x7c1.linen.modern.accessor.Query
+import x7c1.linen.modern.struct.UnreadSource
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 import scala.util.Try
@@ -92,41 +91,4 @@ trait UnreadSourceColumn extends TypedFields {
   def rating: Int
   def start_entry_id: Option[Long]
   def latest_entry_id: Long
-}
-
-case class SourceStatusParts(
-  sourceId: Long,
-  accountId: Long,
-  createdAt: Date
-)
-object SourceStatusParts {
-  implicit object insertable extends Insertable[SourceStatusParts] {
-    override def tableName: String = "source_statuses"
-    override def toContentValues(target: SourceStatusParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("source_id", target.sourceId: java.lang.Long)
-      values.put("account_id", target.accountId: java.lang.Long)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
-    }
-  }
-}
-case class SourceStatusAsStarted(
-  startEntryId: Long,
-  sourceId: Long,
-  accountId: Long
-)
-object SourceStatusAsStarted {
-  implicit object updatable extends Updatable[SourceStatusAsStarted] {
-    override def tableName: String = "source_statuses"
-    override def toContentValues(target: SourceStatusAsStarted): ContentValues = {
-      val values = new ContentValues()
-      values.put("start_entry_id", target.startEntryId: java.lang.Long)
-      values
-    }
-    override def where(target: SourceStatusAsStarted) = Seq(
-      "source_id" -> target.sourceId.toString,
-      "account_id" -> target.accountId.toString
-    )
-  }
 }
