@@ -4,7 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.accessor.Query
 import x7c1.linen.modern.struct.UnreadSource
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.database.TypedCursor
 
 import scala.util.Try
 
@@ -82,13 +82,4 @@ object UnreadSourceAccessor {
     new Query(sql,
       Array(accountId.toString, channelId.toString, accountId.toString))
   }
-}
-
-trait UnreadSourceColumn extends TypedFields {
-  def source_id: Long
-  def title: String
-  def description: String
-  def rating: Int
-  def start_entry_id: Option[Long]
-  def latest_entry_id: Long
 }
