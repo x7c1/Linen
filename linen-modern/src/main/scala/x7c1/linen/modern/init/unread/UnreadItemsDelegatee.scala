@@ -106,7 +106,8 @@ class UnreadItemsDelegatee(
       case Right(account) =>
         Some(account)
     }
-    tmp orElse account
+//    tmp orElse account
+    account
   }
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics

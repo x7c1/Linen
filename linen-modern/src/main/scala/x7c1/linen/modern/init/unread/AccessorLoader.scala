@@ -52,14 +52,22 @@ class AccessorLoader(
     new EntryAccessorBinder(detailAccessors)
 
   def startLoading(account: AccountIdentifiable): Unit = {
-    val first = for {
+//    val first = for {
+//      sourceIds <- startLoadingSources(account.accountId)
+//      remaining <- loadSourceEntries(sourceIds)
+//      _ <- Future { notifyChanged() }
+//    } yield {
+//      remaining
+//    }
+//    first onComplete loadNext
+
+    for {
       sourceIds <- startLoadingSources(account.accountId)
       remaining <- loadSourceEntries(sourceIds)
       _ <- Future { notifyChanged() }
     } yield {
       remaining
     }
-    first onComplete loadNext
   }
 
   def close(): Unit = {
