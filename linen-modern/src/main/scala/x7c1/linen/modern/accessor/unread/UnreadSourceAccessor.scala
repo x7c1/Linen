@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor.unread
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.{SingleWhere, Updatable, Insertable, Query}
+import x7c1.linen.modern.accessor.{Insertable, Query, Updatable}
 import x7c1.linen.modern.struct.{Date, UnreadSource}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
@@ -171,23 +171,6 @@ object ChannelSourceMapParts {
         column.channel_id -> target.channelId,
         column.created_at -> target.createdAt
       )
-    }
-  }
-}
-
-trait retrieved_source_marks extends TypedFields {
-  def source_id: Long
-  def latest_entry_id: Long
-  def updated_at: Int --> Date
-}
-object retrieved_source_marks {
-  val table = "retrieved_source_marks"
-
-  implicit object selectable extends SingleWhere[retrieved_source_marks, Long](table){
-    override def where(id: Long) = Seq("source_id" -> id.toString)
-    override def fromCursor(cursor: Cursor) = {
-      val typed = TypedCursor[retrieved_source_marks](cursor)
-      typed.freezeAt(0)
     }
   }
 }
