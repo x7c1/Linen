@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.unread.{UnreadEntryRow, EntryAccessor, SourceKind, EntryKind, EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
+import x7c1.linen.modern.accessor.unread.{UnreadSource, UnreadSourceRow, UnreadEntryRow, EntryAccessor, SourceKind, EntryKind, EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
 
@@ -32,7 +32,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       fixture.channel1.channelId,
       fixture.account1.accountId
     )
-    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt)
+    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt) collect {
+      case UnreadSourceRow(x: UnreadSource) => x
+    }
     assertEquals(Seq(33, 11), sources.map(_.rating))
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
     assertEquals(
@@ -139,8 +141,9 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
       fixture.account2.accountId,
       fixture.channel1.channelId
     )
-    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt)
-
+    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt) collect {
+      case UnreadSourceRow(x: UnreadSource) => x
+    }
     // default rating is 100
     assertEquals(Seq(100, 100), sources.map(_.rating))
     assertEquals(Seq("description2", "description1"), sources.map(_.description))

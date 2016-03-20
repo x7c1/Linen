@@ -4,11 +4,11 @@ import android.app.LoaderManager
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import x7c1.linen.modern.accessor.unread.{FooterContent, EntryAccessor, EntryAccessorBinder, FooterKind, UnreadEntryRow, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline, UnreadSource}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -34,9 +34,9 @@ class AccessorLoader(
   private var sourceAccessor: Option[UnreadSourceAccessor] = None
   private var currentSourceLength: Int = 0
 
-  def createSourceAccessor: UnreadSourceAccessor =
-    new UnreadSourceAccessor {
-      override def findAt(position: Int): Option[UnreadSource] = {
+  def createSourceAccessor: UnreadSourceAccessor = {
+    val underlying = new UnreadSourceAccessor {
+      override def findAt(position: Int) = {
         sourceAccessor.flatMap(_ findAt position)
       }
       override def positionOf(sourceId: Long): Option[Int] = {
@@ -44,7 +44,8 @@ class AccessorLoader(
       }
       override def length: Int = currentSourceLength
     }
-
+    new SourceFooterAppender(underlying)
+  }
   def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
     val underlying = new EntryAccessorBinder(outlineAccessors)
     new EntriesFooterAppender(underlying)
@@ -178,6 +179,25 @@ object AccessorLoader {
     } yield accessor catch {
       case e: Exception => left(Abort(e))
     }
+}
+
+private class SourceFooterAppender(
+  accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {
+
+  override def findAt(position: Int) = {
+    if (isLast(position)){
+      Some(UnreadSourceRow(SourceFooterContent()))
+    } else {
+      accessor findAt position
+    }
+  }
+  override def positionOf(sourceId: Long) = accessor positionOf sourceId
+
+  override def length: Int = {
+    // +1 to append Footer
+    accessor.length + 1
+  }
+  private def isLast(position: Int) = position == accessor.length
 }
 
 private class EntriesFooterAppender[A <: UnreadEntry](

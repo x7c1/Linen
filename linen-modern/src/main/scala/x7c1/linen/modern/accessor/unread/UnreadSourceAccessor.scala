@@ -2,20 +2,45 @@ package x7c1.linen.modern.accessor.unread
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.modern.accessor.Query
-import x7c1.linen.modern.struct.UnreadSource
 import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.macros.logger.Log
 
 import scala.util.Try
 
 trait UnreadSourceAccessor extends UnreadItemAccessor {
 
   def sourceIds: Seq[Long] = {
-    (0 to length - 1).map(findAt).flatMap(_.map(_.id))
+    (0 to length - 1).view map findAt flatMap {
+      _ flatMap {
+        case UnreadSourceRow(x: UnreadSource) => Some(x.id)
+        case _ => None
+      }
+    }
   }
-  def findAt(position: Int): Option[UnreadSource]
+  def findAt(position: Int): Option[UnreadSourceRow]
 
   def positionOf(sourceId: Long): Option[Int]
+
+  def bindViewHolder[B <: ViewHolder]
+    (holder: B, position: Int)
+    (block: PartialFunction[(B, SourceRowContent), Unit]) = {
+
+    findAt(position) -> holder match {
+      case (Some(UnreadSourceRow(item)), _) if block isDefinedAt (holder, item) =>
+        block(holder, item)
+      case (item, _) =>
+        Log error s"unknown item:$item, holder:$holder"
+    }
+  }
+}
+
+case class UnreadSourceRow(content: SourceRowContent){
+  def source: Option[UnreadSource] = content match {
+    case x: UnreadSource => Some(x)
+    case _ => None
+  }
 }
 
 private class UnreadSourceAccessorImpl(
@@ -28,7 +53,7 @@ private class UnreadSourceAccessorImpl(
   override def findAt(position: Int) = synchronized {
     val n = positionMap(position)
     cursor.moveToFind(n){
-      UnreadSource(
+      UnreadSourceRow apply UnreadSource(
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,

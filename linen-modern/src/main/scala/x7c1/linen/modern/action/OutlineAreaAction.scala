@@ -19,11 +19,15 @@ class OutlineAreaAction(
     fastScrollTo(event.source.id)
   }
   override def onSourceFocused(event: SourceFocusedEvent) = {
-    fastScrollTo(event.source.id)
+    for {
+      Some(sourceId) <- task(event.source map (_.id))
+      _ <- fastScrollTo(sourceId)
+    } yield ()
   }
   override def onSourceSkipStopped(event: SourceSkipStopped) = for {
-    Some(n) <- findEntryPosition(event.currentSource.id)
-    _ <- skipTo(n, event.currentSource.id)
+    Some(sourceId) <- task(event.currentSource map (_.id))
+    Some(n) <- findEntryPosition(sourceId)
+    _ <- skipTo(n, sourceId)
   } yield ()
 
   override def onOutlineSelected(event: OutlineSelectedEvent) = {

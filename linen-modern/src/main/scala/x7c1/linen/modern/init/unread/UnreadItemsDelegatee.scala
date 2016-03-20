@@ -159,12 +159,21 @@ class UnreadRowProviders(
 class SourceListProviders(
   val forItem: ViewHolderProvider[UnreadSourceRowItem],
   val forFooter: ViewHolderProvider[UnreadSourceRowFooter]
-) extends ViewHolderProviders[UnreadSourceRow]{
+) extends ViewHolderProviders[UnreadSourceRow] {
 
   override protected val all = Seq(
     forItem,
     forFooter
   )
+  def createViewTyper(accessor: UnreadSourceAccessor): Int => Int = {
+    position =>
+      val provider = if (position == accessor.length - 1){
+        forFooter
+      } else {
+        forItem
+      }
+      provider.layoutId
+  }
 }
 
 trait EntryRowProviders{

@@ -21,13 +21,15 @@ class DetailAreaAction(
 
   override def onSourceFocused(event: SourceFocusedEvent) = for {
     _ <- await(100)
-    _ <- skipTo(event.source.id)
+    Some(sourceId) <- task(event.source map (_.id))
+    _ <- skipTo(sourceId)
   } yield()
 
   override def onSourceSkipStopped(event: SourceSkipStopped) = for {
     _ <- await(150)
+    Some(sourceId) <- task(event.currentSource map (_.id))
     Some(entryPosition) <- task {
-      entryAccessor firstEntryPositionOf event.currentSource.id
+      entryAccessor firstEntryPositionOf sourceId
     }
     Some(entry) <- task {
       entryAccessor findAt entryPosition
