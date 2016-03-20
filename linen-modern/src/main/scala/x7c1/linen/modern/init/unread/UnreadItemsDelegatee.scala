@@ -2,6 +2,7 @@ package x7c1.linen.modern.init.unread
 
 import android.app.Activity
 import android.graphics.Point
+import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
@@ -9,7 +10,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.{FooterKind, EntryKind, SourceKind, EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{UnreadItemAccessor, FooterKind, EntryKind, SourceKind, EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadEntry, UnreadDetail, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -113,6 +114,14 @@ class UnreadItemsDelegatee(
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
+  }
+  def footerHeightOf(recyclerView: RecyclerView, accessor: UnreadItemAccessor) = {
+    val penultimateHeight = {
+      val position = accessor.length - 2
+      val holder = recyclerView findViewHolderForAdapterPosition position
+      Option(holder).map(_.itemView.getHeight) getOrElse 0
+    }
+    recyclerView.getHeight - penultimateHeight
   }
   lazy val widthWithMargin: Int = {
     val radius = 20

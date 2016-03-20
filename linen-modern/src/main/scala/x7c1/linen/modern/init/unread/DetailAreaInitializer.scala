@@ -25,16 +25,13 @@ trait DetailAreaInitializer {
     }
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager
-    layout.entryDetailList setAdapter {
-      lazy val footerHeight = layout.entryList.getHeight - dipToPixel(10)
-      new DetailRowAdapter(
-        accessors.entryDetail,
-        new DetailSelectedObserver(actions),
-        new OnEntryVisit(activity),
-        unreadRowProviders.forDetailArea,
-        footerHeight
-      )
-    }
+    layout.entryDetailList setAdapter new DetailRowAdapter(
+      accessors.entryDetail,
+      new DetailSelectedObserver(actions),
+      new OnEntryVisit(activity),
+      unreadRowProviders.forDetailArea,
+      footerHeightOf(layout.entryDetailList, accessors.entryDetail)
+    )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,
       focusedEventFactory = new DetailFocusedEventFactory(accessors.entryDetail),

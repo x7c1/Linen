@@ -23,15 +23,12 @@ trait SourceAreaInitializer {
     }
     val manager = new LinearLayoutManager(layout.sourceList.getContext)
     layout.sourceList setLayoutManager manager
-    layout.sourceList setAdapter {
-      lazy val footerHeight = layout.sourceList.getHeight - dipToPixel(10)
-      new SourceRowAdapter(
-        accessors.source,
-        new SourceSelectedObserver(actions),
-        unreadRowProviders.forSourceArea,
-        footerHeight
-      )
-    }
+    layout.sourceList setAdapter new SourceRowAdapter(
+      accessors.source,
+      new SourceSelectedObserver(actions),
+      unreadRowProviders.forSourceArea,
+      footerHeightOf(layout.sourceList, accessors.source)
+    )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.sourceList,
       focusedEventFactory = new SourceFocusedEventFactory(accessors.source),

@@ -8,14 +8,12 @@ import x7c1.wheat.macros.database.TypedCursor
 
 import scala.util.Try
 
-trait UnreadSourceAccessor {
+trait UnreadSourceAccessor extends UnreadItemAccessor {
 
   def sourceIds: Seq[Long] = {
     (0 to length - 1).map(findAt).flatMap(_.map(_.id))
   }
   def findAt(position: Int): Option[UnreadSource]
-
-  def length: Int
 
   def positionOf(sourceId: Long): Option[Int]
 }

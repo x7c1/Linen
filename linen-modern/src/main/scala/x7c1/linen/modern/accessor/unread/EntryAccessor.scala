@@ -12,11 +12,9 @@ import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 import scala.annotation.tailrec
 
-trait EntryAccessor[+A <: UnreadEntry]{
+trait EntryAccessor[+A <: UnreadEntry] extends UnreadItemAccessor {
 
   def findAt(position: Int): Option[UnreadEntryRow[A]]
-
-  def length: Int
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
