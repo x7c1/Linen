@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.unread.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, DetailArea, SourceSelectedEvent}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.display.unread.{DetailArea, DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.UnreadDetail
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
@@ -40,8 +40,9 @@ class DetailAreaAction(
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
     for {
+      _ <- detailArea fastScrollTo event.position
       Some(sourceId) <- task(event.sourceId)
-      _ <- fastScrollTo(event.position, sourceId)
+      _ <- updateToolbar(sourceId)
     } yield ()
   }
   override def onOutlineSkipStopped(event: EntrySkipStopped) = {
