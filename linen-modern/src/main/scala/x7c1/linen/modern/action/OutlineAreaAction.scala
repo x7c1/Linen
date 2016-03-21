@@ -1,9 +1,8 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.unread.{RawSourceAccessor, EntryAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, OutlineArea, SourceSelectedEvent}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineArea, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.UnreadOutline
-import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 
 class OutlineAreaAction(
@@ -16,19 +15,34 @@ class OutlineAreaAction(
   with OnDetailSelected with OnDetailFocused with OnDetailSkipStopped {
 
   override def onSourceSelected(event: SourceSelectedEvent) = {
-    fastScrollTo(event.source.id)
+    task {
+      val sourceId = event.source.id
+      entryAccessor firstEntryPositionOf sourceId map
+        outlineArea.fastScrollTo foreach (_.execute())
+
+      updateToolbar(sourceId).execute()
+    }
   }
   override def onSourceFocused(event: SourceFocusedEvent) = {
-    for {
-      Some(sourceId) <- task(event.source map (_.id))
-      _ <- fastScrollTo(sourceId)
-    } yield ()
+    task {
+      val position = event.source map (_.id) flatMap
+        entryAccessor.firstEntryPositionOf getOrElse
+          (entryAccessor.length - 1)
+
+      outlineArea.fastScrollTo(position).execute()
+      event.source map (_.id) map updateToolbar foreach (_.execute())
+    }
   }
-  override def onSourceSkipStopped(event: SourceSkipStopped) = for {
-    Some(sourceId) <- task(event.currentSource map (_.id))
-    Some(n) <- findEntryPosition(sourceId)
-    _ <- skipTo(n, sourceId)
-  } yield ()
+  override def onSourceSkipStopped(event: SourceSkipStopped) = {
+    task {
+      val entryPosition = event.currentSource map (_.id) flatMap
+        entryAccessor.firstEntryPositionOf getOrElse
+          (entryAccessor.length - 1)
+
+      outlineArea.skipTo(entryPosition).execute()
+      event.currentSource map (_.id) map updateToolbar foreach (_.execute())
+    }
+  }
 
   override def onOutlineSelected(event: OutlineSelectedEvent) = {
     for {
@@ -37,17 +51,18 @@ class OutlineAreaAction(
     } yield ()
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
-    for {
-      Some(sourceId) <- task(event.sourceId)
-      _ <- updateToolbar(sourceId)
-    } yield ()
+    task {
+      event.sourceId map
+        updateToolbar foreach (_.execute())
+    }
   }
   override def onOutlineSkipped(event: EntrySkippedEvent) = {
     for {
       _ <- outlineArea skipTo event.nextPosition
-      Some(sourceId) <- task(event.nextSourceId)
-      _ <- updateToolbar(sourceId)
-    } yield ()
+    } yield {
+      event.nextSourceId map
+        updateToolbar foreach (_.execute())
+    }
   }
   override def onDetailSelected(event: DetailSelectedEvent) = {
     fastScrollTo(event.position, event.entry.sourceId)
@@ -55,37 +70,24 @@ class OutlineAreaAction(
   override def onDetailFocused(event: DetailFocusedEvent) = {
     for {
       _ <- outlineArea fastScrollTo event.position
-      Some(sourceId) <- task(event.sourceId)
-      _ <- updateToolbar(sourceId)
-    } yield ()
+    } yield {
+      event.sourceId map updateToolbar foreach (_.execute())
+    }
   }
   override def onDetailSkipStopped(event: EntrySkipStopped) = {
     for {
       _ <- outlineArea skipTo event.currentPosition
-      Some(sourceId) <- task(event.currentSourceId)
-      _ <- updateToolbar(sourceId)
-    } yield ()
+    } yield {
+      event.currentSourceId map updateToolbar foreach (_.execute())
+    }
   }
   private def fastScrollTo(position: Int, sourceId: Long) = for {
     _ <- outlineArea fastScrollTo position
     _ <- updateToolbar(sourceId)
   } yield ()
 
-  private def skipTo(position: Int, sourceId: Long) = for {
-    _ <- outlineArea skipTo position
-    _ <- updateToolbar(sourceId)
-  } yield ()
-
-  private def fastScrollTo(sourceId: Long): CallbackTask[Unit] = for {
-    Some(n) <- findEntryPosition(sourceId)
-    _ <- fastScrollTo(n, sourceId)
-  } yield ()
-
   private def updateToolbar(sourceId: Long) = task {
     rawSourceAccessor.findTitleOf(sourceId) foreach outlineArea.updateToolbar
-  }
-  private def findEntryPosition(sourceId: Long) = task {
-    entryAccessor firstEntryPositionOf sourceId
   }
 
 }

@@ -2,6 +2,7 @@ package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
 import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent, SourceArea}
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 
@@ -45,8 +46,11 @@ class SourceAreaAction(
   } yield ()
 
   private def skipToIfExist(sourceId: Option[Long]) = for {
-    Some(id) <- task(sourceId)
-    _ <- skipTo(id)
+    position <- task {
+      (sourceId flatMap sourceAccessor.positionOf) getOrElse
+        (sourceAccessor.length - 1)
+    }
+    _ <- sourceArea skipTo position
   } yield ()
 
   private def skipTo(sourceId: Long) = for {

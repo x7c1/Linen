@@ -30,7 +30,7 @@ trait DetailAreaInitializer {
       new DetailSelectedObserver(actions),
       new OnEntryVisit(activity),
       unreadRowProviders.forDetailArea,
-      footerHeightOf(layout.entryList, accessors.entryDetail)
+      footerHeightOf(layout.entryDetailList, accessors.entryDetail)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,

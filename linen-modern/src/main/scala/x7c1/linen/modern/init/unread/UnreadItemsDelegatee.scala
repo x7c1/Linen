@@ -116,12 +116,7 @@ class UnreadItemsDelegatee(
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
   }
   def footerHeightOf(recyclerView: RecyclerView, accessor: UnreadItemAccessor) = {
-    val penultimateHeight = {
-      val position = accessor.length - 2
-      val holder = recyclerView findViewHolderForAdapterPosition position
-      Option(holder).map(_.itemView.getHeight) getOrElse 0
-    }
-    recyclerView.getHeight - penultimateHeight
+    recyclerView.getHeight - dipToPixel(10)
   }
   lazy val widthWithMargin: Int = {
     val radius = 20
