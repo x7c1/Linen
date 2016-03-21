@@ -1,6 +1,6 @@
 package x7c1.wheat.modern.decorator
 
-import android.support.v7.widget.{Toolbar, RecyclerView}
+import android.support.v7.widget.{LinearLayoutManager, Toolbar, RecyclerView}
 import android.view.View
 import android.widget.{CompoundButton, TextView}
 
@@ -9,6 +9,9 @@ object Imports {
 
   implicit def toRichCompoundView[A <: CompoundButton](view: A): RichCompoundButton[A]
     = new RichCompoundButton(view)
+
+  implicit def toRichLinearLayoutManager(manager: LinearLayoutManager): RichLinearLayoutManager
+    = new RichLinearLayoutManager(manager)
 
   implicit def toRichView[A <: View](view: A): RichView[A]
     = new RichView(view)
