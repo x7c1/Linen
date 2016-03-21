@@ -1,8 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent, SourceArea}
-import x7c1.wheat.macros.logger.Log
+import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 

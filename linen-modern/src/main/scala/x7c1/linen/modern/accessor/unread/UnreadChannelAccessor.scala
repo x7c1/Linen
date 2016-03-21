@@ -35,18 +35,16 @@ private object InternalChannelAccessor {
       """SELECT
         | c1._id AS channel_id,
         | c1.name AS name
-        |FROM channels AS c1
-        |LEFT JOIN channel_statuses AS c2 ON
-        | c2.account_id = ? AND
+        |FROM channel_statuses AS c2
+        |INNER JOIN channels AS c1 ON
         | c1._id = c2.channel_id
         |WHERE
-        | c1.account_id = ? AND
+        | c2.account_id = ? AND
         | c2.subscribed = 1
         |ORDER BY c1.created_at DESC
       """.stripMargin
 
     new Query(sql, Array(
-      clientAccountId.toString,
       clientAccountId.toString
     ))
   }
