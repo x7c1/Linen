@@ -26,7 +26,8 @@ trait SourceAreaInitializer {
     layout.sourceList setAdapter new SourceRowAdapter(
       accessors.source,
       new SourceSelectedObserver(actions),
-      unreadRowProviders.forSource
+      unreadRowProviders.forSourceArea,
+      footerHeightOf(layout.sourceList, accessors.source)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.sourceList,

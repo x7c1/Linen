@@ -11,6 +11,7 @@ sealed trait MenuItemKind {
 }
 
 object MenuItemKind {
+  case class UnreadChannelMenu(channelId: Long, body: String) extends MenuItemKind
   case class NoChannel(body: String) extends MenuItemKind
   case class MyChannels(body: String) extends MenuItemKind
   case class PresetChannels(body: String) extends MenuItemKind

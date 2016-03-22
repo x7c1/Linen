@@ -1,11 +1,23 @@
 package x7c1.wheat.modern.callback
 
+import java.io.Closeable
+
+import x7c1.wheat.modern.tasks.Async
+
 
 object TaskProvider {
 
   def apply[A](f: => A): CallbackTask[A] = CallbackTask(_(f))
 
   def of[A, B](f: A)(implicit builder: TaskBuilder[A, B]): CallbackTask[B] = builder build f
+
+  def async[A](f: => A): CallbackTask[A] = Async.await(0).map(_ => f)
+
+  def using[A <: Closeable](closeable: A): CallbackTask[A] =
+    CallbackTask { f =>
+      try f(closeable)
+      finally closeable.close()
+    }
 }
 
 trait TaskBuilder[A, B]{

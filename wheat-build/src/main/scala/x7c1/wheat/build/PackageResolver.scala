@@ -6,6 +6,7 @@ object PackageResolver {
     case "ImageView" => "android.widget.ImageView"
     case "LinearLayout" => "android.widget.LinearLayout"
     case "ListView" => "android.widget.ListView"
+    case "ProgressBar" => "android.widget.ProgressBar"
     case "RelativeLayout" => "android.widget.RelativeLayout"
     case "SeekBar" => "android.widget.SeekBar"
     case "TextView" => "android.widget.TextView"

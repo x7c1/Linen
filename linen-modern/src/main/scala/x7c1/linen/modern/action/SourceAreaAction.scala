@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.UnreadSourceAccessor
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, SourceSelectedEvent, SourceArea}
+import x7c1.linen.modern.accessor.unread.UnreadSourceAccessor
+import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceArea, SourceSelectedEvent}
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
 
@@ -23,12 +23,12 @@ class SourceAreaAction(
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = for {
     _ <- await(300)
-    _ <- skipTo(event.sourceId)
+    _ <- skipToIfExist(event.sourceId)
   } yield ()
 
   override def onOutlineSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
-    _ <- skipTo(event.currentSourceId)
+    _ <- skipToIfExist(event.currentSourceId)
   } yield ()
 
   override def onDetailSelected(event: DetailSelectedEvent) = {
@@ -36,12 +36,20 @@ class SourceAreaAction(
   }
   override def onDetailFocused(event: DetailFocusedEvent) = for {
     _ <- await(300)
-    _ <- skipTo(event.sourceId)
+    _ <- skipToIfExist(event.sourceId)
   } yield()
 
   override def onDetailSkipStopped(event: EntrySkipStopped) = for {
     _ <- await(300)
-    _ <- skipTo(event.currentSourceId)
+    _ <- skipToIfExist(event.currentSourceId)
+  } yield ()
+
+  private def skipToIfExist(sourceId: Option[Long]) = for {
+    position <- task {
+      (sourceId flatMap sourceAccessor.positionOf) getOrElse
+        (sourceAccessor.length - 1)
+    }
+    _ <- sourceArea skipTo position
   } yield ()
 
   private def skipTo(sourceId: Long) = for {

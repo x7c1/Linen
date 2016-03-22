@@ -1,15 +1,15 @@
 package x7c1.linen.modern.init.unread
 
-import android.app.LoaderManager
+import android.app.{Activity, LoaderManager}
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable, EntryAccessor, EntryAccessorBinder, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
-import x7c1.linen.modern.init.unread.SourceNotLoaded.{AccountNotFound, Abort, ChannelNotFound, ErrorEmpty}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
+import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -18,24 +18,26 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class AccessorLoader(
+
+class AccessorLoader private (
   database: SQLiteDatabase,
-  layout: MainLayout,
-  loaderManager: LoaderManager ){
+  context: Context,
+  loaderManager: LoaderManager,
+  onLoad: AccessorsLoadedEvent => Unit ){
 
   private val outlineAccessors = ListBuffer[EntryAccessor[UnreadOutline]]()
   private val detailAccessors = ListBuffer[EntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
-    context = layout.itemView.context,
+    context = context,
     loaderManager = loaderManager,
     startLoaderId = 0
   )
   private var sourceAccessor: Option[UnreadSourceAccessor] = None
   private var currentSourceLength: Int = 0
 
-  def createSourceAccessor: UnreadSourceAccessor =
-    new UnreadSourceAccessor {
-      override def findAt(position: Int): Option[UnreadSource] = {
+  def createSourceAccessor: UnreadSourceAccessor = {
+    val underlying = new UnreadSourceAccessor {
+      override def findAt(position: Int) = {
         sourceAccessor.flatMap(_ findAt position)
       }
       override def positionOf(sourceId: Long): Option[Int] = {
@@ -43,22 +45,33 @@ class AccessorLoader(
       }
       override def length: Int = currentSourceLength
     }
-
-  def createOutlineAccessor: EntryAccessor[UnreadOutline] =
-    new EntryAccessorBinder(outlineAccessors)
-
-  def createDetailAccessor: EntryAccessor[UnreadDetail] =
-    new EntryAccessorBinder(detailAccessors)
-
+    new SourceFooterAppender(underlying)
+  }
+  def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
+    val underlying = new EntryAccessorBinder(outlineAccessors)
+    new EntriesFooterAppender(underlying)
+  }
+  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
+    val underlying = new EntryAccessorBinder(detailAccessors)
+    new EntriesFooterAppender(underlying)
+  }
   def startLoading(account: AccountIdentifiable): Unit = {
-    val first = for {
+//    val first = for {
+//      sourceIds <- startLoadingSources(account.accountId)
+//      remaining <- loadSourceEntries(sourceIds)
+//      _ <- Future { notifyChanged() }
+//    } yield {
+//      remaining
+//    }
+//    first onComplete loadNext
+
+    for {
       sourceIds <- startLoadingSources(account.accountId)
       remaining <- loadSourceEntries(sourceIds)
-      _ <- Future { notifyChanged() }
+      _ <- Future { onLoad(AccessorsLoadedEvent()) }
     } yield {
       remaining
     }
-    first onComplete loadNext
   }
 
   def close(): Unit = {
@@ -121,24 +134,6 @@ class AccessorLoader(
       }
     }
   }
-  private def notifyChanged() = layout.itemView runUi { _ =>
-
-    /*
-    2015-12-20:
-    it should be written like:
-      layout.sourceList.getAdapter.notifyItemRangeInserted(0, ...)
-
-    but this 'notifyItemRangeInserted' causes following error (and crash)
-      java.lang.IndexOutOfBoundsException:
-        Inconsistency detected. Invalid view holder adapter positionViewHolder
-    */
-
-    layout.sourceList.getAdapter.notifyDataSetChanged()
-    layout.entryList.getAdapter.notifyDataSetChanged()
-    layout.entryDetailList.getAdapter.notifyDataSetChanged()
-
-    Log info "[done]"
-  }
   private def formatError(e: Throwable) = {
     "[failed] " +
       (e.toString +: e.getStackTrace.take(30) mkString "\n")
@@ -150,6 +145,17 @@ object AccessorLoader {
   import scalaz.\/.{left, right}
   import scalaz.syntax.std.option._
 
+  def apply
+    (database: SQLiteDatabase, activity: Activity)
+      (listener: AccessorsLoadedEvent => Unit): AccessorLoader = {
+
+    new AccessorLoader(
+      database,
+      activity,
+      activity.getLoaderManager,
+      listener
+    )
+  }
   def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor = {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db) \/> AccountNotFound
@@ -167,4 +173,52 @@ object AccessorLoader {
     } yield accessor catch {
       case e: Exception => left(Abort(e))
     }
+}
+
+case class AccessorsLoadedEvent()
+
+private class SourceFooterAppender(
+  accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {
+
+  override def findAt(position: Int) = {
+    if (isLast(position)){
+      Some(UnreadSourceRow(SourceFooterContent()))
+    } else {
+      accessor findAt position
+    }
+  }
+  override def positionOf(sourceId: Long) = accessor positionOf sourceId
+
+  override def length: Int = {
+    // +1 to append Footer
+    accessor.length + 1
+  }
+  private def isLast(position: Int) = position == accessor.length
+}
+
+private class EntriesFooterAppender[A <: UnreadEntry](
+  accessor: EntryAccessor[A]) extends EntryAccessor[A]{
+
+  override def findAt(position: Int) = {
+    if (isLast(position)){
+      Some(UnreadEntryRow(FooterContent()))
+    } else {
+      accessor.findAt(position)
+    }
+  }
+  override def length = {
+    // +1 to append Footer
+    accessor.length + 1
+  }
+  override def findKindAt(position: Int) = {
+    if (isLast(position)){
+      Some(FooterKind)
+    } else {
+      accessor findKindAt position
+    }
+  }
+  override def firstEntryPositionOf(sourceId: Long) = {
+    accessor firstEntryPositionOf sourceId
+  }
+  private def isLast(position: Int) = position == accessor.length
 }

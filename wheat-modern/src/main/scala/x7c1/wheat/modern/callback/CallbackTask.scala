@@ -1,10 +1,8 @@
 package x7c1.wheat.modern.callback
 
-import java.io.Closeable
-
 import x7c1.wheat.modern.kinds.CallbackBase
 
-import scala.concurrent.{Promise, Future}
+import scala.concurrent.{Future, Promise}
 
 class CallbackTask[EVENT](
   callback: (EVENT => Unit) => Unit) extends CallbackBase[EVENT] {
@@ -32,10 +30,4 @@ object CallbackTask {
     new CallbackTask(execute)
   }
   def task = TaskProvider
-
-  def using[A <: Closeable](closeable: A): CallbackTask[A] =
-    CallbackTask { f =>
-      try f(closeable)
-      finally closeable.close()
-    }
 }

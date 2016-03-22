@@ -1,5 +1,7 @@
 package x7c1.linen.modern.accessor.unread
 
+import x7c1.wheat.macros.database.TypedFields
+
 object UnreadSourceAccessorQueries {
 
   val sql2 =
@@ -47,4 +49,13 @@ object UnreadSourceAccessorQueries {
       |LEFT JOIN source_ratings AS p1
       |  ON (p1.source_id = p4.source_id) AND (p1.account_id = ?)
       """.stripMargin
+}
+
+trait UnreadSourceColumn extends TypedFields {
+  def source_id: Long
+  def title: String
+  def description: String
+  def rating: Int
+  def start_entry_id: Option[Long]
+  def latest_entry_id: Long
 }

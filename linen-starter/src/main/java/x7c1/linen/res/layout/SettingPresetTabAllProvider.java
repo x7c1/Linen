@@ -8,13 +8,13 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SettingPresetTabAll;
+import android.view.View;
+import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingPresetTabAll;
 
 public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPresetTabAll> {
 
@@ -41,10 +41,7 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
     @Override
     public SettingPresetTabAll inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_preset_tab__all, parent, attachToRoot);
-        return new SettingPresetTabAll(
-            view,
-            (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
-        );
+        return factory().createViewHolder(view);
     }
 
     public static ViewHolderProviderFactory<SettingPresetTabAll> factory(){
@@ -58,10 +55,10 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
                 return new SettingPresetTabAllProvider(context);
             }
             @Override
-            public SettingPresetTabAll createViewHolder(View view) {
+            public SettingPresetTabAll createViewHolder(View view){
                 return new SettingPresetTabAll(
-                        view,
-                        (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
+                    view,
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__all__channel_list)
                 );
             }
         };

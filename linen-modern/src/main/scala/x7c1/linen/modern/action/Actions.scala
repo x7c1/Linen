@@ -1,8 +1,8 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.{EntryAccessor, EntryRow, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, UnreadEntryRow, UnreadSource, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline, UnreadSource}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 
@@ -52,50 +52,49 @@ trait OnDetailSkipStopped {
 
 case class SourceFocusedEvent(
   override val position: Int,
-  source: UnreadSource) extends ItemFocusedEvent
+  source: Option[UnreadSource]) extends ItemFocusedEvent
 
 class SourceFocusedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
-    sourceAccessor findAt position map { source =>
-      SourceFocusedEvent(position, source)
+    sourceAccessor findAt position map { row =>
+      SourceFocusedEvent(position, row.source)
     }
   }
 }
 
 case class SourceSkippedEvent(
-  override val nextPosition: Int,
-  nextSource: UnreadSource ) extends ItemSkippedEvent
+  override val nextPosition: Int ) extends ItemSkippedEvent
 
 class SourceSkippedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends ItemSkippedEventFactory[SourceSkippedEvent]{
 
   override def createAt(next: Int) = {
     sourceAccessor findAt next map { source =>
-      SourceSkippedEvent(next, source)
+      SourceSkippedEvent(next)
     }
   }
 }
 
 case class SourceSkipStopped(
   override val currentPosition: Int,
-  currentSource: UnreadSource ) extends SkipStoppedEvent
+  currentSource: Option[UnreadSource] ) extends SkipStoppedEvent
 
 class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
   extends SkipStoppedEventFactory[SourceSkipStopped]{
 
   override def createAt(current: Int) = {
-    sourceAccessor findAt current map { source =>
-      SourceSkipStopped(current, source)
+    sourceAccessor findAt current map { row =>
+      SourceSkipStopped(current, row.source)
     }
   }
 }
 
 class OutlineFocusedEvent(
   override val position: Int,
-  entry: EntryRow[UnreadOutline]) extends ItemFocusedEvent {
-  val sourceId: Long = entry.sourceId
+  entry: UnreadEntryRow[UnreadOutline]) extends ItemFocusedEvent {
+  val sourceId: Option[Long] = entry.sourceId
 }
 
 class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -110,8 +109,8 @@ class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: EntryRow[UnreadOutline] ) extends ItemSkippedEvent {
-  val nextSourceId: Long = nextEntry.sourceId
+  nextEntry: UnreadEntryRow[UnreadOutline] ) extends ItemSkippedEvent {
+  val nextSourceId: Option[Long] = nextEntry.sourceId
 }
 
 class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -126,8 +125,8 @@ class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: EntryRow[UnreadOutline] ) extends SkipStoppedEvent {
-  val currentSourceId: Long = currentEntry.sourceId
+  currentEntry: UnreadEntryRow[UnreadOutline] ) extends SkipStoppedEvent {
+  val currentSourceId: Option[Long] = currentEntry.sourceId
 }
 
 class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
@@ -142,8 +141,8 @@ class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class DetailFocusedEvent(
   override val position: Int,
-  entry: EntryRow[UnreadDetail] ) extends ItemFocusedEvent {
-  val sourceId: Long = entry.sourceId
+  entry: UnreadEntryRow[UnreadDetail] ) extends ItemFocusedEvent {
+  val sourceId: Option[Long] = entry.sourceId
 }
 
 class DetailFocusedEventFactory(entryAccessor: EntryAccessor[UnreadDetail])

@@ -1,21 +1,20 @@
-package x7c1.linen.modern.accessor
+package x7c1.linen.modern.accessor.unread
 
-import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.{Cursor, SQLException}
 import android.support.v7.widget.RecyclerView.ViewHolder
-import x7c1.linen.modern.struct.{Date, UnreadDetail, UnreadEntry, UnreadOutline}
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.linen.modern.accessor.Query
+import x7c1.linen.modern.accessor.database.EntryRecord
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 import scala.annotation.tailrec
 
-trait EntryAccessor[+A <: UnreadEntry]{
+trait EntryAccessor[+A <: UnreadEntry] extends UnreadItemAccessor {
 
-  def findAt(position: Int): Option[EntryRow[A]]
-
-  def length: Int
+  def findAt(position: Int): Option[UnreadEntryRow[A]]
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
@@ -23,22 +22,29 @@ trait EntryAccessor[+A <: UnreadEntry]{
 
   def bindViewHolder[B <: ViewHolder]
     (holder: B, position: Int)
-    (block: PartialFunction[(B, Either[EntrySource, A]), Unit]) = {
+    (block: PartialFunction[(B, EntryRowContent[A]), Unit]) = {
 
     findAt(position) -> holder match {
-      case (Some(EntryRow(item)), _) if block isDefinedAt (holder, item) =>
+      case (Some(UnreadEntryRow(item)), _) if block isDefinedAt (holder, item) =>
         block(holder, item)
       case (item, _) =>
         Log error s"unknown item:$item, holder:$holder"
     }
   }
-
+  def createPositionMap[B](f: UnreadRowKind => B): Int => B = {
+    position => findKindAt(position) match {
+      case Some(kind) => f(kind)
+      case None =>
+        throw new IllegalArgumentException(s"row-kind not defined at $position")
+    }
+  }
 }
 
-case class EntryRow[+A <: UnreadEntry](content: Either[EntrySource, A]){
-  val sourceId: Long = content match {
-    case Left(source) => source.sourceId
-    case Right(entry) => entry.sourceId
+case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
+  def sourceId: Option[Long] = content match {
+    case SourceHeadlineContent(sourceId, title) => Some(sourceId)
+    case EntryContent(entry) => Some(entry.sourceId)
+    case FooterContent() => None
   }
 }
 
@@ -99,7 +105,10 @@ class EntryAccessorImpl[A <: UnreadEntry](
   private lazy val sequence = positions.toHeadlines mergeWith entrySequence
 
   override def findAt(position: Int) = {
-    sequence.findAt(position).map(new EntryRow(_))
+    sequence.findAt(position) map {
+      case Left(source) => UnreadEntryRow(source)
+      case Right(entry) => UnreadEntryRow(EntryContent(entry))
+    }
   }
   override lazy val length = {
     sequence.length
@@ -118,7 +127,7 @@ trait EntryFactory[A <: UnreadEntry]{
 }
 
 class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline] {
-  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
+  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
 
   override def createEntry(): UnreadOutline = {
     UnreadOutline(
@@ -133,7 +142,7 @@ class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline]
 }
 
 class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
-  private lazy val cursor = TypedCursor[EntryRecordColumn](rawCursor)
+  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
 
   override def createEntry(): UnreadDetail = {
     UnreadDetail(
@@ -253,7 +262,7 @@ class EntrySequence[A <: UnreadEntry](
   }
 }
 
-class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[EntrySource] {
+class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[SourceHeadlineContent] {
 
   private lazy val countIndex = cursor getColumnIndex "count"
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
@@ -274,7 +283,7 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
     positionMap.getOrElse(position, false)
   }
 
-  def toHeadlines: SequenceHeadlines[EntrySource] = {
+  def toHeadlines: SequenceHeadlines[SourceHeadlineContent] = {
     val list = (0 to cursor.getCount - 1) map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
@@ -285,71 +294,15 @@ class SourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence
 
   override lazy val length: Int = cursor.getCount
 
-  override def findAt(position: Int): Option[EntrySource] = {
+  override def findAt(position: Int): Option[SourceHeadlineContent] = {
     cursor moveToPosition position match {
       case true =>
         val id = cursor getLong sourceIdIndex
-        Some(new EntrySource(
+        Some(new SourceHeadlineContent(
           sourceId = id,
           title = cursor getString titleIndex
         ))
       case false => None
     }
-  }
-}
-case class EntrySource(
-  sourceId: Long,
-  title: String
-)
-
-trait EntryRecordColumn extends TypedFields {
-  def entry_id: Long
-  def source_id: Long
-  def title: String
-  def content: String
-  def url: String
-  def created_at: Int --> Date
-}
-
-case class EntryParts(
-  sourceId: Long,
-  title: String,
-  content: String,
-  url: EntryUrl,
-  createdAt: Date
-)
-object EntryParts {
-  implicit object insertable extends Insertable[EntryParts] {
-    override def tableName: String = "entries"
-    override def toContentValues(target: EntryParts): ContentValues = {
-      val column = TypedFields.expose[EntryRecordColumn]
-      TypedFields toContentValues (
-        column.source_id -> target.sourceId,
-        column.title -> target.title,
-        column.content -> target.content,
-        column.url -> target.url.raw,
-        column.created_at -> target.createdAt
-      )
-    }
-  }
-}
-
-case class RetrievedEntry(
-  title: String,
-  content: String,
-  url: EntryUrl,
-  createdAt: Date
-)
-
-class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
-  def addEntry(entry: RetrievedEntry): Either[SQLException, Long] = {
-    val parts = EntryParts(
-      sourceId = sourceId,
-      title = entry.title,
-      content = entry.content,
-      url = entry.url,
-      createdAt = entry.createdAt
-    )
-    new WritableDatabase(db).insert(parts)
   }
 }

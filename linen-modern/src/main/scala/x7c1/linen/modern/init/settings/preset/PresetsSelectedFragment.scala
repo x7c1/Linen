@@ -41,9 +41,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
       case Right(accessor) =>
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsChannelsAdapter(
-          listener =
-            new SubscriptionChangedUpdater(args.accountId, helper) append
-            new SubscriptionChangedNotifier(getContext),
+          listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected

@@ -2,17 +2,20 @@ package x7c1.linen.modern.init.unread
 
 import android.app.Activity
 import android.graphics.Point
+import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRowEntry, UnreadDetailRowSource, UnreadOutlineRowEntry, UnreadOutlineRowSource, UnreadSourceRow}
-import x7c1.linen.modern.accessor.preset.{PresetAccount, ClientAccount, ClientAccountSetup}
-import x7c1.linen.modern.accessor.{EntryAccessor, LinenOpenHelper, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
+import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.resource.ViewHolderProviders
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -49,13 +52,13 @@ class UnreadItemsDelegatee(
         false
     }
   }
-  private lazy val helper = new LinenOpenHelper(activity)
+  protected lazy val helper = new LinenOpenHelper(activity)
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader =
-    new AccessorLoader(database, layout, activity.getLoaderManager)
-
+  private lazy val loader = AccessorLoader(database, activity){
+    new OnAccessorsLoadedListener(layout).onLoad
+  }
   lazy val container = new PaneContainer(
     view = layout.paneContainer,
     displayWidth = displaySize.x,
@@ -105,11 +108,15 @@ class UnreadItemsDelegatee(
       case Right(account) =>
         Some(account)
     }
-    tmp orElse account
+//    tmp orElse account
+    account
   }
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
+  }
+  def footerHeightOf(recyclerView: RecyclerView, accessor: UnreadItemAccessor) = {
+    recyclerView.getHeight - dipToPixel(10)
   }
   lazy val widthWithMargin: Int = {
     val radius = 20
@@ -138,9 +145,70 @@ class MenuRowProviders(
 )
 
 class UnreadRowProviders(
-  val forSource: ViewHolderProvider[UnreadSourceRow],
-  val forOutlineSource: ViewHolderProvider[UnreadOutlineRowSource],
-  val forOutlineEntry: ViewHolderProvider[UnreadOutlineRowEntry],
-  val forDetailSource: ViewHolderProvider[UnreadDetailRowSource],
-  val forDetailEntry: ViewHolderProvider[UnreadDetailRowEntry]
+  val forSourceArea: SourceListProviders,
+  val forOutlineArea: OutlineListProviders,
+  val forDetailArea: DetailListProviders
 )
+
+class SourceListProviders(
+  val forItem: ViewHolderProvider[UnreadSourceRowItem],
+  val forFooter: ViewHolderProvider[UnreadSourceRowFooter]
+) extends ViewHolderProviders[UnreadSourceRow] {
+
+  override protected val all = Seq(
+    forItem,
+    forFooter
+  )
+  def createViewTyper(accessor: UnreadSourceAccessor): Int => Int = {
+    position =>
+      val provider = if (position == accessor.length - 1){
+        forFooter
+      } else {
+        forItem
+      }
+      provider.layoutId
+  }
+}
+
+trait EntryRowProviders{
+  self: ViewHolderProviders[_] =>
+
+  def forSource: ViewHolderProvider[_]
+  def forEntry: ViewHolderProvider[_]
+  def forFooter: ViewHolderProvider[_]
+
+  def createViewTyper[A <: UnreadEntry](accessor: EntryAccessor[A]): Int => Int = {
+    val map = accessor createPositionMap {
+      case SourceKind => forSource
+      case EntryKind => forEntry
+      case FooterKind => forFooter
+    }
+    position => map(position).layoutId
+  }
+}
+
+class OutlineListProviders(
+  val forSource: ViewHolderProvider[UnreadOutlineRowSource],
+  val forEntry: ViewHolderProvider[UnreadOutlineRowEntry],
+  val forFooter: ViewHolderProvider[UnreadOutlineRowFooter]
+) extends ViewHolderProviders[UnreadOutlineRow] with EntryRowProviders {
+
+  override protected val all = Seq(
+    forSource,
+    forEntry,
+    forFooter
+  )
+}
+
+class DetailListProviders(
+  val forSource: ViewHolderProvider[UnreadDetailRowSource],
+  val forEntry: ViewHolderProvider[UnreadDetailRowEntry],
+  val forFooter: ViewHolderProvider[UnreadDetailRowFooter]
+) extends ViewHolderProviders[UnreadDetailRow] with EntryRowProviders {
+
+  override protected val all = Seq(
+    forSource,
+    forEntry,
+    forFooter
+  )
+}

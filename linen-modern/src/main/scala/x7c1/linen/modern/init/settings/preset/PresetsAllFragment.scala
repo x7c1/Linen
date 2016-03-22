@@ -46,12 +46,9 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
     val tab = args.tabFactory.create(inflater).inflateOn(container)
     presetsAccessor match {
       case Right(accessor) =>
-        val manager = new LinearLayoutManager(getContext)
-        tab.channelList setLayoutManager manager
+        tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsChannelsAdapter(
-          listener =
-            new SubscriptionChangedUpdater(args.accountId, helper) append
-            new SubscriptionChangedNotifier(getContext),
+          listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
           accessor = accessor,
           provider = args.rowFactory create inflater,
           location = PresetTabAll
@@ -67,13 +64,8 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
   }
 }
 
-class SubscriptionChangedNotifier(context: Context) extends ChannelSubscribedListener {
-  override def onSubscribedChanged(event: SubscribeChangedEvent) = {
-    LocalBroadcaster(event) dispatchFrom context
-  }
-}
 class SubscriptionChangedUpdater(
-  accountId0: Long, helper: LinenOpenHelper) extends ChannelSubscribedListener {
+  accountId0: Long, context: Context, helper: LinenOpenHelper) extends OnChannelSubscribedListener {
 
   override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
     val account = new AccountIdentifiable {
@@ -85,16 +77,10 @@ class SubscriptionChangedUpdater(
     } else {
       subscriber unsubscribe event.channelId
     }
+    LocalBroadcaster(event) dispatchFrom context
   }
 }
 
-trait ChannelSubscribedListener { self =>
+trait OnChannelSubscribedListener { self =>
   def onSubscribedChanged(event: SubscribeChangedEvent)
-  def append(listener: ChannelSubscribedListener): ChannelSubscribedListener =
-    new ChannelSubscribedListener {
-      override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
-        self onSubscribedChanged event
-        listener onSubscribedChanged event
-      }
-    }
 }

@@ -5,11 +5,12 @@ import java.net.{HttpURLConnection, URL}
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.modern.accessor.database.SourceRecord
-import x7c1.linen.modern.accessor.{EntryParts, EntryUrl, LinenOpenHelper}
+import x7c1.linen.modern.accessor.database.{EntryParts, SourceRecord}
+import x7c1.linen.modern.accessor.{EntryUrl, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.CallbackTask.{task, using}
+import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.TaskProvider.using
 
 import scala.concurrent.Future
 

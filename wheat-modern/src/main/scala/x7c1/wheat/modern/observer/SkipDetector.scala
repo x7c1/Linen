@@ -107,16 +107,15 @@ trait SkipPositionFinder {
 }
 
 object SkipPositionFinder {
+  import x7c1.wheat.modern.decorator.Imports._
   def createBy(manager: LinearLayoutManager): SkipPositionFinder =
     new SkipPositionFinder {
-      override def findCurrent =
-        manager.findFirstVisibleItemPosition() match {
-          case x if x < 0 => None
-          case x => Some(x)
-        }
-
-      override def findNext = Some {
-        manager.findFirstVisibleItemPosition() + 1
+      override def findCurrent = {
+        manager.firstCompletelyVisiblePosition orElse
+          manager.firstVisiblePosition
+      }
+      override def findNext = {
+        manager.firstVisiblePosition map (_ + 1)
       }
     }
 }

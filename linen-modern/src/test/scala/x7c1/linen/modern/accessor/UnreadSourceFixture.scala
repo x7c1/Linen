@@ -1,5 +1,8 @@
 package x7c1.linen.modern.accessor
 
+import android.database.SQLException
+import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.modern.accessor.database.EntryParts
 import x7c1.linen.modern.struct.Date
 
 class UnreadSourceFixture(helper: LinenOpenHelper) {
@@ -48,4 +51,24 @@ class UnreadSourceFixture(helper: LinenOpenHelper) {
     url = EntryUrl("http://sample-url2-1"),
     createdAt = Date.current()
   )
+}
+
+case class RetrievedEntry(
+  title: String,
+  content: String,
+  url: EntryUrl,
+  createdAt: Date
+)
+
+class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
+  def addEntry(entry: RetrievedEntry): Either[SQLException, Long] = {
+    val parts = EntryParts(
+      sourceId = sourceId,
+      title = entry.title,
+      content = entry.content,
+      url = entry.url,
+      createdAt = entry.createdAt
+    )
+    new WritableDatabase(db).insert(parts)
+  }
 }

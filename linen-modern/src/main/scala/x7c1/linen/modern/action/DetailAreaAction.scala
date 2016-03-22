@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.{RawSourceAccessor, UnreadSourceAccessor, EntryAccessor}
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, DetailSelectedEvent, DetailArea, SourceSelectedEvent}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.display.unread.{DetailArea, DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.modern.struct.UnreadDetail
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.Async.await
@@ -15,31 +15,52 @@ class DetailAreaAction(
   with OnOutlineSelected with OnOutlineFocused with OnOutlineSkipStopped
   with OnDetailSelected with OnDetailFocused with OnDetailSkipped {
 
-  override def onSourceSelected(event: SourceSelectedEvent) = for {
-    _ <- skipTo(event.source.id)
-  } yield ()
+  override def onSourceSelected(event: SourceSelectedEvent) =
+    for {
+      entryPosition <- task {
+        entryAccessor firstEntryPositionOf event.source.id
+      }
+      entry <- task { entryPosition flatMap entryAccessor.findAt }
+    } yield {
+      entryPosition map detailArea.skipTo foreach (_.execute())
+      entry map (_.sourceId) foreach updateToolBarNow
+    }
 
   override def onSourceFocused(event: SourceFocusedEvent) = for {
     _ <- await(100)
-    _ <- skipTo(event.source.id)
-  } yield()
+    entryPosition <- task {
+      event.source.map(_.id) flatMap
+        entryAccessor.firstEntryPositionOf getOrElse
+          entryAccessor.length - 1
+    }
+  } yield {
+    detailArea.skipTo(entryPosition).execute()
+    updateToolBarNow(event.source.map(_.id))
+  }
 
   override def onSourceSkipStopped(event: SourceSkipStopped) = for {
     _ <- await(150)
-    Some(entryPosition) <- task {
-      entryAccessor firstEntryPositionOf event.currentSource.id
-    }
-    Some(entry) <- task {
-      entryAccessor findAt entryPosition
-    }
-    _ <- skipTo(entryPosition, entry.sourceId)
-  } yield ()
+  } yield {
+    val entryPosition = event.currentSource map (_.id) flatMap
+      entryAccessor.firstEntryPositionOf getOrElse
+      (entryAccessor.length - 1)
+
+    detailArea.skipTo(entryPosition).execute()
+    event.currentSource map (_.id) map updateToolbar foreach (_.execute())
+  }
 
   override def onOutlineSelected(event: OutlineSelectedEvent) = {
-    fastScrollTo(event.position, event.entry.sourceId)
+    for {
+      _ <- detailArea fastScrollTo event.position
+      _ <- updateToolbar(event.entry.sourceId)
+    } yield ()
   }
   override def onOutlineFocused(event: OutlineFocusedEvent) = {
-    fastScrollTo(event.position, event.sourceId)
+    for {
+      _ <- detailArea fastScrollTo event.position
+    } yield {
+      updateToolBarNow(event.sourceId)
+    }
   }
   override def onOutlineSkipStopped(event: EntrySkipStopped) = {
     skipTo(event.currentPosition, event.currentSourceId)
@@ -50,30 +71,31 @@ class DetailAreaAction(
   } yield ()
 
   override def onDetailFocused(event: DetailFocusedEvent) =
-    updateToolbar(event.sourceId)
+    updateToolbarIfExist(event.sourceId)
 
   override def onDetailSkipped(event: EntrySkippedEvent) = {
     skipTo(event.nextPosition, event.nextSourceId)
   }
 
-  private def skipTo(position: Int, sourceId: Long) = for {
-    _ <- detailArea skipTo position
-    _ <- updateToolbar(sourceId)
-  } yield ()
+  private def skipTo(position: Int, sourceId: Option[Long]) = {
+    for {
+      _ <- detailArea skipTo position
+      _ <- updateToolbarIfExist(sourceId)
+    } yield ()
+  }
 
-  private def skipTo(sourceId: Long) = for {
-    Some(entryPosition) <- task { entryAccessor firstEntryPositionOf sourceId }
-    Some(entry) <- task { entryAccessor findAt entryPosition }
-    _ <- detailArea skipTo entryPosition
-    _ <- updateToolbar(entry.sourceId)
-  } yield ()
-
-  private def fastScrollTo(entryPosition: Int, sourceId: Long) = for {
-    _ <- detailArea fastScrollTo entryPosition
-    _ <- updateToolbar(sourceId)
-  } yield ()
-
+  private def updateToolBarNow(sourceId: Option[Long]): Unit = {
+    sourceId flatMap
+      rawSourceAccessor.findTitleOf foreach
+        detailArea.updateToolbar
+  }
   private def updateToolbar(sourceId: Long) = task {
     rawSourceAccessor.findTitleOf(sourceId) foreach detailArea.updateToolbar
+  }
+  private def updateToolbarIfExist(sourceId: Option[Long]) = {
+    task {
+      sourceId map
+        updateToolbar foreach (_.execute())
+    }
   }
 }

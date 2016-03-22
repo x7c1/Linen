@@ -7,15 +7,19 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
-import x7c1.linen.glue.res.layout.MenuRow
+import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UpdaterSchedule}
+import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
+import x7c1.linen.modern.accessor.unread.{UnreadChannelAccessor, UnreadChannelLoader}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
+import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.{MenuItems, SingleMenuItem}
+import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
+import x7c1.wheat.modern.decorator.Imports._
 
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
@@ -31,11 +35,25 @@ trait DrawerMenuInitializer {
       params
     }
     clientAccount foreach { account =>
-      layout.menuList setAdapter new DrawerMenuRowAdapter(menuItems(account))
+      val loader = new UnreadChannelLoader(helper, account)
+      val menuItems = createMenuItems(account, loader.accessor)
+      val adapter = new DrawerMenuRowAdapter(menuItems)
+      layout.menuList setAdapter adapter
+
+      val task = loader.startLoading() map {
+        case e: Done =>
+          Log info s"[done]"
+          layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
+        case e: AccessorError =>
+          Log error e.detail
+      }
+      task.execute()
     }
   }
 
-  protected def menuItems(account: ClientAccount): MenuItems[MenuRow] = {
+  private def createMenuItems(
+    account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
+
     val onClick = new OnMenuItemClick(activity, account.accountId)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
@@ -44,7 +62,7 @@ trait DrawerMenuInitializer {
     MenuItems(
       MenuItems(
         title of "Unread Channels",
-        label of NoChannel("(all articles browsed)")
+        new UnreadChannelsMenu(menuRowProviders.forLabel, label, accessor)
       ),
       -----,
       MenuItems(
@@ -64,11 +82,33 @@ trait DrawerMenuInitializer {
 
 }
 
+class UnreadChannelsMenu(
+  viewHolderProvider: ViewHolderProvider[MenuRowLabel],
+  label: DrawerMenuLabelFactory,
+  accessor: UnreadChannelAccessor) extends MenuItem[MenuRowLabel]{
+
+  override def length = Math.max(accessor.length, 1)
+
+  override def findItemAt(position: Int) = {
+    accessor.length match {
+      case 0 => Some(label of NoChannel("(no unread channels)"))
+      case _ => accessor findAt position map { channel =>
+        label of UnreadChannelMenu(
+          channelId = channel.channelId,
+          body = channel.name )
+      }
+    }
+  }
+  override def viewHolderProviders = Seq(viewHolderProvider)
+}
+
 class OnMenuItemClick(
   activity: Activity with ActivityControl,
   accountId: Long ) extends OnMenuItemClickListener {
 
   override def onClick(kind: MenuItemKind): Unit = kind match {
+    case channel: UnreadChannelMenu =>
+      Log info s"$kind, ${channel.channelId}, ${channel.body}"
     case _: NoChannel =>
       Log info s"$kind"
     case _: MyChannels =>

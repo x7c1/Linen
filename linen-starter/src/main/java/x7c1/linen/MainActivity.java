@@ -3,8 +3,13 @@ package x7c1.linen;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import x7c1.linen.base.TransitAnimation;
+import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.MainLayout;
+import x7c1.linen.modern.init.unread.DetailListProviders;
 import x7c1.linen.modern.init.unread.MenuRowProviders;
+import x7c1.linen.modern.init.unread.OutlineListProviders;
+import x7c1.linen.modern.init.unread.SourceListProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
 import x7c1.linen.modern.init.unread.UnreadRowProviders;
 import x7c1.linen.res.layout.MainLayoutProvider;
@@ -12,10 +17,13 @@ import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowEntryProvider;
+import x7c1.linen.res.layout.UnreadDetailRowFooterProvider;
 import x7c1.linen.res.layout.UnreadDetailRowSourceProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowEntryProvider;
+import x7c1.linen.res.layout.UnreadOutlineRowFooterProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowSourceProvider;
-import x7c1.linen.res.layout.UnreadSourceRowProvider;
+import x7c1.linen.res.layout.UnreadSourceRowFooterProvider;
+import x7c1.linen.res.layout.UnreadSourceRowItemProvider;
 
 
 public class MainActivity extends BaseActivity {
@@ -48,11 +56,20 @@ public class MainActivity extends BaseActivity {
 				new MenuRowSeparatorProvider(this)
 			),
 			new UnreadRowProviders(
-				new UnreadSourceRowProvider(this),
-				new UnreadOutlineRowSourceProvider(this),
-				new UnreadOutlineRowEntryProvider(this),
-				new UnreadDetailRowSourceProvider(this),
-				new UnreadDetailRowEntryProvider(this)
+				new SourceListProviders(
+						new UnreadSourceRowItemProvider(this),
+						new UnreadSourceRowFooterProvider(this)
+				),
+				new OutlineListProviders(
+						new UnreadOutlineRowSourceProvider(this),
+						new UnreadOutlineRowEntryProvider(this),
+						new UnreadOutlineRowFooterProvider(this)
+				),
+				new DetailListProviders(
+						new UnreadDetailRowSourceProvider(this),
+						new UnreadDetailRowEntryProvider(this),
+						new UnreadDetailRowFooterProvider(this)
+				)
 			)
 		);
 		initializer.setup();
@@ -68,5 +85,10 @@ public class MainActivity extends BaseActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		return initializer.onKeyDown(keyCode, event) ||
 				super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected TransitAnimation createTransitAnimation() {
+		return TransitAnimations.forRoot(this);
 	}
 }
