@@ -1,8 +1,8 @@
 package x7c1.linen.modern.init.unread
 
-import android.app.LoaderManager
+import android.app.{Activity, LoaderManager}
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.glue.res.layout.MainLayout
 import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
 import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
@@ -10,7 +10,6 @@ import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -19,15 +18,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class AccessorLoader(
+
+class AccessorLoader private (
   database: SQLiteDatabase,
-  layout: MainLayout,
-  loaderManager: LoaderManager ){
+  context: Context,
+  loaderManager: LoaderManager,
+  onLoad: AccessorsLoadedEvent => Unit ){
 
   private val outlineAccessors = ListBuffer[EntryAccessor[UnreadOutline]]()
   private val detailAccessors = ListBuffer[EntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
-    context = layout.itemView.context,
+    context = context,
     loaderManager = loaderManager,
     startLoaderId = 0
   )
@@ -54,7 +55,7 @@ class AccessorLoader(
     val underlying = new EntryAccessorBinder(detailAccessors)
     new EntriesFooterAppender(underlying)
   }
-  def startLoading(account: AccountIdentifiable)(onLoad: () => Unit): Unit = {
+  def startLoading(account: AccountIdentifiable): Unit = {
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
 //      remaining <- loadSourceEntries(sourceIds)
@@ -67,7 +68,7 @@ class AccessorLoader(
     for {
       sourceIds <- startLoadingSources(account.accountId)
       remaining <- loadSourceEntries(sourceIds)
-      _ <- Future { onLoad() }
+      _ <- Future { onLoad(AccessorsLoadedEvent()) }
     } yield {
       remaining
     }
@@ -144,6 +145,17 @@ object AccessorLoader {
   import scalaz.\/.{left, right}
   import scalaz.syntax.std.option._
 
+  def apply
+    (database: SQLiteDatabase, activity: Activity)
+      (listener: AccessorsLoadedEvent => Unit): AccessorLoader = {
+
+    new AccessorLoader(
+      database,
+      activity,
+      activity.getLoaderManager,
+      listener
+    )
+  }
   def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor = {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db) \/> AccountNotFound
@@ -162,6 +174,8 @@ object AccessorLoader {
       case e: Exception => left(Abort(e))
     }
 }
+
+case class AccessorsLoadedEvent()
 
 private class SourceFooterAppender(
   accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {

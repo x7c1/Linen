@@ -10,13 +10,12 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.{UnreadItemAccessor, FooterKind, EntryKind, SourceKind, EntryAccessor, RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.modern.struct.{UnreadEntry, UnreadDetail, UnreadOutline}
+import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.ViewHolderProviders
-import x7c1.wheat.modern.decorator.Imports._
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -36,7 +35,7 @@ class UnreadItemsDelegatee(
     setupEntryDetailArea()
 
     clientAccount match {
-      case Some(account) => loader.startLoading(account)(onUnreadItemsLoaded)
+      case Some(account) => loader.startLoading(account)
       case None => Log error s"account not found"
     }
   }
@@ -44,24 +43,6 @@ class UnreadItemsDelegatee(
     Log info s"[start]"
     loader.close()
     database.close()
-  }
-  private def onUnreadItemsLoaded() = layout.itemView runUi { _ =>
-
-    /*
-    2015-12-20:
-    it should be written like:
-      layout.sourceList.getAdapter.notifyItemRangeInserted(0, ...)
-
-    but this 'notifyItemRangeInserted' causes following error (and crash)
-      java.lang.IndexOutOfBoundsException:
-        Inconsistency detected. Invalid view holder adapter positionViewHolder
-    */
-
-    layout.sourceList.getAdapter.notifyDataSetChanged()
-    layout.entryList.getAdapter.notifyDataSetChanged()
-    layout.entryDetailList.getAdapter.notifyDataSetChanged()
-
-    Log info "[done]"
   }
   def onKeyDown(keyCode: Int, event: KeyEvent): Boolean = {
     keyCode match {
@@ -75,9 +56,9 @@ class UnreadItemsDelegatee(
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader =
-    new AccessorLoader(database, layout, activity.getLoaderManager)
-
+  private lazy val loader = AccessorLoader(database, activity){
+    new OnAccessorsLoadedListener(layout).onLoad
+  }
   lazy val container = new PaneContainer(
     view = layout.paneContainer,
     displayWidth = displaySize.x,
@@ -168,7 +149,6 @@ class UnreadRowProviders(
   val forOutlineArea: OutlineListProviders,
   val forDetailArea: DetailListProviders
 )
-
 
 class SourceListProviders(
   val forItem: ViewHolderProvider[UnreadSourceRowItem],
