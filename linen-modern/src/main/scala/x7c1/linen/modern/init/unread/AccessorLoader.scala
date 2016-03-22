@@ -54,7 +54,7 @@ class AccessorLoader(
     val underlying = new EntryAccessorBinder(detailAccessors)
     new EntriesFooterAppender(underlying)
   }
-  def startLoading(account: AccountIdentifiable): Unit = {
+  def startLoading(account: AccountIdentifiable)(onLoad: () => Unit): Unit = {
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
 //      remaining <- loadSourceEntries(sourceIds)
@@ -67,7 +67,7 @@ class AccessorLoader(
     for {
       sourceIds <- startLoadingSources(account.accountId)
       remaining <- loadSourceEntries(sourceIds)
-      _ <- Future { notifyChanged() }
+      _ <- Future { onLoad() }
     } yield {
       remaining
     }
@@ -132,24 +132,6 @@ class AccessorLoader(
         loadSourceEntries(remaining) onComplete loadNext
       }
     }
-  }
-  private def notifyChanged() = layout.itemView runUi { _ =>
-
-    /*
-    2015-12-20:
-    it should be written like:
-      layout.sourceList.getAdapter.notifyItemRangeInserted(0, ...)
-
-    but this 'notifyItemRangeInserted' causes following error (and crash)
-      java.lang.IndexOutOfBoundsException:
-        Inconsistency detected. Invalid view holder adapter positionViewHolder
-    */
-
-    layout.sourceList.getAdapter.notifyDataSetChanged()
-    layout.entryList.getAdapter.notifyDataSetChanged()
-    layout.entryDetailList.getAdapter.notifyDataSetChanged()
-
-    Log info "[done]"
   }
   private def formatError(e: Throwable) = {
     "[failed] " +
