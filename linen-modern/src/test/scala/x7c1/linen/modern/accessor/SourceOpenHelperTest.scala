@@ -124,8 +124,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db)
       channel <- ChannelAccessor.create(db, accountId).findAt(0)
-      channelId = channel.channelId
-      accessor <- AccessorLoader.inspectSourceAccessor(db, accountId, channelId).toOption
+      either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
+      accessor <- either.right.toOption
     } yield accessor
   }
 }

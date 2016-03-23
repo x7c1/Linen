@@ -86,7 +86,7 @@ class AccessorLoader private (
   private def startLoadingSources(
     accountId: Long, channelId: Long): Future[Seq[Long]] = loaderFactory asFuture {
 
-    inspectSourceAccessor(database, accountId, channelId: Long).toEither match {
+    inspectSourceAccessor(database, accountId, channelId: Long) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         Seq()
@@ -142,8 +142,6 @@ class AccessorLoader private (
 }
 
 object AccessorLoader {
-  import scalaz.\/
-  import scalaz.\/.{left, right}
 
   def apply
     (database: SQLiteDatabase, activity: Activity)
@@ -159,15 +157,13 @@ object AccessorLoader {
 
   def inspectSourceAccessor(
     db: SQLiteDatabase, accountId: Long,
-    channelId: Long): SourceNotLoaded \/ UnreadSourceAccessor =
+    channelId: Long): SourceNotLoaded Either UnreadSourceAccessor =
 
-    try for {
-      accessor <- UnreadSourceAccessor.create(db, accountId, channelId) match {
-        case Failure(exception) => left(Abort(exception))
-        case Success(accessor) => right(accessor)
-      }
-    } yield accessor catch {
-      case e: Exception => left(Abort(e))
+    try UnreadSourceAccessor.create(db, accountId, channelId) match {
+      case Failure(exception) => Left(Abort(exception))
+      case Success(accessor) => Right(accessor)
+    } catch {
+      case e: Exception => Left(Abort(e))
     }
 }
 
