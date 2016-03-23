@@ -62,7 +62,7 @@ trait DrawerMenuInitializer {
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
-    val onClick = new OnMenuItemClick(activity, account.accountId)
+    val onClick = new OnMenuItemClick(activity, account.accountId, onUnreadChannelSelected)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
     val ----- = new SingleMenuItem(menuRowProviders.forSeparator)
@@ -112,11 +112,13 @@ class UnreadChannelsMenu(
 
 class OnMenuItemClick(
   activity: Activity with ActivityControl,
-  accountId: Long ) extends OnMenuItemClickListener {
+  accountId: Long,
+  onUnreadChannelSelected: UnreadChannelMenu => Unit) extends OnMenuItemClickListener {
 
   override def onClick(kind: MenuItemKind): Unit = kind match {
     case channel: UnreadChannelMenu =>
       Log info s"$kind, ${channel.channelId}, ${channel.body}"
+      onUnreadChannelSelected(channel)
     case _: NoChannel =>
       Log info s"$kind"
     case _: MyChannels =>

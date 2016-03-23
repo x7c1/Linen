@@ -12,6 +12,7 @@ import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.Done
 import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.display.unread.MenuItemKind.UnreadChannelMenu
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -55,6 +56,15 @@ class UnreadItemsDelegatee(
       case (None, _) =>
         Log info "no channels"
       case (_, None) =>
+        Log error s"account not found"
+    }
+  }
+  protected def onUnreadChannelSelected(e: UnreadChannelMenu) = {
+    clientAccount match {
+      case Some(account) =>
+        Log info s"[start]"
+        loader.restartLoading(account, e.channelId)
+      case None =>
         Log error s"account not found"
     }
   }

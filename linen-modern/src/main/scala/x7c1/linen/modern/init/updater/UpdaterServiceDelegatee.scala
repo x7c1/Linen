@@ -93,7 +93,7 @@ class UpdaterMethods(
 }
 
 object ThrowableFormatter {
-  def format[A <: Throwable](e: A)(message: String) = {
-    (message +: e.getMessage +: e.getStackTrace) take 15 mkString "\n"
+  def format[A <: Throwable](e: A, depth: Int = 15)(message: String) = {
+    (message +: e.getMessage +: e.getStackTrace) take depth mkString "\n"
   }
 }

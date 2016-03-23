@@ -4,9 +4,10 @@ import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.accessor.AccountIdentifiable
-import x7c1.linen.modern.accessor.unread.{ClosableSourceAccessor, ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.modern.accessor.unread.{ClosableEntryAccessor, ClosableSourceAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, ErrorEmpty}
+import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -68,12 +69,35 @@ class AccessorLoader private (
 //    first onComplete loadNext
 
     for {
-      sourceIds <- startLoadingSources(account.accountId, channelId)
-      event <- loadSourceEntries(sourceIds)
-      remaining = Future { updateAccessors(event) }
+      accessor <- startLoadingSources(account.accountId, channelId)
+      event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
+      remaining = Future {
+        this.sourceAccessor = accessor
+        updateAccessors(event)
+      }
       _ <- Future { onLoad(event) }
     } yield {
       remaining
+    }
+  }
+  def restartLoading(account: AccountIdentifiable, channelId: Long): Unit = {
+    val f = for {
+      accessor <- startLoadingSources(account.accountId, channelId)
+      event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
+      _ <- Future {
+        close()
+        this.sourceAccessor = accessor
+        updateAccessors(event)
+      }
+      _ <- Future { onLoad(event) }
+    } yield {
+      event.remainingSourceIds
+    }
+    f.onComplete {
+      case Success(sourceIds) =>
+        Log info s"[done] remains:${sourceIds.length}"
+      case Failure(e) =>
+        Log error format(e, depth = 30){"[failed]"}
     }
   }
 
@@ -92,21 +116,24 @@ class AccessorLoader private (
     }
   }
   private def startLoadingSources(
-    accountId: Long, channelId: Long): Future[Seq[Long]] = loaderFactory asFuture {
+    accountId: Long, channelId: Long): Future[Option[ClosableSourceAccessor]] = loaderFactory asFuture {
 
     inspectSourceAccessor(database, accountId, channelId: Long) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         Seq()
+        None
       case Left(empty) =>
         Log info empty.message
         Seq()
+        None
       case Right(accessor) =>
-        this.sourceAccessor = Some(accessor)
-        accessor.sourceIds
+        Some(accessor)
     }
   }
   private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
+    Log info s"[init] remains:${remainingSourceIds.length}"
+
     val (sourceIds, remains) = remainingSourceIds splitAt 50
     val (outlines, details) =
       if (sourceIds.nonEmpty) {
@@ -126,6 +153,8 @@ class AccessorLoader private (
     )
   }
   private def updateAccessors(event: AccessorsLoadedEvent) = {
+    Log info s"[init] sourceIds.length:${event.loadedSourceIds.length}"
+
     val sourceIds = event.loadedSourceIds
     if (sourceIds.nonEmpty){
       val positions = EntryAccessor.createPositionMap(database, sourceIds)
@@ -154,7 +183,7 @@ class AccessorLoader private (
     case Failure(e) => Log error formatError(e)
   }
   private def loadMore(remaining: Seq[Long]): Unit = {
-    Log info s"[init] remaining(${remaining.length})"
+    Log info s"[init] remaining:${remaining.length}"
     remaining match {
       case Seq() => Log info "[done]"
       case _ => after(msec = 50){
@@ -169,7 +198,6 @@ class AccessorLoader private (
 }
 
 object AccessorLoader {
-
   def apply
     (database: SQLiteDatabase, activity: Activity)
       (listener: AccessorsLoadedEvent => Unit): AccessorLoader = {

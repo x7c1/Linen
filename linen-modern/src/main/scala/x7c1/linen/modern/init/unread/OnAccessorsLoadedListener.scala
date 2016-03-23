@@ -7,6 +7,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class OnAccessorsLoadedListener(layout: MainLayout){
   def onLoad(e: AccessorsLoadedEvent): Unit = {
+    Log info s"[init] $e"
     layout.itemView runUi { _ =>
 
       /*
@@ -22,8 +23,6 @@ class OnAccessorsLoadedListener(layout: MainLayout){
       layout.sourceList.getAdapter.notifyDataSetChanged()
       layout.entryList.getAdapter.notifyDataSetChanged()
       layout.entryDetailList.getAdapter.notifyDataSetChanged()
-
-      Log info "[done]"
     }
   }
 }
