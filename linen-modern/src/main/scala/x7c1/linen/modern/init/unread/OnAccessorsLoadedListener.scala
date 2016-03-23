@@ -1,11 +1,12 @@
 package x7c1.linen.modern.init.unread
 
 import x7c1.linen.glue.res.layout.MainLayout
+import x7c1.linen.modern.action.DrawerAction
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 
-class OnAccessorsLoadedListener(layout: MainLayout){
+class OnAccessorsLoadedListener(layout: MainLayout, drawer: DrawerAction){
   def onLoad(e: AccessorsLoadedEvent): Unit = {
     Log info s"[init] $e"
     layout.itemView runUi { _ =>
@@ -23,6 +24,8 @@ class OnAccessorsLoadedListener(layout: MainLayout){
       layout.sourceList.getAdapter.notifyDataSetChanged()
       layout.entryList.getAdapter.notifyDataSetChanged()
       layout.entryDetailList.getAdapter.notifyDataSetChanged()
+
+      drawer.onBack()
     }
   }
 }

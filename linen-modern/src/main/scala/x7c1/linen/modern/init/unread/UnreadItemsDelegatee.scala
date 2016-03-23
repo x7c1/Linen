@@ -73,7 +73,7 @@ class UnreadItemsDelegatee(
   private lazy val database = helper.getReadableDatabase
 
   private lazy val loader = AccessorLoader(database, activity){
-    new OnAccessorsLoadedListener(layout).onLoad
+    new OnAccessorsLoadedListener(layout, actions.drawer).onLoad
   }
   lazy val container = new PaneContainer(
     view = layout.paneContainer,
