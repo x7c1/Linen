@@ -180,7 +180,7 @@ class AccessorLoader private (
       */
       Log info e.toString
 
-    case Failure(e) => Log error formatError(e)
+    case Failure(e) => Log error format(e, depth = 30){"failed"}
   }
   private def loadMore(remaining: Seq[Long]): Unit = {
     Log info s"[init] remaining:${remaining.length}"
@@ -190,10 +190,6 @@ class AccessorLoader private (
         loadSourceEntries(remaining) map updateAccessors onComplete loadNext
       }
     }
-  }
-  private def formatError(e: Throwable) = {
-    "[failed] " +
-      (e.toString +: e.getStackTrace.take(30) mkString "\n")
   }
 }
 
