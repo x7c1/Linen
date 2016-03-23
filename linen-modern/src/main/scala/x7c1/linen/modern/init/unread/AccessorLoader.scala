@@ -3,11 +3,10 @@ package x7c1.linen.modern.init.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.ChannelAccessor.findCurrentChannelId
+import x7c1.linen.modern.accessor.AccountIdentifiable
 import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountIdentifiable}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
-import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, AccountNotFound, ChannelNotFound, ErrorEmpty}
+import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -55,7 +54,7 @@ class AccessorLoader private (
     val underlying = new EntryAccessorBinder(detailAccessors)
     new EntriesFooterAppender(underlying)
   }
-  def startLoading(account: AccountIdentifiable): Unit = {
+  def startLoading(account: AccountIdentifiable, channelId: Long): Unit = {
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
 //      remaining <- loadSourceEntries(sourceIds)
@@ -66,7 +65,7 @@ class AccessorLoader private (
 //    first onComplete loadNext
 
     for {
-      sourceIds <- startLoadingSources(account.accountId)
+      sourceIds <- startLoadingSources(account.accountId, channelId)
       remaining <- loadSourceEntries(sourceIds)
       _ <- Future { onLoad(AccessorsLoadedEvent()) }
     } yield {
@@ -84,8 +83,10 @@ class AccessorLoader private (
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources(accountId: Long): Future[Seq[Long]] = loaderFactory asFuture {
-    inspectSourceAccessor(database, accountId).toEither match {
+  private def startLoadingSources(
+    accountId: Long, channelId: Long): Future[Seq[Long]] = loaderFactory asFuture {
+
+    inspectSourceAccessor(database, accountId, channelId: Long).toEither match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         Seq()
@@ -143,7 +144,6 @@ class AccessorLoader private (
 object AccessorLoader {
   import scalaz.\/
   import scalaz.\/.{left, right}
-  import scalaz.syntax.std.option._
 
   def apply
     (database: SQLiteDatabase, activity: Activity)
@@ -156,16 +156,12 @@ object AccessorLoader {
       listener
     )
   }
-  def inspectSourceAccessor(db: SQLiteDatabase): SourceNotLoaded \/ UnreadSourceAccessor = {
-    for {
-      accountId <- AccountAccessor.findCurrentAccountId(db) \/> AccountNotFound
-      accessor <- inspectSourceAccessor(db, accountId)
-    } yield accessor
-  }
 
-  def inspectSourceAccessor(db: SQLiteDatabase, accountId: Long): SourceNotLoaded \/ UnreadSourceAccessor =
+  def inspectSourceAccessor(
+    db: SQLiteDatabase, accountId: Long,
+    channelId: Long): SourceNotLoaded \/ UnreadSourceAccessor =
+
     try for {
-      channelId <- findCurrentChannelId(db, accountId) \/> ChannelNotFound(accountId)
       accessor <- UnreadSourceAccessor.create(db, accountId, channelId) match {
         case Failure(exception) => left(Abort(exception))
         case Success(accessor) => right(accessor)

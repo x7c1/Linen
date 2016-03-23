@@ -67,7 +67,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
 
@@ -93,7 +93,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val query = EntryAccessor.createPositionQuery(sourceIds)
     val plans = QueryExplainer(db).explain(query)
@@ -112,13 +112,21 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new LinenOpenHelper(context).getReadableDatabase
-    val Right(sourceAccessor) = AccessorLoader.inspectSourceAccessor(db).toEither
+    val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
 
     assertEquals(Some(SourceKind), accessor.findKindAt(0))
     assertEquals(Some(EntryKind), accessor.findKindAt(1))
+  }
+  def inspectSourceAccessor(db: SQLiteDatabase) = {
+    for {
+      accountId <- AccountAccessor.findCurrentAccountId(db)
+      channel <- ChannelAccessor.create(db, accountId).findAt(0)
+      channelId = channel.channelId
+      accessor <- AccessorLoader.inspectSourceAccessor(db, accountId, channelId).toOption
+    } yield accessor
   }
 }
 

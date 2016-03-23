@@ -10,6 +10,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
+import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.Done
 import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
@@ -29,15 +30,10 @@ class UnreadItemsDelegatee(
   with DetailAreaInitializer {
 
   def setup(): Unit = {
-    setupDrawerMenu()
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
-
-    clientAccount match {
-      case Some(account) => loader.startLoading(account)
-      case None => Log error s"account not found"
-    }
+    setupDrawerMenu(onMenuLoaded)
   }
   def close(): Unit = {
     Log info s"[start]"
@@ -50,6 +46,16 @@ class UnreadItemsDelegatee(
         actions.drawer.onBack() || actions.container.onBack()
       case _ =>
         false
+    }
+  }
+  private def onMenuLoaded(e: Done) = {
+    (e.firstChannelId, clientAccount) match {
+      case (Some(channelId), Some(account)) =>
+        loader.startLoading(account, channelId)
+      case (None, _) =>
+        Log info "no channels"
+      case (_, None) =>
+        Log error s"account not found"
     }
   }
   protected lazy val helper = new LinenOpenHelper(activity)

@@ -59,6 +59,8 @@ private class InternalChannelAccessor(raw: Cursor) extends UnreadChannelAccessor
   override def length = raw.getCount
 
   def closeCursor(): Unit = raw.close()
+
+  def firstChannelId: Option[Long] = findAt(0).map(_.channelId)
 }
 
 trait UnreadChannelRecord extends TypedFields {
@@ -83,7 +85,7 @@ class UnreadChannelLoader(helper: LinenOpenHelper, client: ClientAccount){
     case Right(loadedAccessor) =>
       Log info s"[done]"
       holder updateAccessor loadedAccessor
-      new Done(client)
+      new Done(client, loadedAccessor.firstChannelId)
     case Left(error) =>
       Log info s"[failed]"
       new AccessorError(error)

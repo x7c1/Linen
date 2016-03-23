@@ -5,12 +5,13 @@ import java.lang.Math.min
 import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView.Adapter
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
-import x7c1.linen.modern.accessor.unread.{UnreadChannelAccessor, UnreadChannelLoader}
+import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
@@ -18,13 +19,15 @@ import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
 
-  def setupDrawerMenu(): Unit = {
+  type OnChannelLoaded = Done => Unit
+
+  def setupDrawerMenu(listener: OnChannelLoaded): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuArea setLayoutParams {
@@ -40,15 +43,20 @@ trait DrawerMenuInitializer {
       val adapter = new DrawerMenuRowAdapter(menuItems)
       layout.menuList setAdapter adapter
 
-      val task = loader.startLoading() map {
-        case e: Done =>
-          Log info s"[done]"
-          layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
-        case e: AccessorError =>
-          Log error e.detail
-      }
+      val task = loader.startLoading() map onLoad(adapter, listener)
       task.execute()
     }
+  }
+  private def onLoad(
+    adapter: Adapter[_],
+    listener: OnChannelLoaded): ChannelLoaderEvent => Unit = {
+
+    case e: Done =>
+      Log info s"[done]"
+      layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
+      listener(e)
+    case e: AccessorError =>
+      Log error e.detail
   }
 
   private def createMenuItems(
