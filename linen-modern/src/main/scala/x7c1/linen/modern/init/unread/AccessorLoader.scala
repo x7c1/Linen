@@ -4,7 +4,7 @@ import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.accessor.AccountIdentifiable
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.modern.accessor.unread.{ClosableSourceAccessor, ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
@@ -24,14 +24,14 @@ class AccessorLoader private (
   loaderManager: LoaderManager,
   onLoad: AccessorsLoadedEvent => Unit ){
 
-  private val outlineAccessors = ListBuffer[EntryAccessor[UnreadOutline]]()
-  private val detailAccessors = ListBuffer[EntryAccessor[UnreadDetail]]()
+  private val outlineAccessors = ListBuffer[ClosableEntryAccessor[UnreadOutline]]()
+  private val detailAccessors = ListBuffer[ClosableEntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
     context = context,
     loaderManager = loaderManager,
     startLoaderId = 0
   )
-  private var sourceAccessor: Option[UnreadSourceAccessor] = None
+  private var sourceAccessor: Option[ClosableSourceAccessor] = None
   private var currentSourceLength: Int = 0
 
   def createSourceAccessor: UnreadSourceAccessor = {
@@ -46,13 +46,16 @@ class AccessorLoader private (
     }
     new SourceFooterAppender(underlying)
   }
+  private lazy val outlineUnderlying = new EntryAccessorBinder(outlineAccessors)
+
   def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
-    val underlying = new EntryAccessorBinder(outlineAccessors)
-    new EntriesFooterAppender(underlying)
+    new EntriesFooterAppender(outlineUnderlying)
   }
+
+  private lazy val detailUnderlying = new EntryAccessorBinder(detailAccessors)
+
   def createDetailAccessor: EntryAccessor[UnreadDetail] = {
-    val underlying = new EntryAccessorBinder(detailAccessors)
-    new EntriesFooterAppender(underlying)
+    new EntriesFooterAppender(detailUnderlying)
   }
   def startLoading(account: AccountIdentifiable, channelId: Long): Unit = {
 //    val first = for {
@@ -66,8 +69,9 @@ class AccessorLoader private (
 
     for {
       sourceIds <- startLoadingSources(account.accountId, channelId)
-      remaining <- loadSourceEntries(sourceIds)
-      _ <- Future { onLoad(AccessorsLoadedEvent()) }
+      event <- loadSourceEntries(sourceIds)
+      remaining = Future { updateAccessors(event) }
+      _ <- Future { onLoad(event) }
     } yield {
       remaining
     }
@@ -77,6 +81,10 @@ class AccessorLoader private (
     loaderFactory.close()
 
     synchronized {
+      outlineUnderlying.close()
+      detailUnderlying.close()
+      sourceAccessor foreach (_.close())
+
       currentSourceLength = 0
       sourceAccessor = None
       outlineAccessors.clear()
@@ -100,6 +108,25 @@ class AccessorLoader private (
   }
   private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
     val (sourceIds, remains) = remainingSourceIds splitAt 50
+    val (outlines, details) =
+      if (sourceIds.nonEmpty) {
+        val positions = EntryAccessor.createPositionMap(database, sourceIds)
+        val outlines = Option(EntryAccessor.forEntryOutline(database, sourceIds, positions))
+        val details = Option(EntryAccessor.forEntryDetail(database, sourceIds, positions))
+        outlines -> details
+      } else {
+        None -> None
+      }
+
+    AccessorsLoadedEvent(
+      loadedSourceIds = sourceIds,
+      remainingSourceIds = remains,
+      outlines = outlines,
+      details = details
+    )
+  }
+  private def updateAccessors(event: AccessorsLoadedEvent) = {
+    val sourceIds = event.loadedSourceIds
     if (sourceIds.nonEmpty){
       val positions = EntryAccessor.createPositionMap(database, sourceIds)
       val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
@@ -110,7 +137,7 @@ class AccessorLoader private (
         detailAccessors += details
       }
     }
-    remains
+    event.remainingSourceIds
   }
   private def loadNext: Try[Seq[Long]] => Unit = {
     case Success(ids) => loadMore(ids)
@@ -131,7 +158,7 @@ class AccessorLoader private (
     remaining match {
       case Seq() => Log info "[done]"
       case _ => after(msec = 50){
-        loadSourceEntries(remaining) onComplete loadNext
+        loadSourceEntries(remaining) map updateAccessors onComplete loadNext
       }
     }
   }
@@ -157,7 +184,7 @@ object AccessorLoader {
 
   def inspectSourceAccessor(
     db: SQLiteDatabase, accountId: Long,
-    channelId: Long): SourceNotLoaded Either UnreadSourceAccessor =
+    channelId: Long): SourceNotLoaded Either ClosableSourceAccessor =
 
     try UnreadSourceAccessor.create(db, accountId, channelId) match {
       case Failure(exception) => Left(Abort(exception))
@@ -167,7 +194,12 @@ object AccessorLoader {
     }
 }
 
-case class AccessorsLoadedEvent()
+case class AccessorsLoadedEvent(
+  loadedSourceIds: Seq[Long],
+  remainingSourceIds: Seq[Long],
+  outlines: Option[ClosableEntryAccessor[UnreadOutline]],
+  details: Option[ClosableEntryAccessor[UnreadDetail]]
+)
 
 private class SourceFooterAppender(
   accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {

@@ -40,6 +40,10 @@ trait EntryAccessor[+A <: UnreadEntry] extends UnreadItemAccessor {
   }
 }
 
+trait ClosableEntryAccessor[+A <: UnreadEntry] extends EntryAccessor[A]{
+  def close(): Unit
+}
+
 case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
   def sourceId: Option[Long] = content match {
     case SourceHeadlineContent(sourceId, title) => Some(sourceId)
@@ -49,7 +53,7 @@ case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
 }
 
 class EntryAccessorBinder[A <: UnreadEntry](
-  accessors: Seq[EntryAccessor[A]]) extends EntryAccessor[A]{
+  accessors: Seq[ClosableEntryAccessor[A]]) extends ClosableEntryAccessor[A]{
 
   override def findAt(position: Int) = {
     findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
@@ -96,11 +100,15 @@ class EntryAccessorBinder[A <: UnreadEntry](
     }
   }
 
+  override def close(): Unit = synchronized {
+    accessors foreach (_.close())
+  }
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
   entrySequence: EntrySequence[A],
-  positions: SourcePositions) extends EntryAccessor[A] {
+  positions: SourcePositions,
+  cursor: Cursor ) extends ClosableEntryAccessor[A] {
 
   private lazy val sequence = positions.toHeadlines mergeWith entrySequence
 
@@ -120,6 +128,7 @@ class EntryAccessorImpl[A <: UnreadEntry](
     val kind = if (positions isSource position) SourceKind else EntryKind
     Some(kind)
   }
+  override def close(): Unit = cursor.close()
 }
 
 trait EntryFactory[A <: UnreadEntry]{
@@ -160,21 +169,21 @@ object EntryAccessor {
 
   def forEntryOutline(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positions: SourcePositions): EntryAccessor[UnreadOutline] = {
+    positions: SourcePositions): ClosableEntryAccessor[UnreadOutline] = {
 
     val cursor = createOutlineCursor(db, sourceIds)
     val factory = new EntryOutlineFactory(cursor)
     val sequence = new EntrySequence(factory, cursor)
-    new EntryAccessorImpl(sequence, positions)
+    new EntryAccessorImpl(sequence, positions, cursor)
   }
   def forEntryDetail(
     db: SQLiteDatabase, sourceIds: Seq[Long],
-    positions: SourcePositions): EntryAccessor[UnreadDetail] = {
+    positions: SourcePositions): ClosableEntryAccessor[UnreadDetail] = {
 
     val cursor = createDetailCursor(db, sourceIds)
     val factory = new EntryDetailFactory(cursor)
     val sequence = new EntrySequence(factory, cursor)
-    new EntryAccessorImpl(sequence, positions)
+    new EntryAccessorImpl(sequence, positions, cursor)
   }
 
   def createOutlineCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
