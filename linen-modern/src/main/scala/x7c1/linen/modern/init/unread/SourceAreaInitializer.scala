@@ -12,11 +12,7 @@ trait SourceAreaInitializer {
   self: UnreadItemsDelegatee =>
 
   def setupSourceArea(): Unit = {
-    layout.sourceArea setLayoutParams {
-      val params = layout.sourceArea.getLayoutParams
-      params.width = widthWithMargin
-      params
-    }
+    layout.sourceArea updateLayoutParams { _.width = widthWithMargin }
     layout.sourceToolbar setTitle "Technology"
     layout.sourceToolbar onClickNavigation { _ =>
       layout.drawerMenu openDrawer START

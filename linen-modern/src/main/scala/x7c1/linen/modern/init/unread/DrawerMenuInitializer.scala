@@ -28,12 +28,10 @@ trait DrawerMenuInitializer {
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
-    layout.menuArea setLayoutParams {
-      val params = layout.menuArea.getLayoutParams
+    layout.menuArea updateLayoutParams { params =>
       val maxWidth = dipToPixel(320)
       val defaultWidth = displaySize.x - dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
-      params
     }
     clientAccount foreach { account =>
       val loader = new UnreadChannelLoader(helper, account)

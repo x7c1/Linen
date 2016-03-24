@@ -15,11 +15,7 @@ trait DetailAreaInitializer {
   self: UnreadItemsDelegatee =>
 
   def setupEntryDetailArea(): Unit = {
-    layout.entryDetailArea setLayoutParams {
-      val params = layout.entryDetailArea.getLayoutParams
-      params.width = displaySize.x
-      params
-    }
+    layout.entryDetailArea updateLayoutParams { _.width = displaySize.x }
     layout.entryDetailToolbar onClickNavigation { _ =>
       actions.container.onBack()
     }
