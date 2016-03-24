@@ -25,9 +25,7 @@ import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
 
-  type OnChannelLoaded = Done => Unit
-
-  def setupDrawerMenu(listener: OnChannelLoaded): Unit = {
+  def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuArea setLayoutParams {
@@ -43,18 +41,15 @@ trait DrawerMenuInitializer {
       val adapter = new DrawerMenuRowAdapter(menuItems)
       layout.menuList setAdapter adapter
 
-      val task = loader.startLoading() map onLoad(adapter, listener)
+      val task = loader.startLoading() map onLoad(adapter)
       task.execute()
     }
   }
-  private def onLoad(
-    adapter: Adapter[_],
-    listener: OnChannelLoaded): ChannelLoaderEvent => Unit = {
-
+  private def onLoad(adapter: Adapter[_]): ChannelLoaderEvent => Unit = {
     case e: Done =>
       Log info s"[done]"
       layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
-      listener(e)
+      reader onMenuLoaded e
     case e: AccessorError =>
       Log error e.detail
   }
@@ -62,7 +57,7 @@ trait DrawerMenuInitializer {
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
-    val onClick = new OnMenuItemClick(activity, account.accountId, onUnreadChannelSelected)
+    val onClick = new OnMenuItemClick(activity, account.accountId, reader.reloadChannel)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
     val ----- = new SingleMenuItem(menuRowProviders.forSeparator)

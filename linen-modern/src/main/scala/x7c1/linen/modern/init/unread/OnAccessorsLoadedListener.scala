@@ -23,6 +23,7 @@ class OnAccessorsLoadedListener(layout: MainLayout, drawer: => DrawerAction){
     } yield ()).execute()
   }
   private def updateAdapter() = {
+
     /*
     2015-12-20:
     it should be written like:
@@ -32,6 +33,7 @@ class OnAccessorsLoadedListener(layout: MainLayout, drawer: => DrawerAction){
       java.lang.IndexOutOfBoundsException:
         Inconsistency detected. Invalid view holder adapter positionViewHolder
     */
+
     layout.sourceList.getAdapter.notifyDataSetChanged()
     layout.entryList.getAdapter.notifyDataSetChanged()
     layout.entryDetailList.getAdapter.notifyDataSetChanged()

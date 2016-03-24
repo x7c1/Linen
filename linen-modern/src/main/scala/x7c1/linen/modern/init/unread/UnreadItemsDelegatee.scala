@@ -10,8 +10,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.Done
-import x7c1.linen.modern.accessor.unread.{ChannelSelectable, EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -33,7 +32,7 @@ class UnreadItemsDelegatee(
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
-    setupDrawerMenu(onMenuLoaded)
+    setupDrawerMenu()
   }
   def close(): Unit = {
     Log info s"[start]"
@@ -48,40 +47,16 @@ class UnreadItemsDelegatee(
         false
     }
   }
-  private def onMenuLoaded(e: Done) = {
-    e.headChannel match {
-      case Some(channel) =>
-        onUnreadChannelLoaded(channel)
-      case None =>
-        Log info "no channels"
-    }
-  }
-  protected def onUnreadChannelLoaded[A: ChannelSelectable](channel: A) = {
-    clientAccount match {
-      case Some(account) =>
-        Log info s"[start]"
-        loader.startLoading(account, channel)(onAccessorsLoaded.onLoad[A])
-      case None =>
-        Log error s"account not found"
-    }
-  }
-
-  protected def onUnreadChannelSelected[A: ChannelSelectable](channel: A) = {
-    clientAccount match {
-      case Some(account) =>
-        Log info s"[start]"
-        loader.restartLoading(account, channel)(onAccessorsLoaded.onLoad[A])
-      case None =>
-        Log error s"account not found"
-    }
-  }
   protected lazy val helper = new LinenOpenHelper(activity)
 
+  protected lazy val reader = new UnreadChannelsReader(
+    client = clientAccount,
+    loader = loader,
+    onLoaded = new OnAccessorsLoadedListener(layout, actions.drawer)
+  )
   private lazy val database = helper.getReadableDatabase
 
   private lazy val loader = AccessorLoader(database, activity)
-
-  private lazy val onAccessorsLoaded = new OnAccessorsLoadedListener(layout, actions.drawer)
 
   lazy val container = new PaneContainer(
     view = layout.paneContainer,

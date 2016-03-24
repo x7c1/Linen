@@ -13,4 +13,3 @@ object ChannelLoaderEvent {
     def detail: String = error.detail
   }
 }
-
