@@ -17,7 +17,10 @@ class OnAccessorsLoadedListener(layout: MainLayout, drawer: => DrawerAction){
       ui <- task {
         UiThread via layout.itemView
       }
-      _ <- ui { _ => updateAdapter() }
+      _ <- ui { _ =>
+        layout.sourceToolbar setTitle e.channelName
+        updateAdapter()
+      }
       _ <- await(50)
       _ <- ui { _ => drawer.onBack() }
     } yield ()).execute()
