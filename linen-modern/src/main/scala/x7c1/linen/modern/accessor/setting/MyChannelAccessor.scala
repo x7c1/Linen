@@ -1,13 +1,13 @@
 package x7c1.linen.modern.accessor.setting
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.database.ChannelRecord
-import x7c1.linen.modern.struct.Channel
-import x7c1.wheat.macros.database.TypedCursor
+import x7c1.linen.modern.accessor.database.{ChannelRecord, ChannelStatusRecord}
+import x7c1.linen.modern.struct.Date
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 trait MyChannelAccessor {
   def accountId: Long
-  def findAt(position: Int): Option[Channel]
+  def findAt(position: Int): Option[SettingMyChannel]
   def length: Int
 }
 
@@ -31,15 +31,16 @@ object MyChannelAccessor {
 
       db.rawQuery(sql1, Array(accountId.toString))
     }
-    private lazy val cursor = TypedCursor[ChannelRecord](rawCursor)
+    private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
 
     override def findAt(position: Int) =
       cursor.moveToFind(position){
-        Channel(
+        SettingMyChannel(
           channelId = cursor._id,
           name = cursor.name,
           description = cursor.description,
-          createdAt = cursor.created_at.typed
+          createdAt = cursor.created_at.typed,
+          isSubscribed = cursor.subscribed == 1
         )
       }
 
@@ -48,3 +49,15 @@ object MyChannelAccessor {
     }
   }
 }
+
+trait MyChannelRecord extends TypedFields
+  with ChannelRecord
+  with ChannelStatusRecord
+
+case class SettingMyChannel(
+  channelId: Long,
+  name: String,
+  description: String,
+  createdAt: Date,
+  isSubscribed: Boolean
+)

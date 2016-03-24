@@ -20,8 +20,9 @@ class SettingChannelsDelegatee (
   layout: SettingChannelsLayout,
   channelRowProvider: ViewHolderProvider[SettingChannelsRow] ){
 
-  private lazy val database =
-    new LinenOpenHelper(activity).getReadableDatabase
+  private lazy val helper = new LinenOpenHelper(activity)
+
+  private lazy val database = helper.getReadableDatabase
 
   def setup(): Unit = {
     layout.toolbar onClickNavigation { _ =>
@@ -34,13 +35,22 @@ class SettingChannelsDelegatee (
   }
   def showMyChannels(accountId: Long) = {
     layout.channelList setAdapter new ChannelRowAdapter(
-      accessor = ChannelAccessor.create(database, accountId),
+      accessor = MyChannelAccessor.create(database, accountId),
       viewHolderProvider = channelRowProvider,
-      onSources = new OnChannelSources(activity)
+      onSources = new OnChannelSources(activity),
+      onSubscribeChanged = {
+        val listener = new MyChannelSubscribeChangedListener(
+          context = activity,
+          helper = helper,
+          account = AccountIdentifiable(accountId)
+        )
+        listener.updateSubscription
+      }
     )
   }
   def close(): Unit = {
     database.close()
+    helper.close()
     Log info "[done]"
   }
 }
@@ -57,5 +67,21 @@ class OnChannelSources(activity: Activity with ActivityControl)
       }
 
     activity startActivityBy intent
+  }
+}
+
+class MyChannelSubscribeChangedListener(
+  context: Context,
+  helper: LinenOpenHelper,
+  account: AccountIdentifiable){
+
+  def updateSubscription(event: MyChannelSubscribeChanged): Unit = {
+    val subscriber = new ChannelSubscriber(account, helper)
+    if (event.isSubscribed){
+      subscriber subscribe event.channelId
+    } else {
+      subscriber unsubscribe event.channelId
+    }
+    LocalBroadcaster(event) dispatchFrom context
   }
 }
