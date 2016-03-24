@@ -1,14 +1,17 @@
 package x7c1.linen.modern.init.settings
 
 import android.app.Activity
+import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingChannelSources
 import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingChannelsRow}
-import x7c1.linen.modern.accessor.{ChannelAccessor, LinenOpenHelper}
-import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesEvent, OnChannelSourcesListener}
+import x7c1.linen.modern.accessor.database.ChannelSubscriber
+import x7c1.linen.modern.accessor.setting.MyChannelAccessor
+import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
+import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesEvent, MyChannelSubscribeChanged, OnChannelSourcesListener}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory}
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 

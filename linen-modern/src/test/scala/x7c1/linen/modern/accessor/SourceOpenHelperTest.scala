@@ -7,7 +7,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.unread.{UnreadSource, UnreadSourceRow, UnreadEntryRow, EntryAccessor, SourceKind, EntryKind, EntryContent, UnreadSourceAccessor, UnreadSourceAccessorQueries}
+import x7c1.linen.modern.accessor.setting.MyChannelAccessor
+import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, EntryKind, SourceKind, UnreadEntryRow, UnreadSource, UnreadSourceAccessor, UnreadSourceAccessorQueries, UnreadSourceRow}
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.unread.AccessorLoader
 
@@ -123,7 +124,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   def inspectSourceAccessor(db: SQLiteDatabase) = {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db)
-      channel <- ChannelAccessor.create(db, accountId).findAt(0)
+      channel <- MyChannelAccessor.create(db, accountId).findAt(0)
       either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
       accessor <- either.right.toOption
     } yield accessor

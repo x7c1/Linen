@@ -82,5 +82,5 @@ class SubscriptionChangedUpdater(
 }
 
 trait OnChannelSubscribedListener { self =>
-  def onSubscribedChanged(event: SubscribeChangedEvent)
+  def onSubscribedChanged(event: SubscribeChangedEvent): Unit
 }
