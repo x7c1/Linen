@@ -52,7 +52,12 @@ class UnreadItemsDelegatee(
   protected lazy val reader = new UnreadChannelsReader(
     client = clientAccount,
     loader = loader,
-    onLoaded = new OnAccessorsLoadedListener(layout, actions.drawer)
+    onLoaded = new OnAccessorsLoadedListener(
+      layout = layout,
+      container = container,
+      pointer = new SourcePointer(accessors.source, container, actions),
+      drawer = actions.drawer
+    )
   )
   private lazy val database = helper.getReadableDatabase
 

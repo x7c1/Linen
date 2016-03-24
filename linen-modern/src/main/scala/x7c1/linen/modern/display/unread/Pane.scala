@@ -52,6 +52,9 @@ class PaneContainer(
     val diff = min(width - current, max(x, -current))
     view.scrollBy(diff, 0)
   }
+  def skipTo(pane: Pane): CallbackTask[Unit] = task {
+    view.scrollTo(pane.displayPosition, 0)
+  }
   def scrollTo(pane: Pane): CallbackTask[Unit] = task of {
     (done: OnFinish) => for {
       _ <- task {
