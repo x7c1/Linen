@@ -19,6 +19,8 @@ class OnAccessorsLoadedListener(layout: MainLayout, drawer: => DrawerAction){
       }
       _ <- ui { _ =>
         layout.sourceToolbar setTitle e.channelName
+        layout.entryToolbar setTitle ""
+        layout.entryDetailToolbar setTitle ""
         updateAdapter()
       }
       _ <- await(50)
