@@ -36,6 +36,7 @@ class UnreadItemsDelegatee(
   }
   def close(): Unit = {
     Log info s"[start]"
+    closeDrawerMenu()
     loader.close()
     database.close()
   }

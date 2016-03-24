@@ -5,20 +5,21 @@ import java.lang.Math.min
 import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView.Adapter
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelAccessor, UnreadChannelLoader}
+import x7c1.linen.modern.display.settings.MyChannelSubscribeChanged
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.intent.IntentFactory
+import x7c1.wheat.macros.intent.{IntentFactory, LocalBroadcastListener}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 
@@ -33,25 +34,41 @@ trait DrawerMenuInitializer {
       val defaultWidth = displaySize.x - dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
     }
-    clientAccount foreach { account =>
-      val loader = new UnreadChannelLoader(helper, account)
-      val menuItems = createMenuItems(account, loader.accessor)
-      val adapter = new DrawerMenuRowAdapter(menuItems)
-      layout.menuList setAdapter adapter
+    channelLoader -> clientAccount match {
+      case (Some(loader), Some(account)) =>
+        layout.menuList setAdapter new DrawerMenuRowAdapter(
+          items = createMenuItems(account, loader.accessor)
+        )
+        val task = loader.startLoading() flatMap onChannelLoaded map reader.onMenuLoaded
+        task.execute()
+      case _ =>
+        Log error s"client not found"
+    }
+    onSubscribeMyChannel registerTo activity
+  }
+  def closeDrawerMenu(): Unit = {
+    onSubscribeMyChannel unregisterFrom activity
+  }
+  protected lazy val channelLoader = clientAccount match {
+    case Some(account) => Some(new UnreadChannelLoader(helper, account))
+    case None => None
+  }
+  private lazy val onSubscribeMyChannel =
+    LocalBroadcastListener[MyChannelSubscribeChanged]{ event =>
+      val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
+      task foreach (_.execute())
+    }
 
-      val task = loader.startLoading() map onLoad(adapter)
-      task.execute()
+  protected def onChannelLoaded(event: ChannelLoaderEvent): CallbackTask[Done] = CallbackTask { f =>
+    event match {
+      case e: Done =>
+        Log info s"[done]"
+        layout.menuList runUi { _.getAdapter.notifyDataSetChanged() }
+        f(e)
+      case e: AccessorError =>
+        Log error e.detail
     }
   }
-  private def onLoad(adapter: Adapter[_]): ChannelLoaderEvent => Unit = {
-    case e: Done =>
-      Log info s"[done]"
-      layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
-      reader onMenuLoaded e
-    case e: AccessorError =>
-      Log error e.detail
-  }
-
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
