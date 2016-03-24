@@ -4,7 +4,7 @@ import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.accessor.AccountIdentifiable
-import x7c1.linen.modern.accessor.unread.{ClosableEntryAccessor, ClosableSourceAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.modern.accessor.unread.{ChannelSelectable, ClosableEntryAccessor, ClosableSourceAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
@@ -22,8 +22,7 @@ import scala.util.{Failure, Success, Try}
 class AccessorLoader private (
   database: SQLiteDatabase,
   context: Context,
-  loaderManager: LoaderManager,
-  onLoad: AccessorsLoadedEvent => Unit ){
+  loaderManager: LoaderManager ){
 
   private val outlineAccessors = ListBuffer[ClosableEntryAccessor[UnreadOutline]]()
   private val detailAccessors = ListBuffer[ClosableEntryAccessor[UnreadDetail]]()
@@ -58,7 +57,10 @@ class AccessorLoader private (
   def createDetailAccessor: EntryAccessor[UnreadDetail] = {
     new EntriesFooterAppender(detailUnderlying)
   }
-  def startLoading(account: AccountIdentifiable, channelId: Long): Unit = {
+  def startLoading[A: ChannelSelectable]
+    (account: AccountIdentifiable, channel: A)
+      (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
 //      remaining <- loadSourceEntries(sourceIds)
@@ -68,32 +70,40 @@ class AccessorLoader private (
 //    }
 //    first onComplete loadNext
 
+    val select = implicitly[ChannelSelectable[A]]
     for {
-      accessor <- startLoadingSources(account.accountId, channelId)
+      accessor <- startLoadingSources(
+        accountId = account.accountId,
+        channelId = select channelIdOf channel
+      )
       event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
-      remaining = Future {
+      _ <- Future {
         this.sourceAccessor = accessor
         updateAccessors(event)
       }
-      _ <- Future { onLoad(event) }
+      _ <- Future { onLoad(LoadCompleteEvent(channel)) }
     } yield {
-      remaining
+      event
     }
   }
-  def restartLoading(account: AccountIdentifiable, channelId: Long): Unit = {
-    val f = for {
-      accessor <- startLoadingSources(account.accountId, channelId)
+  def restartLoading[A: ChannelSelectable]
+    (account: AccountIdentifiable, channel: A)
+      (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+
+    val select = implicitly[ChannelSelectable[A]]
+    val load = for {
+      accessor <- startLoadingSources(account.accountId, select channelIdOf channel)
       event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
       _ <- Future {
         close()
         this.sourceAccessor = accessor
         updateAccessors(event)
       }
-      _ <- Future { onLoad(event) }
+      _ <- Future { onLoad(LoadCompleteEvent(channel)) }
     } yield {
       event.remainingSourceIds
     }
-    f.onComplete {
+    load onComplete {
       case Success(sourceIds) =>
         Log info s"[done] remains:${sourceIds.length}"
       case Failure(e) =>
@@ -166,10 +176,9 @@ class AccessorLoader private (
         detailAccessors += details
       }
     }
-    event.remainingSourceIds
   }
-  private def loadNext: Try[Seq[Long]] => Unit = {
-    case Success(ids) => loadMore(ids)
+  private def loadNext: Try[AccessorsLoadedEvent] => Unit = {
+    case Success(event) => loadMore(event.remainingSourceIds)
     case Failure(e : IllegalStateException) =>
 
       /*
@@ -187,25 +196,24 @@ class AccessorLoader private (
     remaining match {
       case Seq() => Log info "[done]"
       case _ => after(msec = 50){
-        loadSourceEntries(remaining) map updateAccessors onComplete loadNext
+        loadAndUpdate(remaining) onComplete loadNext
       }
     }
   }
+  private def loadAndUpdate(remaining: Seq[Long]) = for {
+    event <- loadSourceEntries(remaining)
+    _ <- Future { updateAccessors(event) }
+  } yield event
 }
 
 object AccessorLoader {
-  def apply
-    (database: SQLiteDatabase, activity: Activity)
-      (listener: AccessorsLoadedEvent => Unit): AccessorLoader = {
-
+  def apply(database: SQLiteDatabase, activity: Activity): AccessorLoader = {
     new AccessorLoader(
       database,
       activity,
-      activity.getLoaderManager,
-      listener
+      activity.getLoaderManager
     )
   }
-
   def inspectSourceAccessor(
     db: SQLiteDatabase, accountId: Long,
     channelId: Long): SourceNotLoaded Either ClosableSourceAccessor =
@@ -224,6 +232,14 @@ case class AccessorsLoadedEvent(
   outlines: Option[ClosableEntryAccessor[UnreadOutline]],
   details: Option[ClosableEntryAccessor[UnreadDetail]]
 )
+
+case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
+  private lazy val select = implicitly[ChannelSelectable[A]]
+
+  def channelId: Long = select channelIdOf channel
+
+  def channelName: String = select nameOf channel
+}
 
 private class SourceFooterAppender(
   accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {

@@ -7,7 +7,7 @@ sealed trait ChannelLoaderEvent
 object ChannelLoaderEvent {
   class Done(
     val client: ClientAccount,
-    val firstChannelId: Option[Long] ) extends ChannelLoaderEvent
+    val headChannel: Option[UnreadChannel] ) extends ChannelLoaderEvent
 
   class AccessorError(error: ChannelAccessorError) extends ChannelLoaderEvent {
     def detail: String = error.detail

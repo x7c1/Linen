@@ -3,6 +3,7 @@ package x7c1.linen.modern.display.unread
 import android.view.View
 import android.view.View.OnClickListener
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowTitle}
+import x7c1.linen.modern.accessor.unread.ChannelSelectable
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.menu.SingleMenuText
 
@@ -19,6 +20,13 @@ object MenuItemKind {
   case class UpdaterSchedule(body: String) extends MenuItemKind
 
   case class DevCreateDummies(body: String) extends MenuItemKind
+
+  object UnreadChannelMenu {
+    implicit object selectable extends ChannelSelectable[UnreadChannelMenu] {
+      override def channelIdOf = _.channelId
+      override def nameOf = _.body
+    }
+  }
 }
 
 class DrawerMenuTitleFactory(provider: ViewHolderProvider[MenuRowTitle]){

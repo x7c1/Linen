@@ -11,8 +11,7 @@ import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, M
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.Done
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
-import x7c1.linen.modern.display.unread.MenuItemKind.UnreadChannelMenu
+import x7c1.linen.modern.accessor.unread.{ChannelSelectable, EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -50,20 +49,28 @@ class UnreadItemsDelegatee(
     }
   }
   private def onMenuLoaded(e: Done) = {
-    (e.firstChannelId, clientAccount) match {
-      case (Some(channelId), Some(account)) =>
-        loader.startLoading(account, channelId)
-      case (None, _) =>
+    e.headChannel match {
+      case Some(channel) =>
+        onUnreadChannelLoaded(channel)
+      case None =>
         Log info "no channels"
-      case (_, None) =>
-        Log error s"account not found"
     }
   }
-  protected def onUnreadChannelSelected(e: UnreadChannelMenu) = {
+  protected def onUnreadChannelLoaded[A: ChannelSelectable](channel: A) = {
     clientAccount match {
       case Some(account) =>
         Log info s"[start]"
-        loader.restartLoading(account, e.channelId)
+        loader.startLoading(account, channel)(onAccessorsLoaded.onLoad[A])
+      case None =>
+        Log error s"account not found"
+    }
+  }
+
+  protected def onUnreadChannelSelected[A: ChannelSelectable](channel: A) = {
+    clientAccount match {
+      case Some(account) =>
+        Log info s"[start]"
+        loader.restartLoading(account, channel)(onAccessorsLoaded.onLoad[A])
       case None =>
         Log error s"account not found"
     }
@@ -72,9 +79,10 @@ class UnreadItemsDelegatee(
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader = AccessorLoader(database, activity){
-    new OnAccessorsLoadedListener(layout, actions.drawer).onLoad
-  }
+  private lazy val loader = AccessorLoader(database, activity)
+
+  private lazy val onAccessorsLoaded = new OnAccessorsLoadedListener(layout, actions.drawer)
+
   lazy val container = new PaneContainer(
     view = layout.paneContainer,
     displayWidth = displaySize.x,

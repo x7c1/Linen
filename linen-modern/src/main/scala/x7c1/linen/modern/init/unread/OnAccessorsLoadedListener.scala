@@ -1,6 +1,7 @@
 package x7c1.linen.modern.init.unread
 
 import x7c1.linen.glue.res.layout.MainLayout
+import x7c1.linen.modern.accessor.unread.ChannelSelectable
 import x7c1.linen.modern.action.DrawerAction
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
@@ -9,7 +10,7 @@ import x7c1.wheat.modern.tasks.UiThread
 
 
 class OnAccessorsLoadedListener(layout: MainLayout, drawer: => DrawerAction){
-  def onLoad(e: AccessorsLoadedEvent): Unit = {
+  def onLoad[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
     Log info s"[init] $e"
 
     (for {
