@@ -15,7 +15,7 @@ import x7c1.linen.modern.display.settings.MyChannelSubscribeChanged
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
-import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
+import x7c1.linen.modern.init.settings.preset.{SubscribeChangedEvent, PresetChannelsDelegatee}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.{IntentFactory, LocalBroadcastListener}
 import x7c1.wheat.macros.logger.Log
@@ -45,9 +45,11 @@ trait DrawerMenuInitializer {
         Log error s"client not found"
     }
     onSubscribeMyChannel registerTo activity
+    onSubscribePresetChannel registerTo activity
   }
   def closeDrawerMenu(): Unit = {
     onSubscribeMyChannel unregisterFrom activity
+    onSubscribePresetChannel unregisterFrom activity
   }
   protected lazy val channelLoader = clientAccount match {
     case Some(account) => Some(new UnreadChannelLoader(helper, account))
@@ -55,6 +57,12 @@ trait DrawerMenuInitializer {
   }
   protected lazy val onSubscribeMyChannel =
     LocalBroadcastListener[MyChannelSubscribeChanged]{ event =>
+      val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
+      task foreach (_.execute())
+    }
+
+  protected lazy val onSubscribePresetChannel =
+    LocalBroadcastListener[SubscribeChangedEvent]{ event =>
       val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
       task foreach (_.execute())
     }
