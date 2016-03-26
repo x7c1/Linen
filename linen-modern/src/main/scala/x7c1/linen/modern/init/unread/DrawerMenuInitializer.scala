@@ -53,7 +53,7 @@ trait DrawerMenuInitializer {
     case Some(account) => Some(new UnreadChannelLoader(helper, account))
     case None => None
   }
-  private lazy val onSubscribeMyChannel =
+  protected lazy val onSubscribeMyChannel =
     LocalBroadcastListener[MyChannelSubscribeChanged]{ event =>
       val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
       task foreach (_.execute())

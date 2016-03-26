@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.{LayoutInflater, View, ViewGroup}
-import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
+import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
@@ -17,7 +17,7 @@ import x7c1.wheat.macros.logger.Log
 class ArgumentsForAll(
   val accountId: Long,
   val tabFactory: ViewHolderProviderFactory[SettingPresetTabAll],
-  val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
+  val rowFactory: ViewHolderProviderFactory[SettingPresetChannelRow]
 )
 
 trait ReloadableFragment {

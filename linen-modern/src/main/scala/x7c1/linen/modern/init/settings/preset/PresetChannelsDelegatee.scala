@@ -2,7 +2,7 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingPresetChannelsLayout, SettingPresetRow, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.glue.res.layout.{SettingPresetChannelsLayout, SettingPresetChannelRow, SettingPresetTabAll, SettingPresetTabSelected}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
 import x7c1.wheat.macros.intent.{IntentExpander, LocalBroadcastListener}
@@ -53,7 +53,7 @@ class PresetChannelsDelegatee(
 class ProviderFactories(
   val forSelected: ViewHolderProviderFactory[SettingPresetTabSelected],
   val forAll: ViewHolderProviderFactory[SettingPresetTabAll],
-  val forRow: ViewHolderProviderFactory[SettingPresetRow]
+  val forRow: ViewHolderProviderFactory[SettingPresetChannelRow]
 )
 
 class PresetPagerAdapter(
