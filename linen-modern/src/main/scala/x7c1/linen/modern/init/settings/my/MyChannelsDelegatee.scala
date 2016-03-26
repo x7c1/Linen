@@ -9,7 +9,7 @@ import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelsLayout}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
-import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesEvent, MyChannelSubscribeChanged, OnChannelSourcesListener}
+import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
@@ -37,9 +37,9 @@ class MyChannelsDelegatee (
     layout.channelList setAdapter new ChannelRowAdapter(
       accessor = MyChannelAccessor.create(database, accountId),
       viewHolderProvider = channelRowProvider,
-      onSources = new OnChannelSources(activity),
-      onSubscribeChanged = {
-        val listener = new MyChannelSubscribeChangedListener(
+      onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
+      onSubscriptionChanged = {
+        val listener = new OnMyChannelSubscriptionChanged(
           context = activity,
           helper = helper,
           account = AccountIdentifiable(accountId)
@@ -55,10 +55,8 @@ class MyChannelsDelegatee (
   }
 }
 
-class OnChannelSources(activity: Activity with ActivityControl)
-  extends OnChannelSourcesListener {
-
-  override def onSourcesSelected(event: ChannelSourcesEvent): Unit = {
+class OnChannelSourcesSelected(activity: Activity with ActivityControl){
+  def onSourcesSelected(event: ChannelSourcesSelected): Unit = {
     Log info s"[init] $event"
 
     val intent = IntentFactory.using[MyChannelSourcesDelegatee].
@@ -70,12 +68,12 @@ class OnChannelSources(activity: Activity with ActivityControl)
   }
 }
 
-class MyChannelSubscribeChangedListener(
+class OnMyChannelSubscriptionChanged(
   context: Context,
   helper: LinenOpenHelper,
   account: AccountIdentifiable){
 
-  def updateSubscription(event: MyChannelSubscribeChanged): Unit = {
+  def updateSubscription(event: MyChannelSubscriptionChanged): Unit = {
     val subscriber = new ChannelSubscriber(account, helper)
     if (event.isSubscribed){
       subscriber subscribe event.channelId

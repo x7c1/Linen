@@ -5,7 +5,7 @@ import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, Frag
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingPresetChannelSources
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
-import x7c1.linen.modern.display.settings.ChannelSourcesEvent
+import x7c1.linen.modern.display.settings.ChannelSourcesSelected
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener}
@@ -18,7 +18,7 @@ class PresetChannelsDelegatee(
   layout: SettingPresetChannelsLayout,
   factories: ProviderFactories ){
 
-  lazy val onSubscribe = LocalBroadcastListener[SubscribeChangedEvent]{ event =>
+  lazy val onSubscribe = LocalBroadcastListener[PresetChannelSubscriptionChanged]{ event =>
     val reloadable: PartialFunction[Fragment, ReloadableFragment] = event.from match {
       case PresetTabSelected => { case f: PresetsAllFragment => f }
       case PresetTabAll => { case f: PresetsSelectedFragment => f }
@@ -88,7 +88,7 @@ class PresetPagerAdapter(
 }
 
 class OnSourcesSelected(activity: Activity with ActivityControl){
-  def transitToSources(event: ChannelSourcesEvent): Unit = {
+  def transitToSources(event: ChannelSourcesSelected): Unit = {
     Log info s"[init] $event"
 
     val intent = IntentFactory.using[PresetChannelSourcesDelegatee].

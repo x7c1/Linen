@@ -10,8 +10,9 @@ import x7c1.wheat.modern.decorator.Imports._
 class ChannelRowAdapter(
   accessor: MyChannelAccessor,
   viewHolderProvider: ViewHolderProvider[SettingMyChannelRow],
-  onSources: OnChannelSourcesListener,
-  onSubscribeChanged: MyChannelSubscribeChanged => Unit ) extends Adapter[SettingMyChannelRow]{
+  onSourcesSelected: ChannelSourcesSelected => Unit,
+  onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
+) extends Adapter[SettingMyChannelRow]{
 
   override def getItemCount: Int = accessor.length
 
@@ -23,13 +24,13 @@ class ChannelRowAdapter(
       holder.name.text = channel.name
       holder.description.text = channel.description
       holder.sources onClick { _ =>
-        onSources onSourcesSelected ChannelSourcesEvent(
+        onSourcesSelected apply ChannelSourcesSelected(
           accountId = accessor.accountId,
           channelId = channel.channelId
         )
       }
       holder.switchSubscribe onChangedManually { e =>
-        onSubscribeChanged apply MyChannelSubscribeChanged(
+        onSubscriptionChanged apply MyChannelSubscriptionChanged(
           channelId = channel.channelId,
           isSubscribed = e.isChecked
         )
@@ -39,15 +40,11 @@ class ChannelRowAdapter(
   }
 }
 
-trait OnChannelSourcesListener {
-  def onSourcesSelected(event: ChannelSourcesEvent): Unit
-}
-
-case class ChannelSourcesEvent(
+case class ChannelSourcesSelected(
   accountId: Long,
   channelId: Long )
 
-case class MyChannelSubscribeChanged(
+case class MyChannelSubscriptionChanged(
   channelId: Long,
   isSubscribed: Boolean
 )

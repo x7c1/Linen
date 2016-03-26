@@ -73,12 +73,12 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
 class SubscriptionChangedUpdater(
   accountId0: Long, context: Context, helper: LinenOpenHelper) extends OnChannelSubscribedListener {
 
-  override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
+  override def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit = {
     val account = new AccountIdentifiable {
       override def accountId: Long = accountId0
     }
     val subscriber = new ChannelSubscriber(account, helper)
-    if (event.isChecked){
+    if (event.isSubscribed){
       subscriber subscribe event.channelId
     } else {
       subscriber unsubscribe event.channelId
@@ -88,5 +88,5 @@ class SubscriptionChangedUpdater(
 }
 
 trait OnChannelSubscribedListener { self =>
-  def onSubscribedChanged(event: SubscribeChangedEvent): Unit
+  def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit
 }

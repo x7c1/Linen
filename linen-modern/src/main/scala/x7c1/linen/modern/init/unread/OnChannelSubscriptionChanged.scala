@@ -4,8 +4,8 @@ import android.content.Context
 import x7c1.linen.glue.res.layout.UnreadItemsLayout
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelLoader}
-import x7c1.linen.modern.display.settings.MyChannelSubscribeChanged
-import x7c1.linen.modern.init.settings.preset.SubscribeChangedEvent
+import x7c1.linen.modern.display.settings.MyChannelSubscriptionChanged
+import x7c1.linen.modern.init.settings.preset.PresetChannelSubscriptionChanged
 import x7c1.wheat.macros.intent.LocalBroadcastListener
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
@@ -25,10 +25,10 @@ class OnChannelSubscriptionChanged (
     onSubscribePresetChannel unregisterFrom context
   }
   private lazy val onSubscribeMyChannel =
-    LocalBroadcastListener[MyChannelSubscribeChanged]{ event => update() }
+    LocalBroadcastListener[MyChannelSubscriptionChanged]{ event => update() }
 
   private lazy val onSubscribePresetChannel =
-    LocalBroadcastListener[SubscribeChangedEvent]{ event => update() }
+    LocalBroadcastListener[PresetChannelSubscriptionChanged]{ event => update() }
 
   private def update() = {
     val task = loader map (_.startLoading() flatMap notifyAdapter)
