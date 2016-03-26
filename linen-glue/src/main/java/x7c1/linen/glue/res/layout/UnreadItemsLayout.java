@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 
-public class MainLayout extends RecyclerView.ViewHolder {
+public class UnreadItemsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v4.widget.DrawerLayout drawerMenu;
     public final LinearLayout menuArea;
@@ -36,7 +36,7 @@ public class MainLayout extends RecyclerView.ViewHolder {
     public final android.support.v7.widget.Toolbar detailBottomBar;
     public final android.support.design.widget.FloatingActionButton detailToNext;
 
-    public MainLayout(
+    public UnreadItemsLayout(
         View itemView,
         android.support.v4.widget.DrawerLayout drawerMenu,
         LinearLayout menuArea,

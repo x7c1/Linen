@@ -5,14 +5,14 @@ import android.view.KeyEvent;
 
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
-import x7c1.linen.glue.res.layout.MainLayout;
+import x7c1.linen.glue.res.layout.UnreadItemsLayout;
 import x7c1.linen.modern.init.unread.DetailListProviders;
 import x7c1.linen.modern.init.unread.MenuRowProviders;
 import x7c1.linen.modern.init.unread.OutlineListProviders;
 import x7c1.linen.modern.init.unread.SourceListProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
 import x7c1.linen.modern.init.unread.UnreadRowProviders;
-import x7c1.linen.res.layout.MainLayoutProvider;
+import x7c1.linen.res.layout.UnreadItemsLayoutProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
@@ -34,7 +34,7 @@ public class MainActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final MainLayout layout = new MainLayoutProvider(this).inflate(null, false);
+		final UnreadItemsLayout layout = new UnreadItemsLayoutProvider(this).inflate(null, false);
 
 		layout.sourceToolbar.setNavigationIcon(R.drawable.ic_action_menu);
 		layout.sourceToolbar.inflateMenu(R.menu.menu_main);

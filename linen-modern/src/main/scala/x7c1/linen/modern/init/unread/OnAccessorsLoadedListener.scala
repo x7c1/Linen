@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.unread
 
-import x7c1.linen.glue.res.layout.MainLayout
+import x7c1.linen.glue.res.layout.UnreadItemsLayout
 import x7c1.linen.modern.accessor.unread.{ChannelSelectable, UnreadSourceAccessor}
 import x7c1.linen.modern.action.observer.SourceSkipStoppedObserver
 import x7c1.linen.modern.action.{Actions, DrawerAction, SourceSkipStoppedFactory}
@@ -12,7 +12,7 @@ import x7c1.wheat.modern.tasks.UiThread
 
 
 class OnAccessorsLoadedListener(
-  layout: MainLayout,
+  layout: UnreadItemsLayout,
   container: PaneContainer,
   pointer: SourcePointer,
   drawer: => DrawerAction ){
