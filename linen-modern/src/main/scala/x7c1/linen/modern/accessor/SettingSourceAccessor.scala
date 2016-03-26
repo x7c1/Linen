@@ -63,8 +63,9 @@ class SettingSourceAccessorFactory(
         | s1.source_id AS source_id,
         | s2.rating AS rating
         |FROM channel_source_map AS s1
-        |INNER JOIN source_ratings AS s2 ON s1.source_id = s2.source_id
-        |WHERE s1.channel_id = ? AND s2.account_id = ?
+        | LEFT JOIN source_ratings AS s2
+        |   ON s1.source_id = s2.source_id AND s2.account_id = ?
+        |WHERE s1.channel_id = ?
       """.stripMargin
 
     val sql2 =
@@ -78,7 +79,7 @@ class SettingSourceAccessorFactory(
         |ORDER BY t2.source_id DESC
       """.stripMargin
 
-    new Query(sql2, Array(channelId.toString, accountId.toString))
+    new Query(sql2, Array(accountId.toString, channelId.toString))
   }
 }
 

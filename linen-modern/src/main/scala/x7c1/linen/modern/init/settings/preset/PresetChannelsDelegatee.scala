@@ -1,7 +1,6 @@
 package x7c1.linen.modern.init.settings.preset
 
 import android.app.Activity
-import android.content.Intent
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingPresetChannelSources
@@ -9,7 +8,7 @@ import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetChannel
 import x7c1.linen.modern.display.settings.ChannelSourcesEvent
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
-import x7c1.wheat.macros.intent.{IntentExpander, LocalBroadcastListener}
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -92,7 +91,11 @@ class OnSourcesSelected(activity: Activity with ActivityControl){
   def transitToSources(event: ChannelSourcesEvent): Unit = {
     Log info s"[init] $event"
 
-    val intent = new Intent(activity, activity getClassOf SettingPresetChannelSources)
+    val intent = IntentFactory.using[PresetChannelSourcesDelegatee].
+      create(activity, activity getClassOf SettingPresetChannelSources){
+        _.showSources(event.accountId, event.channelId)
+      }
+
     activity startActivityBy intent
   }
 }
