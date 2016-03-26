@@ -1,8 +1,12 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.app.Activity
+import android.content.Intent
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingPresetChannelsLayout, SettingPresetChannelRow, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.glue.activity.ActivityLabel.SettingPresetChannelSources
+import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.modern.display.settings.ChannelSourcesEvent
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
 import x7c1.wheat.macros.intent.{IntentExpander, LocalBroadcastListener}
@@ -82,4 +86,13 @@ class PresetPagerAdapter(
     fragments(position)._1
   }
   override def getCount: Int = fragments.length
+}
+
+class OnSourcesSelected(activity: Activity with ActivityControl){
+  def transitToSources(event: ChannelSourcesEvent): Unit = {
+    Log info s"[init] $event"
+
+    val intent = new Intent(activity, activity getClassOf SettingPresetChannelSources)
+    activity startActivityBy intent
+  }
 }

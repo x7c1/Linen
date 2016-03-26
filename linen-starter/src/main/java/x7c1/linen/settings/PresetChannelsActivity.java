@@ -1,10 +1,14 @@
 package x7c1.linen.settings;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import x7c1.linen.R;
+import x7c1.linen.base.Control;
 import x7c1.linen.base.TransitAnimations;
+import x7c1.linen.glue.activity.ActivityControl;
+import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
 import x7c1.linen.modern.init.settings.preset.ProviderFactories;
@@ -13,7 +17,7 @@ import x7c1.linen.res.layout.SettingPresetChannelRowProvider;
 import x7c1.linen.res.layout.SettingPresetTabAllProvider;
 import x7c1.linen.res.layout.SettingPresetTabSelectedProvider;
 
-public class PresetChannelsActivity extends FragmentActivity {
+public class PresetChannelsActivity extends FragmentActivity implements ActivityControl {
 	private PresetChannelsDelegatee delegatee = null;
 
 	@Override
@@ -54,5 +58,16 @@ public class PresetChannelsActivity extends FragmentActivity {
 	public void finish() {
 		super.finish();
 		TransitAnimations.forDirectChild(this).finish();
+	}
+
+	@Override
+	public void startActivityBy(Intent intent) {
+		startActivity(intent);
+		TransitAnimations.forDirectChild(this).start();
+	}
+
+	@Override
+	public Class<?> getClassOf(ActivityLabel label) {
+		return Control.getActivityClassOf(label);
 	}
 }

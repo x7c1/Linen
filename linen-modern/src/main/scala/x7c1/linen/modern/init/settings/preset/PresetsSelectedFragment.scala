@@ -42,6 +42,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
+          onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected
