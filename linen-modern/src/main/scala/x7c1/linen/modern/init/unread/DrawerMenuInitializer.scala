@@ -9,17 +9,14 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
-import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelAccessor, UnreadChannelLoader}
-import x7c1.linen.modern.display.settings.MyChannelSubscribeChanged
+import x7c1.linen.modern.accessor.unread.{UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
-import x7c1.linen.modern.init.settings.preset.{SubscribeChangedEvent, PresetChannelsDelegatee}
+import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.intent.{IntentFactory, LocalBroadcastListener}
+import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 
@@ -39,44 +36,26 @@ trait DrawerMenuInitializer {
         layout.menuList setAdapter new DrawerMenuRowAdapter(
           items = createMenuItems(account, loader.accessor)
         )
-        val task = loader.startLoading() flatMap onChannelLoaded map reader.onMenuLoaded
-        task.execute()
+        loader.startLoading().
+          flatMap(onChannelSubscriptionChanged.notifyAdapter).
+          map(reader.onMenuLoaded).
+          execute()
+
       case _ =>
         Log error s"client not found"
     }
-    onSubscribeMyChannel registerTo activity
-    onSubscribePresetChannel registerTo activity
+    onChannelSubscriptionChanged registerTo activity
   }
   def closeDrawerMenu(): Unit = {
-    onSubscribeMyChannel unregisterFrom activity
-    onSubscribePresetChannel unregisterFrom activity
+    onChannelSubscriptionChanged unregisterFrom activity
   }
   protected lazy val channelLoader = clientAccount match {
     case Some(account) => Some(new UnreadChannelLoader(helper, account))
     case None => None
   }
-  protected lazy val onSubscribeMyChannel =
-    LocalBroadcastListener[MyChannelSubscribeChanged]{ event =>
-      val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
-      task foreach (_.execute())
-    }
+  protected lazy val onChannelSubscriptionChanged =
+    new OnChannelSubscriptionChanged(layout, channelLoader)
 
-  protected lazy val onSubscribePresetChannel =
-    LocalBroadcastListener[SubscribeChangedEvent]{ event =>
-      val task = channelLoader map (_.startLoading() flatMap onChannelLoaded)
-      task foreach (_.execute())
-    }
-
-  protected def onChannelLoaded(event: ChannelLoaderEvent): CallbackTask[Done] = CallbackTask { f =>
-    event match {
-      case e: Done =>
-        Log info s"[done]"
-        layout.menuList runUi { _.getAdapter.notifyDataSetChanged() }
-        f(e)
-      case e: AccessorError =>
-        Log error e.detail
-    }
-  }
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
