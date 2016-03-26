@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.support.v7.widget.SwitchCompat;
 
-public class SettingChannelsRow extends RecyclerView.ViewHolder {
+public class SettingMyChannelRow extends RecyclerView.ViewHolder {
 
     public final TextView name;
     public final TextView description;
@@ -19,7 +19,7 @@ public class SettingChannelsRow extends RecyclerView.ViewHolder {
     public final TextView edit;
     public final TextView sources;
 
-    public SettingChannelsRow(
+    public SettingMyChannelRow(
         View itemView,
         TextView name,
         TextView description,

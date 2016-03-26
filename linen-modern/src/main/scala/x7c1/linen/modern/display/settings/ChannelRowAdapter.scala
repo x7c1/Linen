@@ -2,23 +2,23 @@ package x7c1.linen.modern.display.settings
 
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import x7c1.linen.glue.res.layout.SettingChannelsRow
+import x7c1.linen.glue.res.layout.SettingMyChannelRow
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 
 class ChannelRowAdapter(
   accessor: MyChannelAccessor,
-  viewHolderProvider: ViewHolderProvider[SettingChannelsRow],
+  viewHolderProvider: ViewHolderProvider[SettingMyChannelRow],
   onSources: OnChannelSourcesListener,
-  onSubscribeChanged: MyChannelSubscribeChanged => Unit ) extends Adapter[SettingChannelsRow]{
+  onSubscribeChanged: MyChannelSubscribeChanged => Unit ) extends Adapter[SettingMyChannelRow]{
 
   override def getItemCount: Int = accessor.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     viewHolderProvider inflateOn parent
   }
-  override def onBindViewHolder(holder: SettingChannelsRow, position: Int): Unit = {
+  override def onBindViewHolder(holder: SettingMyChannelRow, position: Int): Unit = {
     accessor findAt position foreach { channel =>
       holder.name.text = channel.name
       holder.description.text = channel.description

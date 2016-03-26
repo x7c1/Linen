@@ -9,9 +9,9 @@ import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingChannelsLayout;
 import x7c1.linen.modern.init.settings.SettingChannelsDelegatee;
 import x7c1.linen.res.layout.SettingChannelsLayoutProvider;
-import x7c1.linen.res.layout.SettingChannelsRowProvider;
+import x7c1.linen.res.layout.SettingMyChannelRowProvider;
 
-public class SettingChannelsActivity extends BaseActivity {
+public class MyChannelsActivity extends BaseActivity {
 	private SettingChannelsDelegatee delegatee = null;
 
 	@Override
@@ -27,7 +27,7 @@ public class SettingChannelsActivity extends BaseActivity {
 		this.delegatee = new SettingChannelsDelegatee(
 				this,
 				layout,
-				new SettingChannelsRowProvider(this)
+				new SettingMyChannelRowProvider(this)
 		);
 		this.delegatee.setup();
 	}

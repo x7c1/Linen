@@ -20,7 +20,7 @@
         </activity>
 
         <activity
-            android:name=".settings.SettingChannelsActivity"
+            android:name=".settings.MyChannelsActivity"
             >
         </activity>
 

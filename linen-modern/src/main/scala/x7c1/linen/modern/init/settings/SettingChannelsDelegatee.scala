@@ -5,7 +5,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingChannelSources
-import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingChannelsRow}
+import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingMyChannelRow}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
@@ -18,7 +18,7 @@ import x7c1.wheat.modern.decorator.Imports._
 class SettingChannelsDelegatee (
   activity: Activity with ActivityControl,
   layout: SettingChannelsLayout,
-  channelRowProvider: ViewHolderProvider[SettingChannelsRow] ){
+  channelRowProvider: ViewHolderProvider[SettingMyChannelRow] ){
 
   private lazy val helper = new LinenOpenHelper(activity)
 

@@ -6,7 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
@@ -135,7 +135,7 @@ class OnMenuItemClick(
       Log info s"$kind"
 
       val intent = IntentFactory.using[SettingChannelsDelegatee].
-        create(activity, activity getClassOf SettingChannels){
+        create(activity, activity getClassOf SettingMyChannels){
           _.showMyChannels(accountId)
         }
       activity startActivityBy intent
