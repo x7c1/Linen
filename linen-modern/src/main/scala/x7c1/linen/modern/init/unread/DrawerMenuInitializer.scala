@@ -14,7 +14,7 @@ import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelAcces
 import x7c1.linen.modern.display.settings.MyChannelSubscribeChanged
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
-import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
+import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.{IntentFactory, LocalBroadcastListener}
@@ -134,7 +134,7 @@ class OnMenuItemClick(
     case _: MyChannels =>
       Log info s"$kind"
 
-      val intent = IntentFactory.using[SettingChannelsDelegatee].
+      val intent = IntentFactory.using[MyChannelsDelegatee].
         create(activity, activity getClassOf SettingMyChannels){
           _.showMyChannels(accountId)
         }

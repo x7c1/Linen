@@ -1,11 +1,11 @@
-package x7c1.linen.modern.init.settings
+package x7c1.linen.modern.init.settings.my
 
 import android.app.Activity
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.SettingChannelSources
-import x7c1.linen.glue.res.layout.{SettingChannelsLayout, SettingMyChannelRow}
+import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
+import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelsLayout}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
@@ -15,9 +15,9 @@ import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
-class SettingChannelsDelegatee (
+class MyChannelsDelegatee (
   activity: Activity with ActivityControl,
-  layout: SettingChannelsLayout,
+  layout: SettingMyChannelsLayout,
   channelRowProvider: ViewHolderProvider[SettingMyChannelRow] ){
 
   private lazy val helper = new LinenOpenHelper(activity)
@@ -61,8 +61,8 @@ class OnChannelSources(activity: Activity with ActivityControl)
   override def onSourcesSelected(event: ChannelSourcesEvent): Unit = {
     Log info s"[init] $event"
 
-    val intent = IntentFactory.using[ChannelSourcesDelegatee].
-      create(activity, activity getClassOf SettingChannelSources){
+    val intent = IntentFactory.using[MyChannelSourcesDelegatee].
+      create(activity, activity getClassOf SettingMyChannelSources){
         _.showSources(event.accountId, event.channelId)
       }
 

@@ -10,12 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
 
-public class SettingChannelsLayout extends RecyclerView.ViewHolder {
+public class SettingMyChannelsLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final android.support.v7.widget.RecyclerView channelList;
 
-    public SettingChannelsLayout(
+    public SettingMyChannelsLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
         android.support.v7.widget.RecyclerView channelList

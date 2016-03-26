@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init.settings
+package x7c1.linen.modern.init.settings.my
 
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
@@ -14,7 +14,7 @@ import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
-class ChannelSourcesDelegatee (
+class MyChannelSourcesDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
   layout: SettingChannelSourcesLayout,
   sourceRowProvider: ViewHolderProvider[SettingChannelSourcesRow] ){

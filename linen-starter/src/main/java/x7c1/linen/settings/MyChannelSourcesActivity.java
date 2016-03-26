@@ -7,12 +7,12 @@ import x7c1.linen.R;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
-import x7c1.linen.modern.init.settings.ChannelSourcesDelegatee;
+import x7c1.linen.modern.init.settings.my.MyChannelSourcesDelegatee;
 import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
 import x7c1.linen.res.layout.SettingChannelSourcesRowProvider;
 
-public class SettingChannelSourcesActivity extends BaseActivity {
-	private ChannelSourcesDelegatee delegatee = null;
+public class MyChannelSourcesActivity extends BaseActivity {
+	private MyChannelSourcesDelegatee delegatee = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class SettingChannelSourcesActivity extends BaseActivity {
 		layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
 		setContentView(layout.itemView);
 
-		delegatee = new ChannelSourcesDelegatee(
+		delegatee = new MyChannelSourcesDelegatee(
 				this,
 				layout,
 				new SettingChannelSourcesRowProvider(this)
