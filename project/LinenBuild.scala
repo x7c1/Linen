@@ -170,7 +170,7 @@ trait LinenSettings {
     val list = Seq(
       "./gradlew --daemon --parallel assembleDebug",
       s"adb -s $device install -r ./linen-starter/build/outputs/apk/linen-starter-debug.apk",
-      s"adb -s $device shell am start -n x7c1.linen/x7c1.linen.MainActivity"
+      s"adb -s $device shell am start -n x7c1.linen/x7c1.linen.unread.UnreadItemsActivity"
     )
     list foreach {_ !< streams.value.log}
   }

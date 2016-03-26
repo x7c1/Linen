@@ -10,62 +10,58 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.LinearLayout;
-import android.support.v7.widget.RecyclerView;
 import android.widget.RelativeLayout;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.FloatingActionButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.UnreadItemsLayout;
+import x7c1.linen.glue.res.layout.UnreadItemsPanes;
 
-public class UnreadItemsLayoutProvider implements ViewHolderProvider<UnreadItemsLayout> {
+public class UnreadItemsPanesProvider implements ViewHolderProvider<UnreadItemsPanes> {
 
     private final LayoutInflater inflater;
 
-    public UnreadItemsLayoutProvider(Context context){
+    public UnreadItemsPanesProvider(Context context){
         this.inflater = LayoutInflater.from(context);
     }
 
-    public UnreadItemsLayoutProvider(LayoutInflater inflater){
+    public UnreadItemsPanesProvider(LayoutInflater inflater){
         this.inflater = inflater;
     }
 
     @Override
     public int layoutId(){
-        return R.layout.unread_items_layout;
+        return R.layout.unread_items_panes;
     }
 
     @Override
-    public UnreadItemsLayout inflateOn(ViewGroup parent){
+    public UnreadItemsPanes inflateOn(ViewGroup parent){
         return inflate(parent, false);
     }
 
     @Override
-    public UnreadItemsLayout inflate(ViewGroup parent, boolean attachToRoot){
-        View view = inflater.inflate(R.layout.unread_items_layout, parent, attachToRoot);
+    public UnreadItemsPanes inflate(ViewGroup parent, boolean attachToRoot){
+        View view = inflater.inflate(R.layout.unread_items_panes, parent, attachToRoot);
         return factory().createViewHolder(view);
     }
 
-    public static ViewHolderProviderFactory<UnreadItemsLayout> factory(){
-        return new ViewHolderProviderFactory<UnreadItemsLayout>() {
+    public static ViewHolderProviderFactory<UnreadItemsPanes> factory(){
+        return new ViewHolderProviderFactory<UnreadItemsPanes>() {
             @Override
-            public ViewHolderProvider<UnreadItemsLayout> create(LayoutInflater inflater){
-                return new UnreadItemsLayoutProvider(inflater);
+            public ViewHolderProvider<UnreadItemsPanes> create(LayoutInflater inflater){
+                return new UnreadItemsPanesProvider(inflater);
             }
             @Override
-            public ViewHolderProvider<UnreadItemsLayout> create(Context context){
-                return new UnreadItemsLayoutProvider(context);
+            public ViewHolderProvider<UnreadItemsPanes> create(Context context){
+                return new UnreadItemsPanesProvider(context);
             }
             @Override
-            public UnreadItemsLayout createViewHolder(View view){
-                return new UnreadItemsLayout(
+            public UnreadItemsPanes createViewHolder(View view){
+                return new UnreadItemsPanes(
                     view,
-                    (android.support.v4.widget.DrawerLayout) view.findViewById(R.id.unread_items_layout__drawer_menu),
-                    (LinearLayout) view.findViewById(R.id.unread_items_layout__menu_area),
-                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.unread_items_layout__menu_list),
                     (LinearLayout) view.findViewById(R.id.unread_items_panes__pane_container),
                     (RelativeLayout) view.findViewById(R.id.unread_items_panes__source_area),
                     (android.support.v7.widget.Toolbar) view.findViewById(R.id.unread_items_panes__source_toolbar),

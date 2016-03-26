@@ -7,7 +7,7 @@
     android:layout_gravity="end"
     >
 
-    <include layout="@layout/activity_main"/>
+    <include layout="@layout/unread_items_panes"/>
 
     <LinearLayout
         android:id="@+id/unread_items_layout__menu_area"
