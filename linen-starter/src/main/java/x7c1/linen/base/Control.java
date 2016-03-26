@@ -1,5 +1,6 @@
-package x7c1.linen;
+package x7c1.linen.base;
 
+import x7c1.linen.UpdaterService;
 import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceLabel;

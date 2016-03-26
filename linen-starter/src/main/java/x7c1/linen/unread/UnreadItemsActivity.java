@@ -1,8 +1,10 @@
-package x7c1.linen;
+package x7c1.linen.unread;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import x7c1.linen.base.BaseActivity;
+import x7c1.linen.R;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.UnreadItemsLayout;
@@ -26,7 +28,7 @@ import x7c1.linen.res.layout.UnreadSourceRowFooterProvider;
 import x7c1.linen.res.layout.UnreadSourceRowItemProvider;
 
 
-public class MainActivity extends BaseActivity {
+public class UnreadItemsActivity extends BaseActivity {
 
 	private UnreadItemsDelegatee initializer = null;
 

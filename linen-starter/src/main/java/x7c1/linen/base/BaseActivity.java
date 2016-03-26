@@ -1,9 +1,8 @@
-package x7c1.linen;
+package x7c1.linen.base;
 
 import android.app.Activity;
 import android.content.Intent;
 
-import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.glue.activity.ActivityControl;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceControl;
