@@ -14,7 +14,6 @@ import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
-
 class PresetChannelSourcesDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
   layout: SettingChannelSourcesLayout,
@@ -38,13 +37,10 @@ class PresetChannelSourcesDelegatee (
   }
   def showSources(accountId: Long, channelId: Long): Unit = {
     Log info s"account:$accountId, channel:$channelId"
+
     val accessorFactory = new SettingSourceAccessorFactory(database, accountId)
-
-    val a0 = accessorFactory create channelId
-    Log info s"len:${a0.length}"
-
     layout.sourceList setAdapter new SourceRowAdapter(
-      accessor = a0,
+      accessor = accessorFactory create channelId,
       viewHolderProvider = sourceRowProvider,
       onSyncClicked = onSyncClicked
     )
