@@ -2,7 +2,7 @@ package x7c1.wheat.macros.intent
 
 import android.content.{Context, Intent}
 import android.support.v4.content.LocalBroadcastManager
-import x7c1.wheat.macros.base.TreeContext
+import x7c1.wheat.macros.base.PublicFieldsFinder
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -38,7 +38,7 @@ private object LocalBroadcasterImpl {
   }
 }
 
-private trait ActionIntentTreeFactory extends TreeContext {
+private trait ActionIntentTreeFactory extends PublicFieldsFinder {
   import context.universe._
   val eventTree: Tree
 
@@ -47,10 +47,8 @@ private trait ActionIntentTreeFactory extends TreeContext {
 
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
-    val putExtras = eventTree.tpe.members.
-      filter(_.isConstructor).map(_.asMethod).
-      filter(_.paramLists exists (_.nonEmpty)).
-      flatMap(_.paramLists flatMap {_ map toPut(intent, event)})
+    val putExtras = findConstructorOf(eventTree.tpe).
+      map(_.paramLists flatMap {_ map toPut(intent, event)}) getOrElse List()
 
     val action = eventTree.tpe.typeSymbol.fullName
     q"""
