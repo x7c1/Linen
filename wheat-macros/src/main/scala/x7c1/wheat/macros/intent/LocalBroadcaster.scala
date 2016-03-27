@@ -42,13 +42,12 @@ private trait ActionIntentTreeFactory extends PublicFieldsFinder {
   import context.universe._
   val eventTree: Tree
 
-  private lazy val eventName = eventTree.tpe.typeSymbol.name.toString
   private lazy val eventFullName = eventTree.tpe.typeSymbol.fullName
 
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
     val encoder = IntentEncoder(context)(intent)
-    val toPut = encoder.toPut(eventTree.tpe, Left(event), prefix = eventFullName) _
+    val toPut = encoder.toPut(eventTree.tpe, q"$event", prefix = eventFullName) _
     val putExtras = findConstructorOf(eventTree.tpe).
       map(_.paramLists flatMap {_ map toPut}) getOrElse List()
 

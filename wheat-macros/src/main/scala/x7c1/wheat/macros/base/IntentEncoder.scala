@@ -10,7 +10,7 @@ trait IntentEncoder
 
   def encodeInstance(
     instanceType: Type,
-    instance: Either[TermName, Tree], prefix: String = ""): List[Tree] = {
+    instance: Tree, prefix: String = ""): List[Tree] = {
 
     val toPut0 = toPut(instanceType, instance, prefix) _
     findConstructorOf(instanceType).
@@ -30,16 +30,13 @@ trait IntentEncoder
     x =:= typeOf[Seq[Long]]
 
   def toPut
-    (instanceType: Type, instance: Either[TermName, Tree], prefix: String = "")
+    (instanceType: Type, instance: Tree, prefix: String = "")
     (param: Symbol): Tree = {
 
     val name = param.name.encodedName.toString
     buildIntent(
       targetType = param typeSignatureIn instanceType,
-      select = instance match {
-        case Right(tree) => q"""$tree.${TermName(name)}"""
-        case Left(arg) => q"""$arg.${TermName(name)}"""
-      },
+      select = q"""$instance.${TermName(name)}""",
       name = name,
       prefix = prefix
     )
@@ -64,7 +61,7 @@ trait IntentEncoder
           $intent.putExtra($key, $extra.toArray)
         """
       case x if ! isBuiltInType(x) =>
-        val trees = encodeInstance(x, Right(select), s"$prefix:$name")
+        val trees = encodeInstance(x, select, s"$prefix:$name")
         q"""..$trees"""
       case x =>
         val paramType = x.typeSymbol.name.toString
