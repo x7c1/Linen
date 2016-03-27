@@ -2,7 +2,7 @@ package x7c1.wheat.macros.intent
 
 import android.content.{Context, Intent}
 import android.support.v4.content.LocalBroadcastManager
-import x7c1.wheat.macros.base.PublicFieldsFinder
+import x7c1.wheat.macros.base.{IntentEncoder, PublicFieldsFinder}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -47,8 +47,11 @@ private trait ActionIntentTreeFactory extends PublicFieldsFinder {
 
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
+    val encoder = IntentEncoder(context)(intent)
+    val toPut = encoder.toPut(eventTree.tpe, event, prefix = eventFullName) _
+
     val putExtras = findConstructorOf(eventTree.tpe).
-      map(_.paramLists flatMap {_ map toPut(intent, event)}) getOrElse List()
+      map(_.paramLists flatMap {_ map toPut}) getOrElse List()
 
     val action = eventTree.tpe.typeSymbol.fullName
     q"""
@@ -60,23 +63,6 @@ private trait ActionIntentTreeFactory extends PublicFieldsFinder {
       }
     """
   }
-  def isTarget(x: Type) =
-    (x <:< typeOf[Boolean]) ||
-    (x <:< typeOf[Long]) ||
-    (x <:< typeOf[Serializable])
 
-  def toPut(intent: TermName, arg: TermName)(param: Symbol) = {
-    val name = param.name.toString
-    val tree = param.typeSignatureIn(eventTree.tpe) match {
-      case x if isTarget(x) =>
-        val key = s"$eventFullName:$name"
-        q"""$intent.putExtra($key, $arg.${TermName(name)})"""
-      case x =>
-        val paramType = x.typeSymbol.name.toString
-        throw new IllegalArgumentException(
-          s"unsupported type: $eventName#$name: $paramType")
-    }
-    tree
-  }
 }
 
