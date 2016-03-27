@@ -13,7 +13,6 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/setting_channel_sources_layout__toolbar"
             style="@style/AppToolbar"
-            app:title="Source Settings"
             />
 
     </android.support.design.widget.AppBarLayout>

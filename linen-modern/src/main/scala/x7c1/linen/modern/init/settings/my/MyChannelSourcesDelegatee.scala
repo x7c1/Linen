@@ -44,6 +44,7 @@ class MyChannelSourcesDelegatee (
       viewHolderProvider = sourceRowProvider,
       onSyncClicked = onSyncClicked
     )
+    layout.toolbar setTitle event.channelName
   }
   private def onSyncClicked = OnSyncClickedListener { event =>
     ServiceCaller.using[UpdaterMethods].

@@ -26,7 +26,8 @@ class ChannelRowAdapter(
       holder.sources onClick { _ =>
         onSourcesSelected apply ChannelSourcesSelected(
           accountId = accessor.accountId,
-          channelId = channel.channelId
+          channelId = channel.channelId,
+          channelName = channel.name
         )
       }
       holder.switchSubscribe onChangedManually { e =>
@@ -42,7 +43,9 @@ class ChannelRowAdapter(
 
 case class ChannelSourcesSelected(
   accountId: Long,
-  channelId: Long )
+  channelId: Long,
+  channelName: String
+)
 
 case class MyChannelSubscriptionChanged(
   channelId: Long,

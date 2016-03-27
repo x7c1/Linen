@@ -37,13 +37,13 @@ class PresetChannelSourcesDelegatee (
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
     Log info s"$event"
-
     val accessorFactory = new SettingSourceAccessorFactory(database, event.accountId)
     layout.sourceList setAdapter new SourceRowAdapter(
       accessor = accessorFactory create event.channelId,
       viewHolderProvider = sourceRowProvider,
       onSyncClicked = onSyncClicked
     )
+    layout.toolbar setTitle event.channelName
   }
   private def onSyncClicked = OnSyncClickedListener { event =>
     ServiceCaller.using[UpdaterMethods].

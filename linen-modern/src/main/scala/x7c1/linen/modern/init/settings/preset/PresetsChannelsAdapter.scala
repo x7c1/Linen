@@ -27,7 +27,8 @@ class PresetsChannelsAdapter(
       holder.sources onClick { _ =>
         onSourceSelected apply ChannelSourcesSelected(
           accountId = accessor.clientAccountId,
-          channelId = channel.channelId
+          channelId = channel.channelId,
+          channelName = channel.name
         )
       }
       holder.switchSubscribe onChangedManually { e =>
