@@ -8,12 +8,12 @@ trait IntentEncoder
   import context.universe._
   val intent: TermName
 
-  def encodeInstance() = {
+  def encodeInstance(
+    instanceType: Type, instance: Either[TermName, Tree], prefix: String = "") = {
 
-  }
-
-  def encodeParameter() = {
-
+    val toPut0 = toPut(instanceType, instance, prefix) _
+    findConstructorOf(instanceType).
+      map(_.paramLists flatMap {_ map toPut0}) getOrElse List()
   }
 
   def isTarget(x: Type) =
@@ -21,19 +21,35 @@ trait IntentEncoder
     (x <:< typeOf[Long]) ||
     (x <:< typeOf[Serializable])
 
-  def toPut(instanceType: Type, arg: TermName, prefix: String = "")(param: Symbol) = {
+  def toPut
+    (instanceType: Type, instance: Either[TermName, Tree], prefix: String = "")
+    (param: Symbol): Tree = {
+
     val name = param.name.encodedName.toString
     val key = if (prefix.isEmpty) name else s"$prefix:$name"
-
-    val tree = param.typeSignatureIn(instanceType) match {
+    val extra = TermName(context freshName "extra")
+    param.typeSignatureIn(instanceType) match {
       case x if isTarget(x) =>
-        q"""$intent.putExtra($key, $arg.${TermName(name)})"""
+        val assign = instance match {
+          case Right(tree) => q"""$tree.${TermName(name)}"""
+          case Left(arg) => q"""$arg.${TermName(name)}"""
+        }
+        q"""
+          val $extra = $assign
+          $intent.putExtra($key, $extra)
+        """
+      case x if ! isBuiltInType(x) =>
+        val select = instance match {
+          case Right(tree) => q"$tree.${TermName(name)}"
+          case Left(arg) => q"$arg.${TermName(name)}"
+        }
+        val trees = encodeInstance(x, Right(select), s"$prefix:$name")
+        q"""..$trees"""
       case x =>
         val paramType = x.typeSymbol.name.toString
         throw new IllegalArgumentException(
           s"unsupported type: $name: $paramType")
     }
-    tree
   }
 }
 

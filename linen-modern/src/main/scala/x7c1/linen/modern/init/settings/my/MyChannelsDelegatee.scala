@@ -61,7 +61,7 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
 
     val intent = IntentFactory.using[MyChannelSourcesDelegatee].
       create(activity, activity getClassOf SettingMyChannelSources){
-        _.showSources(event.accountId, event.channelId)
+        _.showSources(event)
       }
 
     activity startActivityBy intent

@@ -66,6 +66,7 @@ private trait IntentTreeFactory {
     val value = extra.value match {
       case x if x.tpe =:= typeOf[Seq[Long]] => q"$x.toArray"
       case x => x
+//        throw new IllegalArgumentException(s"unsupported type $x")
     }
     q"$intent.putExtra(${extra.key}, $value)"
   }

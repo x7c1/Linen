@@ -48,7 +48,7 @@ private trait ActionIntentTreeFactory extends PublicFieldsFinder {
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
     val encoder = IntentEncoder(context)(intent)
-    val toPut = encoder.toPut(eventTree.tpe, event, prefix = eventFullName) _
+    val toPut = encoder.toPut(eventTree.tpe, Left(event), prefix = eventFullName) _
 
     val putExtras = findConstructorOf(eventTree.tpe).
       map(_.paramLists flatMap {_ map toPut}) getOrElse List()
