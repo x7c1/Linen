@@ -3,7 +3,7 @@ package x7c1.wheat.macros.intent
 import android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-import x7c1.wheat.macros.base.IntentDecoder
+import x7c1.wheat.macros.base.{IntentTypeDecoder, TreeContext}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -70,11 +70,11 @@ object LocalBroadcastListenerImpl {
   }
 }
 
-private trait LocalBroadcastListenerFactory
-  extends IntentDecoder {
+private trait LocalBroadcastListenerFactory  extends TreeContext {
 
   import context.universe._
   val blockTree: Tree
+  val instanceType: Type
 
   def instantiate() = {
     val Seq(receiver, filter) = createTermNames("receiver", "filter")
@@ -91,11 +91,14 @@ private trait LocalBroadcastListenerFactory
     val Seq(context, intent, event, f, e, message) =
       createTermNames("context", "intent", "event", "f", "e", "message")
 
+    import scala.language.existentials
+    val eventTree = IntentTypeDecoder(this.context)(intent) decodeIntent instanceType
+
     q"""
       new ${typeOf[BroadcastReceiver]}{
         override def onReceive($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) = {
           try {
-            val $event = ${decodeIntent(intent)}
+            val $event = $eventTree
             val $f = $blockTree
             $f($event)
           } catch {
