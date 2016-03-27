@@ -9,40 +9,61 @@ trait IntentEncoder
   val intent: TermName
 
   def encodeInstance(
-    instanceType: Type, instance: Either[TermName, Tree], prefix: String = "") = {
+    instanceType: Type,
+    instance: Either[TermName, Tree], prefix: String = ""): List[Tree] = {
 
     val toPut0 = toPut(instanceType, instance, prefix) _
     findConstructorOf(instanceType).
       map(_.paramLists flatMap {_ map toPut0}) getOrElse List()
   }
 
-  def isTarget(x: Type) =
+  private def isPrimitive(x: Type) =
     (x <:< typeOf[Boolean]) ||
     (x <:< typeOf[Long]) ||
-    (x <:< typeOf[Serializable])
+    (x <:< typeOf[Int]) ||
+    (x <:< typeOf[String])
+
+  private def isSerializable(x: Type) =
+    x <:< typeOf[Serializable]
+
+  private def isSeq(x: Type) =
+    x =:= typeOf[Seq[Long]]
 
   def toPut
     (instanceType: Type, instance: Either[TermName, Tree], prefix: String = "")
     (param: Symbol): Tree = {
 
     val name = param.name.encodedName.toString
+    buildIntent(
+      targetType = param typeSignatureIn instanceType,
+      select = instance match {
+        case Right(tree) => q"""$tree.${TermName(name)}"""
+        case Left(arg) => q"""$arg.${TermName(name)}"""
+      },
+      name = name,
+      prefix = prefix
+    )
+  }
+  def buildIntent(
+    targetType: Type,
+    select: Tree,
+    name: String,
+    prefix: String = ""): Tree = {
+
     val key = if (prefix.isEmpty) name else s"$prefix:$name"
     val extra = TermName(context freshName "extra")
-    param.typeSignatureIn(instanceType) match {
-      case x if isTarget(x) =>
-        val assign = instance match {
-          case Right(tree) => q"""$tree.${TermName(name)}"""
-          case Left(arg) => q"""$arg.${TermName(name)}"""
-        }
+    targetType match {
+      case x if isPrimitive(x) || isSerializable(x) =>
         q"""
-          val $extra = $assign
+          val $extra = $select
           $intent.putExtra($key, $extra)
         """
+      case x if isSeq(x) =>
+        q"""
+          val $extra = $select
+          $intent.putExtra($key, $extra.toArray)
+        """
       case x if ! isBuiltInType(x) =>
-        val select = instance match {
-          case Right(tree) => q"$tree.${TermName(name)}"
-          case Left(arg) => q"$arg.${TermName(name)}"
-        }
         val trees = encodeInstance(x, Right(select), s"$prefix:$name")
         q"""..$trees"""
       case x =>

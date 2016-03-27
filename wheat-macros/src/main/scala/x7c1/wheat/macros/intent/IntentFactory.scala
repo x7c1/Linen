@@ -1,6 +1,7 @@
 package x7c1.wheat.macros.intent
 
-import android.content.{Intent, Context}
+import android.content.{Context, Intent}
+import x7c1.wheat.macros.base.IntentEncoder
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -34,9 +35,8 @@ private trait IntentTreeFactory {
   val block: Tree
 
   case class IntentExtra(
-    key: String,
     value: Tree,
-    typeName: String
+    name: String
   )
   private lazy val (_, call) = block.children match {
     case Seq(x, y: Apply) => x -> y
@@ -45,30 +45,24 @@ private trait IntentTreeFactory {
   lazy val methodName: String = call.symbol.asMethod.fullName
 
   private def extras: List[IntentExtra] = {
-    val pairs = call.symbol.asMethod.paramLists match {
+    val names = call.symbol.asMethod.paramLists match {
       case xs if xs.length > 1 =>
         throw new IllegalArgumentException(s"too many paramLists : $xs")
       case Seq(params) =>
-        params map { param =>
-          param.name.encodedName.toString ->
-            param.typeSignature.typeSymbol.fullName
-        }
+        params map { _.name.encodedName.toString }
     }
-    pairs zip call.children.tail map {
-      case ((paramName, paramType), arg) =>
-        IntentExtra(
-          key = s"$methodName:$paramName",
-          value = arg,
-          typeName = paramType )
+    names zip call.children.tail map {
+      case (paramName, arg) =>
+        IntentExtra(value = arg, name = paramName)
     }
   }
   def putExtras(intent: TermName): List[Tree] = extras map { extra =>
-    val value = extra.value match {
-      case x if x.tpe =:= typeOf[Seq[Long]] => q"$x.toArray"
-      case x => x
-//        throw new IllegalArgumentException(s"unsupported type $x")
-    }
-    q"$intent.putExtra(${extra.key}, $value)"
+    IntentEncoder(context)(intent).buildIntent(
+      targetType = extra.value.tpe,
+      select = extra.value,
+      name = extra.name,
+      prefix = methodName
+    )
   }
   def newIntent(androidContext: Tree, klass: Tree): Tree = {
     val intent = TermName(context freshName "intent")
