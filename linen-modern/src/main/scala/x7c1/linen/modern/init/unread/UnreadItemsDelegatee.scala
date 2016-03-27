@@ -7,7 +7,7 @@ import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MainLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
+import x7c1.linen.glue.res.layout.{UnreadItemsLayout, MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
 import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
@@ -19,7 +19,7 @@ import x7c1.wheat.modern.resource.ViewHolderProviders
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
-  val layout: MainLayout,
+  val layout: UnreadItemsLayout,
   val menuRowProviders: MenuRowProviders,
   val unreadRowProviders: UnreadRowProviders
 ) extends ActionsInitializer
@@ -29,18 +29,14 @@ class UnreadItemsDelegatee(
   with DetailAreaInitializer {
 
   def setup(): Unit = {
-    setupDrawerMenu()
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
-
-    clientAccount match {
-      case Some(account) => loader.startLoading(account)
-      case None => Log error s"account not found"
-    }
+    setupDrawerMenu()
   }
   def close(): Unit = {
     Log info s"[start]"
+    closeDrawerMenu()
     loader.close()
     database.close()
   }
@@ -54,11 +50,20 @@ class UnreadItemsDelegatee(
   }
   protected lazy val helper = new LinenOpenHelper(activity)
 
+  protected lazy val reader = new UnreadChannelsReader(
+    client = clientAccount,
+    loader = loader,
+    onLoaded = new OnAccessorsLoadedListener(
+      layout = layout,
+      container = container,
+      pointer = new SourcePointer(accessors.source, container, actions),
+      drawer = actions.drawer
+    )
+  )
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader = AccessorLoader(database, activity){
-    new OnAccessorsLoadedListener(layout).onLoad
-  }
+  private lazy val loader = AccessorLoader(database, activity)
+
   lazy val container = new PaneContainer(
     view = layout.paneContainer,
     displayWidth = displaySize.x,

@@ -82,7 +82,9 @@ class ChannelSubscriber(account: AccountIdentifiable, helper: LinenOpenHelper){
         case Left(error) => Left(error)
       }
     }
-    private def execute[A, B](channelId: Long)(f: (WritableDatabase, ChannelStatusRecordParts) => Either[A, B]) = {
+    private def execute[A, B](channelId: Long)
+      (f: (WritableDatabase, ChannelStatusRecordParts) => Either[A, B]) = {
+
       val either = WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
         f(writable, ChannelStatusRecordParts(
           channelId = channelId,

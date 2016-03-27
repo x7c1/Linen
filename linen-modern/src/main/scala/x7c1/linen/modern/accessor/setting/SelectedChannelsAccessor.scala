@@ -16,7 +16,7 @@ object SelectedChannelsAccessor {
     }
     either.right map { presetAccountId =>
       val query = createQuery(clientAccountId, presetAccountId)
-      new PresetChannelAccessorImpl(helper, query)
+      new PresetChannelAccessorImpl(helper, query, clientAccountId)
     }
   }
   def createQuery(clientAccountId: Long, presetAccountId: Long) = {

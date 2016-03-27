@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import x7c1.linen.base.Control;
 import x7c1.linen.glue.service.ServiceControl;
 import x7c1.linen.glue.service.ServiceLabel;
 import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee;

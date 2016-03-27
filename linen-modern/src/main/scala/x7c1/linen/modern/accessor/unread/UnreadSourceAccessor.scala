@@ -36,6 +36,10 @@ trait UnreadSourceAccessor extends UnreadItemAccessor {
   }
 }
 
+trait ClosableSourceAccessor extends UnreadSourceAccessor {
+  def close(): Unit
+}
+
 case class UnreadSourceRow(content: SourceRowContent){
   def source: Option[UnreadSource] = content match {
     case x: UnreadSource => Some(x)
@@ -46,7 +50,7 @@ case class UnreadSourceRow(content: SourceRowContent){
 private class UnreadSourceAccessorImpl(
   rawCursor: Cursor,
   positionMap: Map[Int, Int],
-  sourceIdMap: Map[Long, Int]) extends UnreadSourceAccessor {
+  sourceIdMap: Map[Long, Int]) extends ClosableSourceAccessor {
 
   private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
@@ -70,12 +74,13 @@ private class UnreadSourceAccessorImpl(
   override def positionOf(sourceId: Long): Option[Int] = {
     sourceIdMap.get(sourceId)
   }
+  override def close(): Unit = rawCursor.close()
 }
 
 object UnreadSourceAccessor {
   def create(
     db: SQLiteDatabase,
-    accountId: Long, channelId: Long): Try[UnreadSourceAccessor] = {
+    accountId: Long, channelId: Long): Try[ClosableSourceAccessor] = {
 
     Try {
       val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)

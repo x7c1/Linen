@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.settings.preset
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.{LayoutInflater, View, ViewGroup}
-import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabSelected}
+import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabSelected}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.setting.SelectedChannelsAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -14,7 +14,7 @@ import x7c1.wheat.macros.logger.Log
 class ArgumentsForSelected(
   val accountId: Long,
   val tabFactory: ViewHolderProviderFactory[SettingPresetTabSelected],
-  val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
+  val rowFactory: ViewHolderProviderFactory[SettingPresetChannelRow]
 )
 class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with ReloadableFragment {
   private lazy val args = getTypedArguments
@@ -42,6 +42,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
+          onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected

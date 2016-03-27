@@ -27,8 +27,8 @@ class SourceSelectedObserver(actions: Actions)
     val sync = for {
       _ <- actions.outlineArea onSourceSelected event
       _ <- actions.sourceArea onSourceSelected event
-      _ <- actions.container onSourceSelected event
       _ <- actions.detailArea onSourceSelected event
+      _ <- actions.container onSourceSelected event
     } yield ()
 
     Seq(sync) foreach runAsync { Log error _.toString }

@@ -45,6 +45,11 @@ case class Account (accountId: Long)
 trait AccountIdentifiable {
   def accountId: Long
 }
+object AccountIdentifiable {
+  def apply(id: Long): AccountIdentifiable = new AccountIdentifiable {
+    override def accountId: Long = id
+  }
+}
 
 case class AccountParts(
   nickname: String,

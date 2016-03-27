@@ -11,11 +11,7 @@ trait OutlineAreaInitializer {
   self: UnreadItemsDelegatee =>
 
   def setupEntryArea(): Unit = {
-    layout.entryArea setLayoutParams {
-      val params = layout.entryArea.getLayoutParams
-      params.width = widthWithMargin
-      params
-    }
+    layout.entryArea updateLayoutParams { _.width = widthWithMargin }
     layout.entryToolbar onClickNavigation { _ =>
       actions.container.onBack()
     }

@@ -1,8 +1,8 @@
 package x7c1.linen.modern.init.settings.preset
 
 
-case class SubscribeChangedEvent(
+case class PresetChannelSubscriptionChanged(
   channelId: Long,
-  isChecked: Boolean,
+  isSubscribed: Boolean,
   from: PresetEventLocation
 )

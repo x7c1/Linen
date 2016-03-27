@@ -1,10 +1,13 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.{LayoutInflater, View, ViewGroup}
-import x7c1.linen.glue.res.layout.{SettingPresetRow, SettingPresetTabAll}
+import x7c1.linen.glue.activity.ActivityControl
+import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
@@ -17,11 +20,13 @@ import x7c1.wheat.macros.logger.Log
 class ArgumentsForAll(
   val accountId: Long,
   val tabFactory: ViewHolderProviderFactory[SettingPresetTabAll],
-  val rowFactory: ViewHolderProviderFactory[SettingPresetRow]
+  val rowFactory: ViewHolderProviderFactory[SettingPresetChannelRow]
 )
 
-trait ReloadableFragment {
+trait ReloadableFragment { self: Fragment =>
   def reload(channelId: Long): Unit
+  def activityControl: Activity with ActivityControl =
+    getActivity.asInstanceOf[Activity with ActivityControl]
 }
 
 class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableFragment {
@@ -49,6 +54,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
         tab.channelList setLayoutManager new LinearLayoutManager(getContext)
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
+          onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
           accessor = accessor,
           provider = args.rowFactory create inflater,
           location = PresetTabAll
@@ -67,12 +73,12 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
 class SubscriptionChangedUpdater(
   accountId0: Long, context: Context, helper: LinenOpenHelper) extends OnChannelSubscribedListener {
 
-  override def onSubscribedChanged(event: SubscribeChangedEvent): Unit = {
+  override def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit = {
     val account = new AccountIdentifiable {
       override def accountId: Long = accountId0
     }
     val subscriber = new ChannelSubscriber(account, helper)
-    if (event.isChecked){
+    if (event.isSubscribed){
       subscriber subscribe event.channelId
     } else {
       subscriber unsubscribe event.channelId
@@ -82,5 +88,5 @@ class SubscriptionChangedUpdater(
 }
 
 trait OnChannelSubscribedListener { self =>
-  def onSubscribedChanged(event: SubscribeChangedEvent)
+  def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit
 }

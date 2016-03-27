@@ -5,6 +5,7 @@ import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 trait PresetChannelsAccessor {
+  def clientAccountId: Long
   def length: Int
   def findAt(position: Int): Option[SettingPresetChannel]
   def reload(): Unit
@@ -23,7 +24,7 @@ object PresetChannelsAccessor {
     }
     either.right map { presetAccountId =>
       val query = createQuery(clientAccountId, presetAccountId)
-      new PresetChannelAccessorImpl(helper, query)
+      new PresetChannelAccessorImpl(helper, query, clientAccountId)
     }
   }
   def createQuery(clientAccountId: Long, presetAccountId: Long) = {
@@ -47,7 +48,10 @@ object PresetChannelsAccessor {
   }
 }
 
-private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) extends PresetChannelsAccessor {
+private class PresetChannelAccessorImpl(
+  helper: LinenOpenHelper,
+  query: Query,
+  accountId: Long ) extends PresetChannelsAccessor {
 
   private var (rawCursor, cursor) = init()
 
@@ -75,6 +79,7 @@ private class PresetChannelAccessorImpl(helper: LinenOpenHelper, query: Query) e
       cursor = typed
     }
   }
+  override def clientAccountId = accountId
 }
 
 trait SettingPresetChannelRecord extends TypedFields {

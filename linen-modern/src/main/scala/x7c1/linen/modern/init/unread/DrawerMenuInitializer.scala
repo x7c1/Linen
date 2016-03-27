@@ -6,20 +6,19 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannels, SettingPresetChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.accessor.unread.{UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
-import x7c1.linen.modern.init.settings.SettingChannelsDelegatee
+import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
@@ -27,34 +26,40 @@ trait DrawerMenuInitializer {
   def setupDrawerMenu(): Unit = {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
-    layout.menuArea setLayoutParams {
-      val params = layout.menuArea.getLayoutParams
+    layout.menuArea updateLayoutParams { params =>
       val maxWidth = dipToPixel(320)
       val defaultWidth = displaySize.x - dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
-      params
     }
-    clientAccount foreach { account =>
-      val loader = new UnreadChannelLoader(helper, account)
-      val menuItems = createMenuItems(account, loader.accessor)
-      val adapter = new DrawerMenuRowAdapter(menuItems)
-      layout.menuList setAdapter adapter
+    channelLoader -> clientAccount match {
+      case (Some(loader), Some(account)) =>
+        layout.menuList setAdapter new DrawerMenuRowAdapter(
+          items = createMenuItems(account, loader.accessor)
+        )
+        loader.startLoading().
+          flatMap(onChannelSubscriptionChanged.notifyAdapter).
+          map(reader.onMenuLoaded).
+          execute()
 
-      val task = loader.startLoading() map {
-        case e: Done =>
-          Log info s"[done]"
-          layout.menuList runUi { _ => adapter.notifyDataSetChanged() }
-        case e: AccessorError =>
-          Log error e.detail
-      }
-      task.execute()
+      case _ =>
+        Log error s"client not found"
     }
+    onChannelSubscriptionChanged registerTo activity
   }
+  def closeDrawerMenu(): Unit = {
+    onChannelSubscriptionChanged unregisterFrom activity
+  }
+  protected lazy val channelLoader = clientAccount match {
+    case Some(account) => Some(new UnreadChannelLoader(helper, account))
+    case None => None
+  }
+  protected lazy val onChannelSubscriptionChanged =
+    new OnChannelSubscriptionChanged(layout, channelLoader)
 
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
-    val onClick = new OnMenuItemClick(activity, account.accountId)
+    val onClick = new OnMenuItemClick(activity, account.accountId, reader.reloadChannel)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
     val ----- = new SingleMenuItem(menuRowProviders.forSeparator)
@@ -104,18 +109,20 @@ class UnreadChannelsMenu(
 
 class OnMenuItemClick(
   activity: Activity with ActivityControl,
-  accountId: Long ) extends OnMenuItemClickListener {
+  accountId: Long,
+  onUnreadChannelSelected: UnreadChannelMenu => Unit) extends OnMenuItemClickListener {
 
   override def onClick(kind: MenuItemKind): Unit = kind match {
     case channel: UnreadChannelMenu =>
       Log info s"$kind, ${channel.channelId}, ${channel.body}"
+      onUnreadChannelSelected(channel)
     case _: NoChannel =>
       Log info s"$kind"
     case _: MyChannels =>
       Log info s"$kind"
 
-      val intent = IntentFactory.using[SettingChannelsDelegatee].
-        create(activity, activity getClassOf SettingChannels){
+      val intent = IntentFactory.using[MyChannelsDelegatee].
+        create(activity, activity getClassOf SettingMyChannels){
           _.showMyChannels(accountId)
         }
       activity startActivityBy intent

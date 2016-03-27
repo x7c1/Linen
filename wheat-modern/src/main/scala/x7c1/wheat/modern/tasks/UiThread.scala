@@ -12,6 +12,9 @@ class UiThread[A <: View](view: A){
     }
     CallbackTask(f)
   }
+  def join[B](task: CallbackTask[B]): CallbackTask[B] = {
+    apply(_ => ()) flatMap (_ => task)
+  }
 }
 
 object UiThread {

@@ -2,7 +2,7 @@ package x7c1.linen.dev;
 
 import android.os.Bundle;
 
-import x7c1.linen.BaseActivity;
+import x7c1.linen.base.BaseActivity;
 import x7c1.linen.R;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;

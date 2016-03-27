@@ -1,11 +1,14 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.app.Activity
 import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, FragmentPagerAdapter}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingPresetChannelsLayout, SettingPresetRow, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.glue.activity.ActivityLabel.SettingPresetChannelSources
+import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.modern.display.settings.ChannelSourcesSelected
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
-import x7c1.wheat.macros.intent.{IntentExpander, LocalBroadcastListener}
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -15,7 +18,7 @@ class PresetChannelsDelegatee(
   layout: SettingPresetChannelsLayout,
   factories: ProviderFactories ){
 
-  lazy val onSubscribe = LocalBroadcastListener[SubscribeChangedEvent]{ event =>
+  lazy val onSubscribe = LocalBroadcastListener[PresetChannelSubscriptionChanged]{ event =>
     val reloadable: PartialFunction[Fragment, ReloadableFragment] = event.from match {
       case PresetTabSelected => { case f: PresetsAllFragment => f }
       case PresetTabAll => { case f: PresetsSelectedFragment => f }
@@ -53,7 +56,7 @@ class PresetChannelsDelegatee(
 class ProviderFactories(
   val forSelected: ViewHolderProviderFactory[SettingPresetTabSelected],
   val forAll: ViewHolderProviderFactory[SettingPresetTabAll],
-  val forRow: ViewHolderProviderFactory[SettingPresetRow]
+  val forRow: ViewHolderProviderFactory[SettingPresetChannelRow]
 )
 
 class PresetPagerAdapter(
@@ -82,4 +85,17 @@ class PresetPagerAdapter(
     fragments(position)._1
   }
   override def getCount: Int = fragments.length
+}
+
+class OnSourcesSelected(activity: Activity with ActivityControl){
+  def transitToSources(event: ChannelSourcesSelected): Unit = {
+    Log info s"[init] $event"
+
+    val intent = IntentFactory.using[PresetChannelSourcesDelegatee].
+      create(activity, activity getClassOf SettingPresetChannelSources){
+        _.showSources(event)
+      }
+
+    activity startActivityBy intent
+  }
 }

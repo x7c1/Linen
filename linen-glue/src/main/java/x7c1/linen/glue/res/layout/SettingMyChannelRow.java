@@ -11,24 +11,27 @@ import android.view.View;
 import android.widget.TextView;
 import android.support.v7.widget.SwitchCompat;
 
-public class SettingPresetRow extends RecyclerView.ViewHolder {
+public class SettingMyChannelRow extends RecyclerView.ViewHolder {
 
     public final TextView name;
     public final TextView description;
     public final android.support.v7.widget.SwitchCompat switchSubscribe;
+    public final TextView edit;
     public final TextView sources;
 
-    public SettingPresetRow(
+    public SettingMyChannelRow(
         View itemView,
         TextView name,
         TextView description,
         android.support.v7.widget.SwitchCompat switchSubscribe,
+        TextView edit,
         TextView sources
     ){
         super(itemView);
         this.name = name;
         this.description = description;
         this.switchSubscribe = switchSubscribe;
+        this.edit = edit;
         this.sources = sources;
     }
 }

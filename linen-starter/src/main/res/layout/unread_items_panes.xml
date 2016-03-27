@@ -1,13 +1,13 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main__pane_container"
+    android:id="@+id/unread_items_panes__pane_container"
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:id="@+id/activity_main__source_area"
+        android:id="@+id/unread_items_panes__source_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -22,21 +22,21 @@
                 android:layout_height="wrap_content">
 
                 <android.support.v7.widget.Toolbar
-                    android:id="@+id/activity_main__source_toolbar"
+                    android:id="@+id/unread_items_panes__source_toolbar"
                     style="@style/AppToolbar"
                     />
 
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__source_list"
+                android:id="@+id/unread_items_panes__source_list"
                 style="@style/AppItemList"
                 />
 
         </LinearLayout>
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/activity_main__source_bottom_bar"
+            android:id="@+id/unread_items_panes__source_bottom_bar"
             style="@style/AppToolbarBottom"
             >
             <TextView
@@ -46,14 +46,14 @@
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/activity_main__source_to_next"
+            android:id="@+id/unread_items_panes__source_to_next"
             style="@style/ToNextButton.Polyfill"
             />
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/activity_main__entry_area"
+        android:id="@+id/unread_items_panes__entry_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -68,21 +68,21 @@
                 android:layout_height="wrap_content">
 
                 <android.support.v7.widget.Toolbar
-                    android:id="@+id/activity_main__entry_toolbar"
+                    android:id="@+id/unread_items_panes__entry_toolbar"
                     style="@style/AppToolbar"
                     />
 
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__entry_list"
+                android:id="@+id/unread_items_panes__entry_list"
                 style="@style/AppItemList"
                 />
 
         </LinearLayout>
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/activity_main__entry_bottom_bar"
+            android:id="@+id/unread_items_panes__entry_bottom_bar"
             style="@style/AppToolbarBottom"
             >
             <TextView
@@ -92,14 +92,14 @@
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/activity_main__entry_to_next"
+            android:id="@+id/unread_items_panes__entry_to_next"
             style="@style/ToNextButton.Polyfill"
             />
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/activity_main__entry_detail_area"
+        android:id="@+id/unread_items_panes__entry_detail_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -113,19 +113,19 @@
                 android:layout_height="wrap_content">
 
                 <android.support.v7.widget.Toolbar
-                    android:id="@+id/activity_main__entry_detail_toolbar"
+                    android:id="@+id/unread_items_panes__entry_detail_toolbar"
                     style="@style/AppToolbar"
                     />
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main__entry_detail_list"
+                android:id="@+id/unread_items_panes__entry_detail_list"
                 style="@style/AppItemList"
                 />
         </LinearLayout>
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/activity_main__detail_bottom_bar"
+            android:id="@+id/unread_items_panes__detail_bottom_bar"
             style="@style/AppToolbarBottom"
             >
             <TextView
@@ -136,7 +136,7 @@
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/activity_main__detail_to_next"
+            android:id="@+id/unread_items_panes__detail_to_next"
             style="@style/ToNextButton.Polyfill"
             />
 

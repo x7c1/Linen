@@ -2,7 +2,7 @@ package x7c1.wheat.macros.intent
 
 import android.content.{Context, Intent}
 import android.support.v4.content.LocalBroadcastManager
-import x7c1.wheat.macros.base.TreeContext
+import x7c1.wheat.macros.base.{IntentEncoder, PublicFieldsFinder}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -38,18 +38,18 @@ private object LocalBroadcasterImpl {
   }
 }
 
-private trait ActionIntentTreeFactory extends TreeContext {
+private trait ActionIntentTreeFactory extends PublicFieldsFinder {
   import context.universe._
   val eventTree: Tree
 
-  private lazy val eventName = eventTree.tpe.typeSymbol.name.toString
+  private lazy val eventFullName = eventTree.tpe.typeSymbol.fullName
 
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
-    val putExtras = eventTree.tpe.members.
-      filter(_.isConstructor).map(_.asMethod).
-      filter(_.paramLists exists (_.nonEmpty)).
-      flatMap(_.paramLists flatMap {_ map toPut(intent, event)})
+    val encoder = IntentEncoder(context)(intent)
+    val toPut = encoder.toPut(eventTree.tpe, q"$event", prefix = eventFullName) _
+    val putExtras = findConstructorOf(eventTree.tpe).
+      map(_.paramLists flatMap {_ map toPut}) getOrElse List()
 
     val action = eventTree.tpe.typeSymbol.fullName
     q"""
@@ -61,22 +61,6 @@ private trait ActionIntentTreeFactory extends TreeContext {
       }
     """
   }
-  def isTarget(x: Type) =
-    (x <:< typeOf[Boolean]) ||
-    (x <:< typeOf[Long]) ||
-    (x <:< typeOf[Serializable])
 
-  def toPut(intent: TermName, arg: TermName)(param: Symbol) = {
-    val name = param.name.toString
-    val tree = param.typeSignatureIn(eventTree.tpe) match {
-      case x if isTarget(x) =>
-        q"""$intent.putExtra(${param.fullName}, $arg.${TermName(name)})"""
-      case x =>
-        val paramType = x.typeSymbol.name.toString
-        throw new IllegalArgumentException(
-          s"unsupported type: $eventName#$name: $paramType")
-    }
-    tree
-  }
 }
 

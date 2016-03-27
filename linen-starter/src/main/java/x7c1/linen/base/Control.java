@@ -1,11 +1,13 @@
-package x7c1.linen;
+package x7c1.linen.base;
 
+import x7c1.linen.UpdaterService;
 import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceLabel;
+import x7c1.linen.settings.PresetChannelSourcesActivity;
 import x7c1.linen.settings.PresetChannelsActivity;
-import x7c1.linen.settings.SettingChannelSourcesActivity;
-import x7c1.linen.settings.SettingChannelsActivity;
+import x7c1.linen.settings.MyChannelSourcesActivity;
+import x7c1.linen.settings.MyChannelsActivity;
 
 import static java.lang.String.format;
 
@@ -14,14 +16,17 @@ public class Control {
 	public static Class<?> getActivityClassOf(ActivityLabel label) {
 		final Class<?> klass;
 		switch(label){
-			case SettingChannels:
-				klass = SettingChannelsActivity.class;
+			case SettingMyChannels:
+				klass = MyChannelsActivity.class;
+				break;
+			case SettingMyChannelSources:
+				klass = MyChannelSourcesActivity.class;
 				break;
 			case SettingPresetChannels:
 				klass = PresetChannelsActivity.class;
 				break;
-			case SettingChannelSources:
-				klass = SettingChannelSourcesActivity.class;
+			case SettingPresetChannelSources:
+				klass = PresetChannelSourcesActivity.class;
 				break;
 			case CreateRecords:
 				klass = CreateRecordsActivity.class;

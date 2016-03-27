@@ -2,7 +2,7 @@ package x7c1.wheat.macros.intent
 
 import android.content.Intent
 import android.util.Log
-import x7c1.wheat.macros.base.TreeContext
+import x7c1.wheat.macros.base.{IntentDecoder, TreeContext}
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
@@ -42,25 +42,16 @@ trait IntentExpanderTreeFactory extends TreeContext {
   val intentTree: Tree
 
   class MethodParameter(
-    key: String,
-    paramName: String,
-    paramType: Type ){
+    methodFullName: String,
+    paramSymbol: Symbol,
+    intent: TermName ){
 
     lazy val toArg: (TermName, Tree) = {
-      val tree = paramType match {
-        case x if x =:= typeOf[Int] => q"$intentTree.getIntExtra($key, -1)"
-        case x if x =:= typeOf[Long] => q"$intentTree.getLongExtra($key, -1)"
-        case x if x =:= typeOf[Seq[Long]] => q"$intentTree.getLongArrayExtra($key).toSeq"
-        case x if x =:= typeOf[String] => q"$intentTree.getStringExtra($key)"
-        case x =>
-          throw new IllegalArgumentException(s"unsupported type : $x")
-      }
+      val tree = IntentDecoder(context)(intent).
+        decodeParameter(paramSymbol, methodFullName)
+
       val name = TermName(context freshName "x")
-      val exception = typeOf[ExtraNotFoundException]
-      name -> q"""
-        val $name =
-          if ($intentTree.hasExtra($key)) $tree
-          else throw new $exception($key)"""
+      name -> q"""val $name = $tree"""
     }
   }
   case class Method(
@@ -103,7 +94,7 @@ trait IntentExpanderTreeFactory extends TreeContext {
     traverse(context.internal.enclosingOwner)
   }
 
-  def createMethods: Iterable[Method] = {
+  def createMethods(intent: TermName): Iterable[Method] = {
     val methodSymbols = enclosingClass.typeSignature.members collect {
       case x if x.isMethod && x.isPublic =>
         x.asMethod
@@ -119,17 +110,17 @@ trait IntentExpanderTreeFactory extends TreeContext {
       val params = method.paramLists.head map { param =>
         val paramName = param.name.encodedName.toString
         new MethodParameter(
-          key = s"${method.fullName}.$paramName",
-          paramName = paramName,
-          paramType = param.typeSignature
+          methodFullName = method.fullName,
+          paramSymbol = param,
+          intent = intent
         )
       }
       Method(method.name.encodedName.toString, method.fullName, params)
     }
   }
   def findCallee = {
-    val methods = createMethods
     val Seq(intent, action) = createTermNames("intent", "action")
+    val methods = createMethods(intent)
     q"""
       Option($intentTree) match {
         case Some($intent) => Option($intent.getAction) match {

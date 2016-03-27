@@ -2,8 +2,9 @@ package x7c1.linen.modern.init.dev
 
 import android.content.Context
 import x7c1.linen.modern.accessor.DummyString.words
-import x7c1.linen.modern.accessor.database.{EntryParts, ChannelSourceMapParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
-import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, ChannelAccessor, ChannelParts, EntryUrl, LinenOpenHelper}
+import x7c1.linen.modern.accessor.database.{ChannelParts, ChannelSourceMapParts, EntryParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
+import x7c1.linen.modern.accessor.setting.MyChannelAccessor
+import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, EntryUrl, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
 
@@ -34,7 +35,7 @@ object DummyFactory {
       )
       id
     }
-    val channelAccessor = ChannelAccessor.create(db, accountId1)
+    val channelAccessor = MyChannelAccessor.create(db, accountId1)
     val channelId = channelAccessor findAt 0 map (_.channelId) getOrElse {
       writable insert ChannelParts(
         accountId = accountId1,
