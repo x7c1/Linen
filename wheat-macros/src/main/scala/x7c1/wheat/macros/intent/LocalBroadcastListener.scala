@@ -1,9 +1,9 @@
 package x7c1.wheat.macros.intent
 
-import android.content.{Intent, BroadcastReceiver, Context, IntentFilter}
+import android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-import x7c1.wheat.macros.base.{IntentDecoder, TreeContext}
+import x7c1.wheat.macros.base.IntentDecoder
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -112,17 +112,5 @@ private trait LocalBroadcastListenerFactory
   }
   def createFilter = {
     q"""new ${typeOf[IntentFilter]}(${instanceType.typeSymbol.fullName})"""
-  }
-}
-
-
-
-trait PublicFieldsFinder extends TreeContext {
-  import context.universe._
-
-  def findConstructorOf(targetType: Type): Option[MethodSymbol] = {
-    targetType.members.
-      filter(_.isConstructor).map(_.asMethod).
-      find(_.paramLists exists (_.nonEmpty))
   }
 }
