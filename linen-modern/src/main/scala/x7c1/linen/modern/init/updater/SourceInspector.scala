@@ -30,10 +30,10 @@ class SourceInspector private (helper: LinenOpenHelper){
   def loadSource(source: InspectedSource): Future[LoadedSource] = {
     import LinenService.Implicits.executor
 
-    import scala.collection.JavaConversions._
+    import scala.collection.JavaConverters._
 
     Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
-      val entries = feed.getEntries map { case x: SyndEntry => x }
+      val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
       new LoadedSource(
         sourceId = source.sourceId,
         title = Option(feed.getTitle) getOrElse "",
