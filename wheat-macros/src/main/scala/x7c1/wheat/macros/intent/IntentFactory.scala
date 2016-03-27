@@ -57,7 +57,7 @@ private trait IntentTreeFactory {
     pairs zip call.children.tail map {
       case ((paramName, paramType), arg) =>
         IntentExtra(
-          key = s"$methodName.$paramName",
+          key = s"$methodName:$paramName",
           value = arg,
           typeName = paramType )
     }

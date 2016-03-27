@@ -43,6 +43,7 @@ private trait ActionIntentTreeFactory extends TreeContext {
   val eventTree: Tree
 
   private lazy val eventName = eventTree.tpe.typeSymbol.name.toString
+  private lazy val eventFullName = eventTree.tpe.typeSymbol.fullName
 
   def toIntent: Tree = {
     val Seq(intent, event) = createTermNames("intent", "event")
@@ -70,7 +71,8 @@ private trait ActionIntentTreeFactory extends TreeContext {
     val name = param.name.toString
     val tree = param.typeSignatureIn(eventTree.tpe) match {
       case x if isTarget(x) =>
-        q"""$intent.putExtra(${param.fullName}, $arg.${TermName(name)})"""
+        val key = s"$eventFullName:$name"
+        q"""$intent.putExtra($key, $arg.${TermName(name)})"""
       case x =>
         val paramType = x.typeSymbol.name.toString
         throw new IllegalArgumentException(

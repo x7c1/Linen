@@ -3,7 +3,7 @@ package x7c1.wheat.macros.intent
 import android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-import x7c1.wheat.macros.base.{IntentTypeDecoder, TreeContext}
+import x7c1.wheat.macros.base.{IntentDecoder, TreeContext}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -21,10 +21,10 @@ lazy val listener = {
   val receiver = new BroadcastReceiver {
     override def onReceive(context: Context, intent: Intent) = try {
       val event = {
-        val x1 = if (intent.hasExtra(""com.example.SomeEvent.foo"")) {
-          intent.getLongExtra("com.example.SomeEvent.foo", -1)
+        val x1 = if (intent.hasExtra(""com.example.SomeEvent:foo"")) {
+          intent.getLongExtra("com.example.SomeEvent:foo", -1)
         } else {
-          throw new ExtraNotFoundException("com.example.SomeEvent.foo")
+          throw new ExtraNotFoundException("com.example.SomeEvent:foo")
         }
         new SomeEvent(x1)
       }
@@ -92,7 +92,8 @@ private trait LocalBroadcastListenerFactory  extends TreeContext {
       createTermNames("context", "intent", "event", "f", "e", "message")
 
     import scala.language.existentials
-    val eventTree = IntentTypeDecoder(this.context)(intent) decodeIntent instanceType
+    val prefix = instanceType.typeSymbol.fullName
+    val eventTree = IntentDecoder(this.context)(intent) decodeIntent (instanceType, prefix)
 
     q"""
       new ${typeOf[BroadcastReceiver]}{

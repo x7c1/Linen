@@ -7,6 +7,14 @@ trait TreeContext {
   val context: blackbox.Context
   import context.universe._
 
+  def isBuiltInType(x: Type): Boolean = {
+    val prefixes = Seq(
+      "scala.",
+      "java."
+    )
+    val name = x.typeSymbol.fullName
+    prefixes exists name.startsWith
+  }
   def createTermNames(names: String*): Seq[TermName] = {
     names map (x => TermName(context freshName x))
   }
