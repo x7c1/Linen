@@ -3,7 +3,7 @@ package x7c1.wheat.macros.intent
 import android.content.{Intent, BroadcastReceiver, Context, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-import x7c1.wheat.macros.base.TreeContext
+import x7c1.wheat.macros.base.{IntentDecoder, TreeContext}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -62,7 +62,7 @@ object LocalBroadcastListenerImpl {
     val factory = new LocalBroadcastListenerFactory {
       override val context: c.type = c
       override val blockTree = block
-      override val eventType = weakTypeOf[A]
+      override val instanceType = weakTypeOf[A]
     }
     val tree = factory.instantiate()
 //    println(tree)
@@ -71,11 +71,10 @@ object LocalBroadcastListenerImpl {
 }
 
 private trait LocalBroadcastListenerFactory
-  extends TreeContext with PublicFieldsFinder {
+  extends IntentDecoder {
 
   import context.universe._
   val blockTree: Tree
-  val eventType: Type
 
   def instantiate() = {
     val Seq(receiver, filter) = createTermNames("receiver", "filter")
@@ -96,7 +95,7 @@ private trait LocalBroadcastListenerFactory
       new ${typeOf[BroadcastReceiver]}{
         override def onReceive($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) = {
           try {
-            val $event = ${createEvent(intent)}
+            val $event = ${decodeIntent(intent)}
             val $f = $blockTree
             $f($event)
           } catch {
@@ -112,42 +111,11 @@ private trait LocalBroadcastListenerFactory
     """
   }
   def createFilter = {
-    q"""new ${typeOf[IntentFilter]}(${eventType.typeSymbol.fullName})"""
-  }
-  def createEvent(intent: TermName): Tree = {
-    val pairs = findConstructorOf(eventType).
-      map(_.paramLists flatMap {_ map toGet(intent)}).
-      getOrElse(List()).
-      map { TermName(context freshName "x") -> _ }
-
-    val tmps = pairs map { case (x, get) => q"val $x = $get" }
-    val args = pairs map { _._1 }
-    q"""
-      ..$tmps
-      new $eventType(..$args)
-    """
-  }
-  def toGet(intent: TermName)(param: Symbol): Tree = {
-    val key = param.fullName
-    val tree = param.typeSignatureIn(eventType) match {
-      case x if x =:= typeOf[Long] =>
-        q"$intent.getLongExtra($key, -1)"
-      case x if x =:= typeOf[Boolean] =>
-        q"$intent.getBooleanExtra($key, false)"
-      case x if x <:< typeOf[Serializable] =>
-        q"$intent.getSerializableExtra($key).asInstanceOf[$x]"
-      case x =>
-        throw new IllegalArgumentException(s"unsupported type : $x")
-    }
-    q"""
-      if ($intent.hasExtra($key)){
-        $tree
-      } else {
-        throw new ${typeOf[ExtraNotFoundException]}($key)
-      }
-    """
+    q"""new ${typeOf[IntentFilter]}(${instanceType.typeSymbol.fullName})"""
   }
 }
+
+
 
 trait PublicFieldsFinder extends TreeContext {
   import context.universe._
