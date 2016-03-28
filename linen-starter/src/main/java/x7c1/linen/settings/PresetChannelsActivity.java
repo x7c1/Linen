@@ -10,6 +10,8 @@ import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.activity.ActivityControl;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
+import x7c1.linen.glue.service.ServiceControl;
+import x7c1.linen.glue.service.ServiceLabel;
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
 import x7c1.linen.modern.init.settings.preset.ProviderFactories;
 import x7c1.linen.res.layout.SettingPresetChannelsLayoutProvider;
@@ -17,7 +19,9 @@ import x7c1.linen.res.layout.SettingPresetChannelRowProvider;
 import x7c1.linen.res.layout.SettingPresetTabAllProvider;
 import x7c1.linen.res.layout.SettingPresetTabSelectedProvider;
 
-public class PresetChannelsActivity extends FragmentActivity implements ActivityControl {
+public class PresetChannelsActivity
+		extends FragmentActivity implements ActivityControl, ServiceControl {
+
 	private PresetChannelsDelegatee delegatee = null;
 
 	@Override
@@ -69,5 +73,10 @@ public class PresetChannelsActivity extends FragmentActivity implements Activity
 	@Override
 	public Class<?> getClassOf(ActivityLabel label) {
 		return Control.getActivityClassOf(label);
+	}
+
+	@Override
+	public Class<?> getClassOf(ServiceLabel label) {
+		return Control.getServiceClassOf(label);
 	}
 }

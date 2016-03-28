@@ -5,16 +5,19 @@ import android.support.v4.app.{Fragment, FragmentActivity, FragmentManager, Frag
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingPresetChannelSources
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetChannelsLayout, SettingPresetTabAll, SettingPresetTabSelected}
+import x7c1.linen.glue.service.ServiceControl
+import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.display.settings.ChannelSourcesSelected
+import x7c1.linen.modern.init.updater.UpdaterMethods
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory.create
-import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener}
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 
 class PresetChannelsDelegatee(
-  activity: FragmentActivity with ActivityControl,
+  activity: FragmentActivity with ActivityControl with ServiceControl,
   layout: SettingPresetChannelsLayout,
   factories: ProviderFactories ){
 
@@ -25,6 +28,12 @@ class PresetChannelsDelegatee(
     }
     allFragments collect reloadable foreach (_ reload event.channelId)
   }
+  lazy val toLoadSources = LocalBroadcastListener[LoadSourcesEvent]{ event =>
+    ServiceCaller.using[UpdaterMethods].
+      startService(activity, activity getClassOf Updater){
+        _ loadChannelSources (event.channelId, event.accountId)
+      }
+  }
   def allFragments = {
     (0 to layout.pager.getAdapter.getCount - 1).view map { n =>
       layout.pager.getAdapter.instantiateItem(layout.pager, n).asInstanceOf[Fragment]
@@ -33,6 +42,7 @@ class PresetChannelsDelegatee(
   def onCreate(): Unit = {
     Log info s"[start]"
     onSubscribe registerTo activity
+    toLoadSources registerTo activity
 
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
@@ -50,6 +60,7 @@ class PresetChannelsDelegatee(
   def onDestroy(): Unit = {
     Log info s"[start]"
     onSubscribe unregisterFrom activity
+    toLoadSources unregisterFrom activity
   }
 }
 

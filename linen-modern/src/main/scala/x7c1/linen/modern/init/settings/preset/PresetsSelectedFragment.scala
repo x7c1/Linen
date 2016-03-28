@@ -3,13 +3,14 @@ package x7c1.linen.modern.init.settings.preset
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener
-import android.support.v7.widget.{PopupMenu, LinearLayoutManager}
-import android.view.{Menu, MenuItem, LayoutInflater, View, ViewGroup}
+import android.support.v7.widget.{LinearLayoutManager, PopupMenu}
+import android.view.{LayoutInflater, Menu, MenuItem, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabSelected}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.setting.SelectedChannelsAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
+import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
 
 
@@ -45,7 +46,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
           onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
-          onMenuSelected = new OnMenuForSelected(getActivity).onSelected,
+          onMenuSelected = new OnMenuForSelected(getActivity, args.accountId).onSelected,
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected
@@ -60,17 +61,24 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
   }
 }
 
-class OnMenuForSelected(context: Context) {
+class OnMenuForSelected(context: Context, accountId: Long) {
   def onSelected(e: MenuSelected) = {
     val menu = new PopupMenu(context, e.targetView)
-    menu.getMenu.add(Menu.NONE, Menu.NONE, 1, "Reload channel")
+    menu.getMenu.add(Menu.NONE, 123, 1, "Load all sources")
     menu.show()
 
     menu setOnMenuItemClickListener new OnMenuItemClickListener {
       override def onMenuItemClick(item: MenuItem): Boolean = {
         Log info s"[init] $item"
+
+        if (item.getItemId == 123){
+          val event = LoadSourcesEvent(e.channelId, accountId)
+          LocalBroadcaster(event) dispatchFrom context
+        }
         true
       }
     }
   }
 }
+
+case class LoadSourcesEvent(channelId: Long, accountId: Long)
