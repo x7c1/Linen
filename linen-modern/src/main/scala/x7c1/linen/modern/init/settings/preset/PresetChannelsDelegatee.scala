@@ -20,7 +20,7 @@ class PresetChannelsDelegatee(
   factories: ProviderFactories ){
 
   lazy val onSubscribe = LocalBroadcastListener[PresetChannelSubscriptionChanged]{ event =>
-    val reloadable: PartialFunction[Fragment, ReloadableFragment] = event.from match {
+    val reloadable: PartialFunction[Fragment, PresetFragment] = event.from match {
       case PresetTabSelected => { case f: PresetsAllFragment => f }
       case PresetTabAll => { case f: PresetsSelectedFragment => f }
     }
