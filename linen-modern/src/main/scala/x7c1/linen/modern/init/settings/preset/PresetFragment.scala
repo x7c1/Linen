@@ -2,6 +2,7 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.app.Activity
 import android.support.v4.app.Fragment
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
@@ -36,6 +37,12 @@ trait PresetFragment { self: Fragment =>
       activity, args.rowFactory, location, helper, args.accountId
     )
     factory.createAdapter(accessor)
+  }
+  protected def applyAdapterTo(channelList: RecyclerView, from: PresetEventLocation) = {
+    presetsAccessor map toAdapter(from) foreach { adapter =>
+      channelList setLayoutManager new LinearLayoutManager(getContext)
+      channelList setAdapter adapter
+    }
   }
 }
 

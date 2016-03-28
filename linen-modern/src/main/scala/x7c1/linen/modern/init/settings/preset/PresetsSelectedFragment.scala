@@ -2,8 +2,8 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.app.Activity
 import android.os.Bundle
+import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener
-import android.support.v7.widget.{LinearLayoutManager, PopupMenu}
 import android.view.{LayoutInflater, Menu, MenuItem, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabSelected}
 import x7c1.linen.glue.service.ServiceControl
@@ -34,10 +34,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with P
 
     Log info s"[start]"
     val tab = args.tabFactory.create(inflater) inflateOn container
-    presetsAccessor map toAdapter(PresetTabSelected) foreach { adapter =>
-      tab.channelList setLayoutManager new LinearLayoutManager(getContext)
-      tab.channelList setAdapter adapter
-    }
+    applyAdapterTo(tab.channelList, from = PresetTabSelected)
     tab.itemView
   }
   override def onDestroy(): Unit = {

@@ -2,7 +2,6 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
@@ -33,10 +32,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with PresetFragm
 
     Log info s"[start]"
     val tab = args.tabFactory.create(inflater).inflateOn(container)
-    presetsAccessor map toAdapter(PresetTabAll) foreach { adapter =>
-      tab.channelList setLayoutManager new LinearLayoutManager(getContext)
-      tab.channelList setAdapter adapter
-    }
+    applyAdapterTo(tab.channelList, from = PresetTabAll)
     tab.itemView
   }
   override def onDestroy(): Unit = {
