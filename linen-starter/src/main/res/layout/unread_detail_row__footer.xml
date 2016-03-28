@@ -6,13 +6,5 @@
     android:paddingTop="14dp"
     android:paddingBottom="12dp"
     >
-    <TextView
-        android:textSize="17sp"
-        android:textColor="@color/text_primary"
-        android:layout_alignParentTop="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="detail: footer!!"
-        />
 
 </RelativeLayout>
