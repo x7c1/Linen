@@ -12,7 +12,7 @@ class PresetsChannelsAdapter(
   location: PresetEventLocation,
   listener: OnChannelSubscribedListener,
   onSourceSelected: ChannelSourcesSelected => Unit,
-  onMenuSelected: MenuSelected => Unit,
+  onMenuSelected: OnMenuSelectedListener,
   accessor: PresetChannelsAccessor,
   provider: ViewHolderProvider[SettingPresetChannelRow]) extends Adapter[SettingPresetChannelRow] {
 
@@ -26,7 +26,7 @@ class PresetsChannelsAdapter(
       holder.name.text = channel.name
       holder.description.text = channel.description
       holder.menu onClick { view =>
-        onMenuSelected apply MenuSelected(view, channel)
+        onMenuSelected onMenuSelected MenuSelected(view, channel)
       }
       holder.sources onClick { _ =>
         onSourceSelected apply ChannelSourcesSelected(
@@ -55,4 +55,8 @@ object MenuSelected {
   def apply(targetView: View, channel: SettingPresetChannel): MenuSelected = {
     new MenuSelected(targetView, channel)
   }
+}
+
+trait OnMenuSelectedListener {
+  def onMenuSelected(e: MenuSelected): Unit
 }
