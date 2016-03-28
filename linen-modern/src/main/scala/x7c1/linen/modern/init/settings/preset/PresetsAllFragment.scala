@@ -55,6 +55,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with ReloadableF
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
           onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
+          onMenuSelected = new OnMenuForAll().onSelected,
           accessor = accessor,
           provider = args.rowFactory create inflater,
           location = PresetTabAll
@@ -89,4 +90,10 @@ class SubscriptionChangedUpdater(
 
 trait OnChannelSubscribedListener { self =>
   def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit
+}
+
+class OnMenuForAll {
+  def onSelected(e: MenuSelected) = {
+
+  }
 }

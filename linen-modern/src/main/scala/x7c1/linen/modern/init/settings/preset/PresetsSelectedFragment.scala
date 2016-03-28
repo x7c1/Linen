@@ -1,8 +1,10 @@
 package x7c1.linen.modern.init.settings.preset
 
+import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.view.{LayoutInflater, View, ViewGroup}
+import android.support.v7.widget.PopupMenu.OnMenuItemClickListener
+import android.support.v7.widget.{PopupMenu, LinearLayoutManager}
+import android.view.{Menu, MenuItem, LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabSelected}
 import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.setting.SelectedChannelsAccessor
@@ -43,6 +45,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
         tab.channelList setAdapter new PresetsChannelsAdapter(
           listener = new SubscriptionChangedUpdater(args.accountId, getContext, helper),
           onSourceSelected = new OnSourcesSelected(activityControl).transitToSources,
+          onMenuSelected = new OnMenuForSelected(getActivity).onSelected,
           accessor = accessor,
           provider = args.rowFactory create getContext,
           location = PresetTabSelected
@@ -54,5 +57,20 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with R
     Log info s"[start]"
     super.onDestroy()
     helper.close()
+  }
+}
+
+class OnMenuForSelected(context: Context) {
+  def onSelected(e: MenuSelected) = {
+    val menu = new PopupMenu(context, e.targetView)
+    menu.getMenu.add(Menu.NONE, Menu.NONE, 1, "Reload channel")
+    menu.show()
+
+    menu setOnMenuItemClickListener new OnMenuItemClickListener {
+      override def onMenuItemClick(item: MenuItem): Boolean = {
+        Log info s"[init] $item"
+        true
+      }
+    }
   }
 }
