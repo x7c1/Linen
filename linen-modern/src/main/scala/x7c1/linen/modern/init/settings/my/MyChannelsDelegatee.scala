@@ -47,11 +47,15 @@ class MyChannelsDelegatee (
         listener.updateSubscription
       }
     )
+    layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
     database.close()
     helper.close()
     Log info "[done]"
+  }
+  private def showInputDialog(accountId: Long): Unit = {
+    Log info s"[init] account:$accountId"
   }
 }
 
