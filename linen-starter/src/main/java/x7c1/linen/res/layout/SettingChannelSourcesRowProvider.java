@@ -65,6 +65,7 @@ public class SettingChannelSourcesRowProvider implements ViewHolderProvider<Sett
                     (TextView) view.findViewById(R.id.setting_channel_sources_row__description),
                     (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_channel_sources_row__switch_subscribe),
                     (SeekBar) view.findViewById(R.id.setting_channel_sources_row__rating_bar),
+                    (TextView) view.findViewById(R.id.setting_channel_sources_row__rating_value),
                     (TextView) view.findViewById(R.id.setting_channel_sources_row__rating_label),
                     (ImageButton) view.findViewById(R.id.setting_channel_sources_row__sync)
                 );
