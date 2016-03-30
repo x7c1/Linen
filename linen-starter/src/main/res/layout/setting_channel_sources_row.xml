@@ -76,12 +76,18 @@
         android:progressBackgroundTint="@color/to_next_button_background"
         />
 
+    <!--
+        see also:
+        http://stackoverflow.com/questions/10316354/how-to-make-text-view-shape-circle-and-set-different-background-color-based-on-c
+    -->
     <TextView
         android:id="@+id/setting_channel_sources_row__rating_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/setting_channel_sources_row__rating_bar"
-        android:text="95"
+        android:background="@drawable/bg_rating_tooltip"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="@android:color/white"
         />
 
     <TextView
