@@ -30,6 +30,7 @@ class SourceRowAdapter (
       holder.sync onClick { view =>
         onSyncClicked onSyncClicked SyncClickedEvent(source.sourceId)
       }
+      holder.ratingLabel.text = s"RATING:${source.rating}"
       holder.ratingBar setProgress source.rating
       holder.ratingBar setOnSeekBarChangeListener new OnRatingChanged(
         holder,
