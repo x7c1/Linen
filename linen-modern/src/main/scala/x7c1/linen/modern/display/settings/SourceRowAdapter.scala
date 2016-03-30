@@ -47,10 +47,12 @@ private class OnRatingChanged(
 
   lazy val initial = getDefault
   var started = false
+  val minStep = 5
 
   override def onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean): Unit = {
     if (started){
-      holder.ratingValue.text = s"$progress"
+      val stepped = Math.round(progress/ minStep) * minStep
+      holder.ratingValue.text = s"$stepped"
       holder.ratingValue setX {
         val current = seekBar.getThumb.getBounds.left
         initial + current - (holder.ratingValue.getWidth / 2)
