@@ -1,5 +1,6 @@
 package x7c1.linen.modern.display.settings
 
+import android.animation.{Animator, AnimatorListenerAdapter}
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{View, ViewGroup}
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -57,12 +58,23 @@ private class OnRatingChanged(
     }
   }
   override def onStopTrackingTouch(seekBar: SeekBar): Unit = {
-    holder.ratingValue setVisibility View.GONE
+    holder.ratingValue.animate().setDuration(200).alpha(0).setListener(new AnimatorListenerAdapter {
+      override def onAnimationEnd(animation: Animator): Unit = {
+        holder.ratingValue setVisibility View.GONE
+      }
+    })
   }
   override def onStartTrackingTouch(seekBar: SeekBar): Unit = {
     started = true
-    holder.ratingValue setVisibility View.VISIBLE
+
     holder.ratingValue setX initial
+    holder.ratingValue setAlpha 0
+    holder.ratingValue setVisibility View.VISIBLE
+    holder.ratingValue.animate().setDuration(200).alpha(1).setListener(new AnimatorListenerAdapter {
+      override def onAnimationEnd(animation: Animator): Unit = {
+        holder.ratingValue setVisibility View.VISIBLE
+      }
+    })
   }
   private def getLeft(view: View) = {
     val x = new Array[Int](2)
