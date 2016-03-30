@@ -88,6 +88,7 @@
         android:background="@drawable/bg_rating_tooltip"
         android:gravity="center_vertical|center_horizontal"
         android:textColor="@android:color/white"
+        android:elevation="5dp"
         />
 
     <TextView
