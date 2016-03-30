@@ -83,7 +83,6 @@
         android:layout_above="@id/setting_channel_sources_row__rating_bar"
         android:text="95"
         />
-    <!--android:layout_toStartOf="@id/setting_channel_sources_row__rating_bar"-->
 
     <TextView
         android:id="@+id/setting_channel_sources_row__rating_label"
