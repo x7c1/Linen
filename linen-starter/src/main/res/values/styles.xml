@@ -107,6 +107,10 @@
         <item name="android:layout_alignParentEnd">true</item>
     </style>
 
+    <style name="AppTextInputLayout">
+        <item name="colorControlNormal">@color/awafujiiro</item><!-- underline below EditText -->
+    </style>
+
     <dimen name="app_toolbar_bottom_height">38dp</dimen>
 
     <color name="text_primary">@color/rouiro</color>
