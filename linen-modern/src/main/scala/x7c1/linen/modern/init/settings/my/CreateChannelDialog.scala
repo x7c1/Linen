@@ -45,27 +45,30 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
   private def createChannel() = {
     Log info s"[create] account:${args.accountId}"
   }
-  private def hideKeyboard() = Option(getActivity.getCurrentFocus) match {
-    case Some(view) =>
-      Log info s"[focus] $view"
+  private def hideKeyboard() = {
+    Option(getActivity.getCurrentFocus) match {
+      case Some(view) =>
+        Log info s"[focus] $view"
 
-      val manager = getActivity.
-        getSystemService(Context.INPUT_METHOD_SERVICE).
-        asInstanceOf[InputMethodManager]
+        val manager = getActivity.
+          getSystemService(Context.INPUT_METHOD_SERVICE).
+          asInstanceOf[InputMethodManager]
 
-      Log info s"[focus-token] ${view.getWindowToken}"
-      manager.hideSoftInputFromWindow(
-        layout.channelName.getWindowToken,
-        InputMethodManager.HIDE_NOT_ALWAYS
-      )
-      val shown = manager.isAcceptingText
-      Log info s"focus? $shown"
+        Log info s"[focus-token] ${view.getWindowToken}"
+        manager.hideSoftInputFromWindow(
+          layout.channelName.getWindowToken,
+          InputMethodManager.HIDE_NOT_ALWAYS
+        )
+        val shown = manager.isAcceptingText
+        Log info s"focus? $shown"
 
-      val msec = if (shown) 300 else 200
-      view.runAfter(msec){ _ => dismiss() }
+        val msec = if (shown) 300 else 200
+        view.runAfter(msec){ _ => dismiss() }
 
-    case None =>
-      Log info s"[unfocused]"
+      case None =>
+        Log warn s"[unfocused]"
+        dismiss()
+    }
   }
 
   private lazy val layout = {
