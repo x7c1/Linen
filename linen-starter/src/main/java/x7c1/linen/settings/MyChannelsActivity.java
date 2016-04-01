@@ -48,7 +48,6 @@ public class MyChannelsActivity
 	public void onBackPressed() {
 		super.onBackPressed();
 		TransitAnimations.forDirectChild(this).finish();
-//		onBackPressedAtChild();
 	}
 	@Override
 	protected void onDestroy() {
@@ -59,7 +58,6 @@ public class MyChannelsActivity
 	public void finish() {
 		super.finish();
 		TransitAnimations.forDirectChild(this).finish();
-//		finishFromChild();
 	}
 
 	@Override
@@ -83,10 +81,5 @@ public class MyChannelsActivity
 			return new AlertDialog.Builder(context, R.style.AppAlertDialog);
 		}
 	}
-
-//	@Override
-//	protected TransitAnimation createTransitAnimation() {
-//		return TransitAnimations.forDirectChild(this);
-//	}
 }
 
