@@ -51,8 +51,6 @@ class OnMenuForSelected(
   override def onMenuSelected(e: MenuSelected) = {
     val menu = new PopupMenu(activity, e.targetView)
     menu.getMenu.add(Menu.NONE, 123, 1, "Load all sources")
-    menu.show()
-
     menu setOnMenuItemClickListener new OnMenuItemClickListener {
       override def onMenuItemClick(item: MenuItem): Boolean = {
         Log info s"[init] $item"
@@ -66,6 +64,7 @@ class OnMenuForSelected(
         true
       }
     }
+    menu.show()
   }
 }
 

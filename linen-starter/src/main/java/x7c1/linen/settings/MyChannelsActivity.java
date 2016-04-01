@@ -14,7 +14,6 @@ import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.SettingMyChannelsLayout;
 import x7c1.linen.glue.service.ServiceControl;
 import x7c1.linen.glue.service.ServiceLabel;
-import x7c1.linen.modern.init.settings.my.CreateChannelDialog;
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee;
 import x7c1.linen.res.layout.SettingMyChannelCreateProvider;
 import x7c1.linen.res.layout.SettingMyChannelRowProvider;
@@ -39,10 +38,8 @@ public class MyChannelsActivity
 		this.delegatee = new MyChannelsDelegatee(
 				this,
 				layout,
-				new CreateChannelDialog.Arguments(
-						new DialogFactory(),
-						SettingMyChannelCreateProvider.factory()
-				),
+				new DialogFactory(),
+				SettingMyChannelCreateProvider.factory(),
 				new SettingMyChannelRowProvider(this)
 		);
 		this.delegatee.setup();
