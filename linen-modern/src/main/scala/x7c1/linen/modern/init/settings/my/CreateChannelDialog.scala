@@ -82,6 +82,11 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
         Log info s"[init]"
       }
     }
+    /*
+      In order to control timing of dismiss(),
+        temporally set listeners as nop
+        then set onClickListener again in onStart method.
+     */
     val builder = args.dialogFactory.newInstance(getActivity).
       setTitle("Create new channel").
       setPositiveButton("Create", nop).
