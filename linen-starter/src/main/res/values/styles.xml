@@ -111,6 +111,10 @@
         <item name="colorControlNormal">@color/awafujiiro</item><!-- underline below EditText -->
     </style>
 
+    <style name="AppAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/to_next_button_background</item>
+    </style>
+
     <dimen name="app_toolbar_bottom_height">38dp</dimen>
 
     <color name="text_primary">@color/rouiro</color>

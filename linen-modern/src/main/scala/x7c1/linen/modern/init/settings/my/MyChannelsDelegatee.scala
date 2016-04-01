@@ -14,6 +14,8 @@ import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
+import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
+import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.macros.fragment.{FragmentFactory, TypedFragment}
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster}
@@ -24,8 +26,8 @@ import x7c1.wheat.modern.resource.MetricsConverter
 class MyChannelsDelegatee (
   activity: FragmentActivity with ActivityControl,
   layout: SettingMyChannelsLayout,
-  channelRowProvider: ViewHolderProvider[SettingMyChannelRow],
-  inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate] ){
+  dialogArguments: Arguments,
+  channelRowProvider: ViewHolderProvider[SettingMyChannelRow] ){
 
   private lazy val helper = new LinenOpenHelper(activity)
 
@@ -64,20 +66,24 @@ class MyChannelsDelegatee (
   private def showInputDialog(accountId: Long): Unit = {
     Log info s"[init] account:$accountId"
 
-    val fragment = FragmentFactory.create[SampleFragment] by new SampleArg(inputLayoutFactory)
+    val fragment = FragmentFactory.create[CreateChannelDialog] by dialogArguments
     fragment.show(activity.getSupportFragmentManager, "hoge")
   }
 }
 
-class SampleArg(
-  val inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate]
-)
+object CreateChannelDialog {
+  class Arguments(
+    val dialogFactory: ContextualFactory[AlertDialog.Builder],
+    val inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate]
+  )
+}
 
-class SampleFragment extends AppCompatDialogFragment with TypedFragment[SampleArg]{
+class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arguments]{
   lazy val args = getTypedArguments
 
   override def onCreateDialog(savedInstanceState: Bundle): Dialog = {
-    val builder = new AlertDialog.Builder(getActivity).
+    val builder =
+      args.dialogFactory.newInstance(getActivity).
       setTitle("Create new channel").
       setPositiveButton("Create", new OnClickListener {
         override def onClick(dialog: DialogInterface, which: Int): Unit = {
