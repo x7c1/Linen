@@ -1,5 +1,6 @@
 package x7c1.wheat.modern.decorator
 
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.{LinearLayoutManager, Toolbar, RecyclerView}
 import android.view.View
 import android.widget.{CompoundButton, TextView}
@@ -9,6 +10,9 @@ object Imports {
 
   implicit def toRichCompoundView[A <: CompoundButton](view: A): RichCompoundButton[A]
     = new RichCompoundButton(view)
+
+  implicit def toRichAlertDialog[A <: AlertDialog](view: A): RichAlertDialog[A]
+    = new RichAlertDialog(view)
 
   implicit def toRichLinearLayoutManager(manager: LinearLayoutManager): RichLinearLayoutManager
     = new RichLinearLayoutManager(manager)
