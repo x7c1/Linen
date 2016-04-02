@@ -5,12 +5,14 @@ import android.content.{Context, DialogInterface}
 import android.os.Bundle
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.decorator.Imports._
 
 
@@ -25,6 +27,8 @@ object CreateChannelDialog {
 class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arguments]{
   lazy val args = getTypedArguments
 
+  private val provide = EitherTask.hold[NewChannelError]
+
   override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
 
   override def onStart(): Unit = {
@@ -32,20 +36,64 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 
     getDialog match {
       case dialog: AlertDialog =>
-        dialog.positiveButton foreach (_ onClick { _ =>
-          createChannel()
-          hideKeyboard()
-        })
-        dialog.negativeButton foreach (_ onClick { _ =>
-          hideKeyboard()
-        })
-      case dialog => Log error s"unknown dialog $dialog"
+        dialog.positiveButton foreach (_ onClick onClickPositive)
+        dialog.negativeButton foreach (_ onClick onClickNegative)
+      case dialog =>
+        Log error s"unknown dialog $dialog"
     }
   }
-  private def createChannel() = {
-    Log info s"[create] account:${args.accountId}"
+  private def onClickPositive(button: Button) = {
+    val tasks = for {
+      input <- validateInput
+      _ <- createChannel(input)
+      _ <- hideKeyboard()
+    } yield {
+      input
+    }
+    tasks run {
+      case Right(input) =>
+        Log info s"channel created: $input"
+      case Left(error) =>
+        showError(error).execute()
+        Log error error.dump
+    }
   }
-  private def hideKeyboard() = {
+  private def onClickNegative(button: Button) = {
+    Log info s"[init]"
+    hideKeyboard().execute()
+  }
+  private def validateInput = provide {
+    def parseName = {
+      val name = layout.channelName.text.toString
+      if (name.isEmpty){
+        Left(EmptyName())
+      } else {
+        Right(name)
+      }
+    }
+    def parseDescription = {
+      val description = layout.channelDescription.text.toString
+      Right(Option(description))
+    }
+    for {
+      name <- parseName.right
+      description <- parseDescription.right
+    } yield NewChannelInput(
+      channelName = name,
+      description = description
+    )
+  }
+  private def createChannel(input: NewChannelInput) = provide async {
+    Log info s"[create] account:${args.accountId}"
+    Right({})
+  }
+
+  private def showError(error: NewChannelError) = provide ui {
+    error match {
+      case EmptyName() => layout.channelNameLayout setError error.message
+    }
+  }
+  private def hideKeyboard() = provide ui {
     Option(getActivity.getCurrentFocus) match {
       case Some(view) =>
         Log info s"[focus] $view"
@@ -96,3 +144,8 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     builder.create()
   }
 }
+
+case class NewChannelInput(
+  channelName: String,
+  description: Option[String]
+)
