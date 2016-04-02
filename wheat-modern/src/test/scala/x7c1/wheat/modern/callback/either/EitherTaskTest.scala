@@ -7,7 +7,7 @@ import scala.concurrent.Await
 
 class EitherTaskTest extends FlatSpecLike with Matchers {
 
-  val provide = EitherTask.bindLeft[SampleError]
+  val provide = EitherTask.hold[SampleError]
 
   it can "handle right value" in {
     val tasks = for {
