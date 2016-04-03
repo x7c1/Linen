@@ -2,6 +2,7 @@ package x7c1.linen.modern.display.unread
 
 import java.lang.Math.{abs, max, min}
 
+import android.animation.{Animator, AnimatorListenerAdapter}
 import android.content.Context
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
@@ -66,6 +67,17 @@ class PaneContainer(
         view post new ContainerScroller(done)
       }
     } yield ()
+  }
+  def fadeOut(): CallbackTask[Unit] = task of { (done: OnFinish) =>
+    view.animate().setDuration(100).alpha(0.25F).setListener(new AnimatorListenerAdapter {
+      override def onAnimationEnd(animation: Animator): Unit = done.evaluate()
+    }): Unit
+  }
+  def fadeIn(): CallbackTask[Unit] = task of { (done: OnFinish) =>
+    view.setAlpha(0.25F)
+    view.animate().setDuration(100).alpha(1).setListener(new AnimatorListenerAdapter {
+      override def onAnimationEnd(animation: Animator): Unit = done.evaluate()
+    }): Unit
   }
   def findPreviousPane(): Option[Pane] = {
     val current = view.getScrollX
