@@ -7,7 +7,10 @@ import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
+import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
+import x7c1.linen.modern.accessor.database.{ChannelSubscriber, ChannelParts}
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
+import x7c1.linen.modern.struct.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -29,6 +32,8 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 
   private val provide = EitherTask.hold[NewChannelError]
 
+  private lazy val helper = new LinenOpenHelper(getActivity)
+
   override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
 
   override def onStart(): Unit = {
@@ -42,6 +47,12 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
         Log error s"unknown dialog $dialog"
     }
   }
+
+  override def onStop(): Unit = {
+    super.onStop()
+    helper.close()
+  }
+
   private def onClickPositive(button: Button) = {
     val tasks = for {
       input <- validateInput
@@ -53,8 +64,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     tasks run {
       case Right(input) =>
         Log info s"channel created: $input"
-      case Left(error) =>
+      case Left(error: UserInputError) =>
         showError(error).execute()
+      case Left(error) =>
         Log error error.dump
     }
   }
@@ -85,10 +97,30 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
   }
   private def createChannel(input: NewChannelInput) = provide async {
     Log info s"[create] account:${args.accountId}"
-    Right({})
+
+    def create() = helper.writable insert ChannelParts(
+      accountId = args.accountId,
+      name = input.channelName,
+      description = input.description.getOrElse(""),
+      createdAt = Date.current()
+    )
+    def subscribe(channelId: Long) = {
+      val subscriber = new ChannelSubscriber(
+        account = AccountIdentifiable(args.accountId),
+        helper = helper
+      )
+      subscriber subscribe channelId
+    }
+    // todo: use transaction
+    val either = for {
+      channelId <- create().right
+      _ <- subscribe(channelId).right
+    } yield ()
+
+    either.left map { e => SqlError(e) }
   }
 
-  private def showError(error: NewChannelError) = provide ui {
+  private def showError(error: UserInputError) = provide ui {
     error match {
       case EmptyName() => layout.channelNameLayout setError error.message
     }
