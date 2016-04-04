@@ -30,8 +30,8 @@ class OnAccessorsLoadedListener(
       }
       _ <- container.sourceArea skipTo 0
       _ <- container skipTo container.sourceArea
-      _ <- container.fadeIn()
-      _ <- task { drawer.onBack() }
+      _ <- ui join container.fadeIn()
+      _ <- ui join task { drawer.onBack() }
     } yield ()
 
     tasks.execute()
