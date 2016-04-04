@@ -6,13 +6,4 @@
     >
     <include layout="@layout/tools_progress_indeterminate_h"/>
 
-    <TextView
-        android:textSize="17sp"
-        android:textColor="@color/text_primary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/indeterminate_progress_bar"
-        android:text="source: footer!!"
-        />
-
 </RelativeLayout>

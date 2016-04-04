@@ -24,6 +24,18 @@
         android:textColor="@color/text_primary"
         />
 
+    <ImageButton
+        android:id="@+id/setting_preset_channel_row__menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_more_vert_24dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        />
+
     <TextView
         android:id="@+id/setting_preset_channel_row__description"
         android:paddingStart="@dimen/setting_channels_row_padding"

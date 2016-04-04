@@ -32,17 +32,9 @@ public class MyChannelSourcesActivity extends BaseActivity {
 		delegatee.setup();
 	}
 	@Override
-	public void onBackPressed() {
-		onBackPressedAtChild();
-	}
-	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.close();
-	}
-	@Override
-	public void finish() {
-		finishFromChild();
 	}
 	@Override
 	protected TransitAnimation createTransitAnimation() {

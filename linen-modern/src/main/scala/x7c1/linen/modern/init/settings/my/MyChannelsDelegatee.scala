@@ -2,22 +2,28 @@ package x7c1.linen.modern.init.settings.my
 
 import android.app.Activity
 import android.content.Context
+import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
-import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelsLayout}
+import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelRow, SettingMyChannelsLayout}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.setting.MyChannelAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
-import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.ancient.context.ContextualFactory
+import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
+import x7c1.wheat.macros.fragment.FragmentFactory
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 class MyChannelsDelegatee (
-  activity: Activity with ActivityControl,
+  activity: FragmentActivity with ActivityControl,
   layout: SettingMyChannelsLayout,
+  dialogFactory: ContextualFactory[AlertDialog.Builder],
+  inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate],
   channelRowProvider: ViewHolderProvider[SettingMyChannelRow] ){
 
   private lazy val helper = new LinenOpenHelper(activity)
@@ -47,11 +53,24 @@ class MyChannelsDelegatee (
         listener.updateSubscription
       }
     )
+    layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
     database.close()
     helper.close()
     Log info "[done]"
+  }
+  private def showInputDialog(accountId: Long): Unit = {
+    Log info s"[init] account:$accountId"
+
+    val fragment = FragmentFactory.create[CreateChannelDialog] by
+      new CreateChannelDialog.Arguments(
+        accountId = accountId,
+        dialogFactory = dialogFactory,
+        inputLayoutFactory = inputLayoutFactory
+      )
+
+    fragment.show(activity.getSupportFragmentManager, "hoge")
   }
 }
 
@@ -64,7 +83,7 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
         _.showSources(event)
       }
 
-    activity startActivityBy intent
+    activity startActivity intent
   }
 }
 

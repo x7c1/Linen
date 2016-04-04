@@ -1,14 +1,15 @@
 package x7c1.linen.base;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 
 import x7c1.linen.glue.activity.ActivityControl;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceControl;
 import x7c1.linen.glue.service.ServiceLabel;
 
-abstract public class BaseActivity extends Activity implements ActivityControl, ServiceControl {
+abstract public class BaseFragmentActivity
+		extends FragmentActivity implements ActivityControl, ServiceControl {
 
 	protected TransitAnimation transitAnimation = createTransitAnimation();
 	protected abstract TransitAnimation createTransitAnimation();
@@ -19,14 +20,6 @@ abstract public class BaseActivity extends Activity implements ActivityControl, 
 		transitAnimation.start();
 	}
 	@Override
-	public Class<?> getClassOf(ActivityLabel label) {
-		return Control.getActivityClassOf(label);
-	}
-	@Override
-	public Class<?> getClassOf(ServiceLabel label) {
-		return Control.getServiceClassOf(label);
-	}
-	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
 		transitAnimation.finish();
@@ -35,5 +28,13 @@ abstract public class BaseActivity extends Activity implements ActivityControl, 
 	public void finish(){
 		super.finish();
 		transitAnimation.finish();
+	}
+	@Override
+	public Class<?> getClassOf(ActivityLabel label) {
+		return Control.getActivityClassOf(label);
+	}
+	@Override
+	public Class<?> getClassOf(ServiceLabel label) {
+		return Control.getServiceClassOf(label);
 	}
 }

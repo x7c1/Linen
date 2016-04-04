@@ -92,6 +92,29 @@
         <item name="android:layout_marginRight">5dp</item>
     </style>
 
+    <style name="AppFloatingActionButton">
+        <item name="backgroundTint">@color/to_next_button_background</item>
+        <item name="fabSize">normal</item>
+        <item name="rippleColor">@color/brandeis_blue</item>
+
+        <item name="android:src">@drawable/ic_add_24dp</item>
+        <item name="android:clickable">true</item>
+
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">18dp</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+    </style>
+
+    <style name="AppTextInputLayout">
+        <item name="colorControlNormal">@color/awafujiiro</item><!-- underline below EditText -->
+    </style>
+
+    <style name="AppAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/to_next_button_background</item>
+    </style>
+
     <dimen name="app_toolbar_bottom_height">38dp</dimen>
 
     <color name="text_primary">@color/rouiro</color>

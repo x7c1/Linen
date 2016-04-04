@@ -1,5 +1,6 @@
 package x7c1.wheat.modern.tasks
 
+import android.os.{Looper, Handler}
 import android.view.View
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.decorator.Imports._
@@ -18,5 +19,10 @@ class UiThread[A <: View](view: A){
 }
 
 object UiThread {
+  def run[A](f: => A): Unit = {
+    new Handler(Looper.getMainLooper) post new Runnable {
+      override def run(): Unit = f
+    }
+  }
   def via[A <: View](view: A): UiThread[A] = new UiThread(view)
 }

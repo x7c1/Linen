@@ -7,7 +7,6 @@ import x7c1.linen.modern.action.{Actions, DrawerAction, SourceSkipStoppedFactory
 import x7c1.linen.modern.display.unread.PaneContainer
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.tasks.Async.await
 import x7c1.wheat.modern.tasks.UiThread
 
 
@@ -29,10 +28,10 @@ class OnAccessorsLoadedListener(
         updateAdapter()
         pointer focusOn 0
       }
-      _ <- await(10)
-      _ <- ui { _ => drawer.onBack() }
       _ <- container.sourceArea skipTo 0
       _ <- container skipTo container.sourceArea
+      _ <- container.fadeIn()
+      _ <- task { drawer.onBack() }
     } yield ()
 
     tasks.execute()

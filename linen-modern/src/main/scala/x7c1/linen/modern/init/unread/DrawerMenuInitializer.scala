@@ -9,7 +9,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.unread.{UnreadChannelAccessor, UnreadChannelLoader}
+import x7c1.linen.modern.accessor.unread.{ChannelSelectable, UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
@@ -17,6 +17,7 @@ import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
 
@@ -59,7 +60,7 @@ trait DrawerMenuInitializer {
   private def createMenuItems(
     account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
 
-    val onClick = new OnMenuItemClick(activity, account.accountId, reader.reloadChannel)
+    val onClick = new OnMenuItemClick(activity, account.accountId, onChannelSelected)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
     val label = new DrawerMenuLabelFactory(menuRowProviders.forLabel, onClick)
     val ----- = new SingleMenuItem(menuRowProviders.forSeparator)
@@ -83,6 +84,14 @@ trait DrawerMenuInitializer {
         label of DevCreateDummies("Create Records")
       )
     )
+  }
+  def onChannelSelected[A: ChannelSelectable](channel: A) = {
+    val tasks = for {
+      _ <- container.fadeOut()
+      _ <- task { reader reloadChannel channel }
+    } yield {}
+
+    tasks.execute()
   }
 
 }
@@ -125,7 +134,7 @@ class OnMenuItemClick(
         create(activity, activity getClassOf SettingMyChannels){
           _.showMyChannels(accountId)
         }
-      activity startActivityBy intent
+      activity startActivity intent
 
 //      activity startActivityBy new Intent(
 //        activity, activity getClassOf SettingChannels)
@@ -138,14 +147,14 @@ class OnMenuItemClick(
           _.showPresetChannels(accountId)
         }
 
-      activity startActivityBy intent
+      activity startActivity intent
 
     case _: ChannelOrder =>
       Log info s"$kind"
     case _: UpdaterSchedule =>
       Log info s"$kind"
     case _: DevCreateDummies =>
-      activity startActivityBy new Intent(
+      activity startActivity new Intent(
         activity, activity getClassOf CreateRecords)
   }
 }

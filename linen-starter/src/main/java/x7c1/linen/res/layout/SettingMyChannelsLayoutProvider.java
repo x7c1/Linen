@@ -8,13 +8,15 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SettingMyChannelsLayout;
+import android.view.View;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.FloatingActionButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingMyChannelsLayout;
 
 public class SettingMyChannelsLayoutProvider implements ViewHolderProvider<SettingMyChannelsLayout> {
 
@@ -59,7 +61,8 @@ public class SettingMyChannelsLayoutProvider implements ViewHolderProvider<Setti
                 return new SettingMyChannelsLayout(
                     view,
                     (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_my_channels_layout__toolbar),
-                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_my_channels_layout__channel_list)
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_my_channels_layout__channel_list),
+                    (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.setting_my_channels_layout__button_to_create)
                 );
             }
         };

@@ -13,6 +13,7 @@ import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.resource.MetricsConverter
 
 class PresetChannelSourcesDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
@@ -41,7 +42,8 @@ class PresetChannelSourcesDelegatee (
     layout.sourceList setAdapter new SourceRowAdapter(
       accessor = accessorFactory create event.channelId,
       viewHolderProvider = sourceRowProvider,
-      onSyncClicked = onSyncClicked
+      onSyncClicked = onSyncClicked,
+      metricsConverter = MetricsConverter(activity)
     )
     layout.toolbar setTitle event.channelName
   }
