@@ -61,8 +61,8 @@ public class MyChannelsActivity
 	}
 
 	@Override
-	public void startActivityBy(Intent intent) {
-		startActivity(intent);
+	public void startActivity(Intent intent) {
+		super.startActivity(intent);
 		TransitAnimations.forDirectChild(this).start();
 	}
 

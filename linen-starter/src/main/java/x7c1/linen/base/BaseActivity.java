@@ -14,8 +14,8 @@ abstract public class BaseActivity extends Activity implements ActivityControl, 
 	protected abstract TransitAnimation createTransitAnimation();
 
 	@Override
-	public void startActivityBy(Intent intent) {
-		startActivity(intent);
+	public void startActivity(Intent intent) {
+		super.startActivity(intent);
 		transitAnimation.start();
 	}
 	@Override
@@ -26,12 +26,13 @@ abstract public class BaseActivity extends Activity implements ActivityControl, 
 	public Class<?> getClassOf(ServiceLabel label) {
 		return Control.getServiceClassOf(label);
 	}
-
-	protected void onBackPressedAtChild() {
+	@Override
+	public void onBackPressed() {
 		super.onBackPressed();
 		transitAnimation.finish();
 	}
-	protected void finishFromChild(){
+	@Override
+	public void finish(){
 		super.finish();
 		transitAnimation.finish();
 	}

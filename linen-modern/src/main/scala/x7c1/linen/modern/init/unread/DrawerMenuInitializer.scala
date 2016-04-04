@@ -134,7 +134,7 @@ class OnMenuItemClick(
         create(activity, activity getClassOf SettingMyChannels){
           _.showMyChannels(accountId)
         }
-      activity startActivityBy intent
+      activity startActivity intent
 
 //      activity startActivityBy new Intent(
 //        activity, activity getClassOf SettingChannels)
@@ -147,14 +147,14 @@ class OnMenuItemClick(
           _.showPresetChannels(accountId)
         }
 
-      activity startActivityBy intent
+      activity startActivity intent
 
     case _: ChannelOrder =>
       Log info s"$kind"
     case _: UpdaterSchedule =>
       Log info s"$kind"
     case _: DevCreateDummies =>
-      activity startActivityBy new Intent(
+      activity startActivity new Intent(
         activity, activity getClassOf CreateRecords)
   }
 }

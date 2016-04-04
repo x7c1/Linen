@@ -83,7 +83,7 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
         _.showSources(event)
       }
 
-    activity startActivityBy intent
+    activity startActivity intent
   }
 }
 

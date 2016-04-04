@@ -32,11 +32,6 @@ public class PresetChannelSourcesActivity extends BaseActivity {
 	}
 
 	@Override
-	public void onBackPressed() {
-		onBackPressedAtChild();
-	}
-
-	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.close();
@@ -45,10 +40,5 @@ public class PresetChannelSourcesActivity extends BaseActivity {
 	@Override
 	protected TransitAnimation createTransitAnimation() {
 		return TransitAnimations.forDescendant(this);
-	}
-
-	@Override
-	public void finish() {
-		finishFromChild();
 	}
 }
