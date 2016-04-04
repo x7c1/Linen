@@ -1,27 +1,21 @@
 package x7c1.linen.settings;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 
 import x7c1.linen.R;
-import x7c1.linen.base.Control;
+import x7c1.linen.base.BaseFragmentActivity;
+import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
-import x7c1.linen.glue.activity.ActivityControl;
-import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.SettingMyChannelsLayout;
-import x7c1.linen.glue.service.ServiceControl;
-import x7c1.linen.glue.service.ServiceLabel;
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee;
 import x7c1.linen.res.layout.SettingMyChannelCreateProvider;
 import x7c1.linen.res.layout.SettingMyChannelRowProvider;
 import x7c1.linen.res.layout.SettingMyChannelsLayoutProvider;
 import x7c1.wheat.ancient.context.ContextualFactory;
 
-public class MyChannelsActivity
-		extends FragmentActivity implements ActivityControl, ServiceControl {
+public class MyChannelsActivity extends BaseFragmentActivity {
 
 	private MyChannelsDelegatee delegatee = null;
 
@@ -45,35 +39,13 @@ public class MyChannelsActivity
 		this.delegatee.setup();
 	}
 	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		TransitAnimations.forDirectChild(this).finish();
-	}
-	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.close();
 	}
 	@Override
-	public void finish() {
-		super.finish();
-		TransitAnimations.forDirectChild(this).finish();
-	}
-
-	@Override
-	public void startActivity(Intent intent) {
-		super.startActivity(intent);
-		TransitAnimations.forDirectChild(this).start();
-	}
-
-	@Override
-	public Class<?> getClassOf(ActivityLabel label) {
-		return Control.getActivityClassOf(label);
-	}
-
-	@Override
-	public Class<?> getClassOf(ServiceLabel label) {
-		return Control.getServiceClassOf(label);
+	protected TransitAnimation createTransitAnimation() {
+		return TransitAnimations.forDirectChild(this);
 	}
 	private static class DialogFactory implements ContextualFactory<AlertDialog.Builder>{
 		@Override

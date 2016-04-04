@@ -1,26 +1,20 @@
 package x7c1.linen.settings;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 import x7c1.linen.R;
-import x7c1.linen.base.Control;
+import x7c1.linen.base.BaseFragmentActivity;
+import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
-import x7c1.linen.glue.activity.ActivityControl;
-import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
-import x7c1.linen.glue.service.ServiceControl;
-import x7c1.linen.glue.service.ServiceLabel;
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee;
 import x7c1.linen.modern.init.settings.preset.ProviderFactories;
-import x7c1.linen.res.layout.SettingPresetChannelsLayoutProvider;
 import x7c1.linen.res.layout.SettingPresetChannelRowProvider;
+import x7c1.linen.res.layout.SettingPresetChannelsLayoutProvider;
 import x7c1.linen.res.layout.SettingPresetTabAllProvider;
 import x7c1.linen.res.layout.SettingPresetTabSelectedProvider;
 
-public class PresetChannelsActivity
-		extends FragmentActivity implements ActivityControl, ServiceControl {
+public class PresetChannelsActivity extends BaseFragmentActivity {
 
 	private PresetChannelsDelegatee delegatee = null;
 
@@ -45,38 +39,13 @@ public class PresetChannelsActivity
 		);
 		this.delegatee.onCreate();
 	}
-
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		delegatee.onDestroy();
 	}
-
 	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		TransitAnimations.forDirectChild(this).finish();
-	}
-
-	@Override
-	public void finish() {
-		super.finish();
-		TransitAnimations.forDirectChild(this).finish();
-	}
-
-	@Override
-	public void startActivity(Intent intent) {
-		super.startActivity(intent);
-		TransitAnimations.forDirectChild(this).start();
-	}
-
-	@Override
-	public Class<?> getClassOf(ActivityLabel label) {
-		return Control.getActivityClassOf(label);
-	}
-
-	@Override
-	public Class<?> getClassOf(ServiceLabel label) {
-		return Control.getServiceClassOf(label);
+	protected TransitAnimation createTransitAnimation() {
+		return TransitAnimations.forDirectChild(this);
 	}
 }
