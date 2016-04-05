@@ -32,6 +32,7 @@ class ChannelRowAdapter(
       }
       holder.switchSubscribe onChangedManually { e =>
         onSubscriptionChanged apply MyChannelSubscriptionChanged(
+          accountId = accessor.accountId,
           channelId = channel.channelId,
           isSubscribed = e.isChecked
         )
@@ -48,6 +49,7 @@ case class ChannelSourcesSelected(
 )
 
 case class MyChannelSubscriptionChanged(
+  accountId: Long,
   channelId: Long,
   isSubscribed: Boolean
 )

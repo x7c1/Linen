@@ -33,14 +33,23 @@ class MyChannelsDelegatee (
 
   private lazy val loader =  new MyChannelAccessorLoader(database)
 
-  private lazy val channelListener = LocalBroadcastListener[ChannelCreated]{ e =>
+  private lazy val onChannelCreated = LocalBroadcastListener[ChannelCreated]{ e =>
     val client = ClientAccount(e.accountId)
     (loader reload client){ _ =>
       layout.channelList.getAdapter.notifyDataSetChanged()
     }
   }
+  private lazy val onSubscriptionChanged =
+    LocalBroadcastListener[MyChannelSubscriptionChanged]{ event =>
+      val client = ClientAccount(event.accountId)
+      (loader reload client){ _ =>
+        layout.channelList.getAdapter.notifyDataSetChanged()
+      }
+    }
+
   def setup(): Unit = {
-    channelListener registerTo activity
+    onChannelCreated registerTo activity
+    onSubscriptionChanged registerTo activity
 
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
@@ -56,7 +65,8 @@ class MyChannelsDelegatee (
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
-    channelListener unregisterFrom activity
+    onChannelCreated unregisterFrom activity
+    onSubscriptionChanged unregisterFrom activity
     database.close()
     helper.close()
     Log info "[done]"
