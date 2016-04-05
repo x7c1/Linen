@@ -13,24 +13,15 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
 
   private var accessorHolder: Option[AccessorHolder] = None
 
-  def load(client: ClientAccount)(f: MyChannelAccessor => Unit): Unit = {
-    createAccessor(client).right map {
-      new AccessorHolder(_)
-    } match {
-      case Right(accessor) =>
-        this.accessorHolder = Some(accessor)
-        f(accessor)
-      case Left(e) =>
-        Log error format(e){"[error]"}
-    }
-  }
   def reload(client: ClientAccount)(f: MyChannelAccessor => Unit): Unit = {
     accessorHolder -> createAccessor(client) match {
       case (Some(holder), Right(accessor)) =>
         holder updateAccessor accessor
         f(holder)
-      case (None, _) =>
-        Log error s"method[load] not called yet"
+      case (None, Right(accessor)) =>
+        val holder = new AccessorHolder(accessor)
+        this.accessorHolder = Some(holder)
+        f(holder)
       case (_, Left(exception)) =>
         Log error format(exception){"[unexpected]"}
     }
