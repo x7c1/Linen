@@ -17,15 +17,16 @@ class OnChannelSubscriptionChanged (
   layout: UnreadItemsLayout,
   loader: => Option[UnreadChannelLoader]){
 
+  private lazy val listeners = Seq(
+    onCreateMyChannel,
+    onSubscribeMyChannel,
+    onSubscribePresetChannel
+  )
   def registerTo(context: Context): Unit = {
-    onCreateMyChannel registerTo context
-    onSubscribeMyChannel registerTo context
-    onSubscribePresetChannel registerTo context
+    listeners foreach { _ registerTo context }
   }
   def unregisterFrom(context: Context): Unit = {
-    onCreateMyChannel unregisterFrom context
-    onSubscribeMyChannel unregisterFrom context
-    onSubscribePresetChannel unregisterFrom context
+    listeners foreach { _ unregisterFrom context }
   }
   private lazy val onCreateMyChannel =
     LocalBroadcastListener[ChannelCreated]{ _ => update() }
