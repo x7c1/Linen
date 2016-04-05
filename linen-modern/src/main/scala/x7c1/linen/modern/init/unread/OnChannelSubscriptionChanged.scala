@@ -5,6 +5,7 @@ import x7c1.linen.glue.res.layout.UnreadItemsLayout
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelLoader}
 import x7c1.linen.modern.display.settings.MyChannelSubscriptionChanged
+import x7c1.linen.modern.init.settings.my.ChannelCreated
 import x7c1.linen.modern.init.settings.preset.PresetChannelSubscriptionChanged
 import x7c1.wheat.macros.intent.LocalBroadcastListener
 import x7c1.wheat.macros.logger.Log
@@ -17,13 +18,18 @@ class OnChannelSubscriptionChanged (
   loader: => Option[UnreadChannelLoader]){
 
   def registerTo(context: Context): Unit = {
+    onCreateMyChannel registerTo context
     onSubscribeMyChannel registerTo context
     onSubscribePresetChannel registerTo context
   }
   def unregisterFrom(context: Context): Unit = {
+    onCreateMyChannel unregisterFrom context
     onSubscribeMyChannel unregisterFrom context
     onSubscribePresetChannel unregisterFrom context
   }
+  private lazy val onCreateMyChannel =
+    LocalBroadcastListener[ChannelCreated]{ _ => update() }
+
   private lazy val onSubscribeMyChannel =
     LocalBroadcastListener[MyChannelSubscriptionChanged]{ event => update() }
 
