@@ -19,10 +19,17 @@ class UiThread[A <: View](view: A){
 }
 
 object UiThread {
-  def run[A](f: => A): Unit = {
+
+  def run[A](f: => A): Unit = post(f)
+
+  def main[A](f: => A): CallbackTask[A] = CallbackTask { g =>
+    post(g(f))
+  }
+  def via[A <: View](view: A): UiThread[A] = new UiThread(view)
+
+  private def post[A](f: => A) =
     new Handler(Looper.getMainLooper) post new Runnable {
       override def run(): Unit = f
     }
-  }
-  def via[A <: View](view: A): UiThread[A] = new UiThread(view)
+
 }

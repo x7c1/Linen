@@ -8,6 +8,7 @@ import x7c1.linen.modern.display.unread.PaneContainer
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.UiThread
+import x7c1.wheat.modern.tasks.UiThread.main
 
 
 class OnAccessorsLoadedListener(
@@ -20,8 +21,7 @@ class OnAccessorsLoadedListener(
     Log info s"[init] $e"
 
     val tasks = for {
-      ui <- task { UiThread via layout.itemView }
-      _ <- ui { _ =>
+      _ <- main {
         layout.sourceToolbar setTitle e.channelName
         updateAdapter()
         pointer focusOn 0
