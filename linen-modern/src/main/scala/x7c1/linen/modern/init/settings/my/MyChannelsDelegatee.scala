@@ -16,7 +16,7 @@ import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSele
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.macros.fragment.FragmentFactory
-import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcaster}
+import x7c1.wheat.macros.intent.{LocalBroadcastListener, IntentExpander, IntentFactory, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -33,7 +33,15 @@ class MyChannelsDelegatee (
 
   private lazy val loader =  new MyChannelAccessorLoader(database)
 
+  private lazy val channelListener = LocalBroadcastListener[ChannelCreated]{ e =>
+    val client = ClientAccount(e.accountId)
+    (loader reload client){ _ =>
+      layout.channelList.getAdapter.notifyDataSetChanged()
+    }
+  }
   def setup(): Unit = {
+    channelListener registerTo activity
+
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
@@ -44,10 +52,11 @@ class MyChannelsDelegatee (
   }
   def showMyChannels(accountId: Long) = {
     val account = ClientAccount(accountId)
-    loader.load(account){ setAdapter(account) }
+    loader.reload(account){ setAdapter(account) }
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
+    channelListener unregisterFrom activity
     database.close()
     helper.close()
     Log info "[done]"

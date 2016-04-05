@@ -14,6 +14,7 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
+import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.decorator.Imports._
@@ -56,8 +57,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
   private def onClickPositive(button: Button) = {
     val tasks = for {
       input <- validateInput
-      _ <- createChannel(input)
+      channelId <- createChannel(input)
       _ <- hideKeyboard()
+      _ <- notifyCreated(channelId)
     } yield {
       input
     }
@@ -115,8 +117,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     val either = for {
       channelId <- create().right
       _ <- subscribe(channelId).right
-    } yield ()
-
+    } yield {
+      channelId
+    }
     either.left map { e => SqlError(e) }
   }
 
@@ -124,6 +127,14 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     error match {
       case EmptyName() => layout.channelNameLayout setError error.message
     }
+  }
+  private def notifyCreated(channelId: Long) = provide {
+    val event = new ChannelCreated(
+      accountId = args.accountId,
+      channelId = channelId
+    )
+    LocalBroadcaster(event) dispatchFrom getActivity
+    Right(event)
   }
   private def hideKeyboard() = provide ui {
     Option(getActivity.getCurrentFocus) match {
@@ -180,4 +191,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 case class NewChannelInput(
   channelName: String,
   description: Option[String]
+)
+
+class ChannelCreated(
+  val accountId: Long,
+  val channelId: Long
 )
