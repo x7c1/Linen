@@ -23,7 +23,7 @@ class UnreadChannelsReader(
     client match {
       case Some(account) =>
         Log info s"[start]"
-        loader.startLoading(account, channel)(onLoaded.onLoad[A])
+        loader.startLoading(account, channel)(onLoaded.afterLoad[A])
       case None =>
         Log error s"account not found"
     }
@@ -32,7 +32,7 @@ class UnreadChannelsReader(
     client match {
       case Some(account) =>
         Log info s"[start]"
-        loader.restartLoading(account, channel)(onLoaded.onLoad[A])
+        loader.restartLoading(account, channel)(onLoaded.afterReload[A])
       case None =>
         Log error s"account not found"
     }

@@ -16,7 +16,21 @@ class OnAccessorsLoadedListener(
   pointer: SourcePointer,
   drawer: => DrawerAction ){
 
-  def onLoad[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
+  def afterLoad[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
+    Log info s"[init] $e"
+
+    val tasks = for {
+      ui <- task { UiThread via layout.itemView }
+      _ <- ui { _ =>
+        layout.sourceToolbar setTitle e.channelName
+        updateAdapter()
+        pointer focusOn 0
+      }
+    } yield ()
+
+    tasks.execute()
+  }
+  def afterReload[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
     Log info s"[init] $e"
 
     val tasks = for {
