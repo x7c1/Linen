@@ -21,10 +21,10 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
 
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(channelId) = MyChannelAccessor.create(db, accountId) findAt 0 map (_.channelId)
+    val Some(channelId) = MyChannelAccessor.createForDebug(db, accountId) findAt 0 map (_.channelId)
     assertEquals(2, channelId)
 
-    val channelId2 = MyChannelAccessor.create(db, accountId = 123) findAt 0
+    val channelId2 = MyChannelAccessor.createForDebug(db, accountId = 123) findAt 0
     assertEquals(None, channelId2)
   }
 
@@ -35,7 +35,7 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
 
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val length = MyChannelAccessor.create(db, accountId).length
+    val length = MyChannelAccessor.createForDebug(db, accountId).length
     assertEquals(2, length)
   }
 
@@ -46,13 +46,13 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
 
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(c1) = MyChannelAccessor.create(db, accountId).findAt(0)
+    val Some(c1) = MyChannelAccessor.createForDebug(db, accountId).findAt(0)
     assertEquals("sample channel name2", c1.name)
 
-    val Some(c2) = MyChannelAccessor.create(db, accountId).findAt(1)
+    val Some(c2) = MyChannelAccessor.createForDebug(db, accountId).findAt(1)
     assertEquals("sample channel name1", c2.name)
 
-    val c3 = MyChannelAccessor.create(db, accountId).findAt(2)
+    val c3 = MyChannelAccessor.createForDebug(db, accountId).findAt(2)
     assertEquals(None, c3)
   }
 }

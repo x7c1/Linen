@@ -9,7 +9,8 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelRow, SettingMyChannelsLayout}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
-import x7c1.linen.modern.accessor.setting.MyChannelAccessor
+import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.modern.accessor.setting.{MyChannelAccessorLoader, MyChannelAccessor}
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -30,6 +31,8 @@ class MyChannelsDelegatee (
 
   private lazy val database = helper.getReadableDatabase
 
+  private lazy val loader =  new MyChannelAccessorLoader(database)
+
   def setup(): Unit = {
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
@@ -40,25 +43,29 @@ class MyChannelsDelegatee (
     IntentExpander executeBy activity.getIntent
   }
   def showMyChannels(accountId: Long) = {
-    layout.channelList setAdapter new ChannelRowAdapter(
-      accessor = MyChannelAccessor.create(database, accountId),
-      viewHolderProvider = channelRowProvider,
-      onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
-      onSubscriptionChanged = {
-        val listener = new OnMyChannelSubscriptionChanged(
-          context = activity,
-          helper = helper,
-          account = AccountIdentifiable(accountId)
-        )
-        listener.updateSubscription
-      }
-    )
+    val account = ClientAccount(accountId)
+    loader.load(account){ setAdapter(account) }
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
     database.close()
     helper.close()
     Log info "[done]"
+  }
+  private def setAdapter(account: ClientAccount)(accessor: MyChannelAccessor) = {
+    layout.channelList setAdapter new ChannelRowAdapter(
+      accessor = accessor,
+      viewHolderProvider = channelRowProvider,
+      onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
+      onSubscriptionChanged = {
+        val listener = new OnMyChannelSubscriptionChanged(
+          context = activity,
+          helper = helper,
+          account = account
+        )
+        listener.updateSubscription
+      }
+    )
   }
   private def showInputDialog(accountId: Long): Unit = {
     Log info s"[init] account:$accountId"

@@ -124,7 +124,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   def inspectSourceAccessor(db: SQLiteDatabase) = {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db)
-      channel <- MyChannelAccessor.create(db, accountId).findAt(0)
+      channel <- MyChannelAccessor.createForDebug(db, accountId).findAt(0)
       either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
       accessor <- either.right.toOption
     } yield accessor
