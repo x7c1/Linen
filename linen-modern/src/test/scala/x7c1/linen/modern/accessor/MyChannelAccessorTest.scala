@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, SettingMyChannel}
+import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannel}
 import x7c1.linen.modern.init.dev.DummyFactory
 
 
@@ -22,7 +22,7 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(channelId) = MyChannelAccessor.createForDebug(db, accountId) findAt 0 collect {
-      case x: SettingMyChannel => x.channelId
+      case x: MyChannel => x.channelId
     }
     assertEquals(2, channelId)
 
@@ -49,12 +49,12 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val db = new LinenOpenHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(c1) = MyChannelAccessor.createForDebug(db, accountId).findAt(0) collect {
-      case x: SettingMyChannel => x
+      case x: MyChannel => x
     }
     assertEquals("sample channel name2", c1.name)
 
     val Some(c2) = MyChannelAccessor.createForDebug(db, accountId).findAt(1) collect {
-      case x: SettingMyChannel => x
+      case x: MyChannel => x
     }
     assertEquals("sample channel name1", c2.name)
 

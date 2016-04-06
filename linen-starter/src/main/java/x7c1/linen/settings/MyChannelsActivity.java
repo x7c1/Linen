@@ -40,7 +40,6 @@ public class MyChannelsActivity extends BaseFragmentActivity {
 						new SettingMyChannelRowItemProvider(this),
 						new SettingMyChannelRowFooterProvider(this)
 				)
-//				new SettingMyChannelRowProvider(this)
 		);
 		this.delegatee.setup();
 	}

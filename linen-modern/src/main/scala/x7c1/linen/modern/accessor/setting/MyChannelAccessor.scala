@@ -7,7 +7,7 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.sequence.Sequence
 
-trait MyChannelAccessor extends Sequence[SettingMyChannelRow]{
+trait MyChannelAccessor extends Sequence[MyChannelRow]{
 }
 
 object MyChannelAccessor {
@@ -23,14 +23,14 @@ trait MyChannelRecord extends TypedFields
   with ChannelRecord
   with ChannelStatusRecord
 
-sealed trait SettingMyChannelRow
+sealed trait MyChannelRow
 
-case class SettingMyChannel(
+case class MyChannel(
   channelId: Long,
   name: String,
   description: String,
   createdAt: Date,
   isSubscribed: Boolean
-) extends SettingMyChannelRow
+) extends MyChannelRow
 
-case class SettingMyChannelFooter() extends SettingMyChannelRow
+case class MyChannelFooter() extends MyChannelRow

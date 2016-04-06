@@ -3,14 +3,14 @@ package x7c1.linen.modern.display.settings
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
-import x7c1.linen.modern.accessor.setting.{SettingMyChannel, SettingMyChannelFooter}
-import x7c1.linen.modern.accessor.{AccountIdentifiable, setting}
+import x7c1.linen.modern.accessor.AccountIdentifiable
+import x7c1.linen.modern.accessor.setting.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.modern.decorator.Imports._
 
 class ChannelRowAdapter(
   accountId: Long,
-  delegatee: AdapterDelegatee[setting.SettingMyChannelRow, SettingMyChannelRow],
+  delegatee: AdapterDelegatee[MyChannelRow, SettingMyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends Adapter[SettingMyChannelRow]{
@@ -22,7 +22,7 @@ class ChannelRowAdapter(
   }
   override def onBindViewHolder(holder: SettingMyChannelRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
-      case (holder: SettingMyChannelRowItem, channel: SettingMyChannel) =>
+      case (holder: SettingMyChannelRowItem, channel: MyChannel) =>
         holder.name.text = channel.name
         holder.description.text = channel.description
         holder.sources onClick { _ =>
@@ -41,7 +41,7 @@ class ChannelRowAdapter(
         }
         holder.switchSubscribe setChecked channel.isSubscribed
 
-      case (holder: SettingMyChannelRowFooter, footer: SettingMyChannelFooter) =>
+      case (holder: SettingMyChannelRowFooter, footer: MyChannelFooter) =>
         // nop
     }
   }

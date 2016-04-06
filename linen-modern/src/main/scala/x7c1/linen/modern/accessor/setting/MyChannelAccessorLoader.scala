@@ -88,7 +88,7 @@ private class ClosableMyChannelAccessorImpl (
 
   override def findAt(position: Int) =
     (cursor moveToFind position){
-      SettingMyChannel(
+      MyChannel(
         channelId = cursor._id,
         name = cursor.name,
         description = cursor.description,
@@ -107,7 +107,7 @@ private class SourceFooterAppender(
 
   override def findAt(position: Int) = {
     if (position == accessor.length){
-      Some(SettingMyChannelFooter())
+      Some(MyChannelFooter())
     } else {
       accessor findAt position
     }
