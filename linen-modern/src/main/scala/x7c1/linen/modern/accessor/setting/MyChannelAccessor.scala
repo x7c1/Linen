@@ -12,7 +12,7 @@ trait MyChannelAccessor extends Sequence[SettingMyChannelRow]{
 
 object MyChannelAccessor {
   def createForDebug(db: SQLiteDatabase, accountId: Long): MyChannelAccessor = {
-    InternalMyChannelAccessor.create(db, ClientAccount(accountId)) match {
+    ClosableMyChannelAccessor.create(db, ClientAccount(accountId)) match {
       case Left(e) => throw e
       case Right(accessor) => accessor
     }

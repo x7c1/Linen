@@ -27,13 +27,13 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
     }
   }
   private def createAccessor(client: ClientAccount) = {
-    val internal = InternalMyChannelAccessor.create(db, client)
+    val internal = ClosableMyChannelAccessor.create(db, client)
     internal.right map (new SourceFooterAppender(_))
   }
   private class AccessorHolder(
-    private var underlying: InternalMyChannelAccessor) extends MyChannelAccessor {
+    private var underlying: ClosableMyChannelAccessor) extends MyChannelAccessor {
 
-    def updateAccessor(accessor: InternalMyChannelAccessor) = synchronized {
+    def updateAccessor(accessor: ClosableMyChannelAccessor) = synchronized {
       underlying.closeCursor()
       underlying = accessor
     }
@@ -43,15 +43,15 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
   }
 }
 
-private object InternalMyChannelAccessor {
+private object ClosableMyChannelAccessor {
   def create(
     db: SQLiteDatabase,
-    client: ClientAccount): Either[Exception, InternalMyChannelAccessor] = {
+    client: ClientAccount): Either[Exception, ClosableMyChannelAccessor] = {
 
     try {
       val query = createQuery(client)
       val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new InternalMyChannelAccessorImpl(raw, client)
+      Right apply new ClosableMyChannelAccessorImpl(raw, client)
     } catch {
       case e: Exception => Left(e)
     }
@@ -77,12 +77,12 @@ private object InternalMyChannelAccessor {
   }
 }
 
-private trait InternalMyChannelAccessor extends MyChannelAccessor {
+private trait ClosableMyChannelAccessor extends MyChannelAccessor {
     def closeCursor(): Unit
 }
 
-private class InternalMyChannelAccessorImpl (
-  rawCursor: Cursor, client: ClientAccount) extends InternalMyChannelAccessor {
+private class ClosableMyChannelAccessorImpl (
+  rawCursor: Cursor, client: ClientAccount) extends ClosableMyChannelAccessor {
 
   private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
 
@@ -103,7 +103,7 @@ private class InternalMyChannelAccessorImpl (
 }
 
 private class SourceFooterAppender(
-  accessor: InternalMyChannelAccessor) extends InternalMyChannelAccessor{
+  accessor: ClosableMyChannelAccessor) extends ClosableMyChannelAccessor{
 
   override def findAt(position: Int) = {
     if (position == accessor.length){
