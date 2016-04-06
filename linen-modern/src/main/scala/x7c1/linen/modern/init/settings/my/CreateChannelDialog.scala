@@ -196,4 +196,4 @@ case class NewChannelInput(
 class ChannelCreated(
   val accountId: Long,
   val channelId: Long
-)
+) extends AccountIdentifiable

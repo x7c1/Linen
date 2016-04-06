@@ -52,4 +52,4 @@ case class MyChannelSubscriptionChanged(
   accountId: Long,
   channelId: Long,
   isSubscribed: Boolean
-)
+) extends AccountIdentifiable

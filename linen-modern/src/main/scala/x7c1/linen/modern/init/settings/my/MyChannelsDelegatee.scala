@@ -31,21 +31,13 @@ class MyChannelsDelegatee (
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader =  new MyChannelAccessorLoader(database)
+  private lazy val loader = new MyChannelAccessorLoader(database)
 
-  private lazy val onChannelCreated = LocalBroadcastListener[ChannelCreated]{ e =>
-    val client = ClientAccount(e.accountId)
-    (loader reload client){ _ =>
-      layout.channelList.getAdapter.notifyDataSetChanged()
-    }
-  }
+  private lazy val onChannelCreated =
+    LocalBroadcastListener[ChannelCreated]{ reloadChannels }
+
   private lazy val onSubscriptionChanged =
-    LocalBroadcastListener[MyChannelSubscriptionChanged]{ event =>
-      val client = ClientAccount(event.accountId)
-      (loader reload client){ _ =>
-        layout.channelList.getAdapter.notifyDataSetChanged()
-      }
-    }
+    LocalBroadcastListener[MyChannelSubscriptionChanged]{ reloadChannels }
 
   def setup(): Unit = {
     onChannelCreated registerTo activity
@@ -70,6 +62,12 @@ class MyChannelsDelegatee (
     database.close()
     helper.close()
     Log info "[done]"
+  }
+  private def reloadChannels(event: AccountIdentifiable): Unit ={
+    val client = ClientAccount(event.accountId)
+    (loader reload client){ _ =>
+      layout.channelList.getAdapter.notifyDataSetChanged()
+    }
   }
   private def setAdapter(account: ClientAccount)(accessor: MyChannelAccessor) = {
     layout.channelList setAdapter new ChannelRowAdapter(
