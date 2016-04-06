@@ -7,19 +7,19 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
-import x7c1.linen.glue.res.layout.{SettingMyChannelRowItem, SettingMyChannelRowFooter, SettingMyChannelCreate, SettingMyChannelRow, SettingMyChannelsLayout}
+import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.setting.{MyChannelAccessorLoader, MyChannelAccessor}
+import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.wheat.ancient.context.ContextualFactory
-import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
+import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.FragmentFactory
-import x7c1.wheat.macros.intent.{LocalBroadcastListener, IntentExpander, IntentFactory, LocalBroadcaster}
+import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.resource.ViewHolderProviders
 
 class MyChannelsDelegatee (
   activity: FragmentActivity with ActivityControl,
@@ -72,8 +72,8 @@ class MyChannelsDelegatee (
   }
   private def setAdapter(account: ClientAccount)(accessor: MyChannelAccessor) = {
     layout.channelList setAdapter new ChannelRowAdapter(
-      accessor = accessor,
-      providers = channelRowProviders,
+      accountId = account.accountId,
+      delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
@@ -125,25 +125,5 @@ class OnMyChannelSubscriptionChanged(
       subscriber unsubscribe event.channelId
     }
     LocalBroadcaster(event) dispatchFrom context
-  }
-}
-
-class MyChannelRowProviders(
-  val forItem: ViewHolderProvider[SettingMyChannelRowItem],
-  val forFooter: ViewHolderProvider[SettingMyChannelRowFooter]
-) extends ViewHolderProviders[SettingMyChannelRow]{
-
-  override protected def all = Seq(
-    forItem,
-    forFooter
-  )
-  def createViewTyper(accessor: MyChannelAccessor): Int => Int = {
-    position =>
-      val provider = if (position == accessor.length - 1){
-        forFooter
-      } else {
-        forItem
-      }
-      provider.layoutId()
   }
 }
