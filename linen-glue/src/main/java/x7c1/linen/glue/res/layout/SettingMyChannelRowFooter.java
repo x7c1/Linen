@@ -6,11 +6,16 @@
 
 package x7c1.linen.glue.res.layout;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class SettingMyChannelRow extends RecyclerView.ViewHolder {
-    public SettingMyChannelRow(View itemView) {
+public class SettingMyChannelRowFooter extends SettingMyChannelRow {
+
+    
+
+    public SettingMyChannelRowFooter(
+        View itemView
+    ){
         super(itemView);
+        
     }
 }

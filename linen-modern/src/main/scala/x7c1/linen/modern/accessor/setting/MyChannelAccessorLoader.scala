@@ -27,7 +27,8 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
     }
   }
   private def createAccessor(client: ClientAccount) = {
-    InternalMyChannelAccessor.create(db, client)
+    val internal = InternalMyChannelAccessor.create(db, client)
+    internal.right map (new SourceFooterAppender(_))
   }
   private class AccessorHolder(
     private var underlying: InternalMyChannelAccessor) extends MyChannelAccessor {
@@ -52,7 +53,7 @@ private object InternalMyChannelAccessor {
     try {
       val query = createQuery(client)
       val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new InternalMyChannelAccessor(raw, client)
+      Right apply new InternalMyChannelAccessorImpl(raw, client)
     } catch {
       case e: Exception => Left(e)
     }
@@ -78,8 +79,12 @@ private object InternalMyChannelAccessor {
   }
 }
 
-private class InternalMyChannelAccessor private (
-  rawCursor: Cursor, client: ClientAccount) extends MyChannelAccessor {
+private trait InternalMyChannelAccessor extends MyChannelAccessor {
+    def closeCursor(): Unit
+}
+
+private class InternalMyChannelAccessorImpl (
+  rawCursor: Cursor, client: ClientAccount) extends InternalMyChannelAccessor {
 
   private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
 
@@ -98,5 +103,24 @@ private class InternalMyChannelAccessor private (
 
   override def length = rawCursor.getCount
 
-  def closeCursor(): Unit = rawCursor.close()
+  override def closeCursor(): Unit = rawCursor.close()
+}
+
+private class SourceFooterAppender(
+  accessor: InternalMyChannelAccessor) extends InternalMyChannelAccessor{
+
+  override def accountId = accessor.accountId
+
+  override def findAt(position: Int) = {
+    if (position == accessor.length){
+      Some(SettingMyChannelFooter())
+    } else {
+      accessor findAt position
+    }
+  }
+  override def length: Int = {
+    // +1 to append Footer
+    accessor.length + 1
+  }
+  override def closeCursor() = accessor.closeCursor()
 }

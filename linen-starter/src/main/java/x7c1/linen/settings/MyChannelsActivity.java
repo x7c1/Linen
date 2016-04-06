@@ -9,9 +9,11 @@ import x7c1.linen.base.BaseFragmentActivity;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingMyChannelsLayout;
+import x7c1.linen.modern.init.settings.my.MyChannelRowProviders;
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee;
 import x7c1.linen.res.layout.SettingMyChannelCreateProvider;
-import x7c1.linen.res.layout.SettingMyChannelRowProvider;
+import x7c1.linen.res.layout.SettingMyChannelRowFooterProvider;
+import x7c1.linen.res.layout.SettingMyChannelRowItemProvider;
 import x7c1.linen.res.layout.SettingMyChannelsLayoutProvider;
 import x7c1.wheat.ancient.context.ContextualFactory;
 
@@ -34,7 +36,11 @@ public class MyChannelsActivity extends BaseFragmentActivity {
 				layout,
 				new DialogFactory(),
 				SettingMyChannelCreateProvider.factory(),
-				new SettingMyChannelRowProvider(this)
+				new MyChannelRowProviders(
+						new SettingMyChannelRowItemProvider(this),
+						new SettingMyChannelRowFooterProvider(this)
+				)
+//				new SettingMyChannelRowProvider(this)
 		);
 		this.delegatee.setup();
 	}
