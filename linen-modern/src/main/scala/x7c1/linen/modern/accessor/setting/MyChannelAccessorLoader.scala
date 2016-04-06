@@ -37,8 +37,6 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
       underlying.closeCursor()
       underlying = accessor
     }
-    override def accountId = underlying.accountId
-
     override def findAt(position: Int) = underlying findAt position
 
     override def length = underlying.length
@@ -88,8 +86,6 @@ private class InternalMyChannelAccessorImpl (
 
   private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
 
-  override def accountId: Long = client.accountId
-
   override def findAt(position: Int) =
     (cursor moveToFind position){
       SettingMyChannel(
@@ -108,8 +104,6 @@ private class InternalMyChannelAccessorImpl (
 
 private class SourceFooterAppender(
   accessor: InternalMyChannelAccessor) extends InternalMyChannelAccessor{
-
-  override def accountId = accessor.accountId
 
   override def findAt(position: Int) = {
     if (position == accessor.length){

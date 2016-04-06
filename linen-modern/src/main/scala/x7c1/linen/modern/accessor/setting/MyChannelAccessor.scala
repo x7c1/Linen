@@ -8,7 +8,6 @@ import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.sequence.Sequence
 
 trait MyChannelAccessor extends Sequence[SettingMyChannelRow]{
-  def accountId: Long
 }
 
 object MyChannelAccessor {
