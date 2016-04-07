@@ -8,7 +8,7 @@ import x7c1.wheat.modern.sequence.Sequence
 
 import scala.language.higherKinds
 
-trait AdapterDelegatee[A, VH <: ViewHolder]{
+trait AdapterDelegatee[VH <: ViewHolder, A]{
 
   def count: Int
 
@@ -24,7 +24,7 @@ trait AdapterDelegatee[A, VH <: ViewHolder]{
 object AdapterDelegatee {
   def create[A, VH <: ViewHolder, B <: ViewHolderProviders[VH] : ProviderSelectable](
     providers: B,
-    sequence: Sequence[A]): AdapterDelegatee[A, VH] = {
+    sequence: Sequence[A]): AdapterDelegatee[VH, A] = {
 
     new AdapterDelegateeImpl(providers, sequence)
   }
@@ -33,7 +33,7 @@ object AdapterDelegatee {
 private class AdapterDelegateeImpl
 [A, VH <: ViewHolder, P <: ViewHolderProviders[VH] : ProviderSelectable](
   providers: P,
-  sequence: Sequence[A]) extends AdapterDelegatee[A, VH]{
+  sequence: Sequence[A]) extends AdapterDelegatee[VH, A]{
 
   override def count = sequence.length
 

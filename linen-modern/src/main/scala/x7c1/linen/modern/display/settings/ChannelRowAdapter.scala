@@ -10,7 +10,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class ChannelRowAdapter(
   accountId: Long,
-  delegatee: AdapterDelegatee[MyChannelRow, SettingMyChannelRow],
+  delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends Adapter[SettingMyChannelRow]{
