@@ -6,7 +6,7 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.ViewHolderProviders
 import x7c1.wheat.modern.sequence.Sequence
 
-import scala.language.higherKinds
+import scala.language.{reflectiveCalls, higherKinds}
 
 trait AdapterDelegatee[VH <: ViewHolder, A]{
 
@@ -22,24 +22,27 @@ trait AdapterDelegatee[VH <: ViewHolder, A]{
 }
 
 object AdapterDelegatee {
-  def create[A, VH <: ViewHolder, B <: ViewHolderProviders[VH] : ProviderSelectable](
-    providers: B,
-    sequence: Sequence[A]): AdapterDelegatee[VH, A] = {
+  def create[
+    A, VH <: ViewHolder,
+    S <: Sequence[A],
+    P <: ViewHolderProviders[VH] : ({type L[X] = ProviderSelectable[S, X]})#L
+  ](providers: P, sequence: S): AdapterDelegatee[VH, A] = {
 
     new AdapterDelegateeImpl(providers, sequence)
   }
 }
 
-private class AdapterDelegateeImpl
-[A, VH <: ViewHolder, P <: ViewHolderProviders[VH] : ProviderSelectable](
-  providers: P,
-  sequence: Sequence[A]) extends AdapterDelegatee[VH, A]{
+private class AdapterDelegateeImpl[
+    A, VH <: ViewHolder,
+    S <: Sequence[A],
+    P <: ViewHolderProviders[VH] : ({type L[X] = ProviderSelectable[S, X]})#L
+  ](providers: P, sequence: S) extends AdapterDelegatee[VH, A]{
 
   override def count = sequence.length
 
   override def viewTypeAt(position: Int) = {
-    val selector = implicitly[ProviderSelectable[P]]
-    val provider = selector.selectProvider(position, sequence.length - 1, providers)
+    val selector = implicitly[ProviderSelectable[S, P]]
+    val provider = selector.selectProvider(position, sequence, providers)
     provider.layoutId()
   }
   override def createViewHolder(parent: ViewGroup, viewType: Int) = {

@@ -3,18 +3,19 @@ package x7c1.wheat.lore.resource
 import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.resource.ViewHolderProviders
+import x7c1.wheat.modern.sequence.Sequence
 
 
-trait ProviderSelectable[B <: ViewHolderProviders[_ <: ViewHolder]] {
-  def selectProvider(position: Int, last: Int, providers: B): ViewHolderProvider[_]
+trait ProviderSelectable[A <: Sequence[_], B <: ViewHolderProviders[_ <: ViewHolder]] {
+  def selectProvider(position: Int, sequence: A, providers: B): ViewHolderProvider[_]
 }
 
-class FooterSelectable[A <: ViewHolderProviders[_ <: ViewHolder]](
-  footer: A => ViewHolderProvider[_],
-  other: A => ViewHolderProvider[_]) extends ProviderSelectable[A]{
+class FooterSelectable[A <: Sequence[_], B <: ViewHolderProviders[_ <: ViewHolder]](
+  footer: B => ViewHolderProvider[_],
+  other: B => ViewHolderProvider[_]) extends ProviderSelectable[A, B]{
 
-  override def selectProvider(position: Int, last: Int, providers: A) = {
-    if (position == last){
+  override def selectProvider(position: Int, sequence: A, providers: B) = {
+    if (position == sequence.length - 1){
       footer(providers)
     } else {
       other(providers)
