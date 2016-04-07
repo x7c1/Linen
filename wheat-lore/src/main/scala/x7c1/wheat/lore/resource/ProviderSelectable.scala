@@ -10,15 +10,18 @@ trait ProviderSelectable[A <: Sequence[_], B <: ViewHolderProviders[_ <: ViewHol
   def selectProvider(position: Int, sequence: A, providers: B): ViewHolderProvider[_]
 }
 
-class FooterSelectable[A <: Sequence[_], B <: ViewHolderProviders[_ <: ViewHolder]](
+class WithFooter[B <: ViewHolderProviders[_ <: ViewHolder]](
   footer: B => ViewHolderProvider[_],
-  other: B => ViewHolderProvider[_]) extends ProviderSelectable[A, B]{
-
-  override def selectProvider(position: Int, sequence: A, providers: B) = {
-    if (position == sequence.length - 1){
-      footer(providers)
-    } else {
-      other(providers)
+  other: B => ViewHolderProvider[_]
+){
+  implicit def selectable[A <: Sequence[_]]: ProviderSelectable[A, B] =
+    new ProviderSelectable[A, B] {
+      override def selectProvider(position: Int, sequence: A, providers: B) = {
+        if (position == sequence.length - 1){
+          footer(providers)
+        } else {
+          other(providers)
+        }
+      }
     }
-  }
 }
