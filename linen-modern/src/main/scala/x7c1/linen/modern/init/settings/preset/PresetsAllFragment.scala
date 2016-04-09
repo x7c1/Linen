@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
 import x7c1.linen.modern.accessor.database.ChannelSubscriber
-import x7c1.linen.modern.accessor.setting.PresetChannelsAccessor
+import x7c1.linen.modern.accessor.setting.AllPresetChannelsAccessor
 import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -24,7 +24,7 @@ class PresetsAllFragment extends TypedFragment[ArgumentsForAll] with PresetFragm
 
   private lazy val layout = args.tabFactory.createViewHolder(getView)
 
-  override protected def accessorFactory = PresetChannelsAccessor
+  override protected def accessorFactory = AllPresetChannelsAccessor
 
   override def reload(channelId: Long) = {
     Log info s"[start] $channelId"

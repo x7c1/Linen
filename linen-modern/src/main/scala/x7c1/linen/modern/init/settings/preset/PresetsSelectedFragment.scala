@@ -8,7 +8,7 @@ import android.view.{LayoutInflater, Menu, MenuItem, View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabSelected}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.modern.accessor.setting.SelectedChannelsAccessor
+import x7c1.linen.modern.accessor.setting.SelectedPresetChannelsAccessor
 import x7c1.linen.modern.init.updater.UpdaterMethods
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -26,7 +26,7 @@ class PresetsSelectedFragment extends TypedFragment[ArgumentsForSelected] with P
 
   private lazy val layout = args.tabFactory.createViewHolder(getView)
 
-  override protected def accessorFactory = SelectedChannelsAccessor
+  override protected def accessorFactory = SelectedPresetChannelsAccessor
 
   override def reload(channelId: Long) = {
     Log info s"[start] $channelId"
