@@ -3,24 +3,11 @@ package x7c1.linen.modern.accessor.setting
 import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
 import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 
-object SelectedChannelsAccessor extends PresetChannelAccessorFactory {
+object SelectedChannelsAccessor
+  extends PresetChannelAccessorFactory(SelectedPresetChannelsQuery)
 
-  override def create(
-    clientAccountId: Long,
-    helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
-
-    val presetAccount = helper.readable.find[PresetAccount]()
-    val either = presetAccount match {
-      case Left(error) => Left(UnexpectedException(error))
-      case Right(None) => Left(NoPresetAccount())
-      case Right(Some(preset)) => Right(preset.accountId)
-    }
-    either.right map { presetAccountId =>
-      val query = createQuery(clientAccountId, presetAccountId)
-      new PresetChannelAccessorImpl(helper, query, clientAccountId)
-    }
-  }
-  def createQuery(clientAccountId: Long, presetAccountId: Long) = {
+object SelectedPresetChannelsQuery extends PresetChannelQueryFactory {
+  override def createQuery(clientAccountId: Long, presetAccountId: Long) = {
     val sql =
       s"""SELECT
          |  c1._id AS channel_id,
@@ -41,8 +28,24 @@ object SelectedChannelsAccessor extends PresetChannelAccessorFactory {
   }
 }
 
-trait PresetChannelAccessorFactory {
+trait PresetChannelQueryFactory {
+  def createQuery(clientAccountId: Long, presetAccountId: Long): Query
+}
+
+class PresetChannelAccessorFactory(queryFactory: PresetChannelQueryFactory){
   def create(
     clientAccountId: Long,
-    helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor]
+    helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
+
+    val presetAccount = helper.readable.find[PresetAccount]()
+    val either = presetAccount match {
+      case Left(error) => Left(UnexpectedException(error))
+      case Right(None) => Left(NoPresetAccount())
+      case Right(Some(preset)) => Right(preset.accountId)
+    }
+    either.right map { presetAccountId =>
+      val query = queryFactory.createQuery(clientAccountId, presetAccountId)
+      new PresetChannelAccessorImpl(helper, query, clientAccountId)
+    }
+  }
 }

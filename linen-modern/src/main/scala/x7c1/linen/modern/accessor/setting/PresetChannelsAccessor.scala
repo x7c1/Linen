@@ -1,6 +1,5 @@
 package x7c1.linen.modern.accessor.setting
 
-import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
 import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
@@ -11,24 +10,11 @@ trait PresetChannelsAccessor {
   def reload(): Unit
 }
 
-object PresetChannelsAccessor extends PresetChannelAccessorFactory {
+object PresetChannelsAccessor
+  extends PresetChannelAccessorFactory(AllPresetChannelsQuery)
 
-  override def create(
-    clientAccountId: Long,
-    helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
-
-    val presetAccount = helper.readable.find[PresetAccount]()
-    val either = presetAccount match {
-      case Left(error) => Left(UnexpectedException(error))
-      case Right(None) => Left(NoPresetAccount())
-      case Right(Some(preset)) => Right(preset.accountId)
-    }
-    either.right map { presetAccountId =>
-      val query = createQuery(clientAccountId, presetAccountId)
-      new PresetChannelAccessorImpl(helper, query, clientAccountId)
-    }
-  }
-  def createQuery(clientAccountId: Long, presetAccountId: Long) = {
+object AllPresetChannelsQuery extends PresetChannelQueryFactory {
+  override def createQuery(clientAccountId: Long, presetAccountId: Long) = {
     val sql =
       s"""SELECT
          |  c1._id AS channel_id,
