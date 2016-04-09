@@ -11,8 +11,9 @@ trait PresetChannelsAccessor {
   def reload(): Unit
 }
 
-object PresetChannelsAccessor {
-  def create(
+object PresetChannelsAccessor extends PresetChannelAccessorFactory {
+
+  override def create(
     clientAccountId: Long,
     helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
 

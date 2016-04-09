@@ -3,8 +3,9 @@ package x7c1.linen.modern.accessor.setting
 import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
 import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 
-object SelectedChannelsAccessor {
-  def create(
+object SelectedChannelsAccessor extends PresetChannelAccessorFactory {
+
+  override def create(
     clientAccountId: Long,
     helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
 
@@ -38,4 +39,10 @@ object SelectedChannelsAccessor {
       presetAccountId.toString)
     )
   }
+}
+
+trait PresetChannelAccessorFactory {
+  def create(
+    clientAccountId: Long,
+    helper: LinenOpenHelper): Either[PresetRecordError, PresetChannelsAccessor]
 }
