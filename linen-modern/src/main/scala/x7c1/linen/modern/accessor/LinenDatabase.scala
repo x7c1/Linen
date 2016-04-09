@@ -151,6 +151,7 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS retrieved_source_marks (
          |source_id INTEGER NOT NULL,
          |latest_entry_id INTEGER NOT NULL,
+         |latest_entry_created_at INTEGER NOT NULL,
          |updated_at INTEGER NOT NULL,
          |UNIQUE(source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
@@ -163,9 +164,9 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TRIGGER update_source_marks AFTER INSERT ON entries
          |BEGIN
          |  INSERT OR REPLACE INTO retrieved_source_marks
-         |      (source_id, latest_entry_id, updated_at)
+         |      (source_id, latest_entry_id, latest_entry_created_at, updated_at)
          |    VALUES
-         |      (new.source_id, new._id, strftime("%s", CURRENT_TIMESTAMP));
+         |      (new.source_id, new._id, new.created_at, strftime("%s", CURRENT_TIMESTAMP));
          |END
        """.stripMargin
     )
@@ -173,6 +174,7 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
          |source_id INTEGER NOT NULL,
          |start_entry_id INTEGER,
+         |start_entry_created_at INTEGER,
          |account_id INTEGER NOT NULL,
          |created_at INTEGER NOT NULL,
          |UNIQUE(source_id, account_id),

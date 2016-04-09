@@ -9,6 +9,7 @@ trait source_statuses extends TypedFields {
   def source_id: Long
   def account_id: Long
   def start_entry_id: Long
+  def start_entry_created_at: Int
   def created_at: Int --> Date
 }
 object source_statuses {
@@ -38,6 +39,7 @@ object SourceStatusParts {
 
 case class SourceStatusAsStarted(
   startEntryId: Long,
+  startEntryCreatedAt: Int,
   sourceId: Long,
   accountId: Long
 )
@@ -49,7 +51,8 @@ object SourceStatusAsStarted {
 
     override def toContentValues(target: SourceStatusAsStarted) =
       TypedFields toContentValues (
-        column.start_entry_id -> target.startEntryId
+        column.start_entry_id -> target.startEntryId,
+        column.start_entry_created_at -> target.startEntryCreatedAt
       )
 
     override def where(target: SourceStatusAsStarted) = Seq(

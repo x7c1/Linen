@@ -95,6 +95,7 @@ object DummyFactory {
         Log info s"source at $i inserted"
       }
       (1 to 10) foreach { j =>
+        val entryCreatedAt = Date.current()
         val Right(entryId) = writable insert EntryParts(
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
@@ -105,11 +106,13 @@ object DummyFactory {
         if (i == 3){
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId1
           )
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId2
           )
@@ -117,6 +120,7 @@ object DummyFactory {
         if (i == 4){
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId2
           )
