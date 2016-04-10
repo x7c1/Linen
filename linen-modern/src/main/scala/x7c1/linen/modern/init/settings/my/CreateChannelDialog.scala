@@ -23,7 +23,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 object CreateChannelDialog {
   class Arguments(
-    val accountId: Long,
+    val clientAccountId: Long,
     val dialogFactory: ContextualFactory[AlertDialog.Builder],
     val inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate]
   )
@@ -102,17 +102,17 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     )
   }
   private def createChannel(input: NewChannelInput) = provide async {
-    Log info s"[create] account:${args.accountId}"
+    Log info s"[create] account:${args.clientAccountId}"
 
     def create() = helper.writable insert ChannelParts(
-      accountId = args.accountId,
+      accountId = args.clientAccountId,
       name = input.channelName,
       description = input.description.getOrElse(""),
       createdAt = Date.current()
     )
     def subscribe(channelId: Long) = {
       val subscriber = new ChannelSubscriber(
-        account = AccountIdentifiable(args.accountId),
+        account = AccountIdentifiable(args.clientAccountId),
         helper = helper
       )
       subscriber subscribe channelId
@@ -134,7 +134,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
   }
   private def notifyCreated(channelId: Long) = provide {
     val event = new ChannelCreated(
-      accountId = args.accountId,
+      accountId = args.clientAccountId,
       channelId = channelId
     )
     LocalBroadcaster(event) dispatchFrom getActivity

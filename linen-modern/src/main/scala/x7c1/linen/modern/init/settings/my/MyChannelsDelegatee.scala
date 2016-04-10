@@ -90,7 +90,7 @@ class MyChannelsDelegatee (
 
     val fragment = FragmentFactory.create[CreateChannelDialog] by
       new CreateChannelDialog.Arguments(
-        accountId = accountId,
+        clientAccountId = accountId,
         dialogFactory = dialogFactory,
         inputLayoutFactory = inputLayoutFactory
       )
