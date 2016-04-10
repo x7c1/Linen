@@ -31,7 +31,7 @@ class SelectedChannelsAccessorTest extends JUnitSuiteLike {
     assertEquals(0, accessor.length)
 
     def channelAt(n: Int) = {
-      val Right(accessor) = PresetChannelsAccessor.create(
+      val Right(accessor) = AllPresetChannelsAccessor.create(
         clientAccountId = client.accountId,
         helper = helper
       )

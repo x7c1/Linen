@@ -9,13 +9,14 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageButton;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.SeekBar;
-import android.widget.ImageButton;
 
 public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
 
     public final TextView title;
+    public final ImageButton menu;
     public final TextView description;
     public final android.support.v7.widget.SwitchCompat switchSubscribe;
     public final SeekBar ratingBar;
@@ -26,6 +27,7 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
     public SettingChannelSourcesRow(
         View itemView,
         TextView title,
+        ImageButton menu,
         TextView description,
         android.support.v7.widget.SwitchCompat switchSubscribe,
         SeekBar ratingBar,
@@ -35,6 +37,7 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
     ){
         super(itemView);
         this.title = title;
+        this.menu = menu;
         this.description = description;
         this.switchSubscribe = switchSubscribe;
         this.ratingBar = ratingBar;

@@ -70,6 +70,6 @@ trait OnChannelSubscribedListener { self =>
 
 class OnMenuForAll extends OnMenuSelectedListener {
   override def onMenuSelected(e: MenuSelected) = {
-
+    Log info s"[init]"
   }
 }
