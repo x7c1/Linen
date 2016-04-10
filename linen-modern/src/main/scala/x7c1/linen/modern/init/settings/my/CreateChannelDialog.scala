@@ -3,6 +3,7 @@ package x7c1.linen.modern.init.settings.my
 import android.content.DialogInterface.OnClickListener
 import android.content.{Context, DialogInterface}
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -35,6 +36,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 
   private lazy val helper = new LinenOpenHelper(getActivity)
 
+  def showIn(activity: FragmentActivity) = {
+    show(activity.getSupportFragmentManager, "channel-dialog")
+  }
   override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
 
   override def onStart(): Unit = {

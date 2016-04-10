@@ -95,7 +95,7 @@ class MyChannelsDelegatee (
         inputLayoutFactory = inputLayoutFactory
       )
 
-    fragment.show(activity.getSupportFragmentManager, "hoge")
+    fragment showIn activity
   }
 }
 
