@@ -10,6 +10,7 @@ object PackageResolver {
   }
   private val widget = Seq(
     "Button",
+    "CheckBox",
     "EditText",
     "ImageButton",
     "ImageView",
