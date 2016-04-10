@@ -44,6 +44,7 @@ class MyChannelSourcesDelegatee (
     layout.sourceList setAdapter new SourceRowAdapter(
       accessor = accessorFactory create event.channelId,
       account = ClientAccount(event.accountId),
+      channelId = event.channelId,
       viewHolderProvider = sourceRowProvider,
       onMenuSelected = new OnSourceMenuSelected().showMenu,
       onSyncClicked = onSyncClicked,

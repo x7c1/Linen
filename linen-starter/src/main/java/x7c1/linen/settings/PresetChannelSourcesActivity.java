@@ -8,9 +8,10 @@ import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelSourcesDelegatee;
-import x7c1.linen.res.layout.SettingChannelSourceCopyProvider;
 import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
 import x7c1.linen.res.layout.SettingChannelSourcesRowProvider;
+import x7c1.linen.res.layout.SettingSourceCopyProvider;
+import x7c1.linen.res.layout.SettingSourceCopyRowItemProvider;
 
 public class PresetChannelSourcesActivity extends BaseFragmentActivity {
 	private PresetChannelSourcesDelegatee delegatee = null;
@@ -28,7 +29,8 @@ public class PresetChannelSourcesActivity extends BaseFragmentActivity {
 				this,
 				layout,
 				new DialogFactory(),
-				SettingChannelSourceCopyProvider.factory(),
+				SettingSourceCopyProvider.factory(),
+				SettingSourceCopyRowItemProvider.factory(),
 				new SettingChannelSourcesRowProvider(this)
 		);
 		delegatee.setup();

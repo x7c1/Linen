@@ -5,12 +5,19 @@ import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import android.support.v4.app.{DialogFragment, FragmentActivity}
 import android.support.v7.app.AlertDialog
-import android.widget.Button
-import x7c1.linen.glue.res.layout.SettingChannelSourceCopy
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView.Adapter
+import android.view.ViewGroup
+import android.widget.{CompoundButton, Button}
+import android.widget.CompoundButton.OnCheckedChangeListener
+import x7c1.linen.glue.res.layout.{SettingSourceCopy, SettingSourceCopyRow, SettingSourceCopyRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
+import x7c1.linen.modern.accessor.setting.{CopyTargetChannelsAccessor, MyChannel}
 import x7c1.linen.modern.init.settings.preset.CopySourceDialog.Arguments
+import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
+import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
@@ -19,9 +26,11 @@ import x7c1.wheat.modern.decorator.Imports._
 object CopySourceDialog {
   class Arguments(
     val clientAccountId: Long,
+    val originalChannelId: Long,
     val originalSourceId: Long,
     val dialogFactory: ContextualFactory[AlertDialog.Builder],
-    val copyLayoutFactory: ViewHolderProviderFactory[SettingChannelSourceCopy]
+    val copyLayoutFactory: ViewHolderProviderFactory[SettingSourceCopy],
+    val rowFactory: ViewHolderProviderFactory[SettingSourceCopyRowItem]
   )
 }
 
@@ -51,6 +60,17 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
       setPositiveButton("Copy", nop).
       setNegativeButton("Cancel", nop)
 
+    createAccessor() match {
+      case Right(accessor) =>
+        layout.channels setLayoutManager new LinearLayoutManager(getContext)
+        layout.channels setAdapter new CopyTargetChannelsAdapter(
+          AdapterDelegatee.create(
+            providers = new SettingSourceCopyRowProviders(args.rowFactory create getContext),
+            sequence = accessor
+          )
+        )
+      case Left(e) => Log error format(e){"[failed]"}
+    }
     builder setView layout.itemView
     builder.create()
   }
@@ -74,6 +94,13 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
     super.onStop()
     helper.close()
   }
+  private def createAccessor() = {
+    CopyTargetChannelsAccessor.create(
+      db = helper.getReadableDatabase,
+      accountId = args.clientAccountId,
+      channelIdToExclude = args.originalChannelId
+    )
+  }
 
   private def onClickPositive(button: Button) = {
     Log info s"[init]"
@@ -82,5 +109,40 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
   private def onClickNegative(button: Button) = {
     Log info s"[init]"
     dismiss()
+  }
+}
+
+class CopyTargetChannelsAdapter(
+  delegatee: AdapterDelegatee[SettingSourceCopyRow, MyChannel]
+) extends Adapter[SettingSourceCopyRow] {
+
+  private val checkedMap = collection.mutable.Map[Long, Boolean]()
+
+  override def getItemCount: Int = delegatee.count
+
+  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
+    delegatee.createViewHolder(parent, viewType)
+  }
+  override def getItemViewType(position: Int) = {
+    delegatee viewTypeAt position
+  }
+  override def onBindViewHolder(holder: SettingSourceCopyRow, position: Int) = {
+    delegatee.bindViewHolder(holder, position){
+      case (row: SettingSourceCopyRowItem, channel) =>
+        row.label.text = channel.name
+        row.label onClick { _ =>
+          row.checked.toggle()
+        }
+        row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {
+          override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean): Unit = {
+            if (isChecked) {
+              checkedMap(channel.channelId) = true
+            } else {
+              checkedMap remove channel.channelId
+            }
+          }
+        })
+        row.checked setChecked checkedMap.getOrElse(channel.channelId, false)
+    }
   }
 }

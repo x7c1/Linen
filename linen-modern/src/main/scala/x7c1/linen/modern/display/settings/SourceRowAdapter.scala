@@ -15,6 +15,7 @@ import x7c1.wheat.modern.resource.MetricsConverter
 class SourceRowAdapter (
   accessor: SettingSourceAccessor,
   account: ClientAccount,
+  channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
   onMenuSelected: SourceMenuSelected => Unit,
   onSyncClicked: OnSyncClickedListener,
@@ -33,6 +34,7 @@ class SourceRowAdapter (
         onMenuSelected apply SourceMenuSelected(
           targetView = view,
           clientAccount = account,
+          channelId = channelId,
           source = source
         )
       }

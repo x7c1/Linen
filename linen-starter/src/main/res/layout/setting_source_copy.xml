@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Copy to..."
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sample channel name"
+        android:clickable="true"
+        android:focusable="true"
+        android:buttonTint="@color/lapis_lazuli"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/setting_source_copy__channels"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <!--android:tint="@color/cardinal"-->
+    <!--android:buttonTint="@color/text_tertiary"-->
+    <!--style="?android:attr/textAppearanceMedium"-->
+
+    <!--<CheckedTextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:checked="true"-->
+        <!--android:text="sample channel 2"-->
+        <!--android:checkMark="?android:attr/textCheckMark"-->
+        <!--/>-->
+
+    <!--android:background="?android:selectableItemBackground"-->
+
+</LinearLayout>

@@ -9,14 +9,15 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class SettingChannelSourceCopy extends RecyclerView.ViewHolder {
+public class SettingSourceCopy extends RecyclerView.ViewHolder {
 
-    
+    public final android.support.v7.widget.RecyclerView channels;
 
-    public SettingChannelSourceCopy(
-        View itemView
+    public SettingSourceCopy(
+        View itemView,
+        android.support.v7.widget.RecyclerView channels
     ){
         super(itemView);
-        
+        this.channels = channels;
     }
 }
