@@ -6,7 +6,7 @@ import android.support.v7.widget.PopupMenu.OnMenuItemClickListener
 import android.support.v7.widget.{PopupMenu, LinearLayoutManager}
 import android.view.{MenuItem, Menu}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingSourceCopyRowItem, SettingSourceCopy, SettingChannelSourcesLayout, SettingChannelSourcesRow}
+import x7c1.linen.glue.res.layout.{SettingSourceAttachRowItem, SettingSourceAttach, SettingChannelSourcesLayout, SettingChannelSourcesRow}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.accessor.preset.ClientAccount
@@ -25,8 +25,8 @@ class PresetChannelSourcesDelegatee (
   activity: FragmentActivity with ActivityControl with ServiceControl,
   layout: SettingChannelSourcesLayout,
   dialogFactory: ContextualFactory[AlertDialog.Builder],
-  copyLayoutFactory: ViewHolderProviderFactory[SettingSourceCopy],
-  copyRowFactory: ViewHolderProviderFactory[SettingSourceCopyRowItem],
+  attachLayoutFactory: ViewHolderProviderFactory[SettingSourceAttach],
+  attachRowFactory: ViewHolderProviderFactory[SettingSourceAttachRowItem],
   sourceRowProvider: ViewHolderProvider[SettingChannelSourcesRow] ){
 
   private lazy val database =
@@ -55,7 +55,7 @@ class PresetChannelSourcesDelegatee (
       viewHolderProvider = sourceRowProvider,
       onMenuSelected = new OnSourceMenuSelected(
         activity,
-        dialogFactory, copyLayoutFactory, copyRowFactory ).showMenu,
+        dialogFactory, attachLayoutFactory, attachRowFactory ).showMenu,
 
       onSyncClicked = onSyncClicked,
       metricsConverter = MetricsConverter(activity)
@@ -74,33 +74,33 @@ class PresetChannelSourcesDelegatee (
 class OnSourceMenuSelected(
   activity: FragmentActivity,
   dialogFactory: ContextualFactory[AlertDialog.Builder],
-  copyLayoutFactory: ViewHolderProviderFactory[SettingSourceCopy],
-  copyRowFactory: ViewHolderProviderFactory[SettingSourceCopyRowItem]
+  attachLayoutFactory: ViewHolderProviderFactory[SettingSourceAttach],
+  attachRowFactory: ViewHolderProviderFactory[SettingSourceAttachRowItem]
 ){
 
   def showMenu(event: SourceMenuSelected): Unit = {
     Log info s"[init]"
     val menu = new PopupMenu(activity, event.targetView)
-    menu.getMenu.add(Menu.NONE, 123, 1, "Copy source to...")
+    menu.getMenu.add(Menu.NONE, 123, 1, "Attach to...")
     menu setOnMenuItemClickListener new OnMenuItemClickListener {
       override def onMenuItemClick(item: MenuItem): Boolean = {
         if (item.getItemId == 123){
-          createCopySourceDialog(event) showIn activity
+          createAttachSourceDialog(event) showIn activity
         }
         true
       }
     }
     menu.show()
   }
-  def createCopySourceDialog(event: SourceMenuSelected) = {
-    FragmentFactory.create[CopySourceDialog] by
-      new CopySourceDialog.Arguments(
+  def createAttachSourceDialog(event: SourceMenuSelected) = {
+    FragmentFactory.create[AttachSourceDialog] by
+      new AttachSourceDialog.Arguments(
         clientAccountId = event.clientAccountId,
         originalChannelId = event.channelId,
         originalSourceId = event.selectedSourceId,
         dialogFactory = dialogFactory,
-        copyLayoutFactory = copyLayoutFactory,
-        rowFactory = copyRowFactory
+        attachLayoutFactory = attachLayoutFactory,
+        rowFactory = attachRowFactory
       )
   }
 }

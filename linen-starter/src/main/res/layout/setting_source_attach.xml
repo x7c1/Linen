@@ -8,7 +8,7 @@
     >
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/setting_source_copy__channels"
+        android:id="@+id/setting_source_attach__channels"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

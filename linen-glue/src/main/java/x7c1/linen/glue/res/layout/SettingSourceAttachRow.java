@@ -9,8 +9,8 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class SettingSourceCopyRow extends RecyclerView.ViewHolder {
-    public SettingSourceCopyRow(View itemView) {
+public class SettingSourceAttachRow extends RecyclerView.ViewHolder {
+    public SettingSourceAttachRow(View itemView) {
         super(itemView);
     }
 }

@@ -6,18 +6,18 @@ import x7c1.linen.modern.accessor.Query
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.sequence.Sequence
 
-trait CopyTargetChannelsAccessor extends Sequence[MyChannel]
+trait ChannelsToAttachAccessor extends Sequence[MyChannel]
 
-object CopyTargetChannelsAccessor {
+object ChannelsToAttachAccessor {
   def create(
     db: SQLiteDatabase,
     accountId: Long,
-    channelIdToExclude: Long): Either[Exception, CopyTargetChannelsAccessor] = {
+    channelIdToExclude: Long): Either[Exception, ChannelsToAttachAccessor] = {
 
     try {
       val query = createQuery(accountId, channelIdToExclude)
       val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new CopyTargetChannelsImpl(raw, accountId)
+      Right apply new ChannelsToAttachImpl(raw, accountId)
     } catch {
       case e: Exception => Left(e)
     }
@@ -47,8 +47,8 @@ object CopyTargetChannelsAccessor {
   }
 }
 
-private class CopyTargetChannelsImpl(
-  rawCursor: Cursor, accountId: Long ) extends CopyTargetChannelsAccessor {
+private class ChannelsToAttachImpl(
+  rawCursor: Cursor, accountId: Long ) extends ChannelsToAttachAccessor {
 
   private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
 

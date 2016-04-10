@@ -10,8 +10,8 @@ import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelSourcesDelegatee;
 import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
 import x7c1.linen.res.layout.SettingChannelSourcesRowProvider;
-import x7c1.linen.res.layout.SettingSourceCopyProvider;
-import x7c1.linen.res.layout.SettingSourceCopyRowItemProvider;
+import x7c1.linen.res.layout.SettingSourceAttachProvider;
+import x7c1.linen.res.layout.SettingSourceAttachRowItemProvider;
 
 public class PresetChannelSourcesActivity extends BaseFragmentActivity {
 	private PresetChannelSourcesDelegatee delegatee = null;
@@ -29,8 +29,8 @@ public class PresetChannelSourcesActivity extends BaseFragmentActivity {
 				this,
 				layout,
 				new DialogFactory(),
-				SettingSourceCopyProvider.factory(),
-				SettingSourceCopyRowItemProvider.factory(),
+				SettingSourceAttachProvider.factory(),
+				SettingSourceAttachRowItemProvider.factory(),
 				new SettingChannelSourcesRowProvider(this)
 		);
 		delegatee.setup();

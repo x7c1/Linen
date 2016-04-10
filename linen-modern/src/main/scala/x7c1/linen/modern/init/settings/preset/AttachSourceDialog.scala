@@ -10,10 +10,10 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import android.widget.{CompoundButton, Button}
 import android.widget.CompoundButton.OnCheckedChangeListener
-import x7c1.linen.glue.res.layout.{SettingSourceCopy, SettingSourceCopyRow, SettingSourceCopyRowItem}
+import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.setting.{CopyTargetChannelsAccessor, MyChannel}
-import x7c1.linen.modern.init.settings.preset.CopySourceDialog.Arguments
+import x7c1.linen.modern.accessor.setting.{ChannelsToAttachAccessor, MyChannel}
+import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -23,25 +23,25 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 
-object CopySourceDialog {
+object AttachSourceDialog {
   class Arguments(
     val clientAccountId: Long,
     val originalChannelId: Long,
     val originalSourceId: Long,
     val dialogFactory: ContextualFactory[AlertDialog.Builder],
-    val copyLayoutFactory: ViewHolderProviderFactory[SettingSourceCopy],
-    val rowFactory: ViewHolderProviderFactory[SettingSourceCopyRowItem]
+    val attachLayoutFactory: ViewHolderProviderFactory[SettingSourceAttach],
+    val rowFactory: ViewHolderProviderFactory[SettingSourceAttachRowItem]
   )
 }
 
-class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
+class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 
   lazy val args = getTypedArguments
 
   private lazy val helper = new LinenOpenHelper(getActivity)
 
   private lazy val layout = {
-    val factory = args.copyLayoutFactory create getActivity
+    val factory = args.attachLayoutFactory create getActivity
     factory.inflateOn(null)
   }
   private lazy val internalDialog = {
@@ -56,16 +56,16 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
         then set onClickListener again in onStart method.
      */
     val builder = args.dialogFactory.newInstance(getActivity).
-      setTitle("Copy source to...").
-      setPositiveButton("Copy", nop).
-      setNegativeButton("Cancel", nop)
+      setTitle("Attach source to...").
+      setPositiveButton("OK", nop).
+      setNegativeButton("CANCEL", nop)
 
     createAccessor() match {
       case Right(accessor) =>
         layout.channels setLayoutManager new LinearLayoutManager(getContext)
-        layout.channels setAdapter new CopyTargetChannelsAdapter(
+        layout.channels setAdapter new AttachChannelsAdapter(
           AdapterDelegatee.create(
-            providers = new SettingSourceCopyRowProviders(args.rowFactory create getContext),
+            providers = new SettingSourceAttachRowProviders(args.rowFactory create getContext),
             sequence = accessor
           )
         )
@@ -96,7 +96,7 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
   }
 
   private def createAccessor() = {
-    CopyTargetChannelsAccessor.create(
+    ChannelsToAttachAccessor.create(
       db = helper.getReadableDatabase,
       accountId = args.clientAccountId,
       channelIdToExclude = args.originalChannelId
@@ -113,9 +113,9 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
   }
 }
 
-class CopyTargetChannelsAdapter(
-  delegatee: AdapterDelegatee[SettingSourceCopyRow, MyChannel]
-) extends Adapter[SettingSourceCopyRow] {
+class AttachChannelsAdapter(
+  delegatee: AdapterDelegatee[SettingSourceAttachRow, MyChannel]
+) extends Adapter[SettingSourceAttachRow] {
 
   private val checkedMap = collection.mutable.Map[Long, Boolean]()
 
@@ -127,9 +127,9 @@ class CopyTargetChannelsAdapter(
   override def getItemViewType(position: Int) = {
     delegatee viewTypeAt position
   }
-  override def onBindViewHolder(holder: SettingSourceCopyRow, position: Int) = {
+  override def onBindViewHolder(holder: SettingSourceAttachRow, position: Int) = {
     delegatee.bindViewHolder(holder, position){
-      case (row: SettingSourceCopyRowItem, channel) =>
+      case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.name
         row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {

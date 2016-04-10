@@ -10,12 +10,12 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-public class SettingSourceCopyRowItem extends SettingSourceCopyRow {
+public class SettingSourceAttachRowItem extends SettingSourceAttachRow {
 
     public final CheckBox checked;
     public final TextView label;
 
-    public SettingSourceCopyRowItem(
+    public SettingSourceAttachRowItem(
         View itemView,
         CheckBox checked,
         TextView label
