@@ -31,9 +31,9 @@ dependencies {
     compile fileTree(dir: 'libs-generated', include: ['*.jar'])
     compile project(':linen-pickle')
     compile project(':linen-glue')
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
+    compile 'com.android.support:cardview-v7:23.2.1'
     compile 'com.android.support:multidex:1.0.1'
 }
