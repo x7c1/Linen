@@ -94,6 +94,7 @@ class CopySourceDialog extends DialogFragment with TypedFragment[Arguments]{
     super.onStop()
     helper.close()
   }
+
   private def createAccessor() = {
     CopyTargetChannelsAccessor.create(
       db = helper.getReadableDatabase,
@@ -129,10 +130,8 @@ class CopyTargetChannelsAdapter(
   override def onBindViewHolder(holder: SettingSourceCopyRow, position: Int) = {
     delegatee.bindViewHolder(holder, position){
       case (row: SettingSourceCopyRowItem, channel) =>
+        row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.name
-        row.label onClick { _ =>
-          row.checked.toggle()
-        }
         row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {
           override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean): Unit = {
             if (isChecked) {

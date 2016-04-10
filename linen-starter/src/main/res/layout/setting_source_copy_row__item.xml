@@ -3,8 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp"
+    android:paddingEnd="18dp"
+    android:paddingBottom="4dp"
+    android:paddingStart="18dp"
+    android:background="?android:selectableItemBackground"
+    android:gravity="center_vertical"
+    >
     <CheckBox
         android:id="@+id/setting_source_copy_row__item__checked"
         android:layout_width="wrap_content"
@@ -16,7 +22,9 @@
         android:id="@+id/setting_source_copy_row__item__label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"
+        android:layout_marginStart="6dp"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
         />
 
 </LinearLayout>

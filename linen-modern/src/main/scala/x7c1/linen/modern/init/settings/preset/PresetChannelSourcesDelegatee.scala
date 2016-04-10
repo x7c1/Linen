@@ -81,7 +81,7 @@ class OnSourceMenuSelected(
   def showMenu(event: SourceMenuSelected): Unit = {
     Log info s"[init]"
     val menu = new PopupMenu(activity, event.targetView)
-    menu.getMenu.add(Menu.NONE, 123, 1, "Channels to copy source")
+    menu.getMenu.add(Menu.NONE, 123, 1, "Copy source to...")
     menu setOnMenuItemClickListener new OnMenuItemClickListener {
       override def onMenuItemClick(item: MenuItem): Boolean = {
         if (item.getItemId == 123){
