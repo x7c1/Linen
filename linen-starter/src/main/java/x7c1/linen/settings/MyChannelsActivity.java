@@ -1,8 +1,6 @@
 package x7c1.linen.settings;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 
 import x7c1.linen.R;
 import x7c1.linen.base.BaseFragmentActivity;
@@ -15,7 +13,6 @@ import x7c1.linen.res.layout.SettingMyChannelCreateProvider;
 import x7c1.linen.res.layout.SettingMyChannelRowFooterProvider;
 import x7c1.linen.res.layout.SettingMyChannelRowItemProvider;
 import x7c1.linen.res.layout.SettingMyChannelsLayoutProvider;
-import x7c1.wheat.ancient.context.ContextualFactory;
 
 public class MyChannelsActivity extends BaseFragmentActivity {
 
@@ -51,12 +48,6 @@ public class MyChannelsActivity extends BaseFragmentActivity {
 	@Override
 	protected TransitAnimation createTransitAnimation() {
 		return TransitAnimations.forDirectChild(this);
-	}
-	private static class DialogFactory implements ContextualFactory<AlertDialog.Builder>{
-		@Override
-		public AlertDialog.Builder newInstance(Context context) {
-			return new AlertDialog.Builder(context, R.style.AppAlertDialog);
-		}
 	}
 }
 

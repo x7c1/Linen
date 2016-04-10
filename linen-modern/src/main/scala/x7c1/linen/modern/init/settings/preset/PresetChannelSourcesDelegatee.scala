@@ -1,18 +1,20 @@
 package x7c1.linen.modern.init.settings.preset
 
 import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener
 import android.support.v7.widget.{PopupMenu, LinearLayoutManager}
 import android.view.{MenuItem, Menu}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SettingChannelSourcesLayout, SettingChannelSourcesRow}
+import x7c1.linen.glue.res.layout.{SettingChannelSourceCopy, SettingChannelSourcesLayout, SettingChannelSourcesRow}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.{LinenOpenHelper, SettingSourceAccessorFactory}
 import x7c1.linen.modern.display.settings.{ChannelSourcesSelected, OnSyncClickedListener, SourceMenuSelected, SourceRowAdapter}
 import x7c1.linen.modern.init.updater.UpdaterMethods
-import x7c1.wheat.ancient.resource.ViewHolderProvider
+import x7c1.wheat.ancient.context.ContextualFactory
+import x7c1.wheat.ancient.resource.{ViewHolderProviderFactory, ViewHolderProvider}
 import x7c1.wheat.macros.fragment.FragmentFactory
 import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
@@ -22,6 +24,8 @@ import x7c1.wheat.modern.resource.MetricsConverter
 class PresetChannelSourcesDelegatee (
   activity: FragmentActivity with ActivityControl with ServiceControl,
   layout: SettingChannelSourcesLayout,
+  dialogFactory: ContextualFactory[AlertDialog.Builder],
+  copyLayoutFactory: ViewHolderProviderFactory[SettingChannelSourceCopy],
   sourceRowProvider: ViewHolderProvider[SettingChannelSourcesRow] ){
 
   private lazy val database =
@@ -47,7 +51,7 @@ class PresetChannelSourcesDelegatee (
       accessor = accessorFactory create event.channelId,
       account = ClientAccount(event.accountId),
       viewHolderProvider = sourceRowProvider,
-      onMenuSelected = new OnSourceMenuSelected(activity).showMenu,
+      onMenuSelected = new OnSourceMenuSelected(activity, dialogFactory, copyLayoutFactory).showMenu,
       onSyncClicked = onSyncClicked,
       metricsConverter = MetricsConverter(activity)
     )
@@ -62,7 +66,11 @@ class PresetChannelSourcesDelegatee (
 
 }
 
-class OnSourceMenuSelected(activity: FragmentActivity){
+class OnSourceMenuSelected(
+  activity: FragmentActivity,
+  dialogFactory: ContextualFactory[AlertDialog.Builder],
+  copyLayoutFactory: ViewHolderProviderFactory[SettingChannelSourceCopy]){
+
   def showMenu(event: SourceMenuSelected): Unit = {
     Log info s"[init]"
     val menu = new PopupMenu(activity, event.targetView)
@@ -72,10 +80,20 @@ class OnSourceMenuSelected(activity: FragmentActivity){
         Log info s"[init]"
         if (item.getItemId == 123){
           Log info s"${event.selectedSourceId}"
+          createCopySourceDialog(event) showIn activity
         }
         true
       }
     }
     menu.show()
+  }
+  def createCopySourceDialog(event: SourceMenuSelected) = {
+    FragmentFactory.create[CopySourceDialog] by
+      new CopySourceDialog.Arguments(
+        clientAccountId = event.clientAccountId,
+        originalSourceId = event.selectedSourceId,
+        dialogFactory = dialogFactory,
+        copyLayoutFactory = copyLayoutFactory
+      )
   }
 }
