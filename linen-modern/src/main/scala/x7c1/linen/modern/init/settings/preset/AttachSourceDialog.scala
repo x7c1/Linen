@@ -8,11 +8,11 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import android.widget.{CompoundButton, Button}
 import android.widget.CompoundButton.OnCheckedChangeListener
+import android.widget.{Button, CompoundButton}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.setting.{ChannelsToAttachAccessor, MyChannel}
+import x7c1.linen.modern.accessor.setting.{ChannelToAttach, ChannelsToAttachAccessor}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -56,12 +56,13 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
         then set onClickListener again in onStart method.
      */
     val builder = args.dialogFactory.newInstance(getActivity).
-      setTitle("Attach source to...").
+      setTitle("Attached channels").
       setPositiveButton("OK", nop).
       setNegativeButton("CANCEL", nop)
 
     createAccessor() match {
       case Right(accessor) =>
+        Log info s"len:${accessor.length}"
         layout.channels setLayoutManager new LinearLayoutManager(getContext)
         layout.channels setAdapter new AttachChannelsAdapter(
           AdapterDelegatee.create(
@@ -99,7 +100,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
     ChannelsToAttachAccessor.create(
       db = helper.getReadableDatabase,
       accountId = args.clientAccountId,
-      channelIdToExclude = args.originalChannelId
+      sourceId = args.originalSourceId
     )
   }
 
@@ -114,7 +115,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 }
 
 class AttachChannelsAdapter(
-  delegatee: AdapterDelegatee[SettingSourceAttachRow, MyChannel]
+  delegatee: AdapterDelegatee[SettingSourceAttachRow, ChannelToAttach]
 ) extends Adapter[SettingSourceAttachRow] {
 
   private val checkedMap = collection.mutable.Map[Long, Boolean]()
@@ -131,7 +132,7 @@ class AttachChannelsAdapter(
     delegatee.bindViewHolder(holder, position){
       case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
-        row.label.text = channel.name
+        row.label.text = channel.channelName
         row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {
           override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean): Unit = {
             if (isChecked) {
@@ -141,7 +142,11 @@ class AttachChannelsAdapter(
             }
           }
         })
-        row.checked setChecked checkedMap.getOrElse(channel.channelId, false)
+        val isAttached =
+          channel.isAttached ||
+            checkedMap.getOrElse(channel.channelId, false)
+
+        row.checked setChecked isAttached
     }
   }
 }

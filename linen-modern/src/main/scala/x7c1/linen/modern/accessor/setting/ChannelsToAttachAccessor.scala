@@ -3,65 +3,69 @@ package x7c1.linen.modern.accessor.setting
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.modern.accessor.Query
+import x7c1.linen.modern.accessor.database.ChannelRecord
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.sequence.Sequence
 
-trait ChannelsToAttachAccessor extends Sequence[MyChannel]
+trait ChannelsToAttachAccessor extends Sequence[ChannelToAttach]
 
 object ChannelsToAttachAccessor {
   def create(
     db: SQLiteDatabase,
     accountId: Long,
-    channelIdToExclude: Long): Either[Exception, ChannelsToAttachAccessor] = {
+    sourceId: Long ): Either[Exception, ChannelsToAttachAccessor] = {
 
     try {
-      val query = createQuery(accountId, channelIdToExclude)
+      val query = createQuery(accountId, sourceId)
       val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new ChannelsToAttachImpl(raw, accountId)
+      Right apply new ChannelsToAttachImpl(raw)
     } catch {
       case e: Exception => Left(e)
     }
   }
-
-  def createQuery(accountId: Long, channelIdToExclude: Long): Query = {
+  def createQuery(accountId: Long, sourceId: Long): Query = {
     val sql =
       """SELECT
-        | _id,
-        | name,
-        | description,
-        | IFNULL(c2.subscribed, 0) AS subscribed,
-        | c1.created_at AS created_at
+        | c1._id AS _id,
+        | c1.name AS name,
+        | c2.source_id AS attached_source_id
         |FROM channels AS c1
-        | LEFT JOIN channel_statuses AS c2
-        |   ON c1._id = c2.channel_id AND c2.account_id = ?
+        | LEFT JOIN channel_source_map AS c2 ON
+        |   c1._id = c2.channel_id AND
+        |   c2.source_id = ?
         |WHERE
-        | c1.account_id = ? AND
-        | c1._id != ?
-        |ORDER BY c1._id DESC""".stripMargin
+        | c1.account_id = ?
+        |""".stripMargin
 
     new Query(sql, Array(
-      accountId.toString,
-      accountId.toString,
-      channelIdToExclude.toString
+      sourceId.toString,
+      accountId.toString
     ))
   }
 }
 
-private class ChannelsToAttachImpl(
-  rawCursor: Cursor, accountId: Long ) extends ChannelsToAttachAccessor {
+trait ChannelsToAttachRecord extends ChannelRecord {
+  def attached_source_id: Option[Long]
+}
 
-  private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
+private class ChannelsToAttachImpl(rawCursor: Cursor) extends ChannelsToAttachAccessor {
+
+  private lazy val cursor = TypedCursor[ChannelsToAttachRecord](rawCursor)
 
   override def length = rawCursor.getCount
 
   override def findAt(position: Int) =
     (cursor moveToFind position){
-      MyChannel(
+      new ChannelToAttach(
         channelId = cursor._id,
-        name = cursor.name,
-        description = cursor.description,
-        createdAt = cursor.created_at.typed,
-        isSubscribed = cursor.subscribed == 1
+        channelName = cursor.name,
+        isAttached = cursor.attached_source_id.nonEmpty
       )
     }
 }
+
+class ChannelToAttach (
+  val channelId: Long,
+  val channelName: String,
+  val isAttached: Boolean
+)
