@@ -7,7 +7,18 @@ import x7c1.linen.modern.accessor.database.ChannelRecord
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.sequence.Sequence
 
-trait ChannelsToAttachAccessor extends Sequence[ChannelToAttach]
+import scala.collection.immutable.IndexedSeq
+
+trait ChannelsToAttachAccessor extends Sequence[ChannelToAttach]{
+
+  def collectAttached: IndexedSeq[Long] = (0 to length - 1) flatMap findAt collect {
+    case x if x.isAttached => x.channelId
+  }
+  def collectDetached: IndexedSeq[Long] = (0 to length - 1) flatMap findAt collect {
+    case x if ! x.isAttached => x.channelId
+  }
+  def collectAll: IndexedSeq[Long] = (0 to length - 1) flatMap findAt map (_.channelId)
+}
 
 object ChannelsToAttachAccessor {
   def create(
