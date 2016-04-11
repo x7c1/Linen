@@ -6,7 +6,7 @@ import x7c1.wheat.modern.tasks.ScrollerTasks
 
 class DetailArea(
   toolbar: Toolbar,
-  recyclerView: RecyclerView,
+  protected val recyclerView: RecyclerView,
   getPosition: () => Int ) extends Pane {
 
   override lazy val displayPosition: Int = getPosition()

@@ -8,6 +8,7 @@ import x7c1.linen.modern.display.unread.PaneContainer
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.tasks.UiThread
+import x7c1.wheat.modern.tasks.UiThread.main
 
 
 class OnAccessorsLoadedListener(
@@ -16,7 +17,20 @@ class OnAccessorsLoadedListener(
   pointer: SourcePointer,
   drawer: => DrawerAction ){
 
-  def onLoad[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
+  def afterLoad[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
+    Log info s"[init] $e"
+
+    val tasks = for {
+      _ <- main {
+        layout.sourceToolbar setTitle e.channelName
+        updateAdapter()
+        pointer focusOn 0
+      }
+    } yield ()
+
+    tasks.execute()
+  }
+  def afterReload[A: ChannelSelectable](e: LoadCompleteEvent[A]): Unit = {
     Log info s"[init] $e"
 
     val tasks = for {
@@ -30,8 +44,8 @@ class OnAccessorsLoadedListener(
       }
       _ <- container.sourceArea skipTo 0
       _ <- container skipTo container.sourceArea
-      _ <- container.fadeIn()
-      _ <- task { drawer.onBack() }
+      _ <- ui join container.fadeIn()
+      _ <- ui join task { drawer.onBack() }
     } yield ()
 
     tasks.execute()

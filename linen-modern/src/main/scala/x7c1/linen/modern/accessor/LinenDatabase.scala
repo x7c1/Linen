@@ -151,6 +151,7 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS retrieved_source_marks (
          |source_id INTEGER NOT NULL,
          |latest_entry_id INTEGER NOT NULL,
+         |latest_entry_created_at INTEGER NOT NULL,
          |updated_at INTEGER NOT NULL,
          |UNIQUE(source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
@@ -163,9 +164,9 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TRIGGER update_source_marks AFTER INSERT ON entries
          |BEGIN
          |  INSERT OR REPLACE INTO retrieved_source_marks
-         |      (source_id, latest_entry_id, updated_at)
+         |      (source_id, latest_entry_id, latest_entry_created_at, updated_at)
          |    VALUES
-         |      (new.source_id, new._id, strftime("%s", CURRENT_TIMESTAMP));
+         |      (new.source_id, new._id, new.created_at, strftime("%s", CURRENT_TIMESTAMP));
          |END
        """.stripMargin
     )
@@ -173,6 +174,7 @@ class LinenOpenHelper(context: Context)
       s"""CREATE TABLE IF NOT EXISTS source_statuses (
          |source_id INTEGER NOT NULL,
          |start_entry_id INTEGER,
+         |start_entry_created_at INTEGER,
          |account_id INTEGER NOT NULL,
          |created_at INTEGER NOT NULL,
          |UNIQUE(source_id, account_id),
@@ -256,11 +258,31 @@ class WritableDatabase(db: SQLiteDatabase) {
       case e: SQLException => Left(e)
     }
   }
+  def delete[A: Deletable](target: A): Either[SQLException, Int] = {
+    try {
+      val updatable = implicitly[Deletable[A]]
+      val where = updatable where target
+      val clause = where map { case (key, _) => s"$key = ?" }
+      val args = where map { case (_, value) => value }
+      Right apply db.delete(
+        updatable.tableName,
+        clause mkString " AND ",
+        args.toArray
+      )
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
 }
 
 trait Updatable[A] {
   def tableName: String
   def toContentValues(target: A): ContentValues
+  def where(target: A): Seq[(String, String)]
+}
+
+trait Deletable[A]{
+  def tableName: String
   def where(target: A): Seq[(String, String)]
 }
 

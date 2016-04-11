@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.database
 
 import android.content.ContentValues
-import x7c1.linen.modern.accessor.Insertable
+import x7c1.linen.modern.accessor.{Deletable, Insertable}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.database.TypedFields
 
@@ -24,6 +24,21 @@ object ChannelSourceMapParts {
         column.source_id -> target.sourceId,
         column.channel_id -> target.channelId,
         column.created_at -> target.createdAt
+      )
+    }
+  }
+}
+case class ChannelSourceMapKey(
+  channelId: Long,
+  sourceId: Long
+)
+object ChannelSourceMapKey {
+  implicit object deletable extends Deletable[ChannelSourceMapKey]{
+    override def tableName = "channel_source_map"
+    override def where(target: ChannelSourceMapKey) = {
+      Seq(
+        "channel_id" -> target.channelId.toString,
+        "source_id" -> target.sourceId.toString
       )
     }
   }

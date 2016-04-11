@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.dev
 import android.content.Context
 import x7c1.linen.modern.accessor.DummyString.words
 import x7c1.linen.modern.accessor.database.{ChannelParts, ChannelSourceMapParts, EntryParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
-import x7c1.linen.modern.accessor.setting.MyChannelAccessor
+import x7c1.linen.modern.accessor.setting.{MyChannel, MyChannelAccessor}
 import x7c1.linen.modern.accessor.{AccountAccessor, AccountParts, EntryUrl, LinenOpenHelper}
 import x7c1.linen.modern.struct.Date
 import x7c1.wheat.macros.logger.Log
@@ -35,8 +35,9 @@ object DummyFactory {
       )
       id
     }
-    val channelAccessor = MyChannelAccessor.create(db, accountId1)
-    val channelId = channelAccessor findAt 0 map (_.channelId) getOrElse {
+    val channelAccessor = MyChannelAccessor.createForDebug(db, accountId1)
+    val row = channelAccessor findAt 0 collect { case x: MyChannel => x }
+    val channelId = row map (_.channelId) getOrElse {
       writable insert ChannelParts(
         accountId = accountId1,
         name = s"sample channel name1",
@@ -94,6 +95,7 @@ object DummyFactory {
         Log info s"source at $i inserted"
       }
       (1 to 10) foreach { j =>
+        val entryCreatedAt = Date.current()
         val Right(entryId) = writable insert EntryParts(
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
@@ -104,11 +106,13 @@ object DummyFactory {
         if (i == 3){
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId1
           )
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId2
           )
@@ -116,6 +120,7 @@ object DummyFactory {
         if (i == 4){
           writable update SourceStatusAsStarted(
             startEntryId = entryId,
+            startEntryCreatedAt = entryCreatedAt.timestamp,
             sourceId = sourceId,
             accountId = accountId2
           )

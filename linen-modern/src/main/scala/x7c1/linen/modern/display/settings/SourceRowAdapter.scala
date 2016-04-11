@@ -7,13 +7,17 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.{RelativeLayout, SeekBar}
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow
 import x7c1.linen.modern.accessor.SettingSourceAccessor
+import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.resource.MetricsConverter
 
 class SourceRowAdapter (
   accessor: SettingSourceAccessor,
+  account: ClientAccount,
+  channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
+  onMenuSelected: SourceMenuSelected => Unit,
   onSyncClicked: OnSyncClickedListener,
   metricsConverter: MetricsConverter ) extends Adapter[SettingChannelSourcesRow]{
 
@@ -26,6 +30,14 @@ class SourceRowAdapter (
     accessor findAt position foreach { source =>
       holder.title.text = source.title
       holder.description.text = source.description
+      holder.menu onClick { view =>
+        onMenuSelected apply SourceMenuSelected(
+          targetView = view,
+          clientAccount = account,
+          channelId = channelId,
+          source = source
+        )
+      }
       holder.switchSubscribe setChecked true
       holder.sync onClick { view =>
         onSyncClicked onSyncClicked SyncClickedEvent(source.sourceId)

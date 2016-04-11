@@ -3,6 +3,7 @@ package x7c1.linen.modern.init.settings.my
 import android.content.DialogInterface.OnClickListener
 import android.content.{Context, DialogInterface}
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -14,6 +15,7 @@ import x7c1.linen.modern.struct.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
+import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.decorator.Imports._
@@ -21,7 +23,7 @@ import x7c1.wheat.modern.decorator.Imports._
 
 object CreateChannelDialog {
   class Arguments(
-    val accountId: Long,
+    val clientAccountId: Long,
     val dialogFactory: ContextualFactory[AlertDialog.Builder],
     val inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate]
   )
@@ -34,6 +36,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 
   private lazy val helper = new LinenOpenHelper(getActivity)
 
+  def showIn(activity: FragmentActivity) = {
+    show(activity.getSupportFragmentManager, "channel-dialog")
+  }
   override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
 
   override def onStart(): Unit = {
@@ -56,8 +61,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
   private def onClickPositive(button: Button) = {
     val tasks = for {
       input <- validateInput
-      _ <- createChannel(input)
+      channelId <- createChannel(input)
       _ <- hideKeyboard()
+      _ <- notifyCreated(channelId)
     } yield {
       input
     }
@@ -96,17 +102,17 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     )
   }
   private def createChannel(input: NewChannelInput) = provide async {
-    Log info s"[create] account:${args.accountId}"
+    Log info s"[create] account:${args.clientAccountId}"
 
     def create() = helper.writable insert ChannelParts(
-      accountId = args.accountId,
+      accountId = args.clientAccountId,
       name = input.channelName,
       description = input.description.getOrElse(""),
       createdAt = Date.current()
     )
     def subscribe(channelId: Long) = {
       val subscriber = new ChannelSubscriber(
-        account = AccountIdentifiable(args.accountId),
+        account = AccountIdentifiable(args.clientAccountId),
         helper = helper
       )
       subscriber subscribe channelId
@@ -115,8 +121,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     val either = for {
       channelId <- create().right
       _ <- subscribe(channelId).right
-    } yield ()
-
+    } yield {
+      channelId
+    }
     either.left map { e => SqlError(e) }
   }
 
@@ -124,6 +131,14 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     error match {
       case EmptyName() => layout.channelNameLayout setError error.message
     }
+  }
+  private def notifyCreated(channelId: Long) = provide {
+    val event = new ChannelCreated(
+      accountId = args.clientAccountId,
+      channelId = channelId
+    )
+    LocalBroadcaster(event) dispatchFrom getActivity
+    Right(event)
   }
   private def hideKeyboard() = provide ui {
     Option(getActivity.getCurrentFocus) match {
@@ -181,3 +196,8 @@ case class NewChannelInput(
   channelName: String,
   description: Option[String]
 )
+
+class ChannelCreated(
+  val accountId: Long,
+  val channelId: Long
+) extends AccountIdentifiable

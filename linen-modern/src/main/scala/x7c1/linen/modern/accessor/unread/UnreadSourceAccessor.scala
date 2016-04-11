@@ -55,8 +55,9 @@ private class UnreadSourceAccessorImpl(
   private lazy val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
 
   override def findAt(position: Int) = synchronized {
-    val n = positionMap(position)
-    cursor.moveToFind(n){
+    if (position > length - 1) {
+      None
+    } else (cursor moveToFind positionMap(position)){
       UnreadSourceRow apply UnreadSource(
         id = cursor.source_id,
         url = "dummy",

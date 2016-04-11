@@ -3,15 +3,17 @@ package x7c1.linen.settings;
 import android.os.Bundle;
 
 import x7c1.linen.R;
-import x7c1.linen.base.BaseActivity;
+import x7c1.linen.base.BaseFragmentActivity;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 import x7c1.linen.modern.init.settings.preset.PresetChannelSourcesDelegatee;
 import x7c1.linen.res.layout.SettingChannelSourcesLayoutProvider;
 import x7c1.linen.res.layout.SettingChannelSourcesRowProvider;
+import x7c1.linen.res.layout.SettingSourceAttachProvider;
+import x7c1.linen.res.layout.SettingSourceAttachRowItemProvider;
 
-public class PresetChannelSourcesActivity extends BaseActivity {
+public class PresetChannelSourcesActivity extends BaseFragmentActivity {
 	private PresetChannelSourcesDelegatee delegatee = null;
 
 	@Override
@@ -26,6 +28,9 @@ public class PresetChannelSourcesActivity extends BaseActivity {
 		delegatee = new PresetChannelSourcesDelegatee(
 				this,
 				layout,
+				new DialogFactory(),
+				SettingSourceAttachProvider.factory(),
+				SettingSourceAttachRowItemProvider.factory(),
 				new SettingChannelSourcesRowProvider(this)
 		);
 		delegatee.setup();

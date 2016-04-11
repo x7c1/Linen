@@ -2,8 +2,10 @@ package x7c1.linen.modern.display.unread
 
 import java.lang.Math.{abs, max, min}
 
-import android.animation.{Animator, AnimatorListenerAdapter}
+import android.animation.Animator.AnimatorListener
+import android.animation.{ObjectAnimator, Animator, AnimatorSet}
 import android.content.Context
+import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.View.OnTouchListener
@@ -21,6 +23,8 @@ trait Pane {
 
   protected def scrollerTasks: ScrollerTasks
 
+  protected def recyclerView: RecyclerView
+
   def fastScrollTo(position: Int): CallbackTask[Unit] = {
     scrollerTasks fastScrollTo position
   }
@@ -29,6 +33,12 @@ trait Pane {
   }
   def skipTo(position: Int): CallbackTask[Unit] = {
     scrollerTasks skipTo position
+  }
+  def fadeOutAnimator: ObjectAnimator = {
+    ObjectAnimator.ofFloat(recyclerView, "alpha", 1.0F, 0F)
+  }
+  def fadeInAnimator: ObjectAnimator = {
+    ObjectAnimator.ofFloat(recyclerView, "alpha", 0F, 1.0F)
   }
 }
 
@@ -69,15 +79,36 @@ class PaneContainer(
     } yield ()
   }
   def fadeOut(): CallbackTask[Unit] = task of { (done: OnFinish) =>
-    view.animate().setDuration(100).alpha(0.25F).setListener(new AnimatorListenerAdapter {
+    val set = new AnimatorSet()
+    set addListener new AnimatorListener {
       override def onAnimationEnd(animation: Animator): Unit = done.evaluate()
-    }): Unit
+      override def onAnimationRepeat(animation: Animator): Unit = {}
+      override def onAnimationStart(animation: Animator): Unit = {}
+      override def onAnimationCancel(animation: Animator): Unit = {}
+    }
+    set setDuration 100
+    set.playTogether(
+      sourceArea.fadeOutAnimator,
+      outlineArea.fadeOutAnimator,
+      detailArea.fadeOutAnimator
+    )
+    set.start()
   }
   def fadeIn(): CallbackTask[Unit] = task of { (done: OnFinish) =>
-    view.setAlpha(0.25F)
-    view.animate().setDuration(100).alpha(1).setListener(new AnimatorListenerAdapter {
+    val set = new AnimatorSet()
+    set addListener new AnimatorListener {
       override def onAnimationEnd(animation: Animator): Unit = done.evaluate()
-    }): Unit
+      override def onAnimationRepeat(animation: Animator): Unit = {}
+      override def onAnimationStart(animation: Animator): Unit = {}
+      override def onAnimationCancel(animation: Animator): Unit = {}
+    }
+    set setDuration 100
+    set.playTogether(
+      sourceArea.fadeInAnimator,
+      outlineArea.fadeInAnimator,
+      detailArea.fadeInAnimator
+    )
+    set.start()
   }
   def findPreviousPane(): Option[Pane] = {
     val current = view.getScrollX

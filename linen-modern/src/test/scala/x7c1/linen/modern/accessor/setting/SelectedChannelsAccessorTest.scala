@@ -23,7 +23,7 @@ class SelectedChannelsAccessorTest extends JUnitSuiteLike {
     factory.setupJapanesePresets()
 
     val Right(client) = ClientAccountSetup(helper).findOrCreate()
-    val Right(accessor) = SelectedChannelsAccessor.create(
+    val Right(accessor) = SelectedPresetChannelsAccessor.create(
       clientAccountId = client.accountId,
       helper = helper
     )
@@ -31,7 +31,7 @@ class SelectedChannelsAccessorTest extends JUnitSuiteLike {
     assertEquals(0, accessor.length)
 
     def channelAt(n: Int) = {
-      val Right(accessor) = PresetChannelsAccessor.create(
+      val Right(accessor) = AllPresetChannelsAccessor.create(
         clientAccountId = client.accountId,
         helper = helper
       )
@@ -42,7 +42,7 @@ class SelectedChannelsAccessorTest extends JUnitSuiteLike {
     subscriber subscribe channelAt(0).channelId
     subscriber subscribe channelAt(1).channelId
 
-    val Right(updated) = SelectedChannelsAccessor.create(
+    val Right(updated) = SelectedPresetChannelsAccessor.create(
       clientAccountId = client.accountId,
       helper = helper
     )
@@ -52,7 +52,7 @@ class SelectedChannelsAccessorTest extends JUnitSuiteLike {
     assertEquals(Some(true), updated.findAt(1).map(_.isSubscribed))
 
     subscriber unsubscribe channelAt(1).channelId
-    val Right(updated2) = SelectedChannelsAccessor.create(
+    val Right(updated2) = SelectedPresetChannelsAccessor.create(
       clientAccountId = client.accountId,
       helper = helper
     )

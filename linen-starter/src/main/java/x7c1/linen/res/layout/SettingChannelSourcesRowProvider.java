@@ -11,9 +11,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageButton;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.SeekBar;
-import android.widget.ImageButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -62,6 +62,7 @@ public class SettingChannelSourcesRowProvider implements ViewHolderProvider<Sett
                 return new SettingChannelSourcesRow(
                     view,
                     (TextView) view.findViewById(R.id.setting_channel_sources_row__title),
+                    (ImageButton) view.findViewById(R.id.setting_channel_sources_row__menu),
                     (TextView) view.findViewById(R.id.setting_channel_sources_row__description),
                     (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_channel_sources_row__switch_subscribe),
                     (SeekBar) view.findViewById(R.id.setting_channel_sources_row__rating_bar),

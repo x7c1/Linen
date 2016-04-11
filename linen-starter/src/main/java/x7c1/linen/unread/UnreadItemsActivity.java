@@ -1,26 +1,31 @@
 package x7c1.linen.unread;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-import x7c1.linen.base.BaseActivity;
 import x7c1.linen.R;
-import x7c1.linen.base.TransitAnimation;
+import x7c1.linen.base.Control;
 import x7c1.linen.base.TransitAnimations;
+import x7c1.linen.glue.activity.ActivityControl;
+import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.res.layout.UnreadItemsLayout;
+import x7c1.linen.glue.service.ServiceControl;
+import x7c1.linen.glue.service.ServiceLabel;
 import x7c1.linen.modern.init.unread.DetailListProviders;
 import x7c1.linen.modern.init.unread.MenuRowProviders;
 import x7c1.linen.modern.init.unread.OutlineListProviders;
 import x7c1.linen.modern.init.unread.SourceListProviders;
 import x7c1.linen.modern.init.unread.UnreadItemsDelegatee;
 import x7c1.linen.modern.init.unread.UnreadRowProviders;
-import x7c1.linen.res.layout.UnreadItemsLayoutProvider;
 import x7c1.linen.res.layout.MenuRowLabelProvider;
 import x7c1.linen.res.layout.MenuRowSeparatorProvider;
 import x7c1.linen.res.layout.MenuRowTitleProvider;
 import x7c1.linen.res.layout.UnreadDetailRowEntryProvider;
 import x7c1.linen.res.layout.UnreadDetailRowFooterProvider;
 import x7c1.linen.res.layout.UnreadDetailRowSourceProvider;
+import x7c1.linen.res.layout.UnreadItemsLayoutProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowEntryProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowFooterProvider;
 import x7c1.linen.res.layout.UnreadOutlineRowSourceProvider;
@@ -28,7 +33,7 @@ import x7c1.linen.res.layout.UnreadSourceRowFooterProvider;
 import x7c1.linen.res.layout.UnreadSourceRowItemProvider;
 
 
-public class UnreadItemsActivity extends BaseActivity {
+public class UnreadItemsActivity extends Activity implements ActivityControl, ServiceControl {
 
 	private UnreadItemsDelegatee initializer = null;
 
@@ -90,7 +95,18 @@ public class UnreadItemsActivity extends BaseActivity {
 	}
 
 	@Override
-	protected TransitAnimation createTransitAnimation() {
-		return TransitAnimations.forRoot(this);
+	public void startActivity(Intent intent) {
+		super.startActivity(intent);
+		TransitAnimations.forRoot(this).start();
+	}
+
+	@Override
+	public Class<?> getClassOf(ActivityLabel label) {
+		return Control.getActivityClassOf(label);
+	}
+
+	@Override
+	public Class<?> getClassOf(ServiceLabel label) {
+		return Control.getServiceClassOf(label);
 	}
 }

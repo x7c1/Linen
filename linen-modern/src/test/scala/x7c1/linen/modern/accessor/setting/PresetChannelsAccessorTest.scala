@@ -24,7 +24,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
     factory.setupJapanesePresets()
 
     val Right(client) = ClientAccountSetup(helper).findOrCreate()
-    val Right(accessor) = PresetChannelsAccessor.create(
+    val Right(accessor) = AllPresetChannelsAccessor.create(
       clientAccountId = client.accountId,
       helper = helper
     )
@@ -43,7 +43,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
 
     val Right(client) = ClientAccountSetup(helper).findOrCreate()
     def channelAt(n: Int) = {
-      val Right(accessor) = PresetChannelsAccessor.create(
+      val Right(accessor) = AllPresetChannelsAccessor.create(
         clientAccountId = client.accountId,
         helper = helper
       )

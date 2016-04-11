@@ -203,7 +203,7 @@ object EntryAccessor {
         |  created_at
         |FROM entries
         |WHERE source_id = ?
-        |ORDER BY entry_id DESC LIMIT 20""".stripMargin
+        |ORDER BY created_at DESC LIMIT 20""".stripMargin
 
     val union = sourceIds.
       map(_ => s"SELECT * FROM ($sql) AS tmp").
