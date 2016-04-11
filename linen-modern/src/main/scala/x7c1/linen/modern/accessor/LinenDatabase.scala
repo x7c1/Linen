@@ -258,11 +258,31 @@ class WritableDatabase(db: SQLiteDatabase) {
       case e: SQLException => Left(e)
     }
   }
+  def delete[A: Deletable](target: A): Either[SQLException, Int] = {
+    try {
+      val updatable = implicitly[Deletable[A]]
+      val where = updatable where target
+      val clause = where map { case (key, _) => s"$key = ?" }
+      val args = where map { case (_, value) => value }
+      Right apply db.delete(
+        updatable.tableName,
+        clause mkString " AND ",
+        args.toArray
+      )
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
 }
 
 trait Updatable[A] {
   def tableName: String
   def toContentValues(target: A): ContentValues
+  def where(target: A): Seq[(String, String)]
+}
+
+trait Deletable[A]{
+  def tableName: String
   def where(target: A): Seq[(String, String)]
 }
 

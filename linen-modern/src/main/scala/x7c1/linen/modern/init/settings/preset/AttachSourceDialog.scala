@@ -134,6 +134,11 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
       val attachedChannels = accessor.collectAttached
       selectedChannels diff attachedChannels
     }
+    val channelsToDetach = {
+      val unselectedChannels = accessor.collectAll diff selectedChannels
+      val detachedChannels = accessor.collectDetached
+      unselectedChannels diff detachedChannels
+    }
     // todo: use transaction
     channelsToAttach foreach { id =>
       val parts = ChannelSourceMapParts(
@@ -144,6 +149,17 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
       helper.writable.insert(parts).left foreach { e =>
         Log error format(e){
           s"[failed] attach source:${args.originalSourceId} to channel:$id"
+        }
+      }
+    }
+    channelsToDetach foreach { id =>
+      val key = ChannelSourceMapKey(
+        channelId = id,
+        sourceId = args.originalSourceId
+      )
+      helper.writable.delete(key).left foreach { e =>
+        Log error format(e){
+          s"[failed] detach source:${args.originalSourceId} from channel:$id"
         }
       }
     }
