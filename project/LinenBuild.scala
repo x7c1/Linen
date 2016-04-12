@@ -20,7 +20,6 @@ object LinenBuild extends Build with LinenSettings {
     logLevel in assembly := Level.Error
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
-  lazy val scalaz = "org.scalaz" %% "scalaz-concurrent" % "7.1.5"
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -33,7 +32,6 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
-    settings(libraryDependencies += scalaz).
     settings(
       unmanagedJars in Compile ++= androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
@@ -144,7 +142,6 @@ trait LinenSettings {
 
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
     val ignore = (path: String) =>
-      (path startsWith "scalaz") ||
       (path startsWith "org/jdom") || (path startsWith "JDOMAbout") ||
       (path startsWith "com/google/code/rome") || (path startsWith "META-INF") ||
       (path startsWith "x7c1/linen/glue") ||
