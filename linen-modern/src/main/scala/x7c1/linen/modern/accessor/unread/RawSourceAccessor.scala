@@ -1,7 +1,7 @@
 package x7c1.linen.modern.accessor.unread
 
 import x7c1.linen.database.LinenOpenHelper
-import x7c1.linen.modern.init.dev.SourceTitle
+import x7c1.linen.repository.source.SourceTitle
 import x7c1.wheat.macros.logger.Log
 
 class RawSourceAccessor(helper: LinenOpenHelper){

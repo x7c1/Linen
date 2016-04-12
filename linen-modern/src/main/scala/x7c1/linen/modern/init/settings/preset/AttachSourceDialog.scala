@@ -15,7 +15,8 @@ import x7c1.linen.domain.Date
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.accessor.setting.{ChannelToAttach, ChannelsToAttachAccessor}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
-import x7c1.linen.modern.init.updater.ThrowableFormatter.format
+import x7c1.wheat.modern.formatter.ThrowableFormatter
+import ThrowableFormatter.format
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee

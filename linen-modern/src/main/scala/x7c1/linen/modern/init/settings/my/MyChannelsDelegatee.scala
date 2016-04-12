@@ -10,8 +10,8 @@ import x7c1.linen.domain.account.{AccountIdentifiable, ClientAccount}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
-import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
+import x7c1.linen.repository.channel.my.{MyChannelAccessorLoader, MyChannelAccessor}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee

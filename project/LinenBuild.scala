@@ -64,6 +64,13 @@ object LinenBuild extends Build with LinenSettings {
       "junit" % "junit" % "4.12" % Test,
       "org.robolectric" % "robolectric" % "3.0" % Test
     )).
+    settings(
+
+      // not work?
+      // javaOptions in (Test, run) += "-Djava.awt.headless=true",
+
+      fork in Test := true
+    ).
     dependsOn(`wheat-modern`)
 
   lazy val `linen-modern` = project.
@@ -89,7 +96,9 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-lore`, `linen-repository`, `linen-pickle`)
+    dependsOn(`linen-glue`, `wheat-lore`, `linen-pickle`,
+      `linen-repository` % "compile->compile;test->test"
+    )
 
   lazy val `wheat-build` = project.
     settings(

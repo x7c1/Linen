@@ -2,7 +2,7 @@ package x7c1.linen.modern.display.settings
 
 import android.view.View
 import x7c1.linen.domain.account.ClientAccount
-import x7c1.linen.modern.accessor.SettingSource
+import x7c1.linen.repository.source.setting.SettingSource
 
 class SourceMenuSelected private (
   val targetView: View,

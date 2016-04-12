@@ -1,7 +1,7 @@
 package x7c1.linen.modern.init.settings.my
 
 import android.database.SQLException
-import x7c1.linen.modern.init.updater.ThrowableFormatter
+import x7c1.wheat.modern.formatter.ThrowableFormatter
 
 sealed trait NewChannelError {
   def message: String

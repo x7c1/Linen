@@ -7,9 +7,10 @@ import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.SettingSourceAccessorFactory
-import x7c1.linen.modern.init.dev.DummyFactory
-import x7c1.linen.modern.init.updater.ThrowableFormatter.format
+import x7c1.linen.repository.dev.DummyFactory
+import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
+import x7c1.wheat.modern.formatter.ThrowableFormatter
+import ThrowableFormatter.format
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
@@ -102,8 +103,4 @@ class UpdaterMethods(
   }
 }
 
-object ThrowableFormatter {
-  def format[A <: Throwable](e: A, depth: Int = 15)(message: String) = {
-    (message +: e.getMessage +: e.getStackTrace) take depth mkString "\n"
-  }
-}
+

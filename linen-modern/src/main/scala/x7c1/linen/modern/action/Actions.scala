@@ -1,8 +1,8 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, UnreadEntryRow, UnreadSource, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
 

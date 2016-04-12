@@ -2,7 +2,7 @@ package x7c1.linen.modern.init.updater
 
 import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.modern.accessor.preset.{PresetAccountSetup, PresetChannelPiece, PresetChannelSetup, PresetRecordError}
-import x7c1.linen.modern.accessor.{ChannelOwner, ChannelSourceParts}
+import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
 import x7c1.wheat.macros.logger.Log
 
 class PresetFactory (helper: LinenOpenHelper){

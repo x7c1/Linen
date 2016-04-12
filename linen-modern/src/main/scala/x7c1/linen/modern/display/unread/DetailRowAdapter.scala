@@ -5,9 +5,8 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryContent, SourceHeadlineContent}
 import x7c1.linen.modern.init.unread.DetailListProviders
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, SourceHeadlineContent, UnreadDetail, UnreadEntry}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 

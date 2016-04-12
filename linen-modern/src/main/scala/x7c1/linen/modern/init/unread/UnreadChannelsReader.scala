@@ -1,8 +1,10 @@
 package x7c1.linen.modern.init.unread
 
 import x7c1.linen.domain.account.ClientAccount
-import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.Done
-import x7c1.linen.modern.accessor.unread.ChannelSelectable
+import x7c1.linen.repository.channel.unread.{ChannelLoaderEvent, ChannelSelectable}
+import ChannelLoaderEvent.Done
+import x7c1.linen.repository.channel.unread.ChannelSelectable
+import x7c1.linen.repository.unread.AccessorLoader
 import x7c1.wheat.macros.logger.Log
 
 

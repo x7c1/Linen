@@ -8,6 +8,7 @@ import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{EntryParts, retrieved_source_marks, LinenOpenHelper}
 import x7c1.linen.domain.{EntryUrl, Date}
+import x7c1.linen.repository.source.unread.UnreadSourceFixture
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])

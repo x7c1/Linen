@@ -3,8 +3,8 @@ package x7c1.linen.modern.display.unread
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadSourceRowFooter, UnreadSourceRow, UnreadSourceRowItem}
-import x7c1.linen.modern.accessor.unread.{UnreadSource, UnreadSourceAccessor}
 import x7c1.linen.modern.init.unread.SourceListProviders
+import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 

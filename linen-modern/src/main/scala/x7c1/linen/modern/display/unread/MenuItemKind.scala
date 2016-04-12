@@ -3,7 +3,7 @@ package x7c1.linen.modern.display.unread
 import android.view.View
 import android.view.View.OnClickListener
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowTitle}
-import x7c1.linen.modern.accessor.unread.ChannelSelectable
+import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.menu.SingleMenuText
 

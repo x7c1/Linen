@@ -8,12 +8,15 @@ import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.domain.account.{ClientAccount, PresetAccount}
+import x7c1.linen.domain.{EntryKind, FooterKind, SourceKind, UnreadItemAccessor}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.preset.ClientAccountSetup
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
+import x7c1.linen.modern.accessor.unread.RawSourceAccessor
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.source.unread.UnreadSourceAccessor
+import x7c1.linen.repository.unread.AccessorLoader
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.ViewHolderProviders
