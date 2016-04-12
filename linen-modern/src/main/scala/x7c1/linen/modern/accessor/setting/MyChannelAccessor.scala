@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor.setting
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.{ChannelRecord, ChannelStatusRecord}
 import x7c1.linen.domain.Date
-import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.domain.account.ClientAccount
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.sequence.Sequence
 

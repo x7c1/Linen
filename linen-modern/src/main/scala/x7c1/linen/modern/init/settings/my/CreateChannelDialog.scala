@@ -8,7 +8,8 @@ import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import x7c1.linen.database.{ChannelParts, ChannelSubscriber, LinenOpenHelper}
-import x7c1.linen.domain.{AccountIdentifiable, Date}
+import x7c1.linen.domain.Date
+import x7c1.linen.domain.account.AccountIdentifiable
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
 import x7c1.wheat.ancient.context.ContextualFactory

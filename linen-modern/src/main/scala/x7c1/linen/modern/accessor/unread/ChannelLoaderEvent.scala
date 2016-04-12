@@ -1,6 +1,6 @@
 package x7c1.linen.modern.accessor.unread
 
-import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.domain.account.ClientAccount
 
 sealed trait ChannelLoaderEvent
 

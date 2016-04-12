@@ -3,7 +3,7 @@ package x7c1.linen.modern.accessor.setting
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.Query
-import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.domain.account.ClientAccount
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log

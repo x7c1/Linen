@@ -1,7 +1,8 @@
 package x7c1.linen.modern.accessor.setting
 
 import x7c1.linen.database.{LinenOpenHelper, Query}
-import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetAccount, PresetRecordError, UnexpectedException}
+import x7c1.linen.domain.account.PresetAccount
+import x7c1.linen.modern.accessor.preset.{NoPresetAccount, PresetRecordError, UnexpectedException}
 
 class PresetChannelAccessorFactory(queryFactory: PresetChannelQueryFactory){
   def create(

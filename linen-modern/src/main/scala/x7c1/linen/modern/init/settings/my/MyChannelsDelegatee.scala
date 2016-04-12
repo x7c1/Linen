@@ -6,11 +6,10 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.{ChannelSubscriber, LinenOpenHelper}
-import x7c1.linen.domain.AccountIdentifiable
+import x7c1.linen.domain.account.{AccountIdentifiable, ClientAccount}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
-import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.wheat.ancient.context.ContextualFactory
