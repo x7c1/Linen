@@ -30,6 +30,13 @@ subprojects{
                     targetSdkVersion 23
                     multiDexEnabled true
                 }
+                dexOptions {
+                    /*
+                    preDexLibraries = false
+                    incremental true
+                    */
+                    javaMaxHeapSize "4g"
+                }
             }
         }
     }
