@@ -1,10 +1,16 @@
 package x7c1.linen.database
 
-import android.content.ContentValues
 import x7c1.linen.domain.Date
+import x7c1.wheat.macros.database.TypedFields
 
 
+trait AccountRecord extends TypedFields {
+  def nickname: String
+  def biography: String
+  def created_at: Int --> Date
+}
 object AccountRecord {
+  def table: String = "accounts"
 }
 
 case class AccountParts(
@@ -14,14 +20,15 @@ case class AccountParts(
 )
 
 object AccountParts {
+  private def column = TypedFields.expose[AccountRecord]
+
   implicit object insertable extends Insertable[AccountParts]{
-    override def tableName: String = "accounts"
-    override def toContentValues(target: AccountParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("nickname", target.nickname)
-      values.put("biography", target.biography)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
-    }
+    override def tableName = AccountRecord.table
+    override def toContentValues(target: AccountParts) =
+      TypedFields toContentValues (
+        column.nickname -> target.nickname,
+        column.biography -> target.biography,
+        column.created_at -> target.createdAt
+      )
   }
 }
