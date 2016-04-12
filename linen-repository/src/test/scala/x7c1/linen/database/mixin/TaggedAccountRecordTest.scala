@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.preset
+package x7c1.linen.database.mixin
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -8,9 +8,10 @@ import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{LinenOpenHelper, PresetLabel, QueryExplainer}
 
+
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
-class PresetAccountTest extends JUnitSuiteLike {
+class TaggedAccountRecordTest extends JUnitSuiteLike {
   @Test
   def testPlan() = {
     val context = RuntimeEnvironment.application
@@ -20,7 +21,7 @@ class PresetAccountTest extends JUnitSuiteLike {
     val query = TaggedAccountRecord select PresetLabel
     val plans = QueryExplainer(db).explain(query)
 
-//    plans foreach println
+    //    plans foreach println
 
     assertEquals("USE TEMP B-TREE",
       false, plans.exists(_.useTempBtree))
