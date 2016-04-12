@@ -1,9 +1,6 @@
 package x7c1.linen.modern.accessor
 
-import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.Insertable
-import x7c1.linen.domain.Date
 
 trait AccountAccessor {
   def findAt(position: Int): Option[Account]
@@ -42,24 +39,3 @@ object AccountAccessor {
 }
 
 case class Account (accountId: Long)
-
-
-
-
-case class AccountParts(
-  nickname: String,
-  biography: String,
-  createdAt: Date
-)
-object AccountParts {
-  implicit object insertable extends Insertable[AccountParts]{
-    override def tableName: String = "accounts"
-    override def toContentValues(target: AccountParts): ContentValues = {
-      val values = new ContentValues()
-      values.put("nickname", target.nickname)
-      values.put("biography", target.biography)
-      values.put("created_at", target.createdAt.timestamp: java.lang.Integer)
-      values
-    }
-  }
-}

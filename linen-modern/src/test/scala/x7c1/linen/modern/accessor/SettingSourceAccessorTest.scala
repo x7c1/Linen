@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.{ChannelParts, QueryExplainer, LinenOpenHelper}
+import x7c1.linen.database.{AccountParts, ChannelParts, QueryExplainer, LinenOpenHelper}
 import x7c1.linen.domain.Date
 import x7c1.linen.modern.struct.Channel
 
