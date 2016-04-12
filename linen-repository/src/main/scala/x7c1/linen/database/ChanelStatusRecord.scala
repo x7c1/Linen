@@ -1,8 +1,7 @@
-package x7c1.linen.modern.accessor.database
+package x7c1.linen.database
 
 import android.database.{Cursor, SQLException}
-import x7c1.linen.modern.accessor.{AccountIdentifiable, Insertable, LinenOpenHelper, SingleWhere, Updatable, WritableDatabase}
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.domain.{AccountIdentifiable, Date}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 

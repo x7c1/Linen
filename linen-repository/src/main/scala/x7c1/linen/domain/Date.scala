@@ -1,8 +1,8 @@
-package x7c1.linen.modern.struct
+package x7c1.linen.domain
 
 import java.text.SimpleDateFormat
 import java.util
-import java.util.{TimeZone, Locale}
+import java.util.{Locale, TimeZone}
 
 import x7c1.wheat.macros.database.FieldConvertible
 

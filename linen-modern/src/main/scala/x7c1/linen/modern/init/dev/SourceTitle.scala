@@ -2,9 +2,8 @@ package x7c1.linen.modern.init.dev
 
 import android.content.ContentValues
 import android.database.Cursor
-import x7c1.linen.modern.accessor.database.SourceRecord
-import x7c1.linen.modern.accessor.database.SourceRecord.table
-import x7c1.linen.modern.accessor.{SingleWhere, Updatable}
+import x7c1.linen.database.SourceRecord.table
+import x7c1.linen.database.{SingleWhere, SourceRecord, Updatable}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 case class SourceTitle(

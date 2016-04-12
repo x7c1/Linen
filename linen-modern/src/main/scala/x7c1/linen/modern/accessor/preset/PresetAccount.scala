@@ -1,9 +1,9 @@
 package x7c1.linen.modern.accessor.preset
 
 import android.database.Cursor
-import x7c1.linen.modern.accessor.database.{ClientLabel, AccountTagLabel, PresetLabel}
+import x7c1.linen.database.{AccountTagLabel, ClientLabel, PresetLabel, Query, ZeroAritySingle}
+import x7c1.linen.domain.AccountIdentifiable
 import x7c1.linen.modern.accessor.preset.TaggedAccountRecord.select
-import x7c1.linen.modern.accessor.{AccountIdentifiable, Query, ZeroAritySingle}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 

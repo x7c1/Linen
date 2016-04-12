@@ -4,8 +4,8 @@ import java.lang.System.currentTimeMillis
 
 import android.app.Service
 import android.database.sqlite.SQLiteConstraintException
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync.after

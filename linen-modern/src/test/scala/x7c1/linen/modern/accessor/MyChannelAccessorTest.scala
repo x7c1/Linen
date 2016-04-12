@@ -6,6 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannel}
 import x7c1.linen.modern.init.dev.DummyFactory
 

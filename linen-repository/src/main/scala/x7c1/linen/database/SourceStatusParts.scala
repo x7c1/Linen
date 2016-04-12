@@ -1,7 +1,6 @@
-package x7c1.linen.modern.accessor.database
+package x7c1.linen.database
 
-import x7c1.linen.modern.accessor.{Insertable, Updatable}
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.domain.Date
 import x7c1.wheat.macros.database.TypedFields
 
 

@@ -6,8 +6,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.database.{account_tag_map, account_tags}
-import x7c1.linen.modern.accessor.{SampleFactory, LinenOpenHelper}
+import x7c1.linen.database.{LinenOpenHelper, account_tag_map, account_tags}
+import x7c1.linen.modern.accessor.SampleFactory
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])

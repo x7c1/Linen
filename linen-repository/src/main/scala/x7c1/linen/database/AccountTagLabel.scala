@@ -1,5 +1,4 @@
-package x7c1.linen.modern.accessor.database
-
+package x7c1.linen.database
 
 sealed class AccountTagLabel(val text: String)
 

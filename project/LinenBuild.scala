@@ -54,6 +54,11 @@ object LinenBuild extends Build with LinenSettings {
     settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-modern`, `wheat-ancient`)
 
+  lazy val `linen-repository` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    dependsOn(`wheat-modern`)
+
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
@@ -77,7 +82,7 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-lore`, `wheat-modern`, `linen-pickle`)
+    dependsOn(`linen-glue`, `wheat-lore`, `linen-repository`, `linen-pickle`)
 
   lazy val `wheat-build` = project.
     settings(

@@ -6,8 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.{RuntimeEnvironment, RobolectricTestRunner}
 import org.robolectric.annotation.Config
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.database.ChannelSubscriber
+import x7c1.linen.database.{ChannelSubscriber, LinenOpenHelper}
 import x7c1.linen.modern.accessor.preset.ClientAccountSetup
 import x7c1.linen.modern.init.updater.PresetFactory
 

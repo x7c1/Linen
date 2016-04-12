@@ -36,6 +36,7 @@ targets = [
   "wheat-ancient",
   "wheat-lore",
   "linen-glue",
+  "linen-repository",
   "linen-modern",
   "linen-pickle",
   "project",

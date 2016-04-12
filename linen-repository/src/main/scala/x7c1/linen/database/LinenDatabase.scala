@@ -1,9 +1,9 @@
-package x7c1.linen.modern.accessor
+package x7c1.linen.database
 
 import android.content.{ContentValues, Context}
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 
 object LinenDatabase {

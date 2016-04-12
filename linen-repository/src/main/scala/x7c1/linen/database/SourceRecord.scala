@@ -1,10 +1,9 @@
-package x7c1.linen.modern.accessor.database
+package x7c1.linen.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import x7c1.linen.modern.accessor.{Insertable, SingleWhere}
-import x7c1.linen.modern.struct.Date
-import x7c1.wheat.macros.database.{TypedFields, TypedCursor}
+import x7c1.linen.domain.Date
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 object SourceRecord {
 

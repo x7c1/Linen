@@ -5,8 +5,9 @@ import java.util.concurrent.Executors
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.{SettingSourceAccessorFactory, LinenOpenHelper}
+import x7c1.linen.modern.accessor.SettingSourceAccessorFactory
 import x7c1.linen.modern.init.dev.DummyFactory
 import x7c1.linen.modern.init.updater.ThrowableFormatter.format
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}

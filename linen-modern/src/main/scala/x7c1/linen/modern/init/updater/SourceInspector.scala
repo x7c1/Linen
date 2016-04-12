@@ -5,9 +5,8 @@ import java.net.{HttpURLConnection, URL}
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.modern.accessor.database.{EntryParts, SourceRecord}
-import x7c1.linen.modern.accessor.{EntryUrl, LinenOpenHelper}
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.database.{EntryParts, SourceRecord, LinenOpenHelper}
+import x7c1.linen.domain.{EntryUrl, Date}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.TaskProvider.using

@@ -1,8 +1,7 @@
-package x7c1.linen.modern.accessor.database
+package x7c1.linen.database
 
 import android.content.ContentValues
-import x7c1.linen.modern.accessor.{Insertable, EntryUrl}
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.domain.{EntryUrl, Date}
 import x7c1.wheat.macros.database.TypedFields
 
 trait EntryRecord extends TypedFields {

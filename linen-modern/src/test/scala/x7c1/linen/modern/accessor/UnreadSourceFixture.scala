@@ -2,8 +2,8 @@ package x7c1.linen.modern.accessor
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.database.EntryParts
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.database.{EntryParts, WritableDatabase, LinenOpenHelper}
+import x7c1.linen.domain.{EntryUrl, Date}
 
 class UnreadSourceFixture(helper: LinenOpenHelper) {
   private val db = helper.getWritableDatabase

@@ -3,12 +3,13 @@ package x7c1.linen.modern.init.settings.preset
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{SettingChannelSourcesLayout, SettingChannelSourcesRow, SettingSourceAttach, SettingSourceAttachRowItem}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.{LinenOpenHelper, SettingSourceAccessorFactory}
+import x7c1.linen.modern.accessor.SettingSourceAccessorFactory
 import x7c1.linen.modern.display.settings.{ChannelSourcesSelected, OnSyncClickedListener, SourceRowAdapter}
 import x7c1.linen.modern.init.settings.source.OnSourceMenuSelected
 import x7c1.linen.modern.init.updater.UpdaterMethods

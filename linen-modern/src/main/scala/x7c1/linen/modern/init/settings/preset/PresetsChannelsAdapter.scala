@@ -3,10 +3,10 @@ package x7c1.linen.modern.init.settings.preset
 import android.app.Activity
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{View, ViewGroup}
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.LinenOpenHelper
 import x7c1.linen.modern.accessor.setting.{SettingPresetChannel, PresetChannelsAccessor}
 import x7c1.linen.modern.display.settings.ChannelSourcesSelected
 import x7c1.wheat.ancient.resource.{ViewHolderProviderFactory, ViewHolderProvider}

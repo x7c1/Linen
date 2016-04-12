@@ -1,6 +1,6 @@
 package x7c1.linen.modern.accessor.setting
 
-import x7c1.linen.modern.accessor.Query
+import x7c1.linen.database.Query
 
 object AllPresetChannelsAccessor
   extends PresetChannelAccessorFactory(AllPresetChannelsQuery)

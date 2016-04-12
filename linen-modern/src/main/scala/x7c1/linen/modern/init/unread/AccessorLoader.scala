@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.AccountIdentifiable
+import x7c1.linen.domain.AccountIdentifiable
 import x7c1.linen.modern.accessor.unread.{ChannelSelectable, ClosableEntryAccessor, ClosableSourceAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, FooterKind, SourceFooterContent, UnreadEntryRow, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.linen.modern.init.unread.AccessorLoader.inspectSourceAccessor
 import x7c1.linen.modern.init.unread.SourceNotLoaded.{Abort, ErrorEmpty}

@@ -2,8 +2,7 @@ package x7c1.linen.modern.accessor.setting
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.accessor.Query
-import x7c1.linen.modern.accessor.database.ChannelRecord
+import x7c1.linen.database.{ChannelRecord, Query}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.sequence.Sequence
 

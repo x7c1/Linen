@@ -2,7 +2,8 @@ package x7c1.linen.modern.accessor
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.database.Insertable
+import x7c1.linen.domain.Date
 
 trait AccountAccessor {
   def findAt(position: Int): Option[Account]
@@ -42,14 +43,8 @@ object AccountAccessor {
 
 case class Account (accountId: Long)
 
-trait AccountIdentifiable {
-  def accountId: Long
-}
-object AccountIdentifiable {
-  def apply(id: Long): AccountIdentifiable = new AccountIdentifiable {
-    override def accountId: Long = id
-  }
-}
+
+
 
 case class AccountParts(
   nickname: String,

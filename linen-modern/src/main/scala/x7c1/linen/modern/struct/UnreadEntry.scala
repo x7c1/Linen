@@ -1,5 +1,7 @@
 package x7c1.linen.modern.struct
 
+import x7c1.linen.domain.Date
+
 
 trait UnreadEntry {
   def sourceId: Long

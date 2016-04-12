@@ -1,6 +1,6 @@
 package x7c1.linen.modern.accessor.setting
 
-import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
+import x7c1.linen.database.{LinenOpenHelper, Query}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 trait PresetChannelsAccessor {

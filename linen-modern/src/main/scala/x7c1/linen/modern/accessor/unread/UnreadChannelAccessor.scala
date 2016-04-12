@@ -1,10 +1,10 @@
 package x7c1.linen.modern.accessor.unread
 
 import android.database.Cursor
+import x7c1.linen.database.{LinenOpenHelper, Query}
 import x7c1.linen.modern.accessor.preset.ClientAccount
 import x7c1.linen.modern.accessor.unread.ChannelAccessorError.UnexpectedError
 import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
-import x7c1.linen.modern.accessor.{LinenOpenHelper, Query}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask

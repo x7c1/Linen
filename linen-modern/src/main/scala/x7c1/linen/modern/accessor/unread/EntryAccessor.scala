@@ -3,8 +3,7 @@ package x7c1.linen.modern.accessor.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
-import x7c1.linen.modern.accessor.Query
-import x7c1.linen.modern.accessor.database.EntryRecord
+import x7c1.linen.database.{EntryRecord, Query}
 import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log

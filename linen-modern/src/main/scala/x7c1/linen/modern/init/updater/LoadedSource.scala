@@ -1,7 +1,6 @@
 package x7c1.linen.modern.init.updater
 
-import x7c1.linen.modern.accessor.Updatable
-import x7c1.linen.modern.accessor.database.{EntryParts, SourceRecord}
+import x7c1.linen.database.{EntryParts, SourceRecord, Updatable}
 import x7c1.wheat.macros.database.TypedFields
 
 
