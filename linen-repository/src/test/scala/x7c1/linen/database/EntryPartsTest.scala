@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor
+package x7c1.linen.database
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -6,8 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.{EntryParts, retrieved_source_marks, LinenOpenHelper}
-import x7c1.linen.domain.{EntryUrl, Date}
+import x7c1.linen.domain.{Date, EntryUrl}
 import x7c1.linen.repository.source.unread.UnreadSourceFixture
 
 @Config(manifest=Config.NONE)
