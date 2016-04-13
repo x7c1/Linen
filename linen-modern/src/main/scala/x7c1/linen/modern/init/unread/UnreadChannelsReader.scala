@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.unread
 
-import x7c1.linen.domain.account.ClientAccount
+import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.{ChannelLoaderEvent, ChannelSelectable}
 import ChannelLoaderEvent.Done
 import x7c1.linen.repository.channel.unread.ChannelSelectable

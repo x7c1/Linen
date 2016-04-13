@@ -1,7 +1,7 @@
 package x7c1.linen.database
 
 import android.database.Cursor
-import x7c1.linen.domain.Date
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
 object retrieved_source_marks {

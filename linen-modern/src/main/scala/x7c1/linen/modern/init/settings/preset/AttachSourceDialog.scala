@@ -11,10 +11,10 @@ import android.view.ViewGroup
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.{Button, CompoundButton}
 import x7c1.linen.database.{ChannelSourceMapKey, ChannelSourceMapParts, LinenOpenHelper}
-import x7c1.linen.domain.Date
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
 import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor}
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee

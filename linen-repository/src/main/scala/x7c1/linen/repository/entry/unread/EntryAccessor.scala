@@ -4,7 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.{EntryRecord, Query}
-import x7c1.linen.domain.{EntryKind, SourceKind, UnreadRowKind}
+import x7c1.linen.repository.unread.{EntryKind, SourceKind, UnreadRowKind}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}

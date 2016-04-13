@@ -3,7 +3,8 @@ package x7c1.linen.repository.source.unread
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.{EntryParts, LinenOpenHelper, WritableDatabase}
-import x7c1.linen.domain.{Date, EntryUrl}
+import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.source.setting.{ChannelSourceParts, ChannelOwner, SampleFactory}
 
 class UnreadSourceFixture(helper: LinenOpenHelper) {

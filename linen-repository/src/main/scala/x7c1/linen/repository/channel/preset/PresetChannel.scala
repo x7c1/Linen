@@ -2,7 +2,7 @@ package x7c1.linen.repository.channel.preset
 
 import android.database.Cursor
 import x7c1.linen.database.{ChannelRecord, SingleWhere}
-import x7c1.linen.domain.account.PresetAccount
+import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.source.setting.Channel
 import x7c1.wheat.macros.database.TypedCursor
 

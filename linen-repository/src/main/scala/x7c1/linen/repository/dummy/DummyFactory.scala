@@ -1,10 +1,12 @@
-package x7c1.linen.repository.dev
+package x7c1.linen.repository.dummy
 
 import android.content.Context
 import x7c1.linen.database.{AccountParts, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
-import x7c1.linen.domain.{Date, EntryUrl}
+import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
-import x7c1.linen.repository.dev.DummyString.words
+import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.dummy.DummyString.words
+import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.source.unread.SourceTitle
 import x7c1.wheat.macros.logger.Log
 

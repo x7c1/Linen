@@ -1,7 +1,7 @@
 package x7c1.linen.repository.entry.unread
 
 import android.net.Uri
-import x7c1.linen.domain.Date
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.action.SiteVisitable
 
 

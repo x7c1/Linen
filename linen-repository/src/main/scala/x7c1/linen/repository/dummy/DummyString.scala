@@ -1,4 +1,4 @@
-package x7c1.linen.repository.dev
+package x7c1.linen.repository.dummy
 
 import scala.util.Random
 

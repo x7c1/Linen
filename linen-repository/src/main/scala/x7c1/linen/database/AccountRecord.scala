@@ -1,6 +1,6 @@
 package x7c1.linen.database
 
-import x7c1.linen.domain.Date
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
 
 

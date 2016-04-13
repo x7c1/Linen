@@ -7,7 +7,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.LinenOpenHelper
-import x7c1.linen.repository.dev.{AccountAccessor, DummyFactory}
+import x7c1.linen.repository.account.dev.AccountAccessor
+import x7c1.linen.repository.dummy.DummyFactory
 
 
 @Config(manifest=Config.NONE)

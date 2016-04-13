@@ -3,8 +3,7 @@ package x7c1.linen.repository.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.domain.FooterKind
-import x7c1.linen.domain.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}

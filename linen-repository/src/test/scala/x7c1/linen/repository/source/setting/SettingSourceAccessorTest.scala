@@ -8,8 +8,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{AccountParts, ChannelParts, LinenOpenHelper, QueryExplainer}
-import x7c1.linen.domain.Date
-import x7c1.linen.repository.dev.Account
+import x7c1.linen.repository.account.dev.Account
+import x7c1.linen.repository.date.Date
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])

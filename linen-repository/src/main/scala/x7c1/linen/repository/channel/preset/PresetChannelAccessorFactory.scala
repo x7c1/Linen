@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.preset
 
 import x7c1.linen.database.{LinenOpenHelper, Query}
-import x7c1.linen.domain.account.PresetAccount
+import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.preset.{NoPresetAccount, PresetRecordError, UnexpectedException}
 
 class PresetChannelAccessorFactory(queryFactory: PresetChannelQueryFactory){

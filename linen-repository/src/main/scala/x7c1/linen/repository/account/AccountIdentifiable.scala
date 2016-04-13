@@ -1,4 +1,4 @@
-package x7c1.linen.domain.account
+package x7c1.linen.repository.account
 
 import android.database.Cursor
 import x7c1.linen.database.mixin.TaggedAccountRecord

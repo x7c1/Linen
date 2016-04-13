@@ -1,4 +1,4 @@
-package x7c1.linen.domain
+package x7c1.linen.repository.unread
 
 sealed trait UnreadRowKind
 

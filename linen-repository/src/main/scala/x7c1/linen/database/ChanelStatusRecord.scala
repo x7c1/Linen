@@ -1,8 +1,8 @@
 package x7c1.linen.database
 
 import android.database.{Cursor, SQLException}
-import x7c1.linen.domain.Date
-import x7c1.linen.domain.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 

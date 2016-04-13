@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface.{OnClickListener, OnMultiChoiceClickListener}
 import android.content.{Context, DialogInterface}
 import x7c1.linen.database.LinenOpenHelper
-import x7c1.linen.repository.dev.ChannelNameAccessor
+import x7c1.linen.repository.channel.dev.ChannelNameAccessor
 import x7c1.wheat.macros.logger.Log
 
 class ChannelSelector private (

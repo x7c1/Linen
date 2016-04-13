@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.unread
 
-import x7c1.linen.domain.account.ClientAccount
+import x7c1.linen.repository.account.ClientAccount
 
 sealed trait ChannelLoaderEvent
 

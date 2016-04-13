@@ -6,7 +6,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.domain.{Date, EntryUrl}
+import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.source.unread.UnreadSourceFixture
 
 @Config(manifest=Config.NONE)

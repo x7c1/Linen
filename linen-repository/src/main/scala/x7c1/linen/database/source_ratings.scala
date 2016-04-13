@@ -1,7 +1,7 @@
 package x7c1.linen.database
 
 import android.content.ContentValues
-import x7c1.linen.domain.Date
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
 
 trait source_ratings extends TypedFields {

@@ -8,11 +8,11 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{DebugTools, LinenOpenHelper, QueryExplainer}
-import x7c1.linen.domain.{SourceKind, EntryKind}
+import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
-import x7c1.linen.repository.dev.{AccountAccessor, DummyFactory}
-import x7c1.linen.repository.entry.unread.{EntryContent, UnreadEntryRow, EntryAccessor}
-import x7c1.linen.repository.unread.AccessorLoader
+import x7c1.linen.repository.dummy.DummyFactory
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, UnreadEntryRow}
+import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, SourceKind}
 
 import scala.util.Success
 
