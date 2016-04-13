@@ -4,13 +4,13 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.Query
-import x7c1.linen.domain.UnreadItemAccessor
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.sequence.Sequence
 
 import scala.util.Try
 
-trait UnreadSourceAccessor extends UnreadItemAccessor {
+trait UnreadSourceAccessor extends Sequence[UnreadSourceRow] {
 
   def sourceIds: Seq[Long] = {
     (0 to length - 1).view map findAt flatMap {
@@ -20,8 +20,6 @@ trait UnreadSourceAccessor extends UnreadItemAccessor {
       }
     }
   }
-  def findAt(position: Int): Option[UnreadSourceRow]
-
   def positionOf(sourceId: Long): Option[Int]
 
   def bindViewHolder[B <: ViewHolder]

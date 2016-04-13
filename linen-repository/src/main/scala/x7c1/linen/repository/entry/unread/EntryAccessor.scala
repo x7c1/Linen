@@ -4,16 +4,14 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.{EntryRecord, Query}
-import x7c1.linen.domain.{SourceKind, EntryKind, UnreadRowKind, UnreadItemAccessor}
+import x7c1.linen.domain.{EntryKind, SourceKind, UnreadRowKind}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 import scala.annotation.tailrec
 
-trait EntryAccessor[+A <: UnreadEntry] extends UnreadItemAccessor {
-
-  def findAt(position: Int): Option[UnreadEntryRow[A]]
+trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 

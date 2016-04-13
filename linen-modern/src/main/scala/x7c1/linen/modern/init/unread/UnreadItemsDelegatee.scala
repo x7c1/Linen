@@ -8,7 +8,7 @@ import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.domain.account.{ClientAccount, PresetAccount}
-import x7c1.linen.domain.{EntryKind, FooterKind, SourceKind, UnreadItemAccessor}
+import x7c1.linen.domain.{EntryKind, FooterKind, SourceKind}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.accessor.preset.ClientAccountSetup
@@ -124,7 +124,7 @@ class UnreadItemsDelegatee(
     val metrics = activity.getResources.getDisplayMetrics
     TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
   }
-  def footerHeightOf(recyclerView: RecyclerView, accessor: UnreadItemAccessor) = {
+  def footerHeightOf(recyclerView: RecyclerView) = {
     recyclerView.getHeight - dipToPixel(10)
   }
   lazy val widthWithMargin: Int = {
