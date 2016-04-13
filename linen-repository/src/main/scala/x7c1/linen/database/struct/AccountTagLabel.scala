@@ -1,4 +1,4 @@
-package x7c1.linen.database
+package x7c1.linen.database.struct
 
 sealed class AccountTagLabel(val text: String)
 

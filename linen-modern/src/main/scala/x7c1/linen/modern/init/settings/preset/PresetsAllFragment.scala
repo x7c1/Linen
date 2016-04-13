@@ -3,7 +3,8 @@ package x7c1.linen.modern.init.settings.preset
 import android.content.Context
 import android.os.Bundle
 import android.view.{LayoutInflater, View, ViewGroup}
-import x7c1.linen.database.{ChannelSubscriber, LinenOpenHelper}
+import x7c1.linen.database.LinenOpenHelper
+import x7c1.linen.database.struct.ChannelSubscriber
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.preset.AllPresetChannelsAccessor

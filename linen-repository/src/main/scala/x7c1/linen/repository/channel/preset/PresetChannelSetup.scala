@@ -1,6 +1,7 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.{ChannelParts, LinenOpenHelper, WritableDatabase}
+import x7c1.linen.database.struct.ChannelParts
+import x7c1.linen.database.{LinenOpenHelper, WritableDatabase}
 import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.preset.{PresetRecordError, UnexpectedException}

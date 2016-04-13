@@ -1,7 +1,8 @@
 package x7c1.linen.repository.source.setting
 
 import android.database.Cursor
-import x7c1.linen.database.{ChannelRecord, SingleWhere}
+import x7c1.linen.database.SingleWhere
+import x7c1.linen.database.struct.ChannelRecord
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedCursor
 

@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.dev
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.ChannelRecord
+import x7c1.linen.database.struct.ChannelRecord
 import x7c1.wheat.macros.database.TypedCursor
 
 trait ChannelNameAccessor {

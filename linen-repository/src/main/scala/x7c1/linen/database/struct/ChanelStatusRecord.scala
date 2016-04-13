@@ -1,6 +1,7 @@
-package x7c1.linen.database
+package x7c1.linen.database.struct
 
 import android.database.{Cursor, SQLException}
+import x7c1.linen.database.{WritableDatabase, LinenOpenHelper, Insertable, Updatable, SingleWhere}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}

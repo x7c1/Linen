@@ -1,7 +1,8 @@
 package x7c1.linen.repository.dummy
 
 import android.content.Context
-import x7c1.linen.database.{AccountParts, ChannelParts, ChannelSourceMapParts, EntryParts, LinenOpenHelper, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
+import x7c1.linen.database.struct.{SourceStatusAsStarted, SourceStatusParts, SourceParts, SourceRatingParts, EntryParts, ChannelParts, ChannelSourceMapParts, AccountParts}
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.date.Date

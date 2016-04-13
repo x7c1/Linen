@@ -7,7 +7,8 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import x7c1.linen.database.{ChannelParts, ChannelSubscriber, LinenOpenHelper}
+import x7c1.linen.database.struct.{ChannelParts, ChannelSubscriber}
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
 import x7c1.linen.repository.account.AccountIdentifiable

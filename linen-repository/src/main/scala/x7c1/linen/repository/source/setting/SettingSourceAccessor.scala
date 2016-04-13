@@ -2,7 +2,8 @@ package x7c1.linen.repository.source.setting
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.linen.database.{ChannelSourceMapParts, Query, SourceParts, SourceRatingParts, WritableDatabase}
+import x7c1.linen.database.struct.{SourceParts, SourceRatingParts, ChannelSourceMapParts}
+import x7c1.linen.database.{Query, WritableDatabase}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 

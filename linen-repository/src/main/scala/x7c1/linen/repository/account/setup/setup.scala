@@ -1,6 +1,7 @@
 package x7c1.linen.repository.account.setup
 
-import x7c1.linen.database.{AccountParts, ClientLabel, LinenOpenHelper, PresetLabel}
+import x7c1.linen.database.struct.{ClientLabel, PresetLabel, AccountParts}
+import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.repository.account.{ClientAccount, PresetAccount}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.preset.PresetRecordError

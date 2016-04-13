@@ -3,7 +3,8 @@ package x7c1.linen.repository.account
 import android.database.Cursor
 import x7c1.linen.database.mixin.TaggedAccountRecord
 import x7c1.linen.database.mixin.TaggedAccountRecord.select
-import x7c1.linen.database.{ClientLabel, PresetLabel, ZeroAritySingle}
+import x7c1.linen.database.struct.{ClientLabel, PresetLabel}
+import x7c1.linen.database.ZeroAritySingle
 import x7c1.wheat.macros.database.TypedCursor
 
 object AccountIdentifiable {

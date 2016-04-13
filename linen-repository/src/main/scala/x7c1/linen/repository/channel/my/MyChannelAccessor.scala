@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.my
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.{ChannelRecord, ChannelStatusRecord}
+import x7c1.linen.database.struct.{ChannelRecord, ChannelStatusRecord}
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields

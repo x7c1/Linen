@@ -1,6 +1,7 @@
 package x7c1.linen.repository.account.setup
 
-import x7c1.linen.database.{AccountTagMapParts, account_tags, WritableDatabase, AccountParts, AccountTagLabel, LinenOpenHelper, ZeroAritySingle}
+import x7c1.linen.database.struct.{AccountTagLabel, AccountParts, account_tags, AccountTagMapParts}
+import x7c1.linen.database.{WritableDatabase, LinenOpenHelper, ZeroAritySingle}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.preset.{NoPresetTag, UnexpectedException, PresetRecordError}

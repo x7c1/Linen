@@ -6,7 +6,8 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.{LinenOpenHelper, PresetLabel, QueryExplainer}
+import x7c1.linen.database.struct.PresetLabel
+import x7c1.linen.database.{LinenOpenHelper, QueryExplainer}
 
 
 @Config(manifest=Config.NONE)
