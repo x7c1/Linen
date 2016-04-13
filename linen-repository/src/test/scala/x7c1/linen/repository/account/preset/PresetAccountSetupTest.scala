@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.preset
+package x7c1.linen.repository.account.preset
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -1,8 +1,9 @@
-package x7c1.linen.modern.accessor.preset
+package x7c1.linen.repository.account.preset
 
 import x7c1.linen.database.{AccountParts, AccountTagLabel, AccountTagMapParts, ChannelParts, ClientLabel, LinenOpenHelper, PresetLabel, WritableDatabase, ZeroAritySingle, account_tags}
 import x7c1.linen.domain.Date
 import x7c1.linen.domain.account.{AccountIdentifiable, ClientAccount, PresetAccount}
+import x7c1.linen.repository.channel.preset.{PresetChannelPiece, PresetChannel}
 
 object PresetAccountSetup {
   def apply(helper: LinenOpenHelper): PresetAccountSetup = {

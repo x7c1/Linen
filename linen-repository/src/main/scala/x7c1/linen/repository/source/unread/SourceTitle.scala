@@ -1,4 +1,4 @@
-package x7c1.linen.repository.source
+package x7c1.linen.repository.source.unread
 
 import android.content.ContentValues
 import android.database.Cursor

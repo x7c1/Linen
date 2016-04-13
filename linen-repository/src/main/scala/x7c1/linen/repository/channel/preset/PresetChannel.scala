@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.preset
+package x7c1.linen.repository.channel.preset
 
 import android.database.Cursor
 import x7c1.linen.database.{ChannelRecord, SingleWhere}

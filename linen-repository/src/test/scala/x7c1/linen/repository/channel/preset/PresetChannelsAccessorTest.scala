@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.setting
+package x7c1.linen.repository.channel.preset
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -7,8 +7,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{ChannelSubscriber, LinenOpenHelper}
-import x7c1.linen.modern.accessor.preset.ClientAccountSetup
-import x7c1.linen.modern.init.updater.PresetFactory
+import x7c1.linen.repository.account.preset.ClientAccountSetup
+import x7c1.linen.repository.preset.PresetFactory
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])

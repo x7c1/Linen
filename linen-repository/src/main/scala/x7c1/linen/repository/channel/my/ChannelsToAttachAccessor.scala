@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.setting
+package x7c1.linen.repository.channel.my
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase

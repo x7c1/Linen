@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.dev
+package x7c1.linen.repository.dev
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.ChannelRecord

@@ -7,7 +7,7 @@ import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.setting.{PresetChannelAccessorFactory, PresetChannelsAccessor}
+import x7c1.linen.repository.channel.preset.{PresetChannelAccessorFactory, PresetChannelsAccessor}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.logger.Log
 

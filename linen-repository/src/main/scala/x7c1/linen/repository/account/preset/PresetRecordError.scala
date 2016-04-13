@@ -1,5 +1,4 @@
-package x7c1.linen.modern.accessor.preset
-
+package x7c1.linen.repository.account.preset
 
 sealed trait PresetRecordError
 

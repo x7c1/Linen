@@ -6,7 +6,7 @@ import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.database.{ChannelSubscriber, LinenOpenHelper}
 import x7c1.linen.domain.account.AccountIdentifiable
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
-import x7c1.linen.modern.accessor.setting.AllPresetChannelsAccessor
+import x7c1.linen.repository.channel.preset.AllPresetChannelsAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.intent.LocalBroadcaster

@@ -1,9 +1,8 @@
 package x7c1.linen.modern.action
 
-import x7c1.linen.modern.accessor.unread.RawSourceAccessor
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineArea, OutlineSelectedEvent, SourceSelectedEvent}
 import x7c1.linen.repository.entry.unread.{UnreadOutline, EntryAccessor}
-import x7c1.linen.repository.source.unread.UnreadSourceAccessor
+import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.wheat.modern.callback.CallbackTask.task
 
 class OutlineAreaAction(

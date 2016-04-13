@@ -8,6 +8,7 @@ import android.os.IBinder
 import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.dev.DummyFactory
+import x7c1.linen.repository.preset.PresetFactory
 import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
 import x7c1.wheat.modern.formatter.ThrowableFormatter
 import ThrowableFormatter.format

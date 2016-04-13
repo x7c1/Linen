@@ -7,9 +7,9 @@ import x7c1.linen.database.LinenOpenHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.setting.{SettingPresetChannel, PresetChannelsAccessor}
 import x7c1.linen.modern.display.settings.ChannelSourcesSelected
-import x7c1.wheat.ancient.resource.{ViewHolderProviderFactory, ViewHolderProvider}
+import x7c1.linen.repository.channel.preset.{PresetChannelsAccessor, SettingPresetChannel}
+import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.modern.decorator.Imports._
 
 class PresetsChannelsAdapter(

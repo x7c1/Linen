@@ -1,4 +1,4 @@
-package x7c1.linen.modern.accessor.setting
+package x7c1.linen.repository.channel.preset
 
 import x7c1.linen.database.Query
 

@@ -5,7 +5,7 @@ import x7c1.linen.database.{AccountParts, ChannelParts, ChannelSourceMapParts, E
 import x7c1.linen.domain.{Date, EntryUrl}
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.dev.DummyString.words
-import x7c1.linen.repository.source.SourceTitle
+import x7c1.linen.repository.source.unread.SourceTitle
 import x7c1.wheat.macros.logger.Log
 
 import scala.util.Random
