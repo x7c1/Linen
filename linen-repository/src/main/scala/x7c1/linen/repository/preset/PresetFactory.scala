@@ -1,7 +1,7 @@
 package x7c1.linen.repository.preset
 
 import x7c1.linen.database.LinenOpenHelper
-import x7c1.linen.repository.account.preset.{PresetAccountSetup, PresetChannelSetup, PresetRecordError}
+import x7c1.linen.repository.account.preset.{PresetAccountSetup, PresetChannelSetup}
 import x7c1.linen.repository.channel.preset.PresetChannelPiece
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
 import x7c1.wheat.macros.logger.Log

@@ -4,6 +4,7 @@ import x7c1.linen.database.{AccountParts, AccountTagLabel, AccountTagMapParts, C
 import x7c1.linen.domain.Date
 import x7c1.linen.domain.account.{AccountIdentifiable, ClientAccount, PresetAccount}
 import x7c1.linen.repository.channel.preset.{PresetChannelPiece, PresetChannel}
+import x7c1.linen.repository.preset.{UnexpectedException, NoPresetTag, PresetRecordError}
 
 object PresetAccountSetup {
   def apply(helper: LinenOpenHelper): PresetAccountSetup = {
