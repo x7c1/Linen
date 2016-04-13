@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import x7c1.linen.database.LinenOpenHelper
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.dummy.DummyFactory
 import x7c1.linen.repository.preset.PresetFactory

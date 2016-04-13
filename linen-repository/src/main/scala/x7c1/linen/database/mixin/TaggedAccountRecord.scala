@@ -1,8 +1,8 @@
 package x7c1.linen.database.mixin
 
-import x7c1.linen.database.Query
 import x7c1.linen.database.struct.AccountTagLabel
 import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.Query
 
 trait TaggedAccountRecord extends TypedFields {
   def account_id: Long

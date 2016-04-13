@@ -4,8 +4,8 @@ import android.database.Cursor
 import x7c1.linen.database.mixin.TaggedAccountRecord
 import x7c1.linen.database.mixin.TaggedAccountRecord.select
 import x7c1.linen.database.struct.{ClientLabel, PresetLabel}
-import x7c1.linen.database.ZeroAritySingle
 import x7c1.wheat.macros.database.TypedCursor
+import x7c1.wheat.modern.database.ZeroAritySingle
 
 object AccountIdentifiable {
   def apply(id: Long): AccountIdentifiable = new AccountIdentifiable {

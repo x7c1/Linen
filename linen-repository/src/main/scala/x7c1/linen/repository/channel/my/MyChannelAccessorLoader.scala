@@ -2,10 +2,10 @@ package x7c1.linen.repository.channel.my
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.Query
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.database.Query
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 

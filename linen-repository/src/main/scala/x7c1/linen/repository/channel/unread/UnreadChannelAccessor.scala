@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.unread
 
 import android.database.Cursor
-import x7c1.linen.database.{LinenOpenHelper, Query}
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.ChannelAccessorError.UnexpectedError
 import x7c1.linen.repository.channel.unread.ChannelLoaderEvent.{Done, AccessorError}
@@ -9,6 +9,7 @@ import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.TaskProvider.async
+import x7c1.wheat.modern.database.Query
 
 trait UnreadChannelAccessor {
   def findAt(position: Int): Option[UnreadChannel]

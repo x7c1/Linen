@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
-import x7c1.linen.database.{LinenDatabase, LinenOpenHelper}
+import x7c1.linen.database.control.{LinenOpenHelper, LinenDatabase}
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater

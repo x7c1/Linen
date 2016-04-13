@@ -3,9 +3,9 @@ package x7c1.linen.repository.source.unread
 import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.database.struct.SourceRecord
-import SourceRecord.table
-import x7c1.linen.database.{SingleWhere, Updatable}
+import x7c1.linen.database.struct.SourceRecord.table
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.{SingleWhere, Updatable}
 
 case class SourceTitle(
   sourceId: Long,

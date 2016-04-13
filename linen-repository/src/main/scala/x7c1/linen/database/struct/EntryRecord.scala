@@ -1,10 +1,10 @@
 package x7c1.linen.database.struct
 
 import android.content.ContentValues
-import x7c1.linen.database.Insertable
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.Insertable
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long

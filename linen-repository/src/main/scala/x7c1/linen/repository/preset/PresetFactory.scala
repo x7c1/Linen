@@ -1,6 +1,6 @@
 package x7c1.linen.repository.preset
 
-import x7c1.linen.database.LinenOpenHelper
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.channel.preset.{PresetChannelSetup, PresetChannelPiece}
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}

@@ -2,6 +2,7 @@ package x7c1.linen.database
 
 import android.database.Cursor
 import org.robolectric.RuntimeEnvironment
+import x7c1.linen.database.control.LinenOpenHelper
 
 object DebugTools {
   def showTable(tableName: String) = {

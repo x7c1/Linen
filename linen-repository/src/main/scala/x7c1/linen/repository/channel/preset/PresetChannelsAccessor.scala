@@ -1,7 +1,8 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.{LinenOpenHelper, Query}
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.Query
 
 trait PresetChannelsAccessor {
   def clientAccountId: Long

@@ -1,8 +1,8 @@
 package x7c1.linen.database.struct
 
-import x7c1.linen.database.{Updatable, Insertable}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.{Insertable, Updatable}
 
 
 trait source_statuses extends TypedFields {

@@ -1,9 +1,9 @@
 package x7c1.linen.database.struct
 
 import android.database.Cursor
-import x7c1.linen.database.{Insertable, SingleWhere}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.{Insertable, SingleWhere}
 
 
 trait account_tag_map extends TypedFields {

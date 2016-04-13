@@ -1,9 +1,9 @@
 package x7c1.linen.database.struct
 
 import android.content.ContentValues
-import x7c1.linen.database.{Deletable, Insertable}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.{Deletable, Insertable}
 
 trait channel_source_map extends TypedFields {
   def source_id: Long

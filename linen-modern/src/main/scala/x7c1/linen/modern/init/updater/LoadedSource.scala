@@ -1,8 +1,8 @@
 package x7c1.linen.modern.init.updater
 
 import x7c1.linen.database.struct.{SourceRecord, EntryParts}
-import x7c1.linen.database.Updatable
 import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.Updatable
 
 
 class LoadedSource(

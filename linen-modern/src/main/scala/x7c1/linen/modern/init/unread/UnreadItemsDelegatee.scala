@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
-import x7c1.linen.database.LinenOpenHelper
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}

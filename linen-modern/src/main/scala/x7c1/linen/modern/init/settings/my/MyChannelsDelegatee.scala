@@ -5,7 +5,7 @@ import android.content.Context
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.database.LinenOpenHelper
+import x7c1.linen.database.control.LinenOpenHelper
 import x7c1.linen.database.struct.ChannelSubscriber
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
