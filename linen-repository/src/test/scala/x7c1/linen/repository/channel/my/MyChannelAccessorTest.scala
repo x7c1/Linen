@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.dummy.DummyFactory
 
@@ -20,7 +20,7 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getWritableDatabase
+    val db = new DatabaseHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(channelId) = MyChannelAccessor.createForDebug(db, accountId) findAt 0 collect {
       case x: MyChannel => x.channelId
@@ -36,7 +36,7 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getWritableDatabase
+    val db = new DatabaseHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val length = MyChannelAccessor.createForDebug(db, accountId).length
     assertEquals(2, length)
@@ -47,7 +47,7 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getWritableDatabase
+    val db = new DatabaseHelper(context).getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
     val Some(c1) = MyChannelAccessor.createForDebug(db, accountId).findAt(0) collect {
       case x: MyChannel => x

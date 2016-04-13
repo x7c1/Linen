@@ -3,7 +3,7 @@ package x7c1.linen.modern.init.settings.preset
 import android.app.Activity
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{View, ViewGroup}
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
@@ -69,7 +69,7 @@ class PresetsChannelsAdapterFactory(
   activity: Activity with ActivityControl with ServiceControl,
   factory: ViewHolderProviderFactory[SettingPresetChannelRow],
   location: PresetEventLocation,
-  helper: LinenOpenHelper, accountId: Long){
+  helper: DatabaseHelper, accountId: Long){
 
   def createAdapter(accessor: PresetChannelsAccessor): PresetsChannelsAdapter = {
     new PresetsChannelsAdapter(

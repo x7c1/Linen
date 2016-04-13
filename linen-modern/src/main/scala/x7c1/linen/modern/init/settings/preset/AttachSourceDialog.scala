@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.{Button, CompoundButton}
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelSourceMapKey, ChannelSourceMapParts}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
@@ -42,7 +42,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 
   lazy val args = getTypedArguments
 
-  private lazy val helper = new LinenOpenHelper(getActivity)
+  private lazy val helper = new DatabaseHelper(getActivity)
 
   private lazy val layout = {
     val factory = args.attachLayoutFactory create getActivity

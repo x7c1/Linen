@@ -1,7 +1,7 @@
 package x7c1.linen.database.struct
 
 import android.database.{Cursor, SQLException}
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
@@ -69,7 +69,7 @@ object ChannelStatusRecordParts {
   }
 }
 
-class ChannelSubscriber(account: AccountIdentifiable, helper: LinenOpenHelper){
+class ChannelSubscriber(account: AccountIdentifiable, helper: DatabaseHelper){
   def subscribe(channelId: Long): Either[SQLException, Unit] = {
     Writer(subscribed = true) insertOrUpdate channelId
   }

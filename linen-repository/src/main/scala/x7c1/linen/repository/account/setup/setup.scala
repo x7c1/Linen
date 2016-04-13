@@ -1,18 +1,18 @@
 package x7c1.linen.repository.account.setup
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ClientLabel, PresetLabel, AccountParts}
 import x7c1.linen.repository.account.{ClientAccount, PresetAccount}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.preset.PresetRecordError
 
 object PresetAccountSetup {
-  def apply(helper: LinenOpenHelper): PresetAccountSetup = {
+  def apply(helper: DatabaseHelper): PresetAccountSetup = {
     new PresetAccountSetup(helper)
   }
 }
 
-class PresetAccountSetup (helper: LinenOpenHelper) {
+class PresetAccountSetup (helper: DatabaseHelper) {
   private lazy val setup = new TaggedAccountSetup[PresetAccount](helper, PresetLabel)
 
   def findOrCreate(): Either[PresetRecordError, PresetAccount] = {
@@ -26,12 +26,12 @@ class PresetAccountSetup (helper: LinenOpenHelper) {
 }
 
 object ClientAccountSetup {
-  def apply(helper: LinenOpenHelper): ClientAccountSetup = {
+  def apply(helper: DatabaseHelper): ClientAccountSetup = {
     new ClientAccountSetup(helper)
   }
 }
 
-class ClientAccountSetup private (helper: LinenOpenHelper){
+class ClientAccountSetup private (helper: DatabaseHelper){
   private lazy val setup = new TaggedAccountSetup[ClientAccount](helper, ClientLabel)
 
   def findOrCreate(): Either[PresetRecordError, ClientAccount] = {

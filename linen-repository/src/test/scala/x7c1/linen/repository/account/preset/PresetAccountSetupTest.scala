@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{account_tags, account_tag_map}
 import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.source.setting.SampleFactory
@@ -18,7 +18,7 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
   @Test
   def testSetup1() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val factory = new SampleFactory(helper)
     val firstAccount = factory.createAccount()
 
@@ -37,7 +37,7 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
   @Test
   def testSetup2() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
 
     val Right(account1) = PresetAccountSetup(helper).findOrCreate()
     val Right(account2) = PresetAccountSetup(helper).findOrCreate()

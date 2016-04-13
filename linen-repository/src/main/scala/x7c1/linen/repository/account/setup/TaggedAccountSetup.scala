@@ -1,6 +1,6 @@
 package x7c1.linen.repository.account.setup
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{AccountParts, AccountTagLabel, AccountTagMapParts, account_tags}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.date.Date
@@ -8,7 +8,7 @@ import x7c1.linen.repository.preset.{NoPresetTag, PresetRecordError, UnexpectedE
 import x7c1.wheat.modern.database.{WritableDatabase, ZeroAritySingle}
 
 class TaggedAccountSetup[A <: AccountIdentifiable : ZeroAritySingle](
-  helper: LinenOpenHelper,
+  helper: DatabaseHelper,
   tagLabel: AccountTagLabel ) {
 
   private val finder = new AccountTagFinder(helper)
@@ -38,7 +38,7 @@ class TaggedAccountSetup[A <: AccountIdentifiable : ZeroAritySingle](
     }
 }
 
-private class AccountTagFinder(helper: LinenOpenHelper){
+private class AccountTagFinder(helper: DatabaseHelper){
   def findId(tag: AccountTagLabel): Either[PresetRecordError, Long] =
     helper.readable.find[account_tags] by tag match {
       case Left(a) => Left(UnexpectedException(a))

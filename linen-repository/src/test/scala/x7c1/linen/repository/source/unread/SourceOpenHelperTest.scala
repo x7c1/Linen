@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.DebugTools
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
@@ -28,7 +28,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   @Test
   def testQueryForSourceArea() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase
@@ -50,7 +50,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
   @Test
   def testQueryPlanForSourceArea() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase
@@ -71,7 +71,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getReadableDatabase
+    val db = new DatabaseHelper(context).getReadableDatabase
     val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
@@ -97,7 +97,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getReadableDatabase
+    val db = new DatabaseHelper(context).getReadableDatabase
     val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val query = EntryAccessor.createPositionQuery(sourceIds)
@@ -116,7 +116,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new LinenOpenHelper(context).getReadableDatabase
+    val db = new DatabaseHelper(context).getReadableDatabase
     val Some(sourceAccessor) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
     val positions = EntryAccessor.createPositionMap(db, sourceIds)
@@ -144,7 +144,7 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
   @Test
   def testQueryForNotRatedSources() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val fixture = new UnreadSourceFixture(helper)
 
     val db = helper.getWritableDatabase

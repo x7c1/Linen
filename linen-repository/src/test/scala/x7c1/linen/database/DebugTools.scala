@@ -2,13 +2,13 @@ package x7c1.linen.database
 
 import android.database.Cursor
 import org.robolectric.RuntimeEnvironment
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 
 object DebugTools {
   def showTable(tableName: String) = {
     println(s"====== tableName : $tableName")
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val db = helper.getReadableDatabase
     val cursor = db.rawQuery(s"SELECT * FROM $tableName LIMIT 100", Array())
     dumpCursor(cursor)

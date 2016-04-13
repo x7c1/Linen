@@ -1,13 +1,13 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.ChannelParts
 import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.preset.{PresetRecordError, UnexpectedException}
 import x7c1.wheat.modern.database.WritableDatabase
 
-class PresetChannelSetup private (helper: LinenOpenHelper, account: PresetAccount) {
+class PresetChannelSetup private (helper: DatabaseHelper, account: PresetAccount) {
   def getOrCreate(piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] = {
     helper.readable.find[PresetChannel] by (account -> piece) match {
       case Right(Some(x)) => Right(x)
@@ -32,7 +32,7 @@ class PresetChannelSetup private (helper: LinenOpenHelper, account: PresetAccoun
  }
 
 object PresetChannelSetup {
-  def apply(helper: LinenOpenHelper, account: PresetAccount): PresetChannelSetup = {
+  def apply(helper: DatabaseHelper, account: PresetAccount): PresetChannelSetup = {
     new PresetChannelSetup(helper, account)
   }
 }

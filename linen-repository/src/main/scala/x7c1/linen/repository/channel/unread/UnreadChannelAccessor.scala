@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.unread
 
 import android.database.Cursor
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.ChannelAccessorError.UnexpectedError
 import x7c1.linen.repository.channel.unread.ChannelLoaderEvent.{Done, AccessorError}
@@ -18,7 +18,7 @@ trait UnreadChannelAccessor {
 
 private object InternalChannelAccessor {
   def create(
-    helper: LinenOpenHelper,
+    helper: DatabaseHelper,
     clientAccountId: Long ): Either[ChannelAccessorError, InternalChannelAccessor] = {
 
     try {
@@ -74,7 +74,7 @@ trait ChannelSelectable[A] {
   def nameOf: A => String
 }
 
-class UnreadChannelLoader(helper: LinenOpenHelper, client: ClientAccount){
+class UnreadChannelLoader(helper: DatabaseHelper, client: ClientAccount){
   private lazy val holder = new AccessorHolder
 
   lazy val accessor: UnreadChannelAccessor = holder

@@ -1,12 +1,12 @@
 package x7c1.linen.repository.preset
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.channel.preset.{PresetChannelSetup, PresetChannelPiece}
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
 import x7c1.wheat.macros.logger.Log
 
-class PresetFactory (helper: LinenOpenHelper){
+class PresetFactory (helper: DatabaseHelper){
 
   def setupJapanesePresets() = {
     val sets = Seq(
@@ -18,7 +18,7 @@ class PresetFactory (helper: LinenOpenHelper){
   }
 
 }
-private case class SetupStarter(helper: LinenOpenHelper)(set: PresetChannelSet){
+private case class SetupStarter(helper: DatabaseHelper)(set: PresetChannelSet){
 
   def start(): Unit = setupChannelOwner() match {
     case Left(error) => Log error error.toString

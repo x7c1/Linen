@@ -5,7 +5,7 @@ import java.net.{HttpURLConnection, URL}
 
 import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{SourceRecord, EntryParts}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
@@ -16,10 +16,10 @@ import x7c1.wheat.modern.callback.TaskProvider.using
 import scala.concurrent.Future
 
 object SourceInspector {
-  def apply(helper: LinenOpenHelper ): SourceInspector = new SourceInspector(helper)
+  def apply(helper: DatabaseHelper ): SourceInspector = new SourceInspector(helper)
 }
 
-class SourceInspector private (helper: LinenOpenHelper){
+class SourceInspector private (helper: DatabaseHelper){
 
   def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
     helper.readable.find[SourceRecord].by(sourceId) match {

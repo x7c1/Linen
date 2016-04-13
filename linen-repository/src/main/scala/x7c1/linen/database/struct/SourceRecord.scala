@@ -47,7 +47,7 @@ object SourceParts {
         column.url -> target.url,
         column.description -> target.description,
         column.created_at -> target.createdAt
-        )
+      )
     }
   }
 }

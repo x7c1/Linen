@@ -1,7 +1,7 @@
 package x7c1.linen.repository.dummy
 
 import android.content.Context
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{SourceStatusAsStarted, SourceStatusParts, SourceParts, SourceRatingParts, EntryParts, ChannelParts, ChannelSourceMapParts, AccountParts}
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
@@ -18,7 +18,7 @@ object DummyFactory {
     createDummies0(context)(n)(_ => ())
   }
   def createDummies0(context: Context)(n: Int)(callback: Int => Unit): Unit = {
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val db = helper.getWritableDatabase
     val writable = helper.writable
 

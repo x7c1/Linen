@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.ChannelSubscriber
 import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.preset.PresetFactory
@@ -18,7 +18,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
   @Test
   def testSetup1() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
 
     val factory = new PresetFactory(helper)
     factory.setupJapanesePresets()
@@ -36,7 +36,7 @@ class PresetChannelsAccessorTest extends JUnitSuiteLike {
   @Test
   def testSubscribeChannel() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
 
     val factory = new PresetFactory(helper)
     factory.setupJapanesePresets()

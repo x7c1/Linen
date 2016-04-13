@@ -1,9 +1,9 @@
 package x7c1.linen.repository.source.unread
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.wheat.macros.logger.Log
 
-class RawSourceAccessor(helper: LinenOpenHelper){
+class RawSourceAccessor(helper: DatabaseHelper){
 
   private lazy val readable = helper.readable
 

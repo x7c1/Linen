@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Query
 
@@ -13,7 +13,7 @@ trait PresetChannelsAccessor {
 
 
 private class PresetChannelAccessorImpl(
-  helper: LinenOpenHelper,
+  helper: DatabaseHelper,
   query: Query,
   accountId: Long ) extends PresetChannelsAccessor {
 

@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import x7c1.wheat.modern.database.{ReadableDatabase, WritableDatabase}
 
-class LinenOpenHelper(context: Context)
+class DatabaseHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {
 
   lazy val writable = new WritableDatabase(getWritableDatabase)

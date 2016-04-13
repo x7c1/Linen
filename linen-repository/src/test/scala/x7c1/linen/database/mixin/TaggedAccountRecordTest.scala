@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.PresetLabel
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -17,7 +17,7 @@ class TaggedAccountRecordTest extends JUnitSuiteLike {
   @Test
   def testPlan() = {
     val context = RuntimeEnvironment.application
-    val helper = new LinenOpenHelper(context)
+    val helper = new DatabaseHelper(context)
     val db = helper.getReadableDatabase
 
     val query = TaggedAccountRecord select PresetLabel

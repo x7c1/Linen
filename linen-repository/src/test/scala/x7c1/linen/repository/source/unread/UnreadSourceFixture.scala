@@ -2,14 +2,14 @@ package x7c1.linen.repository.source.unread
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.EntryParts
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.source.setting.{ChannelSourceParts, ChannelOwner, SampleFactory}
 import x7c1.wheat.modern.database.WritableDatabase
 
-class UnreadSourceFixture(helper: LinenOpenHelper) {
+class UnreadSourceFixture(helper: DatabaseHelper) {
   private val db = helper.getWritableDatabase
   private val factory = new SampleFactory(helper)
 

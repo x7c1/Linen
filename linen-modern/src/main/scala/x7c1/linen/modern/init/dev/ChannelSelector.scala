@@ -3,13 +3,13 @@ package x7c1.linen.modern.init.dev
 import android.app.AlertDialog
 import android.content.DialogInterface.{OnClickListener, OnMultiChoiceClickListener}
 import android.content.{Context, DialogInterface}
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.channel.dev.ChannelNameAccessor
 import x7c1.wheat.macros.logger.Log
 
 class ChannelSelector private (
   context: Context,
-  helper: LinenOpenHelper,
+  helper: DatabaseHelper,
   onSelect: OnSelectChannels){
 
   private val items = ChannelNameAccessor(helper.getReadableDatabase).allNames
@@ -55,7 +55,7 @@ class ChannelSelector private (
 
 object ChannelSelector {
   def apply
-    (context: Context, helper: LinenOpenHelper)
+    (context: Context, helper: DatabaseHelper)
     (f: ChannelSelectedEvent => Unit): ChannelSelector = {
 
     new ChannelSelector(context, helper, new OnSelectChannels {

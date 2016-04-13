@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import x7c1.linen.database.control.LinenOpenHelper
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.dummy.DummyFactory
 import x7c1.linen.repository.preset.PresetFactory
@@ -33,7 +33,7 @@ object UpdaterServiceDelegatee {
 }
 
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
-  private lazy val helper = new LinenOpenHelper(service)
+  private lazy val helper = new DatabaseHelper(service)
   private lazy val queue = new SourceUpdaterQueue(service, helper)
 
   def onBind(intent: Intent): Option[IBinder] = {
@@ -55,7 +55,7 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 
 class UpdaterMethods(
   service: Service with ServiceControl,
-  helper: LinenOpenHelper,
+  helper: DatabaseHelper,
   queue: SourceUpdaterQueue,
   startId: Int){
 
