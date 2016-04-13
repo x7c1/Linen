@@ -7,6 +7,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.{LinenOpenHelper, account_tag_map, account_tags}
+import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.source.setting.SampleFactory
 
 @Config(manifest=Config.NONE)

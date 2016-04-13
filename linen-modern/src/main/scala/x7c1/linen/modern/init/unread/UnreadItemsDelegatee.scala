@@ -12,7 +12,7 @@ import x7c1.linen.domain.{EntryKind, FooterKind, SourceKind}
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.repository.account.preset.ClientAccountSetup
+import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.repository.unread.AccessorLoader
