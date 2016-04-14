@@ -8,7 +8,7 @@ import x7c1.linen.repository.preset.{PresetRecordError, UnexpectedException}
 import x7c1.wheat.modern.database.WritableDatabase
 
 class PresetChannelSetup private (helper: DatabaseHelper, account: PresetAccount) {
-  def getOrCreate(piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] = {
+  def findOrCreate(piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] = {
     helper.readable.find[PresetChannel] by (account -> piece) via {
       case Right(Some(x)) => Right(x)
       case Right(None) => createPresetChannel(account, piece)

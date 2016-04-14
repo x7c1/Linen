@@ -1,6 +1,7 @@
 package x7c1.linen.repository.preset
 
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.channel.preset.{PresetChannelSetup, PresetChannelPiece}
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
@@ -42,9 +43,15 @@ private case class SetupStarter(helper: DatabaseHelper)(set: PresetChannelSet){
     partsList foreach addSource
   }
   private def setupChannelOwner(): Either[PresetRecordError, ChannelOwner] = {
+    def setupAccount() = {
+      PresetAccountSetup(helper).findOrCreate().left map (UnexpectedError(_))
+    }
+    def setupChannel(account: PresetAccount) = {
+      PresetChannelSetup(helper, account) findOrCreate set.channel
+    }
     for {
-      account <- PresetAccountSetup(helper).findOrCreate().right
-      channel <- PresetChannelSetup(helper, account).getOrCreate(set.channel).right
+      account <- setupAccount().right
+      channel <- setupChannel(account).right
     } yield new ChannelOwner(
       db = helper.getWritableDatabase,
       channelId = channel.channelId,
