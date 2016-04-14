@@ -3,8 +3,6 @@ package x7c1.linen.modern.init.unread
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.RecyclerView
-import android.util.TypedValue
-import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
@@ -17,7 +15,7 @@ import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAcces
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, FooterKind, SourceKind}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.resource.ViewHolderProviders
+import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -108,17 +106,15 @@ class UnreadItemsDelegatee(
         Some(account)
     }
   }
-  def dipToPixel(dip: Int): Int = {
-    val metrics = activity.getResources.getDisplayMetrics
-    TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
-  }
   def footerHeightOf(recyclerView: RecyclerView) = {
-    recyclerView.getHeight - dipToPixel(10)
+    recyclerView.getHeight - converter.dipToPixel(10)
   }
+  lazy val converter = MetricsConverter(activity)
+
   lazy val widthWithMargin: Int = {
     val radius = 20
     val margin = 10
-    displaySize.x - dipToPixel(margin + radius)
+    displaySize.x - converter.dipToPixel(margin + radius)
   }
   lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay

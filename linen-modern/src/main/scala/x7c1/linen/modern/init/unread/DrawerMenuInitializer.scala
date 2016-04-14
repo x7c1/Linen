@@ -28,8 +28,8 @@ trait DrawerMenuInitializer {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuArea updateLayoutParams { params =>
-      val maxWidth = dipToPixel(320)
-      val defaultWidth = displaySize.x - dipToPixel(65)
+      val maxWidth = converter dipToPixel 320
+      val defaultWidth = displaySize.x - converter.dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
     }
     channelLoader -> clientAccount match {
