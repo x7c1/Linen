@@ -28,7 +28,7 @@ trait PresetFragment { self: Fragment =>
     accessorFactory.create(args.accountId, helper) match {
       case Right(accessor) => Some(accessor)
       case Left(error) =>
-        Log error error.toString
+        Log error error.detail
         None
     }
   }

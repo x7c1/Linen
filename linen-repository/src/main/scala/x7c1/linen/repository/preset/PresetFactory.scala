@@ -22,7 +22,7 @@ class PresetFactory (helper: DatabaseHelper){
 private case class SetupStarter(helper: DatabaseHelper)(set: PresetChannelSet){
 
   def start(): Unit = setupChannelOwner() match {
-    case Left(error) => Log error error.toString
+    case Left(error) => Log error error.detail
     case Right(owner) => setupSources(owner)
   }
   private def setupSources(owner: ChannelOwner) = {
