@@ -121,7 +121,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     // todo: use transaction
     val either = for {
       channelId <- create().right
-      _ <- subscribe(channelId).right
+      _ <- subscribe(channelId).toEither.right
     } yield {
       channelId
     }

@@ -26,11 +26,11 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
     val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId
-    val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id)
+    val Right(Some(map)) = helper.readable.find[account_tag_map].by(account1.accountId).toEither
+    val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id).toEither
     assertEquals("preset", tag.tag_label)
 
-    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId)
+    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId).toEither
     assertEquals(None, x)
   }
 
@@ -43,13 +43,13 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
     val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map] by account1.accountId
-    val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id)
+    val Right(Some(map)) = helper.readable.find[account_tag_map].by(account1.accountId).toEither
+    val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id).toEither
     assertEquals("preset", tag.tag_label)
 
     val factory = new SampleFactory(helper)
     val firstAccount = factory.createAccount()
-    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId)
+    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId).toEither
     assertEquals(None, x)
   }
 

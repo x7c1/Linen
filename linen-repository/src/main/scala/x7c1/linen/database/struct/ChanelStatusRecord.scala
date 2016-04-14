@@ -7,6 +7,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.{Insertable, SingleWhere, Updatable, WritableDatabase}
+import x7c1.wheat.modern.either.OptionEither
 
 
 trait ChannelStatusRecord extends TypedFields {
@@ -70,18 +71,20 @@ object ChannelStatusRecordParts {
 }
 
 class ChannelSubscriber(account: AccountIdentifiable, helper: DatabaseHelper){
-  def subscribe(channelId: Long): Either[SQLException, Unit] = {
+  import x7c1.wheat.modern.either.Imports._
+
+  def subscribe(channelId: Long): OptionEither[SQLException, Unit] = {
     Writer(subscribed = true) insertOrUpdate channelId
   }
-  def unsubscribe(channelId: Long): Either[SQLException, Unit] = {
+  def unsubscribe(channelId: Long): OptionEither[SQLException, Unit] = {
     Writer(subscribed = false) insertOrUpdate channelId
   }
   private case class Writer(subscribed: Boolean){
     def insertOrUpdate(channelId: Long) = {
-      helper.readable.find[ChannelStatusRecord] by (account -> channelId) match {
-        case Right(Some(record)) => update(channelId)
-        case Right(None) => insert(channelId)
-        case Left(error) => Left(error)
+      val either = helper.readable.find[ChannelStatusRecord] by (account -> channelId)
+      either.option flatMap {
+        case Some(record) => update(channelId).toOptionEither
+        case None => insert(channelId).toOptionEither
       }
     }
     private def execute[A, B](channelId: Long)

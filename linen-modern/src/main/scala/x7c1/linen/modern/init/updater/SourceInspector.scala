@@ -22,7 +22,7 @@ object SourceInspector {
 class SourceInspector private (helper: DatabaseHelper){
 
   def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
-    helper.readable.find[SourceRecord].by(sourceId) match {
+    helper.readable.find[SourceRecord].by(sourceId) via {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
       case Right(Some(source)) => Right(InspectedSource(source))

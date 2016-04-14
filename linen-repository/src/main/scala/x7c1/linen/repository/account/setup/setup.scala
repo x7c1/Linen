@@ -4,7 +4,8 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ClientLabel, PresetLabel, AccountParts}
 import x7c1.linen.repository.account.{ClientAccount, PresetAccount}
 import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.preset.PresetRecordError
+import x7c1.linen.repository.preset.{NoPresetAccount, UnexpectedException, PresetRecordError}
+import x7c1.wheat.modern.either.{OptionLeft, OptionRight}
 
 object PresetAccountSetup {
   def apply(helper: DatabaseHelper): PresetAccountSetup = {
@@ -21,7 +22,11 @@ class PresetAccountSetup (helper: DatabaseHelper) {
       biography = "preset channels",
       createdAt = Date.current()
     )
-    either.right map PresetAccount.apply
+    either match {
+      case OptionRight(Some(r)) => Right(PresetAccount(r))
+      case OptionRight(None) => Left(NoPresetAccount())
+      case OptionLeft(l) => Left(UnexpectedException(l))
+    }
   }
 }
 
@@ -40,6 +45,10 @@ class ClientAccountSetup private (helper: DatabaseHelper){
       biography = "no profile",
       createdAt = Date.current()
     )
-    either.right map ClientAccount.apply
+    either match {
+      case OptionRight(Some(r)) => Right(ClientAccount(r))
+      case OptionRight(None) => Left(NoPresetAccount())
+      case OptionLeft(l) => Left(UnexpectedException(l))
+    }
   }
 }

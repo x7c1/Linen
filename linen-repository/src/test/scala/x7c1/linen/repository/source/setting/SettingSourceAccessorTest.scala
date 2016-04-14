@@ -98,7 +98,7 @@ class SampleFactory (helper: DatabaseHelper){
       description = s"sample channel description",
       createdAt = Date.current()
     )
-    val Right(Some(channel)) = readable.find[Channel].by(id)
+    val Right(Some(channel)) = readable.find[Channel].by(id).toEither
     channel
   }
 }

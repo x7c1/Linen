@@ -8,7 +8,7 @@ class RawSourceAccessor(helper: DatabaseHelper){
   private lazy val readable = helper.readable
 
   def findTitleOf(sourceId: Long): Option[String] = {
-    readable.find[SourceTitle].by(sourceId) match {
+    readable.find[SourceTitle] by sourceId via {
       case Left(exception) =>
         Log error exception.getMessage
         None

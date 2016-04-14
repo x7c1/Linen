@@ -9,7 +9,7 @@ import x7c1.wheat.modern.database.WritableDatabase
 
 class PresetChannelSetup private (helper: DatabaseHelper, account: PresetAccount) {
   def getOrCreate(piece: PresetChannelPiece): Either[PresetRecordError, PresetChannel] = {
-    helper.readable.find[PresetChannel] by (account -> piece) match {
+    helper.readable.find[PresetChannel] by (account -> piece) via {
       case Right(Some(x)) => Right(x)
       case Right(None) => createPresetChannel(account, piece)
       case Left(error) => Left(UnexpectedException(error))

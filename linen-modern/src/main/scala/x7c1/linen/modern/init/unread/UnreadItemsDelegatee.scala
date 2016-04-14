@@ -102,12 +102,10 @@ class UnreadItemsDelegatee(
   def setupClientAccount(): Option[ClientAccount] = {
 
     // using preset account temporally to display channels
-    val tmp = helper.readable.find[PresetAccount]() match {
-      case Left(error) => None
-      case Right(None) => None
-      case Right(Some(account)) => Some(ClientAccount(account.accountId))
+    val tmp = {
+      val either = helper.readable.find[PresetAccount]() map (_.accountId)
+      either.map(ClientAccount(_)).toOption
     }
-
     val account = ClientAccountSetup(helper).findOrCreate() match {
       case Left(error) =>
         Log error error.toString
