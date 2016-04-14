@@ -26,4 +26,3 @@ class PresetChannelAccessorFactory(queryFactory: PresetChannelQueryFactory){
 trait PresetChannelQueryFactory {
   def createQuery(clientAccountId: Long, presetAccountId: Long): Query
 }
-

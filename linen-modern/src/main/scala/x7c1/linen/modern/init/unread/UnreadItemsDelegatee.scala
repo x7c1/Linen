@@ -10,8 +10,8 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
+import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
-import x7c1.linen.repository.account.{ClientAccount, PresetAccount}
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, FooterKind, SourceKind}
@@ -100,21 +100,13 @@ class UnreadItemsDelegatee(
   lazy val clientAccount: Option[ClientAccount] = setupClientAccount()
 
   def setupClientAccount(): Option[ClientAccount] = {
-
-    // using preset account temporally to display channels
-    val tmp = {
-      val either = helper.readable.find[PresetAccount]() map (_.accountId)
-      either.map(ClientAccount(_)).toOption
-    }
-    val account = ClientAccountSetup(helper).findOrCreate() match {
+    ClientAccountSetup(helper).findOrCreate() match {
       case Left(error) =>
         Log error error.toString
         None
       case Right(account) =>
         Some(account)
     }
-//    tmp orElse account
-    account
   }
   def dipToPixel(dip: Int): Int = {
     val metrics = activity.getResources.getDisplayMetrics
