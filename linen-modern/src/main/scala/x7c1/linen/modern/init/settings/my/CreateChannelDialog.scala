@@ -7,11 +7,13 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.ChannelParts
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
-import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
-import x7c1.linen.modern.accessor.database.{ChannelSubscriber, ChannelParts}
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -34,7 +36,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 
   private val provide = EitherTask.hold[NewChannelError]
 
-  private lazy val helper = new LinenOpenHelper(getActivity)
+  private lazy val helper = new DatabaseHelper(getActivity)
 
   def showIn(activity: FragmentActivity) = {
     show(activity.getSupportFragmentManager, "channel-dialog")
@@ -120,7 +122,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     // todo: use transaction
     val either = for {
       channelId <- create().right
-      _ <- subscribe(channelId).right
+      _ <- subscribe(channelId).toEither.right
     } yield {
       channelId
     }

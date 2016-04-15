@@ -5,14 +5,14 @@ import android.content.Context
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
-import x7c1.linen.modern.accessor.database.ChannelSubscriber
-import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.setting.{MyChannelAccessor, MyChannelAccessorLoader}
-import x7c1.linen.modern.accessor.{AccountIdentifiable, LinenOpenHelper}
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
+import x7c1.linen.repository.account.{AccountIdentifiable, ClientAccount}
+import x7c1.linen.repository.channel.my.{MyChannelAccessor, MyChannelAccessorLoader}
+import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -28,7 +28,7 @@ class MyChannelsDelegatee (
   inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate],
   channelRowProviders: MyChannelRowProviders ){
 
-  private lazy val helper = new LinenOpenHelper(activity)
+  private lazy val helper = new DatabaseHelper(activity)
 
   private lazy val database = helper.getReadableDatabase
 
@@ -114,7 +114,7 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
 
 class OnMyChannelSubscriptionChanged(
   context: Context,
-  helper: LinenOpenHelper,
+  helper: DatabaseHelper,
   account: AccountIdentifiable){
 
   def updateSubscription(event: MyChannelSubscriptionChanged): Unit = {

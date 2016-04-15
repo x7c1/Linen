@@ -8,12 +8,12 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
-import x7c1.linen.modern.accessor.preset.ClientAccount
-import x7c1.linen.modern.accessor.unread.{ChannelSelectable, UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
+import x7c1.linen.repository.account.ClientAccount
+import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
@@ -28,8 +28,8 @@ trait DrawerMenuInitializer {
     val manager = new LinearLayoutManager(layout.menuArea.getContext)
     layout.menuList setLayoutManager manager
     layout.menuArea updateLayoutParams { params =>
-      val maxWidth = dipToPixel(320)
-      val defaultWidth = displaySize.x - dipToPixel(65)
+      val maxWidth = converter dipToPixel 320
+      val defaultWidth = displaySize.x - converter.dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
     }
     channelLoader -> clientAccount match {

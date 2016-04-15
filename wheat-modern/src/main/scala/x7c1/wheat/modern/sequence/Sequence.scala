@@ -2,7 +2,7 @@ package x7c1.wheat.modern.sequence
 
 import scala.annotation.tailrec
 
-trait Sequence[A]{
+trait Sequence[+A]{
   def length: Int
   def findAt(position: Int): Option[A]
 }

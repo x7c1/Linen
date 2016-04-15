@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSkipStoppedObserver}
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
 import x7c1.linen.modern.display.unread.{DetailRowAdapter, OnEntryVisitListener, PaneDragDetector}
-import x7c1.linen.modern.struct.UnreadEntry
+import x7c1.linen.repository.entry.unread.UnreadEntry
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.action.SiteVisitor
 import x7c1.wheat.modern.decorator.Imports._
@@ -26,7 +26,7 @@ trait DetailAreaInitializer {
       new DetailSelectedObserver(actions),
       new OnEntryVisit(activity),
       unreadRowProviders.forDetailArea,
-      footerHeightOf(layout.entryDetailList, accessors.entryDetail)
+      footerHeightOf(layout.entryDetailList)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryDetailList,

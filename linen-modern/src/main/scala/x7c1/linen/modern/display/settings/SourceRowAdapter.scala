@@ -6,8 +6,8 @@ import android.view.{View, ViewGroup}
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.{RelativeLayout, SeekBar}
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow
-import x7c1.linen.modern.accessor.SettingSourceAccessor
-import x7c1.linen.modern.accessor.preset.ClientAccount
+import x7c1.linen.repository.account.ClientAccount
+import x7c1.linen.repository.source.setting.SettingSourceAccessor
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.resource.MetricsConverter

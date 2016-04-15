@@ -4,9 +4,10 @@ import java.lang.System.currentTimeMillis
 
 import android.app.Service
 import android.database.sqlite.SQLiteConstraintException
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.init.updater.ThrowableFormatter.format
+import x7c1.wheat.modern.formatter.ThrowableFormatter
+import ThrowableFormatter.format
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -14,7 +15,7 @@ import scala.collection.mutable
 
 class SourceUpdaterQueue(
   service: Service with ServiceControl,
-  helper: LinenOpenHelper){
+  helper: DatabaseHelper){
 
   private lazy val inspector = SourceInspector(helper)
   private lazy val queueMap = new SourceQueueMap

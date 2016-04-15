@@ -22,7 +22,7 @@ trait OutlineAreaInitializer {
       accessors.entryOutline,
       new OutlineSelectedObserver(actions),
       unreadRowProviders.forOutlineArea,
-      footerHeightOf(layout.entryList, accessors.entryOutline)
+      footerHeightOf(layout.entryList)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
       recyclerView = layout.entryList,

@@ -2,11 +2,12 @@ package x7c1.linen.modern.init.unread
 
 import android.content.Context
 import x7c1.linen.glue.res.layout.UnreadItemsLayout
-import x7c1.linen.modern.accessor.unread.ChannelLoaderEvent.{AccessorError, Done}
-import x7c1.linen.modern.accessor.unread.{ChannelLoaderEvent, UnreadChannelLoader}
+import x7c1.linen.repository.channel.unread.{ChannelLoaderEvent, UnreadChannelLoader}
+import ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.linen.modern.display.settings.MyChannelSubscriptionChanged
 import x7c1.linen.modern.init.settings.my.ChannelCreated
 import x7c1.linen.modern.init.settings.preset.PresetChannelSubscriptionChanged
+import x7c1.linen.repository.channel.unread.{ChannelLoaderEvent, UnreadChannelLoader}
 import x7c1.wheat.macros.intent.LocalBroadcastListener
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask

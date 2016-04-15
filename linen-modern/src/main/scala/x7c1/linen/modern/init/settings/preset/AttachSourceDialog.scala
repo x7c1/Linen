@@ -10,19 +10,19 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.{Button, CompoundButton}
+import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.{ChannelSourceMapKey, ChannelSourceMapParts}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
-import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.database.{ChannelSourceMapKey, ChannelSourceMapParts}
-import x7c1.linen.modern.accessor.setting.{ChannelToAttach, ChannelsToAttachAccessor}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
-import x7c1.linen.modern.init.updater.ThrowableFormatter.format
-import x7c1.linen.modern.struct.Date
+import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor}
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 import scala.collection.mutable
 
@@ -42,7 +42,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 
   lazy val args = getTypedArguments
 
-  private lazy val helper = new LinenOpenHelper(getActivity)
+  private lazy val helper = new DatabaseHelper(getActivity)
 
   private lazy val layout = {
     val factory = args.attachLayoutFactory create getActivity

@@ -3,11 +3,11 @@ package x7c1.linen.modern.init.settings.preset
 import android.app.Activity
 import android.support.v4.app.Fragment
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.setting.{PresetChannelAccessorFactory, PresetChannelsAccessor}
+import x7c1.linen.repository.channel.preset.{PresetChannelAccessorFactory, PresetChannelsAccessor}
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.logger.Log
 
@@ -22,13 +22,13 @@ trait PresetFragment { self: Fragment =>
 
   protected def accessorFactory: PresetChannelAccessorFactory
 
-  protected lazy val helper = new LinenOpenHelper(getContext)
+  protected lazy val helper = new DatabaseHelper(getContext)
 
   protected lazy val presetsAccessor = {
     accessorFactory.create(args.accountId, helper) match {
       case Right(accessor) => Some(accessor)
       case Left(error) =>
-        Log error error.toString
+        Log error error.detail
         None
     }
   }

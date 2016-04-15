@@ -20,7 +20,6 @@ object LinenBuild extends Build with LinenSettings {
     logLevel in assembly := Level.Error
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
-  lazy val scalaz = "org.scalaz" %% "scalaz-concurrent" % "7.1.5"
 
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
@@ -33,7 +32,6 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
-    settings(libraryDependencies += scalaz).
     settings(
       unmanagedJars in Compile ++= androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
@@ -55,6 +53,25 @@ object LinenBuild extends Build with LinenSettings {
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-modern`, `wheat-ancient`)
+
+  lazy val `linen-repository` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    settings(libraryDependencies ++= Seq(
+      "com.novocode" % "junit-interface" % "0.11" % Test,
+      "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
+      "org.robolectric" % "android-all" % "5.1.1_r9-robolectric-1" % Test,
+      "junit" % "junit" % "4.12" % Test,
+      "org.robolectric" % "robolectric" % "3.0" % Test
+    )).
+    settings(
+
+      // not work?
+      // javaOptions in (Test, run) += "-Djava.awt.headless=true",
+
+      fork in Test := true
+    ).
+    dependsOn(`wheat-modern`)
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
@@ -79,7 +96,9 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-lore`, `wheat-modern`, `linen-pickle`)
+    dependsOn(`linen-glue`, `wheat-lore`, `linen-pickle`,
+      `linen-repository` % "compile->compile;test->test"
+    )
 
   lazy val `wheat-build` = project.
     settings(
@@ -144,7 +163,6 @@ trait LinenSettings {
 
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
     val ignore = (path: String) =>
-      (path startsWith "scalaz") ||
       (path startsWith "org/jdom") || (path startsWith "JDOMAbout") ||
       (path startsWith "com/google/code/rome") || (path startsWith "META-INF") ||
       (path startsWith "x7c1/linen/glue") ||

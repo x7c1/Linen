@@ -3,19 +3,19 @@ package x7c1.linen.modern.init.unread
 import android.app.Activity
 import android.graphics.Point
 import android.support.v7.widget.RecyclerView
-import android.util.TypedValue
-import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.KeyEvent
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
-import x7c1.linen.modern.accessor.LinenOpenHelper
-import x7c1.linen.modern.accessor.preset.{ClientAccount, ClientAccountSetup, PresetAccount}
-import x7c1.linen.modern.accessor.unread.{EntryAccessor, EntryKind, FooterKind, RawSourceAccessor, SourceKind, UnreadItemAccessor, UnreadSourceAccessor}
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
-import x7c1.linen.modern.struct.{UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.account.ClientAccount
+import x7c1.linen.repository.account.setup.ClientAccountSetup
+import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, FooterKind, SourceKind}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.resource.ViewHolderProviders
+import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -48,7 +48,7 @@ class UnreadItemsDelegatee(
         false
     }
   }
-  protected lazy val helper = new LinenOpenHelper(activity)
+  protected lazy val helper = new DatabaseHelper(activity)
 
   protected lazy val reader = new UnreadChannelsReader(
     client = clientAccount,
@@ -98,35 +98,23 @@ class UnreadItemsDelegatee(
   lazy val clientAccount: Option[ClientAccount] = setupClientAccount()
 
   def setupClientAccount(): Option[ClientAccount] = {
-
-    // using preset account temporally to display channels
-    val tmp = helper.readable.find[PresetAccount]() match {
-      case Left(error) => None
-      case Right(None) => None
-      case Right(Some(account)) => Some(ClientAccount(account.accountId))
-    }
-
-    val account = ClientAccountSetup(helper).findOrCreate() match {
+    ClientAccountSetup(helper).findOrCreate() match {
       case Left(error) =>
         Log error error.toString
         None
       case Right(account) =>
         Some(account)
     }
-//    tmp orElse account
-    account
   }
-  def dipToPixel(dip: Int): Int = {
-    val metrics = activity.getResources.getDisplayMetrics
-    TypedValue.applyDimension(COMPLEX_UNIT_DIP, dip, metrics).toInt
+  def footerHeightOf(recyclerView: RecyclerView) = {
+    recyclerView.getHeight - converter.dipToPixel(10)
   }
-  def footerHeightOf(recyclerView: RecyclerView, accessor: UnreadItemAccessor) = {
-    recyclerView.getHeight - dipToPixel(10)
-  }
+  lazy val converter = MetricsConverter(activity)
+
   lazy val widthWithMargin: Int = {
     val radius = 20
     val margin = 10
-    displaySize.x - dipToPixel(margin + radius)
+    displaySize.x - converter.dipToPixel(margin + radius)
   }
   lazy val displaySize: Point = {
     val display = activity.getWindowManager.getDefaultDisplay

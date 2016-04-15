@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
+import x7c1.linen.database.control.{DatabaseHelper, LinenDatabase}
 import x7c1.linen.glue.res.layout.DevCreateRecordsLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.modern.accessor.{LinenOpenHelper, LinenDatabase}
 import x7c1.linen.modern.init.updater.{UpdaterMethods, UpdaterServiceDelegatee}
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
@@ -23,7 +23,7 @@ class CreateRecordsDelegatee (
       Log info s"${intent.getExtras}"
     }
   }
-  private lazy val helper = new LinenOpenHelper(activity)
+  private lazy val helper = new DatabaseHelper(activity)
 
   def getBroadcastManager = LocalBroadcastManager.getInstance(activity)
 
