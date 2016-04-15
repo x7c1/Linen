@@ -29,7 +29,7 @@ class PresetChannelSetup private (helper: DatabaseHelper, account: PresetAccount
         name = piece.name
       )
     }
- }
+}
 
 object PresetChannelSetup {
   def apply(helper: DatabaseHelper, account: PresetAccount): PresetChannelSetup = {
