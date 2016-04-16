@@ -70,7 +70,7 @@
         android:layout_height="45dp"
         android:layout_below="@id/border"
         android:layout_alignParentEnd="true"
-        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingEnd="12dp"
         android:paddingStart="0dp"
         />
 

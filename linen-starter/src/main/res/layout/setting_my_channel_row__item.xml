@@ -57,9 +57,9 @@
         android:layout_below="@id/border"
         android:layout_alignParentEnd="true"
         android:paddingTop="@dimen/setting_channels_row_padding"
-        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingEnd="12dp"
         android:paddingBottom="@dimen/setting_channels_row_padding"
-        android:paddingStart="5dp"
+        android:paddingStart="4dp"
         />
 
     <TextView
