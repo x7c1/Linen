@@ -28,7 +28,14 @@ class SourceRowAdapter (
   override def onBindViewHolder(holder: SettingChannelSourcesRow, position: Int): Unit = {
     accessor findAt position foreach { source =>
       holder.title.text = source.title
+
+      if (source.description.isEmpty){
+        holder.description setVisibility View.GONE
+      } else {
+        holder.description setVisibility View.VISIBLE
+      }
       holder.description.text = source.description
+
       holder.menu onClick { view =>
         onMenuSelected apply SourceMenuSelected(
           targetView = view,

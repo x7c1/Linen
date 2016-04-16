@@ -29,7 +29,14 @@ class PresetsChannelsAdapter(
   override def onBindViewHolder(holder: SettingPresetChannelRow, position: Int) = {
     accessor.findAt(position) foreach { channel =>
       holder.name.text = channel.name
+
+      if (channel.description.isEmpty){
+        holder.description setVisibility View.GONE
+      } else {
+        holder.description setVisibility View.VISIBLE
+      }
       holder.description.text = channel.description
+
       holder.menu onClick { view =>
         onMenuSelected onMenuSelected MenuSelected(view, channel)
       }

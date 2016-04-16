@@ -1,7 +1,7 @@
 package x7c1.linen.modern.display.settings
 
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.ViewGroup
+import android.view.{View, ViewGroup}
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
 import x7c1.linen.modern.init.settings.preset.{MenuSelected, OnMenuSelectedListener}
 import x7c1.linen.repository.account.AccountIdentifiable
@@ -26,7 +26,14 @@ class ChannelRowAdapter(
     delegatee.bindViewHolder(holder, position){
       case (holder: SettingMyChannelRowItem, channel: MyChannel) =>
         holder.name.text = channel.name
+
+        if (channel.description.isEmpty){
+          holder.description setVisibility View.GONE
+        } else {
+          holder.description setVisibility View.VISIBLE
+        }
         holder.description.text = channel.description
+
         holder.menu onClick { view =>
           onMenuSelected onMenuSelected MenuSelected(view, channel)
         }
