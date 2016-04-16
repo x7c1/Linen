@@ -3,6 +3,7 @@ package x7c1.linen.modern.display.settings
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
+import x7c1.linen.modern.init.settings.preset.{MenuSelected, OnMenuSelectedListener}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -12,6 +13,7 @@ class ChannelRowAdapter(
   accountId: Long,
   delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
+  onMenuSelected: OnMenuSelectedListener,
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends Adapter[SettingMyChannelRow]{
 
@@ -25,6 +27,9 @@ class ChannelRowAdapter(
       case (holder: SettingMyChannelRowItem, channel: MyChannel) =>
         holder.name.text = channel.name
         holder.description.text = channel.description
+        holder.menu onClick { view =>
+          onMenuSelected onMenuSelected MenuSelected(view, channel)
+        }
         holder.sources onClick { _ =>
           onSourcesSelected apply ChannelSourcesSelected(
             accountId = accountId,

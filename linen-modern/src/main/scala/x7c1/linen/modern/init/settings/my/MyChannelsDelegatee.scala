@@ -9,7 +9,9 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
+import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
+import x7c1.linen.modern.init.settings.preset.OnMenuForSelected
 import x7c1.linen.repository.account.{AccountIdentifiable, ClientAccount}
 import x7c1.linen.repository.channel.my.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
@@ -22,7 +24,7 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 class MyChannelsDelegatee (
-  activity: FragmentActivity with ActivityControl,
+  activity: FragmentActivity with ActivityControl with ServiceControl,
   layout: SettingMyChannelsLayout,
   dialogFactory: ContextualFactory[AlertDialog.Builder],
   inputLayoutFactory: ViewHolderProviderFactory[SettingMyChannelCreate],
@@ -75,6 +77,7 @@ class MyChannelsDelegatee (
       accountId = account.accountId,
       delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
+      onMenuSelected = new OnMenuForSelected(activity, account.accountId),
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
           context = activity,
