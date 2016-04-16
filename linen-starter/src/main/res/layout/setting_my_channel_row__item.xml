@@ -10,11 +10,12 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/setting_channels_row_padding"
+    android:paddingTop="12dp"
     >
 
     <TextView
         android:id="@+id/setting_my_channel_row__item__name"
+        android:paddingTop="4dp"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:layout_width="match_parent"
@@ -26,8 +27,10 @@
 
     <TextView
         android:id="@+id/setting_my_channel_row__item__description"
-        android:paddingStart="@dimen/setting_channels_row_padding"
+        android:paddingTop="4dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingBottom="4dp"
+        android:paddingStart="@dimen/setting_channels_row_padding"
         android:layout_below="@id/setting_my_channel_row__item__name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
