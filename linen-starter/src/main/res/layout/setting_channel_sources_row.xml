@@ -47,7 +47,7 @@
         android:layout_below="@id/setting_channel_sources_row__title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/setting_channels_row_padding"
+        android:layout_marginBottom="12dp"
         android:textSize="15sp"
         android:textColor="@color/text_secondary"
         android:lineSpacingExtra="4dp"
