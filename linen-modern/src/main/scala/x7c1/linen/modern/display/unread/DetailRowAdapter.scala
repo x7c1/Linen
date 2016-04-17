@@ -1,8 +1,6 @@
 package x7c1.linen.modern.display.unread
 
 import android.support.v7.widget.RecyclerView.Adapter
-import android.text.Html
-import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
 import x7c1.linen.modern.init.unread.DetailListProviders
@@ -27,8 +25,7 @@ class DetailRowAdapter(
     entryAccessor.bindViewHolder(holder, position){
       case (row: UnreadDetailRowEntry, EntryContent(entry)) =>
         row.title.text = entry.fullTitle
-        row.content.text = Html.fromHtml(entry.fullContent)
-        row.content setMovementMethod LinkMovementMethod.getInstance()
+        row.content setHtml entry.fullContent
 
         row.itemView onClick { _ =>
           val event = DetailSelectedEvent(position, entry)
@@ -39,6 +36,7 @@ class DetailRowAdapter(
         }
       case (row: UnreadDetailRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
+
       case (row: UnreadDetailRowFooter, _) =>
         row.itemView updateLayoutParams { _.height = footerHeight }
         Log info s"footer"

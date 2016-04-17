@@ -1,7 +1,10 @@
 package x7c1.wheat.modern.decorator
 
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.TextView
+import x7c1.wheat.modern.resource.EmptyDrawableGetter
 
 class RichTextView[A <: TextView](view: A){
 
@@ -17,5 +20,15 @@ class RichTextView[A <: TextView](view: A){
       }
     }
     view setText x
+  }
+
+  def setHtml(source: String): Unit = {
+    val html = Html.fromHtml(
+      source,
+      EmptyDrawableGetter/* imageGetter */,
+      null/* tagHandler */
+    )
+    view setText html
+    view setMovementMethod LinkMovementMethod.getInstance()
   }
 }
