@@ -13,20 +13,20 @@ public class UnreadDetailRowEntry extends UnreadDetailRow {
 
     public final TextView title;
     public final TextView content;
-    public final TextView createdAt;
+    public final TextView later;
     public final TextView visit;
 
     public UnreadDetailRowEntry(
         View itemView,
         TextView title,
         TextView content,
-        TextView createdAt,
+        TextView later,
         TextView visit
     ){
         super(itemView);
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
+        this.later = later;
         this.visit = visit;
     }
 }

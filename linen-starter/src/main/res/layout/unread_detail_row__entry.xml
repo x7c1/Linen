@@ -44,38 +44,12 @@
             android:lineSpacingMultiplier="1.2"
             />
 
-        <TextView
-            android:id="@+id/unread_detail_row__entry__created_at"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/unread_detail_row__entry__content"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/text_tertiary"
-            android:textSize="13sp"
-            android:fontFamily="sans-serif-condensed"
-            />
-
-        <TextView
-            android:id="@+id/unread_detail_row__entry__author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/unread_detail_row__entry__content"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:layout_toStartOf="@id/unread_detail_row__entry__created_at"
-            android:textColor="@color/text_tertiary"
-            android:textSize="13sp"
-            android:fontFamily="sans-serif-condensed"
-            />
-
         <View
             android:id="@+id/border2"
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_below="@id/unread_detail_row__entry__created_at"
+            android:layout_below="@id/unread_detail_row__entry__content"
+            android:layout_marginTop="12dp"
             android:background="@color/text_tertiary"
             />
 

@@ -29,7 +29,7 @@ class DetailRowAdapter(
         row.title.text = entry.fullTitle
         row.content.text = Html.fromHtml(entry.fullContent)
         row.content setMovementMethod LinkMovementMethod.getInstance()
-        row.createdAt.text = entry.createdAt.format
+
         row.itemView onClick { _ =>
           val event = DetailSelectedEvent(position, entry)
           selectedListener onEntryDetailSelected event
