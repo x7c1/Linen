@@ -46,13 +46,29 @@
 
         <TextView
             android:id="@+id/unread_detail_row__entry__created_at"
-            android:textSize="12sp"
-            android:textAlignment="textEnd"
             android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/unread_detail_row__entry__content"
+            android:layout_alignParentEnd="true"
             android:textColor="@color/text_tertiary"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-condensed"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__entry__author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/unread_detail_row__entry__content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toStartOf="@id/unread_detail_row__entry__created_at"
+            android:textColor="@color/text_tertiary"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-condensed"
             />
 
         <View
@@ -64,18 +80,58 @@
             />
 
         <TextView
+            android:id="@+id/dummy_to_position_center"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-condensed"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableStart="@drawable/ic_wrap_text_black_24dp"
+            android:drawablePadding="3dp"
+            android:text="LATER"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__entry__later"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_toStartOf="@id/dummy_to_position_center"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableStart="@drawable/ic_share_black_24dp"
+            android:drawablePadding="3dp"
+            android:text="SHARE"
+            />
+
+        <TextView
             android:id="@+id/unread_detail_row__entry__visit"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_below="@id/border2"
-            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/dummy_to_position_center"
+            android:layout_marginStart="12dp"
             android:gravity="center_vertical"
             android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-condensed"
             android:textSize="13sp"
             android:clickable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableEnd="@drawable/ic_call_made_24dp"
-            android:text="VISIT"
+            android:drawableStart="@drawable/ic_open_in_new_black_24dp"
+            android:drawablePadding="3dp"
+            android:text="OPEN"
             />
 
     </RelativeLayout>
