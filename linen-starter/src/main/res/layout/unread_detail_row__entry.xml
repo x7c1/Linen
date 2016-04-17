@@ -79,23 +79,12 @@
             android:background="@color/text_tertiary"
             />
 
-        <TextView
+        <View
             android:id="@+id/dummy_to_position_center"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_below="@id/border2"
             android:layout_centerInParent="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:textSize="13sp"
-            android:clickable="true"
-            android:gravity="center_vertical"
-            android:textColor="@color/text_secondary"
-            android:fontFamily="sans-serif-condensed"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableStart="@drawable/ic_wrap_text_black_24dp"
-            android:drawablePadding="3dp"
-            android:text="LATER"
             />
 
         <TextView
@@ -113,7 +102,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:drawableStart="@drawable/ic_share_black_24dp"
             android:drawablePadding="3dp"
-            android:text="SHARE"
+            android:text="LATER"
             />
 
         <TextView
