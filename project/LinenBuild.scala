@@ -33,6 +33,13 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
     settings(
+      resolvers += "Android ROME Feed Reader Repository" at
+        "https://android-rome-feed-reader.googlecode.com/svn/maven2/releases"
+    ).
+    settings(libraryDependencies ++= Seq(
+      "com.google.code.android-rome-feed-reader" % "android-rome-feed-reader" % "1.0.0-r2"
+    )).
+    settings(
       unmanagedJars in Compile ++= androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value
