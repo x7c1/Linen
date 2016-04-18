@@ -1,22 +1,17 @@
-package x7c1.linen.modern.init.updater
+package x7c1.linen.repository.crawler
 
 import java.lang.System.currentTimeMillis
 
-import android.app.Service
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.crawler.{LoadedSource, InspectedSource, SourceInspector}
-import x7c1.wheat.modern.formatter.ThrowableFormatter
-import ThrowableFormatter.format
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable
 
-class SourceUpdaterQueue(
-  service: Service with ServiceControl,
-  helper: DatabaseHelper){
+class SourceUpdaterQueue(helper: DatabaseHelper){
+  import Implicits._
 
   private lazy val inspector = SourceInspector(helper)
 
@@ -34,7 +29,6 @@ class SourceUpdaterQueue(
   }
   private def update(source: InspectedSource): Unit = {
     Log info s"[init] source:$source"
-    import x7c1.linen.modern.init.updater.LinenService.Implicits._
 
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start

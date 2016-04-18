@@ -3,7 +3,7 @@ package x7c1.linen.repository.crawler
 import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
-import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndFeed, SyndEntry}
+import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{EntryParts, SourceRecord}
@@ -20,6 +20,7 @@ object SourceInspector {
 }
 
 class SourceInspector private (helper: DatabaseHelper){
+  import Implicits._
 
   def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
     helper.readable.find[SourceRecord].by(sourceId) via {
@@ -30,7 +31,6 @@ class SourceInspector private (helper: DatabaseHelper){
 
   def loadSource(source: InspectedSource): Future[LoadedSource] = {
     import collection.JavaConverters._
-    import scala.concurrent.ExecutionContext.Implicits.global
 
     Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
       val entries = feed.getEntries.asScala map { case x: SyndEntry => x }

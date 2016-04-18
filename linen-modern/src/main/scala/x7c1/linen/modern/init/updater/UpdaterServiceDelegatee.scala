@@ -1,33 +1,23 @@
 package x7c1.linen.modern.init.updater
 
-import java.util.concurrent.Executors
-
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.crawler.SourceInspector
+import x7c1.linen.repository.crawler.{Implicits, SourceInspector, SourceUpdaterQueue}
 import x7c1.linen.repository.dummy.DummyFactory
 import x7c1.linen.repository.preset.PresetFactory
 import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
-import x7c1.wheat.modern.formatter.ThrowableFormatter
-import ThrowableFormatter.format
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.async
 
 import scala.concurrent.Future
 
-object LinenService {
-  object Implicits {
-    import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-    private lazy val pool = Executors.newCachedThreadPool()
-    implicit def executor: ExecutionContextExecutor = ExecutionContext fromExecutor pool
-  }
-}
 
 object UpdaterServiceDelegatee {
   val ActionTypeSample = "hoge"
@@ -35,7 +25,7 @@ object UpdaterServiceDelegatee {
 
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
   private lazy val helper = new DatabaseHelper(service)
-  private lazy val queue = new SourceUpdaterQueue(service, helper)
+  private lazy val queue = new SourceUpdaterQueue(helper)
 
   def onBind(intent: Intent): Option[IBinder] = {
     Log info "[init]"
@@ -59,6 +49,8 @@ class UpdaterMethods(
   helper: DatabaseHelper,
   queue: SourceUpdaterQueue,
   startId: Int){
+
+  import Implicits._
 
   def execute(intent: Intent) = IntentExpander findFrom intent match {
     case Left(e: ExtraNotFound) => Log error e.toString
@@ -84,7 +76,6 @@ class UpdaterMethods(
   def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"
 
-    import LinenService.Implicits._
     val inspector = SourceInspector(helper)
     val future = Future { inspector inspectSource sourceId } map {
       case Right(source) => queue enqueue source
