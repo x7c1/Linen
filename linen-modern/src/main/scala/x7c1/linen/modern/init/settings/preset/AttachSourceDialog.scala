@@ -116,53 +116,16 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
   private def onClickPositive(button: Button) = {
     Log info s"[init]"
 
-    channelsAccessor foreach update
+    channelsAccessor map {
+      MyChannelConnectionUpdater(helper, args.originalSourceId, _)
+    } foreach {
+      _ updateMapping selectedChannelMap
+    }
     dismiss()
   }
   private def onClickNegative(button: Button) = {
     Log info s"[init]"
     dismiss()
-  }
-  private def update(accessor: ChannelsToAttachAccessor): Unit ={
-    val selectedChannels = selectedChannelMap.collect {
-      case (id, attached) if attached => id
-    }.toSeq
-
-    val channelsToAttach = {
-      val attachedChannels = accessor.collectAttached
-      selectedChannels diff attachedChannels
-    }
-    val channelsToDetach = {
-      val unselectedChannels = accessor.collectAll diff selectedChannels
-      val detachedChannels = accessor.collectDetached
-      unselectedChannels diff detachedChannels
-    }
-    // todo: use transaction
-    channelsToAttach foreach { id =>
-      val parts = ChannelSourceMapParts(
-        channelId = id,
-        sourceId = args.originalSourceId,
-        createdAt = Date.current()
-      )
-      helper.writable.insert(parts).left foreach { e =>
-        Log error format(e){
-          s"[failed] attach source:${args.originalSourceId} to channel:$id"
-        }
-      }
-    }
-    channelsToDetach foreach { id =>
-      val key = ChannelSourceMapKey(
-        channelId = id,
-        sourceId = args.originalSourceId
-      )
-      helper.writable.delete(key).left foreach { e =>
-        Log error format(e){
-          s"[failed] detach source:${args.originalSourceId} from channel:$id"
-        }
-      }
-    }
-    Log info s"1-$channelsToAttach"
-    Log info s"2-$channelsToDetach"
   }
 }
 
