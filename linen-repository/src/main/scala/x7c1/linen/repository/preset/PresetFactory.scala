@@ -30,7 +30,7 @@ private case class SetupStarter(helper: DatabaseHelper)(set: PresetChannelSet){
       piece => ChannelSourceParts(
         url = piece.url,
         title = piece.title,
-        description = s"(not loaded yet)",
+        description = "",
         rating = 100
       )
     }

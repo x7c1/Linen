@@ -26,7 +26,7 @@ class OnSourceMenuSelected(
 ){
   def showMenu(event: SourceMenuSelected): Unit = {
     val menu = new PopupMenu(activity, event.targetView)
-    menu.getMenu.add(Menu.NONE, 123, 1, "Attached channels")
+    menu.getMenu.add(Menu.NONE, 123, 1, "Attached my channels")
     menu.getMenu.add(1, 234, 1, "Load now")
     menu setOnMenuItemClickListener new OnMenuItemClickListener {
       override def onMenuItemClick(item: MenuItem): Boolean = {
