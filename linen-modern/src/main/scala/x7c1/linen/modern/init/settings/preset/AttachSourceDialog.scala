@@ -10,16 +10,15 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelSourceMapKey, ChannelSourceMapParts}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
-import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor}
-import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor, MyChannelConnectionUpdater}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.decorator.CheckedState
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
@@ -80,7 +79,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
             providers = new SettingSourceAttachRowProviders(args.rowFactory create getContext),
             sequence = accessor
           ),
-          selectedChannelMap
+          CheckedState(selectedChannelMap)
         )
     }
     builder setView layout.itemView
@@ -169,7 +168,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 
 class AttachChannelsAdapter(
   delegatee: AdapterDelegatee[SettingSourceAttachRow, ChannelToAttach],
-  selectedMap: collection.mutable.Map[Long, Boolean]
+  state: CheckedState[Long]
 ) extends Adapter[SettingSourceAttachRow] {
 
   override def getItemCount: Int = delegatee.count
@@ -185,18 +184,8 @@ class AttachChannelsAdapter(
       case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.channelName
-
-        row.checked onCheckedChanged { event =>
-          if (event.isChecked) {
-            selectedMap(channel.channelId) = true
-          } else {
-            selectedMap remove channel.channelId
-          }
-        }
-        val isAttached = channel.isAttached ||
-          selectedMap.getOrElse(channel.channelId, false)
-
-        row.checked setChecked isAttached
+        row.checked bindTo state(channel.channelId, channel.isAttached)
     }
+
   }
 }

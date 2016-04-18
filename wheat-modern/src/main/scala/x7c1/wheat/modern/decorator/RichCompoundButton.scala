@@ -30,6 +30,13 @@ class RichCompoundButton[A <: CompoundButton](view: A){
       }
     }
   }
+  def bindTo[B](map: CheckedStateMap[B]): Unit = {
+    onCheckedChanged { event =>
+      if (event.isChecked) map.check()
+      else map.uncheck()
+    }
+    view setChecked map.isChecked
+  }
 }
 
 object RichCompoundButton {
@@ -37,4 +44,31 @@ object RichCompoundButton {
     view: A,
     isChecked: Boolean
   )
+}
+
+class CheckedStateMap[A](
+  map: collection.mutable.Map[A, Boolean],
+  key: A, default: => Boolean){
+
+  def check(): Unit = {
+    map(key) = true
+  }
+  def uncheck(): Unit = {
+    map remove key
+  }
+  def isChecked: Boolean = {
+    map.getOrElse(key, default)
+  }
+}
+
+class CheckedState[A] private (map: collection.mutable.Map[A, Boolean]){
+  def apply(key: A, default: => Boolean): CheckedStateMap[A] = {
+    new CheckedStateMap(map, key, default)
+  }
+}
+
+object CheckedState {
+  def apply[A](map: collection.mutable.Map[A, Boolean]): CheckedState[A] = {
+    new CheckedState[A](map)
+  }
 }
