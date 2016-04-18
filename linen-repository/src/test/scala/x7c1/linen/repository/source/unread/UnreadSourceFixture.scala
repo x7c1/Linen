@@ -40,18 +40,21 @@ class UnreadSourceFixture(helper: DatabaseHelper) {
   val Right(entryId1_1) = new SourceEntryUpdater(db, sourceId1) addEntry RetrievedEntry(
     title = "sample-entry1-1",
     content = "sample-content",
+    author = "sample-author",
     url = EntryUrl("http://sample-url"),
     createdAt = Date.current()
   )
   val Right(entryId1_2) = new SourceEntryUpdater(db, sourceId1) addEntry RetrievedEntry(
     title = "sample-entry1-2",
     content = "sample-content2",
+    author = "sample-author1-2",
     url = EntryUrl("http://sample-url2"),
     createdAt = Date.current()
   )
   val Right(entryId2_1) = new SourceEntryUpdater(db, sourceId2) addEntry RetrievedEntry(
     title = "sample-entry2-1",
     content = "sample-content2-1",
+    author = "sample-author2-1",
     url = EntryUrl("http://sample-url2-1"),
     createdAt = Date.current()
   )
@@ -60,6 +63,7 @@ class UnreadSourceFixture(helper: DatabaseHelper) {
 case class RetrievedEntry(
   title: String,
   content: String,
+  author: String,
   url: EntryUrl,
   createdAt: Date
 )
@@ -70,6 +74,7 @@ class SourceEntryUpdater(db: SQLiteDatabase, sourceId: Long){
       sourceId = sourceId,
       title = entry.title,
       content = entry.content,
+      author = entry.author,
       url = entry.url,
       createdAt = entry.createdAt
     )

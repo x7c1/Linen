@@ -103,6 +103,7 @@ object DummyFactory {
           sourceId = sourceId,
           title = s"$sourceId-$j entry title",
           content = s"$sourceId-$j entry content " + words(100,500),
+          author = s"author $sourceId-$j",
           url = EntryUrl(s"http://example.com/entry-$sourceId-$j"),
           createdAt = Date.current()
         )

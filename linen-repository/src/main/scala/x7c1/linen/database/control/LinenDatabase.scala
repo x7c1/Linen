@@ -3,7 +3,19 @@ package x7c1.linen.database.control
 object LinenDatabase {
 
   val name: String = "linen-db"
-  val version = 1
+
+  val version: Int = upgrades match {
+    case _ :+ last => last.version
+    case _ => 1
+  }
+  def upgradesFrom(oldVersion: Int): Seq[Upgrade] =
+    (upgrades foldLeft Seq[Upgrade]()){
+      case (queries, update) if oldVersion < update.version =>
+        queries :+ update
+      case (queries, _) =>
+        queries
+    }
+
   def defaults: Seq[String] = {
     val accounts = Seq(
       s"""CREATE TABLE IF NOT EXISTS accounts (
@@ -176,4 +188,11 @@ object LinenDatabase {
       sourceStatuses
     ).flatten
   }
+  private def upgrades = Seq(
+    Upgrade(20160418)(
+      "ALTER TABLE entries ADD COLUMN author TEXT NOT NULL DEFAULT ''"
+    )
+  )
 }
+
+case class Upgrade(version: Int)(val queries: String*)

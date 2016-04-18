@@ -11,6 +11,7 @@ trait EntryRecord extends TypedFields {
   def source_id: Long
   def title: String
   def content: String
+  def author: String
   def url: String
   def created_at: Int --> Date
 }
@@ -22,6 +23,7 @@ case class EntryParts(
   sourceId: Long,
   title: String,
   content: String,
+  author: String,
   url: EntryUrl,
   createdAt: Date
 )
@@ -34,9 +36,10 @@ object EntryParts {
         column.source_id -> target.sourceId,
         column.title -> target.title,
         column.content -> target.content,
+        column.author -> target.author,
         column.url -> target.url.raw,
         column.created_at -> target.createdAt
-        )
+      )
     }
   }
 }

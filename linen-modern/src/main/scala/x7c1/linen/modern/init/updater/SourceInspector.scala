@@ -65,6 +65,7 @@ class SourceInspector private (helper: DatabaseHelper){
       sourceId = sourceId,
       title = Option(entry.getTitle) getOrElse "",
       content = Option(entry.getDescription.getValue) getOrElse "",
+      author = Option(entry.getAuthor) getOrElse "",
       url = EntryUrl(url),
       createdAt = Date(published)
     ) catch {

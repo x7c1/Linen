@@ -29,6 +29,7 @@ class EntryPartsTest extends JUnitSuiteLike {
       sourceId = sourceId,
       title = "sample-title",
       content = "sample-content",
+      author = "sample-author",
       url = url,
       createdAt = Date.current()
     )
@@ -44,6 +45,7 @@ class EntryPartsTest extends JUnitSuiteLike {
       sourceId = sourceId,
       title = "sample-title-2",
       content = "sample-content-2",
+      author = "sample-author-2",
       url = url,
       createdAt = Date.current()
     )

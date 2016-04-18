@@ -17,6 +17,18 @@ class DatabaseHelper(context: Context)
   }
 
   override def onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int): Unit = {
+    Log info s"[init] $oldVersion -> $newVersion"
+
+    val upgrades = LinenDatabase upgradesFrom oldVersion
+    val procedure = for {
+      upgrade <- upgrades.view
+      _ = Log info s"version:${upgrade.version}"
+      query <- upgrade.queries
+    } yield {
+      Log info s"query: $query"
+      db execSQL query
+    }
+    procedure.force
   }
 
   override def onCreate(db: SQLiteDatabase): Unit = {
@@ -25,5 +37,6 @@ class DatabaseHelper(context: Context)
       Log info s"query: $query"
       db execSQL query
     }
+    onUpgrade(db, 0, LinenDatabase.version)
   }
 }

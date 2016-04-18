@@ -79,7 +79,7 @@ class SourceUpdaterQueue(
           case Left(e) =>
             Log error s"$index,${entry.url.host},${e.getMessage}"
           case Right(b) =>
-            Log debug s"$index,${entry.url.host},${entry.title}"
+            Log debug s"$index,${entry.url.host},${entry.title} (by ${entry.author})"
         }
 
 //        notifier.notifyProgress(index)
