@@ -1,6 +1,6 @@
-package x7c1.linen.modern.init.updater
+package x7c1.linen.repository.crawler
 
-import x7c1.linen.database.struct.{SourceRecord, EntryParts}
+import x7c1.linen.database.struct.{EntryParts, SourceRecord}
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.database.Updatable
 

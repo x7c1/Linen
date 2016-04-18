@@ -78,7 +78,7 @@ object LinenBuild extends Build with LinenSettings {
 
       fork in Test := true
     ).
-    dependsOn(`wheat-modern`)
+    dependsOn(`wheat-modern`, `linen-pickle`)
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
@@ -103,7 +103,7 @@ object LinenBuild extends Build with LinenSettings {
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-lore`, `linen-pickle`,
+    dependsOn(`linen-glue`, `wheat-lore`,
       `linen-repository` % "compile->compile;test->test"
     )
 

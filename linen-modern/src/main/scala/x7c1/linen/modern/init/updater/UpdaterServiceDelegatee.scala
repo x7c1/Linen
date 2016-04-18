@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
+import x7c1.linen.repository.crawler.SourceInspector
 import x7c1.linen.repository.dummy.DummyFactory
 import x7c1.linen.repository.preset.PresetFactory
 import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory

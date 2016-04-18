@@ -1,12 +1,12 @@
-package x7c1.linen.modern.init.updater
+package x7c1.linen.repository.crawler
 
 import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
-import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
+import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndFeed, SyndEntry}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{SourceRecord, EntryParts}
+import x7c1.linen.database.struct.{EntryParts, SourceRecord}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.modern.callback.CallbackTask
@@ -29,9 +29,8 @@ class SourceInspector private (helper: DatabaseHelper){
     }
 
   def loadSource(source: InspectedSource): Future[LoadedSource] = {
-    import LinenService.Implicits.executor
-
-    import scala.collection.JavaConverters._
+    import collection.JavaConverters._
+    import scala.concurrent.ExecutionContext.Implicits.global
 
     Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
       val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
