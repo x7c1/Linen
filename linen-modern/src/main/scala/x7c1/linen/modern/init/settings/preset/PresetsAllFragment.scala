@@ -68,9 +68,3 @@ class SubscriptionChangedUpdater(
 trait OnChannelSubscribedListener { self =>
   def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit
 }
-
-class OnMenuForAll extends OnMenuSelectedListener {
-  override def onMenuSelected(e: MenuSelected) = {
-    Log info s"[init]"
-  }
-}
