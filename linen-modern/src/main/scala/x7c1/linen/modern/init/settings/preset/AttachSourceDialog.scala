@@ -8,8 +8,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import android.widget.CompoundButton.OnCheckedChangeListener
-import android.widget.{Button, CompoundButton}
+import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelSourceMapKey, ChannelSourceMapParts}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
@@ -186,15 +185,14 @@ class AttachChannelsAdapter(
       case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.channelName
-        row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {
-          override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean): Unit = {
-            if (isChecked) {
-              selectedMap(channel.channelId) = true
-            } else {
-              selectedMap remove channel.channelId
-            }
+
+        row.checked onCheckedChanged { event =>
+          if (event.isChecked) {
+            selectedMap(channel.channelId) = true
+          } else {
+            selectedMap remove channel.channelId
           }
-        })
+        }
         val isAttached = channel.isAttached ||
           selectedMap.getOrElse(channel.channelId, false)
 
