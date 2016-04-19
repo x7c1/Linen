@@ -6,6 +6,7 @@ import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, Unread
 import x7c1.linen.modern.init.unread.DetailListProviders
 import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, SourceHeadlineContent, UnreadDetail, UnreadEntry}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.action.SiteVisitable
 import x7c1.wheat.modern.decorator.Imports._
 
 
@@ -13,6 +14,7 @@ class DetailRowAdapter(
   entryAccessor: EntryAccessor[UnreadDetail],
   selectedListener: OnDetailSelectedListener,
   visitSelectedListener: OnEntryVisitListener[UnreadDetail],
+  laterSelectedListener: OnLaterSelectedListener,
   providers: DetailListProviders,
   footerHeight: => Int ) extends Adapter[UnreadDetailRow] {
 
@@ -33,6 +35,10 @@ class DetailRowAdapter(
         }
         row.visit onClick { _ =>
           visitSelectedListener onVisit entry
+        }
+        row.later onClick { _ =>
+          val event = LaterSelectedEvent(entry)
+          laterSelectedListener onLaterSelected event
         }
       case (row: UnreadDetailRowSource, source: SourceHeadlineContent) =>
         row.title.text = source.title
@@ -58,3 +64,9 @@ case class DetailSelectedEvent(position: Int, entry: UnreadDetail){
 trait OnEntryVisitListener[A <: UnreadEntry]{
   def onVisit(target: A): Unit
 }
+
+trait OnLaterSelectedListener {
+  def onLaterSelected[A: SiteVisitable](event: LaterSelectedEvent[A])
+}
+
+case class LaterSelectedEvent[A: SiteVisitable](target: A)

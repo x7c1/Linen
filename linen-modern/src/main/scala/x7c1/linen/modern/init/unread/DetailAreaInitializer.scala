@@ -4,10 +4,10 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedObserver, EntryDetailFocusedObserver, EntryDetailSkipStoppedObserver}
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
-import x7c1.linen.modern.display.unread.{DetailRowAdapter, OnEntryVisitListener, PaneDragDetector}
+import x7c1.linen.modern.display.unread.{DetailRowAdapter, LaterSelectedEvent, OnEntryVisitListener, OnLaterSelectedListener, PaneDragDetector}
 import x7c1.linen.repository.entry.unread.UnreadEntry
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.action.SiteVisitor
+import x7c1.wheat.modern.action.{PocketSender, SiteVisitable, SiteVisitor}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -25,6 +25,7 @@ trait DetailAreaInitializer {
       accessors.entryDetail,
       new DetailSelectedObserver(actions),
       new OnEntryVisit(activity),
+      new OnEntryLater(activity),
       unreadRowProviders.forDetailArea,
       footerHeightOf(layout.entryDetailList)
     )
@@ -56,5 +57,11 @@ class OnEntryVisit[A <: UnreadEntry](context: Context) extends OnEntryVisitListe
   override def onVisit(target: A): Unit = {
     Log info target.url
     SiteVisitor(context) open target
+  }
+}
+
+class OnEntryLater(context: Context) extends OnLaterSelectedListener {
+  override def onLaterSelected[A: SiteVisitable](event: LaterSelectedEvent[A]): Unit = {
+    PocketSender(context) save event.target
   }
 }
