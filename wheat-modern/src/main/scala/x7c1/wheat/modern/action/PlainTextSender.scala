@@ -36,3 +36,16 @@ object PocketSender {
     new PocketSender(context)
   }
 }
+
+class TweetComposer (context: Context){
+  def compose(message: String): Unit = {
+    val sender = PlainTextSender(context, "com.twitter.android")
+    sender share message
+  }
+}
+
+object TweetComposer {
+  def apply(context: Context): TweetComposer = {
+    new TweetComposer(context)
+  }
+}
