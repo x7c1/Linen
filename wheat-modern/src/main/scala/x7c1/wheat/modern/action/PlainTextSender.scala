@@ -3,7 +3,7 @@ package x7c1.wheat.modern.action
 import android.content.{Context, Intent}
 import x7c1.wheat.macros.logger.Log
 
-class PlainTextSender (context: Context, packageName: String){
+class PlainTextSender private (context: Context, packageName: String){
 
   def share(text: String): Unit = {
     ActivityIntentFactory(context) createFor packageName match {
@@ -23,7 +23,7 @@ object PlainTextSender {
   }
 }
 
-class PocketSender (context: Context){
+class PocketSender private (context: Context){
   def save[A: SiteVisitable](target: A): Unit = {
     val uri = implicitly[SiteVisitable[A]].targetUri(target)
     val sender = PlainTextSender(context, "com.ideashower.readitlater.pro")
@@ -37,7 +37,7 @@ object PocketSender {
   }
 }
 
-class TweetComposer (context: Context){
+class TweetComposer private (context: Context){
   def compose(message: String): Unit = {
     val sender = PlainTextSender(context, "com.twitter.android")
     sender share message
