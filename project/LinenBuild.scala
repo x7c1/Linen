@@ -88,26 +88,6 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
-    settings(libraryDependencies ++= Seq(
-      "com.novocode" % "junit-interface" % "0.11" % Test,
-      "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
-      "org.robolectric" % "android-all" % "5.1.1_r9-robolectric-1" % Test,
-      "junit" % "junit" % "4.12" % Test,
-      "org.robolectric" % "robolectric" % "3.0" % Test
-    )).
-    settings(
-
-      // not work?
-      // javaOptions in (Test, run) += "-Djava.awt.headless=true",
-
-      fork in Test := true
-    ).
-    settings(
-      assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
-      assemblyOutputPath in assembly := linenJarPath.value,
-      assemblyExcludedJars in assembly := androidJars.value,
-      assemblyMergeStrategy in assembly := discardTargets.value
-    ).
     dependsOn(`linen-scene`)
 
   lazy val `wheat-build` = project.
