@@ -27,7 +27,7 @@ class DetailRowAdapter(
     entryAccessor.bindViewHolder(holder, position){
       case (row: UnreadDetailRowEntry, EntryContent(entry)) =>
         row.title.text = entry.fullTitle
-        row.content setHtml entry.fullContent
+        row.content setHtmlWithoutImage entry.fullContent
 
         row.itemView onClick { _ =>
           val event = DetailSelectedEvent(position, entry)

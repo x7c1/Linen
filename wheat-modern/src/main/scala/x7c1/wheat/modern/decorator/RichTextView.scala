@@ -22,7 +22,7 @@ class RichTextView[A <: TextView](view: A){
     view setText x
   }
 
-  def setHtml(source: String): Unit = {
+  def setHtmlWithoutImage(source: String): Unit = {
     val html = Html.fromHtml(
       source,
       EmptyDrawableGetter/* imageGetter */,
