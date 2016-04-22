@@ -11,10 +11,10 @@ import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
-import x7c1.linen.modern.init.settings.preset.OnMenuForSelected
 import x7c1.linen.repository.account.{AccountIdentifiable, ClientAccount}
 import x7c1.linen.repository.channel.my.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
+import x7c1.linen.scene.channel.menu.OnChannelMenuSelected
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -77,7 +77,7 @@ class MyChannelsDelegatee (
       accountId = account.accountId,
       delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
-      onMenuSelected = new OnMenuForSelected(activity, account.accountId),
+      onMenuSelected = new OnChannelMenuSelected(activity, account.accountId),
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
           context = activity,

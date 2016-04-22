@@ -7,7 +7,7 @@ import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.display.settings.SourceMenuSelected
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog
-import x7c1.linen.modern.init.updater.UpdaterMethods
+import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.FragmentFactory
@@ -36,7 +36,7 @@ class OnSourceMenuSelected(
       toAttach,
       toLoad
     )
-    PopupMenuBox(activity, event.targetView, items).show()
+    PopupMenuBox(activity, event.targetView).show(items:_*)
   }
   def createAttachSourceDialog(event: SourceMenuSelected) = {
     FragmentFactory.create[AttachSourceDialog] by

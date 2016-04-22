@@ -27,14 +27,13 @@ class PopupMenuBox private (
         pairs collectFirst {
           case (item, index) if menuItem.getItemId == index => item
         } match {
-          case Some(item) => item.onTapped.onItemTapped(MenuItemTappedEvent())
+          case Some(item) => item.onTapped onItemTapped MenuItemTappedEvent()
           case None => Log error s"unknown menu-id:${menuItem.getItemId}"
         }
         true
       }
     }
 }
-
 object PopupMenuBox {
   def apply(
     context: Context,
@@ -43,8 +42,15 @@ object PopupMenuBox {
 
     new PopupMenuBox(context, view, items)
   }
+  def apply(context: Context, view: View): MenuHolder = {
+    new MenuHolder(context, view)
+  }
+  class MenuHolder (context: Context, view: View){
+    def show(items: PopupMenuItem*): Unit = {
+      new PopupMenuBox(context, view, items).show()
+    }
+  }
 }
-
 case class PopupMenuItem(
   title: String,
   onTapped: OnPopupMenuItemTapped

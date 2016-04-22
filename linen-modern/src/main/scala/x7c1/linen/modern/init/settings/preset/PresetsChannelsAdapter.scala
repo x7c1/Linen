@@ -2,14 +2,14 @@ package x7c1.linen.modern.init.settings.preset
 
 import android.app.Activity
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.{View, ViewGroup}
+import android.view.ViewGroup
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.ChannelSourcesSelected
-import x7c1.linen.repository.channel.my.MyChannel
-import x7c1.linen.repository.channel.preset.{PresetChannelsAccessor, SettingPresetChannel}
+import x7c1.linen.repository.channel.preset.PresetChannelsAccessor
+import x7c1.linen.scene.channel.menu.{MenuSelected, OnChannelMenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -52,22 +52,6 @@ class PresetsChannelsAdapter(
   }
 }
 
-class MenuSelected private (
-  val targetView: View, val channelId: Long)
-
-object MenuSelected {
-  def apply(targetView: View, channel: SettingPresetChannel): MenuSelected = {
-    new MenuSelected(targetView, channel.channelId)
-  }
-  def apply(targetView: View, channel: MyChannel): MenuSelected = {
-    new MenuSelected(targetView, channel.channelId)
-  }
-}
-
-trait OnMenuSelectedListener {
-  def onMenuSelected(e: MenuSelected): Unit
-}
-
 class PresetsChannelsAdapterFactory(
   activity: Activity with ActivityControl with ServiceControl,
   factory: ViewHolderProviderFactory[SettingPresetChannelRow],
@@ -78,7 +62,7 @@ class PresetsChannelsAdapterFactory(
     new PresetsChannelsAdapter(
       listener = new SubscriptionChangedUpdater(accountId, activity, helper),
       onSourceSelected = new OnSourcesSelected(activity).transitToSources,
-      onMenuSelected = new OnMenuForSelected(activity, accountId),
+      onMenuSelected = new OnChannelMenuSelected(activity, accountId),
       accessor = accessor,
       provider = factory create activity,
       location = location
