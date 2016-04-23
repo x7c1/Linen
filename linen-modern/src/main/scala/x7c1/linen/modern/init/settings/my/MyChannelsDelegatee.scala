@@ -77,7 +77,7 @@ class MyChannelsDelegatee (
       accountId = account.accountId,
       delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
-      onMenuSelected = new OnChannelMenuSelected(activity, account.accountId),
+      onMenuSelected = OnChannelMenuSelected.forMyChannel(activity, account.accountId),
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
           context = activity,

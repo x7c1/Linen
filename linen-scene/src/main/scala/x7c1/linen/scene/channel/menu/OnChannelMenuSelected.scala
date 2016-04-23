@@ -1,24 +1,46 @@
 package x7c1.linen.scene.channel.menu
 
 import android.app.Activity
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.menu.popup.{PopupMenuBox, PopupMenuItem}
+import x7c1.wheat.modern.menu.popup.PopupMenuItem
 
-class OnChannelMenuSelected(
-  activity: Activity with ServiceControl,
-  accountId: Long) extends OnMenuSelectedListener {
 
-  override def onMenuSelected(e: MenuSelected) = {
-    val items = Seq(
-      itemToLoadSources(e.channelId)
-    )
-    PopupMenuBox(activity, e.targetView, items).show()
+object OnChannelMenuSelected {
+  def forMyChannel(
+    activity: Activity with ServiceControl,
+    accountId: Long): OnMenuSelectedListener = {
+
+    OnMenuSelectedListener.create(activity){ event =>
+      val factory = new MenuItemFactory(activity, accountId)
+      Seq(
+        factory.toLoadSources(event.channelId)
+      )
+    }
   }
-  private def itemToLoadSources(channelId: Long) =
+
+  def forPresetChannel(
+    activity: Activity with ServiceControl,
+    accountId: Long): OnMenuSelectedListener = {
+
+    OnMenuSelectedListener.create(activity){ event =>
+      val factory = new MenuItemFactory(activity, accountId)
+      Seq(
+        factory.toLoadSources(event.channelId)
+      )
+    }
+  }
+}
+
+class MenuItemFactory(
+  activity: Activity with ServiceControl,
+  accountId: Long){
+
+  def toLoadSources(channelId: Long): PopupMenuItem =
     PopupMenuItem("Load all sources"){ _ =>
       Log info s"[init] channel:$channelId"
       ServiceCaller.using[UpdaterMethods].
@@ -26,4 +48,10 @@ class OnChannelMenuSelected(
           _ loadChannelSources (channelId, accountId)
         }
     }
+
+  def toDeleteChannel(helper: DatabaseHelper, event: MenuSelected): PopupMenuItem = {
+    PopupMenuItem("Delete this channel"){ _ =>
+//      helper.writable delete event
+    }
+  }
 }

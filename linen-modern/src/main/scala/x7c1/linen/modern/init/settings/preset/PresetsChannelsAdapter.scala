@@ -62,7 +62,7 @@ class PresetsChannelsAdapterFactory(
     new PresetsChannelsAdapter(
       listener = new SubscriptionChangedUpdater(accountId, activity, helper),
       onSourceSelected = new OnSourcesSelected(activity).transitToSources,
-      onMenuSelected = new OnChannelMenuSelected(activity, accountId),
+      onMenuSelected = OnChannelMenuSelected.forPresetChannel(activity, accountId),
       accessor = accessor,
       provider = factory create activity,
       location = location
