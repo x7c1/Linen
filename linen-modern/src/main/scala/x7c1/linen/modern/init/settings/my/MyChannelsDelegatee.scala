@@ -82,8 +82,8 @@ class MyChannelsDelegatee (
         activity = activity,
         accountId = account.accountId,
         helper = helper,
-        onDeleted = _ => {
-          // todo: reload & notify
+        onDeleted = _ => (loader reload account){ _ =>
+          layout.channelList.getAdapter.notifyDataSetChanged()
         }
       ),
       onSubscriptionChanged = {

@@ -7,7 +7,7 @@ import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.repository.channel.my.MyChannel
 import x7c1.linen.repository.channel.preset.SettingPresetChannel
 import x7c1.linen.scene.updater.UpdaterMethods
-import x7c1.wheat.macros.intent.ServiceCaller
+import x7c1.wheat.macros.intent.{LocalBroadcaster, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.menu.popup.PopupMenuItem
 
@@ -24,7 +24,7 @@ object OnChannelMenuSelected {
       val factory = new MenuItemFactory(activity, accountId)
       Seq(
         factory.toLoadSources(event.channelId),
-        factory.toDeleteChannel(helper, event, onDeleted)
+        factory.toDeleteChannel(helper, event.channel, onDeleted)
       )
     }
   }
@@ -57,12 +57,15 @@ class MenuItemFactory(
 
   def toDeleteChannel(
     helper: DatabaseHelper,
-    event: MenuSelected[MyChannel],
+    channel: MyChannel,
     onDeleted: MyChannelDeleted => Unit ): PopupMenuItem = {
 
     PopupMenuItem("Delete this channel"){ _ =>
-      helper.writable delete event.channel
-      onDeleted(MyChannelDeleted(event.channel))
+      helper.writable delete channel
+
+      val event = MyChannelDeleted(channel)
+      onDeleted(event)
+      LocalBroadcaster(event) dispatchFrom activity
     }
   }
 }
