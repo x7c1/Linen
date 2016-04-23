@@ -1,8 +1,9 @@
 package x7c1.linen.repository.channel.my
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.{ChannelRecord, ChannelStatusRecord}
+import x7c1.linen.database.struct.{ChannelDeletable, ChannelRecord, ChannelStatusRecord}
 import x7c1.linen.repository.account.ClientAccount
+import x7c1.linen.repository.channel.ChannelIdentifiable
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.sequence.Sequence
@@ -31,5 +32,12 @@ case class MyChannel(
   description: String,
   createdAt: Date,
   isSubscribed: Boolean ) extends MyChannelRow
+
+object MyChannel {
+  implicit object id extends ChannelIdentifiable[MyChannel]{
+    override def channelId(target: MyChannel): Long = target.channelId
+  }
+  implicit object deletable extends ChannelDeletable[MyChannel](_.channelId)
+}
 
 case class MyChannelFooter() extends MyChannelRow

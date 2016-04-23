@@ -4,6 +4,8 @@ import android.app.Activity
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
+import x7c1.linen.repository.channel.my.MyChannel
+import x7c1.linen.repository.channel.preset.SettingPresetChannel
 import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
@@ -13,19 +15,23 @@ import x7c1.wheat.modern.menu.popup.PopupMenuItem
 object OnChannelMenuSelected {
   def forMyChannel(
     activity: Activity with ServiceControl,
-    accountId: Long): OnMenuSelectedListener = {
+    accountId: Long,
+    helper: DatabaseHelper,
+    onDeleted: MyChannelDeleted => Unit ): OnMenuSelectedListener[MyChannel] = {
 
+    Log info s"[init]"
     OnMenuSelectedListener.create(activity){ event =>
       val factory = new MenuItemFactory(activity, accountId)
       Seq(
-        factory.toLoadSources(event.channelId)
+        factory.toLoadSources(event.channelId),
+        factory.toDeleteChannel(helper, event, onDeleted)
       )
     }
   }
 
   def forPresetChannel(
     activity: Activity with ServiceControl,
-    accountId: Long): OnMenuSelectedListener = {
+    accountId: Long): OnMenuSelectedListener[SettingPresetChannel] = {
 
     OnMenuSelectedListener.create(activity){ event =>
       val factory = new MenuItemFactory(activity, accountId)
@@ -49,9 +55,16 @@ class MenuItemFactory(
         }
     }
 
-  def toDeleteChannel(helper: DatabaseHelper, event: MenuSelected): PopupMenuItem = {
+  def toDeleteChannel(
+    helper: DatabaseHelper,
+    event: MenuSelected[MyChannel],
+    onDeleted: MyChannelDeleted => Unit ): PopupMenuItem = {
+
     PopupMenuItem("Delete this channel"){ _ =>
-//      helper.writable delete event
+      helper.writable delete event.channel
+      onDeleted(MyChannelDeleted(event.channel))
     }
   }
 }
+
+case class MyChannelDeleted(channel: MyChannel)

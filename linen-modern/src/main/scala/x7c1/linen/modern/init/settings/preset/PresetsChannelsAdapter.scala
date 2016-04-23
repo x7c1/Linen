@@ -8,7 +8,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingPresetChannelRow
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.ChannelSourcesSelected
-import x7c1.linen.repository.channel.preset.PresetChannelsAccessor
+import x7c1.linen.repository.channel.preset.{SettingPresetChannel, PresetChannelsAccessor}
 import x7c1.linen.scene.channel.menu.{MenuSelected, OnChannelMenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.modern.decorator.Imports._
@@ -17,7 +17,7 @@ class PresetsChannelsAdapter(
   location: PresetEventLocation,
   listener: OnChannelSubscribedListener,
   onSourceSelected: ChannelSourcesSelected => Unit,
-  onMenuSelected: OnMenuSelectedListener,
+  onMenuSelected: OnMenuSelectedListener[SettingPresetChannel],
   accessor: PresetChannelsAccessor,
   provider: ViewHolderProvider[SettingPresetChannelRow]) extends Adapter[SettingPresetChannelRow] {
 

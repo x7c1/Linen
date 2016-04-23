@@ -88,6 +88,12 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
+    settings(
+      assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
+      assemblyOutputPath in assembly := linenJarPath.value,
+      assemblyExcludedJars in assembly := androidJars.value,
+      assemblyMergeStrategy in assembly := discardTargets.value
+    ).
     dependsOn(`linen-scene`)
 
   lazy val `wheat-build` = project.

@@ -73,11 +73,19 @@ class MyChannelsDelegatee (
     }
   }
   private def setAdapter(account: ClientAccount)(accessor: MyChannelAccessor) = {
+    Log info s"[init]"
     layout.channelList setAdapter new ChannelRowAdapter(
       accountId = account.accountId,
       delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
-      onMenuSelected = OnChannelMenuSelected.forMyChannel(activity, account.accountId),
+      onMenuSelected = OnChannelMenuSelected.forMyChannel(
+        activity = activity,
+        accountId = account.accountId,
+        helper = helper,
+        onDeleted = _ => {
+          // todo: reload & notify
+        }
+      ),
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
           context = activity,

@@ -13,7 +13,7 @@ class ChannelRowAdapter(
   accountId: Long,
   delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
-  onMenuSelected: OnMenuSelectedListener,
+  onMenuSelected: OnMenuSelectedListener[MyChannel],
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends Adapter[SettingMyChannelRow]{
 
