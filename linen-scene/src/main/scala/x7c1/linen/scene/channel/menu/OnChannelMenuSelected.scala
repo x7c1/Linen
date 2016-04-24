@@ -9,6 +9,7 @@ import x7c1.linen.repository.channel.preset.SettingPresetChannel
 import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.macros.intent.{LocalBroadcaster, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter
 import x7c1.wheat.modern.menu.popup.PopupMenuItem
 
 
@@ -61,11 +62,14 @@ class MenuItemFactory(
     onDeleted: MyChannelDeleted => Unit ): PopupMenuItem = {
 
     PopupMenuItem("Delete this channel"){ _ =>
-      helper.writable delete channel
-
-      val event = MyChannelDeleted(channel)
-      onDeleted(event)
-      LocalBroadcaster(event) dispatchFrom activity
+      helper.writable delete channel match {
+        case Left(error) =>
+          Log error (ThrowableFormatter format error){"[failed]"}
+        case Right(_) =>
+          val event = MyChannelDeleted(channel)
+          onDeleted(event)
+          LocalBroadcaster(event) dispatchFrom activity
+      }
     }
   }
 }
