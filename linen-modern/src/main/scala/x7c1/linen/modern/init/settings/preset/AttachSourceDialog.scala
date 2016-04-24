@@ -21,6 +21,7 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.CheckedState
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.tasks.UiThread
 
 import scala.collection.mutable
 
@@ -121,11 +122,10 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
     } foreach {
       _ updateMapping selectedChannelMap
     }
-    dismiss()
+    UiThread.runDelayed(msec = 200){ dismiss() }
   }
   private def onClickNegative(button: Button) = {
-    Log info s"[init]"
-    dismiss()
+    UiThread.runDelayed(msec = 200){ dismiss() }
   }
 }
 

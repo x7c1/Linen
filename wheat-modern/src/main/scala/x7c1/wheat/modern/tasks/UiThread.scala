@@ -22,14 +22,18 @@ object UiThread {
 
   def run[A](f: => A): Unit = post(f)
 
+  def runDelayed[A](msec: Long)(f: => A): Unit =
+    new Handler(Looper.getMainLooper).postDelayed(runnable(f), msec)
+
   def main[A](f: => A): CallbackTask[A] = CallbackTask { g =>
     post(g(f))
   }
   def via[A <: View](view: A): UiThread[A] = new UiThread(view)
 
   private def post[A](f: => A) =
-    new Handler(Looper.getMainLooper) post new Runnable {
-      override def run(): Unit = f
-    }
+    new Handler(Looper.getMainLooper) post runnable(f)
 
+  private def runnable[A](f: => A) = new Runnable {
+    override def run(): Unit = f
+  }
 }
