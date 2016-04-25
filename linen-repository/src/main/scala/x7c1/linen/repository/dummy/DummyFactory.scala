@@ -2,9 +2,10 @@ package x7c1.linen.repository.dummy
 
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{SourceStatusAsStarted, SourceStatusParts, SourceParts, SourceRatingParts, EntryParts, ChannelParts, ChannelSourceMapParts, AccountParts}
+import x7c1.linen.database.struct.{AccountParts, ChannelParts, ChannelSourceMapParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
+import x7c1.linen.repository.crawler.{LoadedEntry, UpdatedSource}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.DummyString.words
 import x7c1.linen.repository.entry.EntryUrl
@@ -14,6 +15,8 @@ import x7c1.wheat.macros.logger.Log
 import scala.util.Random
 
 object DummyFactory {
+  import x7c1.linen.repository.dummy.DummySourceLoader.Implicits._
+
   def createDummies(context: Context)(n: Int): Unit = {
     createDummies0(context)(n)(_ => ())
   }
@@ -99,13 +102,15 @@ object DummyFactory {
       }
       (1 to 10) foreach { j =>
         val entryCreatedAt = Date.current()
-        val Right(entryId) = writable insert EntryParts(
-          sourceId = sourceId,
-          title = s"$sourceId-$j entry title",
-          content = s"$sourceId-$j entry content " + words(100,500),
-          url = EntryUrl(s"http://example.com/entry-$sourceId-$j"),
-          createdAt = Date.current()
-        )
+        val UpdatedSource(_, Seq((entryId, _))) = DummyEntryBinder(helper).bind(sourceId, Seq(
+          LoadedEntry(
+            title = s"$sourceId-$j entry title",
+            content = s"$sourceId-$j entry content " + words(100,500),
+            author = s"author $sourceId-$j",
+            url = EntryUrl(s"http://example.com/entry-$sourceId-$j"),
+            createdAt = Date.current()
+          )
+        ))
         if (i == 3){
           writable update SourceStatusAsStarted(
             startEntryId = entryId,

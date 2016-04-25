@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init.updater
+package x7c1.linen.scene.updater
 
 import android.app.{Notification, NotificationManager, PendingIntent, Service}
 import android.content.Context.NOTIFICATION_SERVICE
@@ -8,7 +8,7 @@ import android.support.v4.app.NotificationCompat.Builder
 import android.support.v4.content.LocalBroadcastManager
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.modern.init.updater.UpdaterServiceDelegatee.ActionTypeSample
+import x7c1.linen.scene.updater.UpdaterServiceTypes.ActionTypeSample
 import x7c1.wheat.macros.logger.Log
 
 class UpdaterServiceNotifier(service: Service with ServiceControl, max: Int){

@@ -53,9 +53,3 @@ trait SettingPresetChannelRecord extends TypedFields {
   def subscribed: Int
 }
 
-case class SettingPresetChannel(
-  channelId: Long,
-  name: String,
-  description: String,
-  isSubscribed: Boolean
-)

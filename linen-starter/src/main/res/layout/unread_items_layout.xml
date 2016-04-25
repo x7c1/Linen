@@ -12,7 +12,7 @@
     <LinearLayout
         android:id="@+id/unread_items_layout__menu_area"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@android:color/white"
         android:orientation="vertical"

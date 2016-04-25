@@ -1,26 +1,41 @@
-package x7c1.linen.modern.init.updater
+package x7c1.linen.repository.crawler
 
 import java.lang.System.currentTimeMillis
 
-import android.app.Service
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.glue.service.ServiceControl
-import x7c1.wheat.modern.formatter.ThrowableFormatter
-import ThrowableFormatter.format
+import x7c1.linen.database.struct.{RetrievedSourceMarkParts, EntryParts}
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
+import scala.util.Try
 
-class SourceUpdaterQueue(
-  service: Service with ServiceControl,
-  helper: DatabaseHelper){
+object SourceUpdaterQueue {
+  def apply(
+    helper: DatabaseHelper,
+    sourceLoader: SourceLoader,
+    onSourceDequeue: SourceDequeueEvent => Unit = _ => {}): SourceUpdaterQueue = {
 
-  private lazy val inspector = SourceInspector(helper)
+    new SourceUpdaterQueueImpl(helper, sourceLoader, onSourceDequeue)
+  }
+}
+
+trait SourceUpdaterQueue {
+  def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit
+}
+
+private class SourceUpdaterQueueImpl(
+  helper: DatabaseHelper,
+  sourceLoader: SourceLoader,
+  onSourceDequeue: SourceDequeueEvent => Unit) extends SourceUpdaterQueue {
+
   private lazy val queueMap = new SourceQueueMap
 
-  def enqueue(source: InspectedSource): Unit = synchronized {
+  override def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit = synchronized {
     Log info s"[init] source:$source"
     val host = source.feedUrl.getHost
     if (queueMap has host){
@@ -30,28 +45,36 @@ class SourceUpdaterQueue(
       update(source)
     }
   }
-  private def update(source: InspectedSource): Unit = {
+  private def update(source: InspectedSource)(implicit x: ExecutionContext): Unit = {
     Log info s"[init] source:$source"
-    import x7c1.linen.modern.init.updater.LinenService.Implicits._
 
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start
 
-    val future = inspector.loadSource(source) map { loadedSource =>
+    val future = sourceLoader loadSource source map { loadedSource =>
       Log info s"[loaded] msec:${elapsed()}, source:$source"
 
       if (loadedSource isModifiedFrom source){
         updateSource(loadedSource)
       }
-      insertEntries(loadedSource)
+      val entries = source.latestEntry match {
+        case Some(latest) =>
+          loadedSource.validEntries filter newerThan(latest)
+        case None =>
+          loadedSource.validEntries
+      }
+      val insertedEntries = insertEntries(entries map toEntryParts(source.sourceId))
+      UpdatedSource(loadedSource, insertedEntries)
     }
     future onFailure {
       case e => Log error format(e)(s"[error] ${source.feedUrl}")
     }
-    future onComplete { _ =>
+    future onComplete { result =>
       val host = source.feedUrl.getHost
       val nextSource = this synchronized {
         queueMap dequeue host
+        onSourceDequeue(SourceDequeueEvent(source, result))
+
         Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
         queueMap headOption host
       }
@@ -61,6 +84,20 @@ class SourceUpdaterQueue(
       }
     }
   }
+  private def toEntryParts(sourceId: Long): LoadedEntry => EntryParts =
+    entry => EntryParts(
+      sourceId = sourceId,
+      title = entry.title,
+      content = entry.content,
+      author = entry.author,
+      url = entry.url,
+      createdAt = entry.createdAt
+    )
+
+  private def newerThan(latest: LatestEntry) = (parts: LoadedEntry) => {
+    (parts.createdAt.timestamp >= latest.createdAt.timestamp) &&
+      (parts.url.raw != latest.entryUrl)
+  }
   private def updateSource(source: LoadedSource): Unit = {
     helper.writable update source match {
       case Left(error) => Log error error.getMessage
@@ -68,22 +105,35 @@ class SourceUpdaterQueue(
       case Right(_) => Log info s"updated: ${source.title}"
     }
   }
-  private def insertEntries(source: LoadedSource): Unit = {
-    val loadedEntries = source.validEntries
+  private def insertEntries(entries: Seq[EntryParts]): Seq[(Long, EntryParts)] = {
+
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
-    loadedEntries.zipWithIndex foreach {
+    val marks = entries.zipWithIndex flatMap {
       case (entry, index) =>
         helper.writable insert entry match {
           case Left(e: SQLiteConstraintException) =>
             // nop, entry already exists
+            None
           case Left(e) =>
             Log error s"$index,${entry.url.host},${e.getMessage}"
-          case Right(b) =>
-            Log debug s"$index,${entry.url.host},${entry.title}"
+            None
+          case Right(entryId) =>
+            Log debug s"$index,${entry.url.host},${entry.title} (by ${entry.author})"
+            Some(entryId -> entry)
         }
 
 //        notifier.notifyProgress(index)
     }
+    marks.headOption foreach {
+      case (entryId, entry) =>
+        helper.writable insert RetrievedSourceMarkParts(
+          sourceId = entry.sourceId,
+          latestEntryId = entryId,
+          latestEntryCreatedAt = entry.createdAt,
+          updatedAt = Date.current()
+        )
+    }
+    marks
 //    notifier.notifyDone()
   }
 }
@@ -120,3 +170,13 @@ private class SourceQueueMap {
     map.get(host).flatMap(_.headOption)
   }
 }
+
+case class SourceDequeueEvent(
+  inspected: InspectedSource,
+  updated: Try[UpdatedSource]
+)
+
+case class UpdatedSource(
+  source: LoadedSource,
+  insertedEntries: Seq[(Long, EntryParts)]
+)

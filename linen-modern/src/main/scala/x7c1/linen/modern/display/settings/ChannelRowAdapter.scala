@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
+import x7c1.linen.scene.channel.menu.{MenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.modern.decorator.Imports._
 
@@ -12,6 +13,7 @@ class ChannelRowAdapter(
   accountId: Long,
   delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
+  onMenuSelected: OnMenuSelectedListener[MyChannel],
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends Adapter[SettingMyChannelRow]{
 
@@ -24,7 +26,11 @@ class ChannelRowAdapter(
     delegatee.bindViewHolder(holder, position){
       case (holder: SettingMyChannelRowItem, channel: MyChannel) =>
         holder.name.text = channel.name
-        holder.description.text = channel.description
+        holder.description toggleVisibility channel.description
+
+        holder.menu onClick { view =>
+          onMenuSelected onMenuSelected MenuSelected(view, channel)
+        }
         holder.sources onClick { _ =>
           onSourcesSelected apply ChannelSourcesSelected(
             accountId = accountId,

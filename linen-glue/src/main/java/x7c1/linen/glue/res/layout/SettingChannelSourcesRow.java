@@ -22,7 +22,6 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
     public final SeekBar ratingBar;
     public final TextView ratingValue;
     public final TextView ratingLabel;
-    public final ImageButton sync;
 
     public SettingChannelSourcesRow(
         View itemView,
@@ -32,8 +31,7 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
         android.support.v7.widget.SwitchCompat switchSubscribe,
         SeekBar ratingBar,
         TextView ratingValue,
-        TextView ratingLabel,
-        ImageButton sync
+        TextView ratingLabel
     ){
         super(itemView);
         this.title = title;
@@ -43,6 +41,5 @@ public class SettingChannelSourcesRow extends RecyclerView.ViewHolder {
         this.ratingBar = ratingBar;
         this.ratingValue = ratingValue;
         this.ratingLabel = ratingLabel;
-        this.sync = sync;
     }
 }

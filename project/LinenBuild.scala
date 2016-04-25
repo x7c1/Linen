@@ -33,6 +33,13 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `linen-pickle` = project.
     settings(linenSettings:_*).
     settings(
+      resolvers += "Android ROME Feed Reader Repository" at
+        "https://android-rome-feed-reader.googlecode.com/svn/maven2/releases"
+    ).
+    settings(libraryDependencies ++= Seq(
+      "com.google.code.android-rome-feed-reader" % "android-rome-feed-reader" % "1.0.0-r2"
+    )).
+    settings(
       unmanagedJars in Compile ++= androidSdkClasspath,
       assemblyOutputPath in assembly := pickleJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value
@@ -71,34 +78,23 @@ object LinenBuild extends Build with LinenSettings {
 
       fork in Test := true
     ).
-    dependsOn(`wheat-modern`)
+    dependsOn(`wheat-modern`, `linen-pickle`)
+
+  lazy val `linen-scene` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    dependsOn(`linen-repository`, `linen-glue`, `wheat-lore`)
 
   lazy val `linen-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
-    settings(libraryDependencies ++= Seq(
-      "com.novocode" % "junit-interface" % "0.11" % Test,
-      "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
-      "org.robolectric" % "android-all" % "5.1.1_r9-robolectric-1" % Test,
-      "junit" % "junit" % "4.12" % Test,
-      "org.robolectric" % "robolectric" % "3.0" % Test
-    )).
-    settings(
-
-      // not work?
-      // javaOptions in (Test, run) += "-Djava.awt.headless=true",
-
-      fork in Test := true
-    ).
     settings(
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
       assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
-    dependsOn(`linen-glue`, `wheat-lore`, `linen-pickle`,
-      `linen-repository` % "compile->compile;test->test"
-    )
+    dependsOn(`linen-scene`)
 
   lazy val `wheat-build` = project.
     settings(

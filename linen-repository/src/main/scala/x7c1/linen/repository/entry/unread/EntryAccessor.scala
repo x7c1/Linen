@@ -197,6 +197,7 @@ object EntryAccessor {
         |  source_id,
         |  title,
         |  url,
+        |  author,
         |  $content,
         |  created_at
         |FROM entries

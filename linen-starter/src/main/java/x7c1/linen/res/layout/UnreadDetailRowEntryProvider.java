@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.UnreadDetailRowEntry;
 
@@ -20,7 +21,11 @@ public class UnreadDetailRowEntryProvider implements ViewHolderProvider<UnreadDe
     private final LayoutInflater inflater;
 
     public UnreadDetailRowEntryProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public UnreadDetailRowEntryProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -36,12 +41,29 @@ public class UnreadDetailRowEntryProvider implements ViewHolderProvider<UnreadDe
     @Override
     public UnreadDetailRowEntry inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.unread_detail_row__entry, parent, attachToRoot);
-        return new UnreadDetailRowEntry(
-            view,
-            (TextView) view.findViewById(R.id.unread_detail_row__entry__title),
-            (TextView) view.findViewById(R.id.unread_detail_row__entry__content),
-            (TextView) view.findViewById(R.id.unread_detail_row__entry__created_at),
-            (TextView) view.findViewById(R.id.unread_detail_row__entry__visit)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    public static ViewHolderProviderFactory<UnreadDetailRowEntry> factory(){
+        return new ViewHolderProviderFactory<UnreadDetailRowEntry>() {
+            @Override
+            public ViewHolderProvider<UnreadDetailRowEntry> create(LayoutInflater inflater){
+                return new UnreadDetailRowEntryProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<UnreadDetailRowEntry> create(Context context){
+                return new UnreadDetailRowEntryProvider(context);
+            }
+            @Override
+            public UnreadDetailRowEntry createViewHolder(View view){
+                return new UnreadDetailRowEntry(
+                    view,
+                    (TextView) view.findViewById(R.id.unread_detail_row__entry__title),
+                    (TextView) view.findViewById(R.id.unread_detail_row__entry__content),
+                    (TextView) view.findViewById(R.id.unread_detail_row__entry__later),
+                    (TextView) view.findViewById(R.id.unread_detail_row__entry__visit)
+                );
+            }
+        };
     }
 }

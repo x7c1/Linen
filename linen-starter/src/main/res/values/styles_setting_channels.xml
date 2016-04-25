@@ -3,17 +3,16 @@
 
     <style name="SettingChannelsRowButtons">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">45dp</item>
 
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
 
-        <item name="android:paddingTop">@dimen/setting_channels_row_padding</item>
         <item name="android:paddingEnd">@dimen/setting_channels_row_padding</item>
-        <item name="android:paddingBottom">@dimen/setting_channels_row_padding</item>
         <item name="android:paddingStart">@dimen/setting_channels_row_padding</item>
 
+        <item name="android:gravity">center_vertical</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
         <item name="android:clickable">true</item>
     </style>

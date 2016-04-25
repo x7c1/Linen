@@ -18,7 +18,6 @@ class SourceRowAdapter (
   channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
   onMenuSelected: SourceMenuSelected => Unit,
-  onSyncClicked: OnSyncClickedListener,
   metricsConverter: MetricsConverter ) extends Adapter[SettingChannelSourcesRow]{
 
   override def getItemCount: Int = accessor.length
@@ -29,7 +28,8 @@ class SourceRowAdapter (
   override def onBindViewHolder(holder: SettingChannelSourcesRow, position: Int): Unit = {
     accessor findAt position foreach { source =>
       holder.title.text = source.title
-      holder.description.text = source.description
+      holder.description toggleVisibility source.description
+
       holder.menu onClick { view =>
         onMenuSelected apply SourceMenuSelected(
           targetView = view,
@@ -39,9 +39,6 @@ class SourceRowAdapter (
         )
       }
       holder.switchSubscribe setChecked true
-      holder.sync onClick { view =>
-        onSyncClicked onSyncClicked SyncClickedEvent(source.sourceId)
-      }
       holder.ratingLabel.text = s"RATING:${source.rating}"
       holder.ratingBar setProgress source.rating
       holder.ratingBar setOnSeekBarChangeListener new OnRatingChanged(
@@ -103,17 +100,3 @@ private class OnRatingChanged(
     barLeft - parentLeft + params.leftMargin + ratingRadiusPixel
   }
 }
-
-trait OnSyncClickedListener {
-  def onSyncClicked(event: SyncClickedEvent): Unit
-}
-object OnSyncClickedListener {
-  def apply(f: SyncClickedEvent => Unit): OnSyncClickedListener =
-    new OnSyncClickedListener {
-      override def onSyncClicked(event: SyncClickedEvent): Unit = f(event)
-    }
-}
-
-case class SyncClickedEvent(
-  sourceId: Long
-)

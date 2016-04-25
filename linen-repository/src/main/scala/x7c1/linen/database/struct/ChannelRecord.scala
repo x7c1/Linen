@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
-import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.{Deletable, Insertable}
 
 trait ChannelRecord extends TypedFields {
   def _id: Long
@@ -40,4 +40,11 @@ object ChannelParts {
       )
     }
   }
+}
+
+class ChannelDeletable[A](f: A => Long) extends Deletable[A]{
+  override def tableName: String = ChannelRecord.table
+  override def where(target: A): Seq[(String, String)] = Seq(
+    "_id" -> f(target).toString
+  )
 }

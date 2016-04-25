@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageButton;
 import android.support.v7.widget.SwitchCompat;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
@@ -60,6 +61,7 @@ public class SettingMyChannelRowItemProvider implements ViewHolderProvider<Setti
                 return new SettingMyChannelRowItem(
                     view,
                     (TextView) view.findViewById(R.id.setting_my_channel_row__item__name),
+                    (ImageButton) view.findViewById(R.id.setting_my_channel_row__item__menu),
                     (TextView) view.findViewById(R.id.setting_my_channel_row__item__description),
                     (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_my_channel_row__item__switch_subscribe),
                     (TextView) view.findViewById(R.id.setting_my_channel_row__item__edit),

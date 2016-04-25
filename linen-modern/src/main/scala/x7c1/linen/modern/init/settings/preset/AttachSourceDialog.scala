@@ -8,21 +8,20 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
-import android.widget.CompoundButton.OnCheckedChangeListener
-import android.widget.{Button, CompoundButton}
+import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelSourceMapKey, ChannelSourceMapParts}
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
-import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor}
-import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor, MyChannelConnectionUpdater}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.decorator.CheckedState
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.tasks.UiThread
 
 import scala.collection.mutable
 
@@ -81,7 +80,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
             providers = new SettingSourceAttachRowProviders(args.rowFactory create getContext),
             sequence = accessor
           ),
-          selectedChannelMap
+          CheckedState(selectedChannelMap)
         )
     }
     builder setView layout.itemView
@@ -118,59 +117,21 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
   private def onClickPositive(button: Button) = {
     Log info s"[init]"
 
-    channelsAccessor foreach update
-    dismiss()
+    channelsAccessor map {
+      MyChannelConnectionUpdater(helper, args.originalSourceId, _)
+    } foreach {
+      _ updateMapping selectedChannelMap
+    }
+    UiThread.runDelayed(msec = 200){ dismiss() }
   }
   private def onClickNegative(button: Button) = {
-    Log info s"[init]"
-    dismiss()
-  }
-  private def update(accessor: ChannelsToAttachAccessor): Unit ={
-    val selectedChannels = selectedChannelMap.collect {
-      case (id, attached) if attached => id
-    }.toSeq
-
-    val channelsToAttach = {
-      val attachedChannels = accessor.collectAttached
-      selectedChannels diff attachedChannels
-    }
-    val channelsToDetach = {
-      val unselectedChannels = accessor.collectAll diff selectedChannels
-      val detachedChannels = accessor.collectDetached
-      unselectedChannels diff detachedChannels
-    }
-    // todo: use transaction
-    channelsToAttach foreach { id =>
-      val parts = ChannelSourceMapParts(
-        channelId = id,
-        sourceId = args.originalSourceId,
-        createdAt = Date.current()
-      )
-      helper.writable.insert(parts).left foreach { e =>
-        Log error format(e){
-          s"[failed] attach source:${args.originalSourceId} to channel:$id"
-        }
-      }
-    }
-    channelsToDetach foreach { id =>
-      val key = ChannelSourceMapKey(
-        channelId = id,
-        sourceId = args.originalSourceId
-      )
-      helper.writable.delete(key).left foreach { e =>
-        Log error format(e){
-          s"[failed] detach source:${args.originalSourceId} from channel:$id"
-        }
-      }
-    }
-    Log info s"1-$channelsToAttach"
-    Log info s"2-$channelsToDetach"
+    UiThread.runDelayed(msec = 200){ dismiss() }
   }
 }
 
 class AttachChannelsAdapter(
   delegatee: AdapterDelegatee[SettingSourceAttachRow, ChannelToAttach],
-  selectedMap: collection.mutable.Map[Long, Boolean]
+  state: CheckedState[Long]
 ) extends Adapter[SettingSourceAttachRow] {
 
   override def getItemCount: Int = delegatee.count
@@ -186,19 +147,8 @@ class AttachChannelsAdapter(
       case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.channelName
-        row.checked.setOnCheckedChangeListener(new OnCheckedChangeListener {
-          override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean): Unit = {
-            if (isChecked) {
-              selectedMap(channel.channelId) = true
-            } else {
-              selectedMap remove channel.channelId
-            }
-          }
-        })
-        val isAttached = channel.isAttached ||
-          selectedMap.getOrElse(channel.channelId, false)
-
-        row.checked setChecked isAttached
+        row.checked bindTo state(channel.channelId, channel.isAttached)
     }
+
   }
 }

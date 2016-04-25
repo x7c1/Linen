@@ -44,23 +44,39 @@
             android:lineSpacingMultiplier="1.2"
             />
 
-        <TextView
-            android:id="@+id/unread_detail_row__entry__created_at"
-            android:textSize="12sp"
-            android:textAlignment="textEnd"
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/unread_detail_row__entry__content"
-            android:textColor="@color/text_tertiary"
-            />
-
         <View
             android:id="@+id/border2"
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_below="@id/unread_detail_row__entry__created_at"
+            android:layout_below="@id/unread_detail_row__entry__content"
+            android:layout_marginTop="12dp"
             android:background="@color/text_tertiary"
+            />
+
+        <View
+            android:id="@+id/dummy_to_position_center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_below="@id/border2"
+            android:layout_centerInParent="true"
+            />
+
+        <TextView
+            android:id="@+id/unread_detail_row__entry__later"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border2"
+            android:layout_toStartOf="@id/dummy_to_position_center"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableStart="@drawable/ic_wrap_text_black_24dp"
+            android:drawablePadding="3dp"
+            android:text="LATER"
             />
 
         <TextView
@@ -68,14 +84,17 @@
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_below="@id/border2"
-            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/dummy_to_position_center"
+            android:layout_marginStart="12dp"
             android:gravity="center_vertical"
             android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-condensed"
             android:textSize="13sp"
             android:clickable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableEnd="@drawable/ic_call_made_24dp"
-            android:text="VISIT"
+            android:drawableStart="@drawable/ic_open_in_new_black_24dp"
+            android:drawablePadding="3dp"
+            android:text="OPEN"
             />
 
     </RelativeLayout>

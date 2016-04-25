@@ -10,10 +10,11 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/setting_channels_row_padding"
+    android:paddingTop="12dp"
     >
     <TextView
         android:id="@+id/setting_preset_channel_row__name"
+        android:paddingTop="4dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:layout_width="match_parent"
@@ -27,7 +28,9 @@
         android:id="@+id/setting_preset_channel_row__menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="4dp"
         android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
         android:paddingStart="8dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
@@ -42,7 +45,7 @@
         android:layout_below="@id/setting_preset_channel_row__name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/setting_channels_row_padding"
+        android:layout_marginBottom="12dp"
         android:textSize="15sp"
         android:textColor="@color/text_secondary"
         android:lineSpacingMultiplier="1.2"
@@ -61,13 +64,11 @@
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/setting_preset_channel_row__switch_subscribe"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_below="@id/border"
         android:layout_alignParentEnd="true"
-        android:paddingTop="@dimen/setting_channels_row_padding"
-        android:paddingEnd="@dimen/setting_channels_row_padding"
-        android:paddingBottom="@dimen/setting_channels_row_padding"
-        android:paddingStart="5dp"
+        android:paddingEnd="12dp"
+        android:paddingStart="4dp"
         />
 
     <TextView

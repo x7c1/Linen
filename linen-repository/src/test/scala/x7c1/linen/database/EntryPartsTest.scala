@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{retrieved_source_marks, EntryParts}
+import x7c1.linen.database.struct.EntryParts
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.source.unread.UnreadSourceFixture
@@ -29,28 +29,20 @@ class EntryPartsTest extends JUnitSuiteLike {
       sourceId = sourceId,
       title = "sample-title",
       content = "sample-content",
+      author = "sample-author",
       url = url,
       createdAt = Date.current()
     )
-//    x1.left.foreach(println)
     assertEquals(true, x1.isRight)
-
-    val Right(Some(mark1)) = helper.readable.find[retrieved_source_marks].by(sourceId).toEither
-    val Right(newEntryId) = x1
-    assertEquals(newEntryId, mark1.latest_entry_id)
-    assertEquals(sourceId, mark1.source_id)
 
     val x2 = writable insert EntryParts(
       sourceId = sourceId,
       title = "sample-title-2",
       content = "sample-content-2",
+      author = "sample-author-2",
       url = url,
       createdAt = Date.current()
     )
-//    x2.left.foreach(println)
     assertEquals(false, x2.isRight)
-
-    val Right(Some(mark2)) = helper.readable.find[retrieved_source_marks].by(sourceId).toEither
-    assertEquals(newEntryId, mark2.latest_entry_id)
   }
 }

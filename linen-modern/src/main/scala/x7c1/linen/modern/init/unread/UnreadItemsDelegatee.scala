@@ -29,6 +29,9 @@ class UnreadItemsDelegatee(
   with DetailAreaInitializer {
 
   def setup(): Unit = {
+    Log info s"[init]"
+    Log info s"db:ver.${database.getVersion}"
+
     setupSourceArea()
     setupEntryArea()
     setupEntryDetailArea()
