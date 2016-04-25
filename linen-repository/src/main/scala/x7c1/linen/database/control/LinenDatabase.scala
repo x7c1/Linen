@@ -150,16 +150,7 @@ object LinenDatabase {
          |)""".stripMargin,
 
       s"""CREATE INDEX retrieved_source_marks_created_at ON retrieved_source_marks (
-         |updated_at)""".stripMargin,
-
-      s"""CREATE TRIGGER update_source_marks AFTER INSERT ON entries
-         |BEGIN
-         |  INSERT OR REPLACE INTO retrieved_source_marks
-         |      (source_id, latest_entry_id, latest_entry_created_at, updated_at)
-         |    VALUES
-         |      (new.source_id, new._id, new.created_at, strftime("%s", CURRENT_TIMESTAMP));
-         |END
-       """.stripMargin
+         |updated_at)""".stripMargin
     )
     val sourceStatuses = Seq(
       s"""CREATE TABLE IF NOT EXISTS source_statuses (

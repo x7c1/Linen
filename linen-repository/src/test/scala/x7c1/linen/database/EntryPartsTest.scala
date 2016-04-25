@@ -33,13 +33,7 @@ class EntryPartsTest extends JUnitSuiteLike {
       url = url,
       createdAt = Date.current()
     )
-//    x1.left.foreach(println)
     assertEquals(true, x1.isRight)
-
-    val Right(Some(mark1)) = helper.readable.find[retrieved_source_marks].by(sourceId).toEither
-    val Right(newEntryId) = x1
-    assertEquals(newEntryId, mark1.latest_entry_id)
-    assertEquals(sourceId, mark1.source_id)
 
     val x2 = writable insert EntryParts(
       sourceId = sourceId,
@@ -49,10 +43,6 @@ class EntryPartsTest extends JUnitSuiteLike {
       url = url,
       createdAt = Date.current()
     )
-//    x2.left.foreach(println)
     assertEquals(false, x2.isRight)
-
-    val Right(Some(mark2)) = helper.readable.find[retrieved_source_marks].by(sourceId).toEither
-    assertEquals(newEntryId, mark2.latest_entry_id)
   }
 }

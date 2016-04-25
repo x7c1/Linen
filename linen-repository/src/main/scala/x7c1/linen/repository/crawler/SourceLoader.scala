@@ -1,11 +1,10 @@
 package x7c1.linen.repository.crawler
 
-import java.io.{InputStreamReader, BufferedInputStream}
+import java.io.{BufferedInputStream, InputStreamReader}
 import java.net.{HttpURLConnection, URL}
 
-import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndFeed, SyndEntry}
+import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.database.struct.EntryParts
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.modern.callback.CallbackTask
@@ -29,7 +28,7 @@ object RemoteSourceLoader extends SourceLoader {
         sourceId = source.sourceId,
         title = Option(feed.getTitle) getOrElse "",
         description = Option(feed.getDescription) getOrElse "",
-        entries = entries map convertEntry(source.sourceId)
+        entries = entries map convertEntry
       )
     }
   }
@@ -46,12 +45,11 @@ object RemoteSourceLoader extends SourceLoader {
       new SyndFeedInput().build(reader)
     }
   }
-  private def convertEntry(sourceId: Long)(entry: SyndEntry): Either[InvalidEntry, EntryParts] = {
+  private def convertEntry(entry: SyndEntry): Either[InvalidEntry, LoadedEntry] = {
     try for {
       url <- (Option(entry.getLink) toRight EmptyUrl()).right
       published <- (Option(entry.getPublishedDate) toRight EmptyPublishedDate()).right
-    } yield EntryParts(
-        sourceId = sourceId,
+    } yield LoadedEntry(
         title = Option(entry.getTitle) getOrElse "",
         content = Option(entry.getDescription.getValue) getOrElse "",
         author = Option(entry.getAuthor) getOrElse "",

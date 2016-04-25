@@ -1,6 +1,6 @@
 package x7c1.linen.repository.crawler
 
-import x7c1.linen.database.struct.{EntryParts, SourceRecord}
+import x7c1.linen.database.struct.SourceRecord
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.database.Updatable
 
@@ -9,7 +9,7 @@ class LoadedSource(
   val sourceId: Long,
   val title: String,
   val description: String,
-  entries: Seq[Either[InvalidEntry, EntryParts]]){
+  entries: Seq[Either[InvalidEntry, LoadedEntry]]){
 
   lazy val validEntries = {
     entries collect {

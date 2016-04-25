@@ -63,8 +63,8 @@ private class SourceUpdaterQueueImpl(
         case None =>
           loadedSource.validEntries
       }
-      insertEntries(entries)
-      loadedSource
+      val insertedEntries = insertEntries(entries map toEntryParts(source.sourceId))
+      UpdatedSource(loadedSource, insertedEntries)
     }
     future onFailure {
       case e => Log error format(e)(s"[error] ${source.feedUrl}")
@@ -84,7 +84,17 @@ private class SourceUpdaterQueueImpl(
       }
     }
   }
-  private def newerThan(latest: LatestEntry) = (parts: EntryParts) => {
+  private def toEntryParts(sourceId: Long): LoadedEntry => EntryParts =
+    entry => EntryParts(
+      sourceId = sourceId,
+      title = entry.title,
+      content = entry.content,
+      author = entry.author,
+      url = entry.url,
+      createdAt = entry.createdAt
+    )
+
+  private def newerThan(latest: LatestEntry) = (parts: LoadedEntry) => {
     (parts.createdAt.timestamp >= latest.createdAt.timestamp) &&
       (parts.url.raw != latest.entryUrl)
   }
@@ -95,22 +105,35 @@ private class SourceUpdaterQueueImpl(
       case Right(_) => Log info s"updated: ${source.title}"
     }
   }
-  private def insertEntries(entries: Seq[EntryParts]): Unit = {
+  private def insertEntries(entries: Seq[EntryParts]): Seq[(Long, EntryParts)] = {
 
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
-    loadedEntries.zipWithIndex foreach {
+    val marks = entries.zipWithIndex flatMap {
       case (entry, index) =>
         helper.writable insert entry match {
           case Left(e: SQLiteConstraintException) =>
             // nop, entry already exists
+            None
           case Left(e) =>
             Log error s"$index,${entry.url.host},${e.getMessage}"
-          case Right(b) =>
+            None
+          case Right(entryId) =>
             Log debug s"$index,${entry.url.host},${entry.title} (by ${entry.author})"
+            Some(entryId -> entry)
         }
 
 //        notifier.notifyProgress(index)
     }
+    marks.headOption foreach {
+      case (entryId, entry) =>
+        helper.writable insert RetrievedSourceMarkParts(
+          sourceId = entry.sourceId,
+          latestEntryId = entryId,
+          latestEntryCreatedAt = entry.createdAt,
+          updatedAt = Date.current()
+        )
+    }
+    marks
 //    notifier.notifyDone()
   }
 }
@@ -150,5 +173,10 @@ private class SourceQueueMap {
 
 case class SourceDequeueEvent(
   inspected: InspectedSource,
-  loaded: Try[LoadedSource]
+  updated: Try[UpdatedSource]
+)
+
+case class UpdatedSource(
+  source: LoadedSource,
+  insertedEntries: Seq[(Long, EntryParts)]
 )

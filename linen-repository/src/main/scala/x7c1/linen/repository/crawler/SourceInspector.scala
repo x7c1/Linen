@@ -40,7 +40,9 @@ class InspectedSource(
   val description: String,
   val feedUrl: URL,
   val latestEntry: Option[LatestEntry]
-)
+){
+  override def toString = s"sourceId:$sourceId,title:$title,$feedUrl"
+}
 object InspectedSource {
   def apply(source: SourceRecord, entry: Option[LatestEntry]): InspectedSource = {
     new InspectedSource(
