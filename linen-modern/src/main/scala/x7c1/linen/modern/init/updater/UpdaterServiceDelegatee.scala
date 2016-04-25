@@ -15,7 +15,7 @@ import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
 class UpdaterServiceDelegatee(service: Service with ServiceControl){
   private lazy val helper = new DatabaseHelper(service)
 
-  private lazy val queue = new SourceUpdaterQueue(helper, RemoteSourceLoader)
+  private lazy val queue = SourceUpdaterQueue(helper, RemoteSourceLoader)
 
   def onBind(intent: Intent): Option[IBinder] = {
     Log info "[init]"

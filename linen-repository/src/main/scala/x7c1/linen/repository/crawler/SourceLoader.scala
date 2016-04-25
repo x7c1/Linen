@@ -12,16 +12,15 @@ import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.TaskProvider.using
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SourceLoader {
-  def loadSource(source: InspectedSource): Future[LoadedSource]
+  def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource]
 }
 
 object RemoteSourceLoader extends SourceLoader {
-  import Implicits._
 
-  override def loadSource(source: InspectedSource): Future[LoadedSource] = {
+  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource] = {
     import collection.JavaConverters._
 
     Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>

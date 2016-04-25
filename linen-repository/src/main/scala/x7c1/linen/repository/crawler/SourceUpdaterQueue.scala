@@ -4,18 +4,38 @@ import java.lang.System.currentTimeMillis
 
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.{RetrievedSourceMarkParts, EntryParts}
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
+import scala.util.Try
 
-class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
-  import Implicits._
+object SourceUpdaterQueue {
+  def apply(
+    helper: DatabaseHelper,
+    sourceLoader: SourceLoader,
+    onSourceDequeue: SourceDequeueEvent => Unit = _ => {}): SourceUpdaterQueue = {
+
+    new SourceUpdaterQueueImpl(helper, sourceLoader, onSourceDequeue)
+  }
+}
+
+trait SourceUpdaterQueue {
+  def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit
+}
+
+private class SourceUpdaterQueueImpl(
+  helper: DatabaseHelper,
+  sourceLoader: SourceLoader,
+  onSourceDequeue: SourceDequeueEvent => Unit) extends SourceUpdaterQueue {
 
   private lazy val queueMap = new SourceQueueMap
 
-  def enqueue(source: InspectedSource): Unit = synchronized {
+  override def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit = synchronized {
     Log info s"[init] source:$source"
     val host = source.feedUrl.getHost
     if (queueMap has host){
@@ -25,7 +45,7 @@ class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
       update(source)
     }
   }
-  private def update(source: InspectedSource): Unit = {
+  private def update(source: InspectedSource)(implicit x: ExecutionContext): Unit = {
     Log info s"[init] source:$source"
 
     val start = currentTimeMillis()
@@ -37,15 +57,24 @@ class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
       if (loadedSource isModifiedFrom source){
         updateSource(loadedSource)
       }
-      insertEntries(loadedSource)
+      val entries = source.latestEntry match {
+        case Some(latest) =>
+          loadedSource.validEntries filter newerThan(latest)
+        case None =>
+          loadedSource.validEntries
+      }
+      insertEntries(entries)
+      loadedSource
     }
     future onFailure {
       case e => Log error format(e)(s"[error] ${source.feedUrl}")
     }
-    future onComplete { _ =>
+    future onComplete { result =>
       val host = source.feedUrl.getHost
       val nextSource = this synchronized {
         queueMap dequeue host
+        onSourceDequeue(SourceDequeueEvent(source, result))
+
         Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
         queueMap headOption host
       }
@@ -55,6 +84,10 @@ class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
       }
     }
   }
+  private def newerThan(latest: LatestEntry) = (parts: EntryParts) => {
+    (parts.createdAt.timestamp >= latest.createdAt.timestamp) &&
+      (parts.url.raw != latest.entryUrl)
+  }
   private def updateSource(source: LoadedSource): Unit = {
     helper.writable update source match {
       case Left(error) => Log error error.getMessage
@@ -62,8 +95,8 @@ class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
       case Right(_) => Log info s"updated: ${source.title}"
     }
   }
-  private def insertEntries(source: LoadedSource): Unit = {
-    val loadedEntries = source.validEntries
+  private def insertEntries(entries: Seq[EntryParts]): Unit = {
+
 //    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     loadedEntries.zipWithIndex foreach {
       case (entry, index) =>
@@ -114,3 +147,8 @@ private class SourceQueueMap {
     map.get(host).flatMap(_.headOption)
   }
 }
+
+case class SourceDequeueEvent(
+  inspected: InspectedSource,
+  loaded: Try[LoadedSource]
+)

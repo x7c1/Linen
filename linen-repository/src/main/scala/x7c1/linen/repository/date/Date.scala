@@ -6,6 +6,8 @@ import java.util.{Locale, TimeZone}
 
 import x7c1.wheat.macros.database.FieldConvertible
 
+import scala.concurrent.duration.Duration
+
 object Date {
   def current(): Date = new DateImpl(new util.Date)
 
@@ -28,10 +30,18 @@ object Date {
   private class DateImpl(underlying: util.Date) extends Date {
     override lazy val format = dateFormat format underlying
     override lazy val timestamp = (underlying.getTime / 1000).toInt
+    override def - (duration: Duration): Date = {
+      Date(timestamp - duration.toSeconds.toInt)
+    }
+    override def + (duration: Duration): Date = {
+      Date(timestamp + duration.toSeconds.toInt)
+    }
   }
 }
 
 trait Date {
   def format: String
   def timestamp: Int
+  def - (duration: Duration): Date
+  def + (duration: Duration): Date
 }
