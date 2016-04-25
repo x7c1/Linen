@@ -10,10 +10,8 @@ import x7c1.wheat.modern.patch.TaskAsync.after
 
 import scala.collection.mutable
 
-class SourceUpdaterQueue(helper: DatabaseHelper){
+class SourceUpdaterQueue(helper: DatabaseHelper, sourceLoader: SourceLoader){
   import Implicits._
-
-  private lazy val inspector = SourceInspector(helper)
 
   private lazy val queueMap = new SourceQueueMap
 
@@ -33,7 +31,7 @@ class SourceUpdaterQueue(helper: DatabaseHelper){
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start
 
-    val future = inspector.loadSource(source) map { loadedSource =>
+    val future = sourceLoader loadSource source map { loadedSource =>
       Log info s"[loaded] msec:${elapsed()}, source:$source"
 
       if (loadedSource isModifiedFrom source){
