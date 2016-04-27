@@ -225,5 +225,3 @@ class EntrySequence[A <: UnreadEntry](
     }
   }
 }
-
-

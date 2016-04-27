@@ -12,7 +12,7 @@ import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.dummy.DummyFactory
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositions, UnreadEntryRow}
+import x7c1.linen.repository.entry.unread.{EntrySourcePositionsFactory, EntryAccessor, EntryContent, EntrySourcePositions, UnreadEntryRow}
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, SourceKind}
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -78,8 +78,10 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
-    val positions = EntrySourcePositions.createPositionMap(db, accountId, sourceIds)
-
+    val positions = {
+      val factory = new EntrySourcePositionsFactory(db, accountId)
+      factory create sourceIds
+    }
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
@@ -104,7 +106,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
-    val query = EntrySourcePositions.createPositionQuery(accountId, sourceIds)
+    val query = EntrySourcePositions.createQuery(accountId, sourceIds)
     val plans = QueryExplainer(db).explain(query)
 
 //    println(query.sql)
@@ -123,7 +125,10 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
     val sourceIds = sourceAccessor.sourceIds
-    val positions = EntrySourcePositions.createPositionMap(db, accountId, sourceIds)
+    val positions = {
+      val factory = new EntrySourcePositionsFactory(db, accountId)
+      factory.create(sourceIds)
+    }
     val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
 
     assertEquals(Some(SourceKind), accessor.findKindAt(0))

@@ -6,7 +6,7 @@ import x7c1.wheat.modern.database.Query
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 object EntrySourcePositions {
-  def createPositionQuery(accountId: Long, sourceIds: Seq[Long]): Query = {
+  def createQuery(accountId: Long, sourceIds: Seq[Long]): Query = {
     val count =
       s"""SELECT
          |  _id AS entry_id,
@@ -29,29 +29,11 @@ object EntrySourcePositions {
 
     new Query(union, sourceIds.map(_.toString).toArray)
   }
-  def createPositionCursor(db: SQLiteDatabase, accountId: Long, sourceIds: Seq[Long]) = {
-    val query = createPositionQuery(accountId, sourceIds)
-    db.rawQuery(query.sql, query.selectionArgs)
-  }
-  def createPositionMap(db: SQLiteDatabase, accountId: Long, sourceIds: Seq[Long]): EntrySourcePositions = {
-    val cursor = createPositionCursor(db, accountId, sourceIds)
-    val countIndex = cursor getColumnIndex "count"
-    val sourceIdIndex = cursor getColumnIndex "source_id"
-    val list = (0 to cursor.getCount - 1).view map { i =>
-      cursor moveToPosition i
-      cursor.getLong(sourceIdIndex) -> cursor.getInt(countIndex)
-    }
-    val pairs = list.scanLeft(0L -> (0, 0)){
-      case ((_, (previous, sum)), (sourceId, count)) =>
-        sourceId -> (count + 1, previous + sum)
-    } map {
-      case (sourceId, (count, position)) =>
-        sourceId -> (position + 1)
-    }
-    new EntrySourcePositions(cursor, pairs.toMap)
-  }
 }
-class EntrySourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Sequence[SourceHeadlineContent] {
+
+class EntrySourcePositions(
+  cursor: Cursor,
+  countMap: Map[Long, Int]) extends Sequence[SourceHeadlineContent] {
 
   private lazy val countIndex = cursor getColumnIndex "count"
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
@@ -93,5 +75,30 @@ class EntrySourcePositions(cursor: Cursor, countMap: Map[Long, Int]) extends Seq
         ))
       case false => None
     }
+  }
+}
+
+class EntrySourcePositionsFactory(db: SQLiteDatabase, accountId: Long){
+
+  def createCursor(sourceIds: Seq[Long]): Cursor = {
+    val query = EntrySourcePositions.createQuery(accountId, sourceIds)
+    db.rawQuery(query.sql, query.selectionArgs)
+  }
+  def create(sourceIds: Seq[Long]): EntrySourcePositions = {
+    val cursor = createCursor(sourceIds)
+    val countIndex = cursor getColumnIndex "count"
+    val sourceIdIndex = cursor getColumnIndex "source_id"
+    val list = (0 to cursor.getCount - 1).view map { i =>
+      cursor moveToPosition i
+      cursor.getLong(sourceIdIndex) -> cursor.getInt(countIndex)
+    }
+    val pairs = list.scanLeft(0L -> (0, 0)){
+      case ((_, (previous, sum)), (sourceId, count)) =>
+        sourceId -> (count + 1, previous + sum)
+    } map {
+      case (sourceId, (count, position)) =>
+        sourceId -> (position + 1)
+    }
+    new EntrySourcePositions(cursor, pairs.toMap)
   }
 }

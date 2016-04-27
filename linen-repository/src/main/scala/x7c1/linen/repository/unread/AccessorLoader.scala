@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{EntrySourcePositions, ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.wheat.macros.logger.Log
@@ -153,7 +153,10 @@ class AccessorLoader private (
     val (sourceIds, remains) = remainingSourceIds splitAt 50
     val (outlines, details) =
       if (sourceIds.nonEmpty) {
-        val positions = EntrySourcePositions.createPositionMap(database, accountId, sourceIds)
+        val positions = {
+          val factory = new EntrySourcePositionsFactory(database, accountId)
+          factory.create(sourceIds)
+        }
         val outlines = Option(EntryAccessor.forEntryOutline(database, sourceIds, positions))
         val details = Option(EntryAccessor.forEntryDetail(database, sourceIds, positions))
         outlines -> details
@@ -174,7 +177,10 @@ class AccessorLoader private (
 
     val sourceIds = event.loadedSourceIds
     if (sourceIds.nonEmpty){
-      val positions = EntrySourcePositions.createPositionMap(database, event.accountId, sourceIds)
+      val positions = {
+        val factory = new EntrySourcePositionsFactory(database, event.accountId)
+        factory.create(sourceIds)
+      }
       val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
       val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
       synchronized {
