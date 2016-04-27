@@ -1,11 +1,14 @@
 package x7c1.linen.modern.init.unread
 
 import android.support.v7.widget.LinearLayoutManager
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
-import x7c1.linen.modern.action.{EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
+import x7c1.linen.modern.action.{OutlineFocusedEvent, EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEventFactory}
 import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}
+import x7c1.linen.repository.entry.unread.{UnreadOutline, EntryAccessor}
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
+import x7c1.wheat.modern.observer.{OnItemFocusedListener, FocusDetector, SkipDetector, SkipPositionFinder}
 
 trait OutlineAreaInitializer {
   self: UnreadItemsDelegatee =>
