@@ -12,12 +12,9 @@ import scala.util.Try
 
 trait UnreadSourceAccessor extends Sequence[UnreadSourceRow] {
 
-  def sourceIds: Seq[Long] = {
-    (0 to length - 1).view map findAt flatMap {
-      _ flatMap {
-        case UnreadSourceRow(x: UnreadSource) => Some(x.id)
-        case _ => None
-      }
+  def sources: Seq[UnreadSource] = {
+    (0 to length - 1).view flatMap findAt collect {
+      case UnreadSourceRow(x: UnreadSource) => x
     }
   }
   def positionOf(sourceId: Long): Option[Int]

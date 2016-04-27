@@ -1,12 +1,13 @@
 package x7c1.linen.repository.entry.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.wheat.modern.database.Query
 
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 object EntrySourcePositions {
-  def createQuery(accountId: Long, sourceIds: Seq[Long]): Query = {
+  def createQuery(sources: Seq[UnreadSource]): Query = {
     val count =
       s"""SELECT
          |  _id AS entry_id,
@@ -23,11 +24,11 @@ object EntrySourcePositions {
          |FROM ($count) AS c1
          |INNER JOIN sources as s1 ON s1._id = c1.source_id""".stripMargin
 
-    val union = sourceIds.
+    val union = sources.
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    new Query(union, sourceIds.map(_.toString).toArray)
+    new Query(union, sources.map(_.id.toString).toArray)
   }
 }
 
@@ -78,14 +79,14 @@ class EntrySourcePositions(
   }
 }
 
-class EntrySourcePositionsFactory(db: SQLiteDatabase, accountId: Long){
+class EntrySourcePositionsFactory(db: SQLiteDatabase){
 
-  def createCursor(sourceIds: Seq[Long]): Cursor = {
-    val query = EntrySourcePositions.createQuery(accountId, sourceIds)
+  def createCursor(sources: Seq[UnreadSource]): Cursor = {
+    val query = EntrySourcePositions.createQuery(sources)
     db.rawQuery(query.sql, query.selectionArgs)
   }
-  def create(sourceIds: Seq[Long]): EntrySourcePositions = {
-    val cursor = createCursor(sourceIds)
+  def create(sources: Seq[UnreadSource]): EntrySourcePositions = {
+    val cursor = createCursor(sources)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
     val list = (0 to cursor.getCount - 1).view map { i =>

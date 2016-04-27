@@ -77,12 +77,12 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
+    val sources = sourceAccessor.sources
     val positions = {
-      val factory = new EntrySourcePositionsFactory(db, accountId)
-      factory create sourceIds
+      val factory = new EntrySourcePositionsFactory(db)
+      factory create sources
     }
-    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+    val accessor = EntryAccessor.forEntryOutline(db, sources, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
     assertEquals(true, entries.exists {
@@ -105,8 +105,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
-    val query = EntrySourcePositions.createQuery(accountId, sourceIds)
+    val sources = sourceAccessor.sources
+    val query = EntrySourcePositions.createQuery(sources)
     val plans = QueryExplainer(db).explain(query)
 
 //    println(query.sql)
@@ -124,12 +124,12 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
     val db = new DatabaseHelper(context).getReadableDatabase
     val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
+    val sources = sourceAccessor.sources
     val positions = {
-      val factory = new EntrySourcePositionsFactory(db, accountId)
-      factory.create(sourceIds)
+      val factory = new EntrySourcePositionsFactory(db)
+      factory create sources
     }
-    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+    val accessor = EntryAccessor.forEntryOutline(db, sources, positions)
 
     assertEquals(Some(SourceKind), accessor.findKindAt(0))
     assertEquals(Some(EntryKind), accessor.findKindAt(1))

@@ -7,7 +7,7 @@ import x7c1.linen.repository.account.AccountIdentifiable
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.{UnreadSource, ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -77,8 +77,7 @@ class AccessorLoader private (
         channelId = select channelIdOf channel
       )
       event <- loadSourceEntries(
-        accountId = account.accountId,
-        remainingSourceIds = accessor map (_.sourceIds) getOrElse Seq()
+        remainingSources = accessor map (_.sources) getOrElse Seq()
       )
       _ <- Future {
         this.sourceAccessor = accessor
@@ -97,8 +96,7 @@ class AccessorLoader private (
     val load = for {
       accessor <- startLoadingSources(account.accountId, select channelIdOf channel)
       event <- loadSourceEntries(
-        accountId = account.accountId,
-        remainingSourceIds = accessor map (_.sourceIds) getOrElse Seq()
+        remainingSources = accessor map (_.sources) getOrElse Seq()
       )
       _ <- Future {
         close()
@@ -107,11 +105,11 @@ class AccessorLoader private (
       }
       _ <- Future { onLoad(LoadCompleteEvent(channel)) }
     } yield {
-      event.remainingSourceIds
+      event.remainingSources
     }
     load onComplete {
-      case Success(sourceIds) =>
-        Log info s"[done] remains:${sourceIds.length}"
+      case Success(sources) =>
+        Log info s"[done] remains:${sources.length}"
       case Failure(e) =>
         Log error format(e, depth = 30){"[failed]"}
     }
@@ -147,51 +145,52 @@ class AccessorLoader private (
         Some(accessor)
     }
   }
-  private def loadSourceEntries(accountId: Long, remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
-    Log info s"[init] remains:${remainingSourceIds.length}"
+  private def loadSourceEntries(remainingSources: Seq[UnreadSource]) =
+    loaderFactory asFuture {
+      Log info s"[init] remains:${remainingSources.length}"
 
-    val (sourceIds, remains) = remainingSourceIds splitAt 50
-    val (outlines, details) =
-      if (sourceIds.nonEmpty) {
-        val positions = {
-          val factory = new EntrySourcePositionsFactory(database, accountId)
-          factory.create(sourceIds)
+      val (sources, remains) = remainingSources splitAt 50
+      val (outlines, details) =
+        if (sources.nonEmpty) {
+          val positions = {
+            val factory = new EntrySourcePositionsFactory(database)
+            factory create sources
+          }
+          val outlines = Option(EntryAccessor.forEntryOutline(database, sources, positions))
+          val details = Option(EntryAccessor.forEntryDetail(database, sources, positions))
+          outlines -> details
+        } else {
+          None -> None
         }
-        val outlines = Option(EntryAccessor.forEntryOutline(database, sourceIds, positions))
-        val details = Option(EntryAccessor.forEntryDetail(database, sourceIds, positions))
-        outlines -> details
-      } else {
-        None -> None
-      }
 
-    AccessorsLoadedEvent(
-      accountId = accountId,
-      loadedSourceIds = sourceIds,
-      remainingSourceIds = remains,
-      outlines = outlines,
-      details = details
-    )
-  }
+      AccessorsLoadedEvent(
+        loadedSources = sources,
+        remainingSources = remains,
+        outlines = outlines,
+        details = details
+      )
+    }
+
   private def updateAccessors(event: AccessorsLoadedEvent) = {
-    Log info s"[init] sourceIds.length:${event.loadedSourceIds.length}"
+    Log info s"[init] sources.length:${event.loadedSources.length}"
 
-    val sourceIds = event.loadedSourceIds
-    if (sourceIds.nonEmpty){
+    val sources = event.loadedSources
+    if (sources.nonEmpty){
       val positions = {
-        val factory = new EntrySourcePositionsFactory(database, event.accountId)
-        factory.create(sourceIds)
+        val factory = new EntrySourcePositionsFactory(database)
+        factory create sources
       }
-      val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
-      val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
+      val outlines = EntryAccessor.forEntryOutline(database, sources, positions)
+      val details = EntryAccessor.forEntryDetail(database, sources, positions)
       synchronized {
-        currentSourceLength += sourceIds.length
+        currentSourceLength += sources.length
         outlineAccessors += outlines
         detailAccessors += details
       }
     }
   }
   private def loadNext: Try[AccessorsLoadedEvent] => Unit = {
-    case Success(event) => loadMore(event.accountId, event.remainingSourceIds)
+    case Success(event) => loadMore(event.remainingSources)
     case Failure(e : IllegalStateException) =>
 
       /*
@@ -204,17 +203,17 @@ class AccessorLoader private (
 
     case Failure(e) => Log error format(e, depth = 30){"failed"}
   }
-  private def loadMore(accountId: Long, remaining: Seq[Long]): Unit = {
+  private def loadMore(remaining: Seq[UnreadSource]): Unit = {
     Log info s"[init] remaining:${remaining.length}"
     remaining match {
       case Seq() => Log info "[done]"
       case _ => after(msec = 50){
-        loadAndUpdate(accountId, remaining) onComplete loadNext
+        loadAndUpdate(remaining) onComplete loadNext
       }
     }
   }
-  private def loadAndUpdate(accountId: Long, remaining: Seq[Long]) = for {
-    event <- loadSourceEntries(accountId, remaining)
+  private def loadAndUpdate(remaining: Seq[UnreadSource]) = for {
+    event <- loadSourceEntries(remaining)
     _ <- Future { updateAccessors(event) }
   } yield event
 }
@@ -240,9 +239,8 @@ object AccessorLoader {
 }
 
 case class AccessorsLoadedEvent(
-  accountId: Long,
-  loadedSourceIds: Seq[Long],
-  remainingSourceIds: Seq[Long],
+  loadedSources: Seq[UnreadSource],
+  remainingSources: Seq[UnreadSource],
   outlines: Option[ClosableEntryAccessor[UnreadOutline]],
   details: Option[ClosableEntryAccessor[UnreadDetail]]
 )

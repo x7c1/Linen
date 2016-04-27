@@ -166,31 +166,31 @@ class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
 object EntryAccessor {
 
   def forEntryOutline(
-    db: SQLiteDatabase, sourceIds: Seq[Long],
+    db: SQLiteDatabase, sources: Seq[UnreadSource],
     positions: EntrySourcePositions): ClosableEntryAccessor[UnreadOutline] = {
 
-    val cursor = createOutlineCursor(db, sourceIds)
+    val cursor = createOutlineCursor(db, sources)
     val factory = new EntryOutlineFactory(cursor)
     val sequence = new EntrySequence(factory, cursor)
     new EntryAccessorImpl(sequence, positions, cursor)
   }
   def forEntryDetail(
-    db: SQLiteDatabase, sourceIds: Seq[Long],
+    db: SQLiteDatabase, sources: Seq[UnreadSource],
     positions: EntrySourcePositions): ClosableEntryAccessor[UnreadDetail] = {
 
-    val cursor = createDetailCursor(db, sourceIds)
+    val cursor = createDetailCursor(db, sources)
     val factory = new EntryDetailFactory(cursor)
     val sequence = new EntrySequence(factory, cursor)
     new EntryAccessorImpl(sequence, positions, cursor)
   }
 
-  def createOutlineCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
-    createCursor(db, sourceIds, "substr(content, 1, 75) AS content")
+  def createOutlineCursor(db: SQLiteDatabase, sources: Seq[UnreadSource]) = {
+    createCursor(db, sources, "substr(content, 1, 75) AS content")
   }
-  def createDetailCursor(db: SQLiteDatabase, sourceIds: Seq[Long]) = {
-    createCursor(db, sourceIds, "content")
+  def createDetailCursor(db: SQLiteDatabase, sources: Seq[UnreadSource]) = {
+    createCursor(db, sources, "content")
   }
-  def createCursor(db: SQLiteDatabase, sourceIds: Seq[Long], content: String) = {
+  def createCursor(db: SQLiteDatabase, sources: Seq[UnreadSource], content: String) = {
     val sql =
       s"""SELECT
         |  _id AS entry_id,
@@ -204,11 +204,11 @@ object EntryAccessor {
         |WHERE source_id = ?
         |ORDER BY created_at DESC LIMIT 20""".stripMargin
 
-    val union = sourceIds.
+    val union = sources.
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    db.rawQuery(union, sourceIds.map(_.toString).toArray)
+    db.rawQuery(union, sources.map(_.id.toString).toArray)
   }
 }
 
