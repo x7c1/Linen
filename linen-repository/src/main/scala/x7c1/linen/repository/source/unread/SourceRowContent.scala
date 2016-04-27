@@ -9,6 +9,8 @@ case class UnreadSource(
   description: String,
   rating: Int,
   latestEntryId: Long,
-  startEntryId: Option[Long] ) extends SourceRowContent
+  latestEntryCreatedAt: Int,
+  startEntryId: Option[Long],
+  startEntryCreatedAt: Option[Int] ) extends SourceRowContent
 
 case class SourceFooterContent() extends SourceRowContent

@@ -71,6 +71,9 @@ private object TypedColumnImpl {
          */
         q"Option($cursor.getString($indexKey)).map(_.toLong)"
 
+      case x if x =:= typeOf[Option[Int]] =>
+        q"Option($cursor.getString($indexKey)).map(_.toInt)"
+
       case x if x <:< typeOf[FieldTransform[_, _]] =>
         val Seq(from, to) = tpe.typeArgs
         val value = getValue(from, indexKey)

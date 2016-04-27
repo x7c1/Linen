@@ -201,15 +201,17 @@ object EntryAccessor {
         |  $content,
         |  created_at
         |FROM entries
-        |WHERE source_id = ?
-        |ORDER BY created_at DESC LIMIT 20""".stripMargin
+        |WHERE ${QueryParts.where}
+        |ORDER BY created_at DESC
+        |LIMIT ${QueryParts.limit}""".stripMargin
 
     val union = sources.
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    db.rawQuery(union, sources.map(_.id.toString).toArray)
+    db.rawQuery(union, QueryParts.toArgs(sources))
   }
+
 }
 
 class EntrySequence[A <: UnreadEntry](

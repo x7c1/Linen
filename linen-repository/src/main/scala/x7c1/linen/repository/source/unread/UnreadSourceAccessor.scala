@@ -61,7 +61,9 @@ private class UnreadSourceAccessorImpl(
         description = cursor.description,
         rating = cursor.rating,
         latestEntryId = cursor.latest_entry_id,
-        startEntryId = cursor.start_entry_id
+        latestEntryCreatedAt = cursor.latest_entry_created_at,
+        startEntryId = cursor.start_entry_id,
+        startEntryCreatedAt = cursor.start_entry_created_at
       )
     }
   }

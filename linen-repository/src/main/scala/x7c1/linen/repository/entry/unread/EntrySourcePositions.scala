@@ -3,18 +3,18 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.wheat.modern.database.Query
-
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 object EntrySourcePositions {
   def createQuery(sources: Seq[UnreadSource]): Query = {
+
     val count =
       s"""SELECT
          |  _id AS entry_id,
          |  source_id
          |FROM entries
-         |WHERE source_id = ?
-         |LIMIT 20""".stripMargin
+         |WHERE ${QueryParts.where}
+         |LIMIT ${QueryParts.limit}""".stripMargin
 
     val sql =
       s"""SELECT
@@ -28,7 +28,7 @@ object EntrySourcePositions {
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    new Query(union, sources.map(_.id.toString).toArray)
+    new Query(union, QueryParts.toArgs(sources))
   }
 }
 

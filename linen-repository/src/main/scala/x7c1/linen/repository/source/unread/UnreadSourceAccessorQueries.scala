@@ -21,7 +21,8 @@ object UnreadSourceAccessorQueries {
       |  t1.source_id AS source_id,
       |  t1.start_entry_id AS start_entry_id,
       |  t1.start_entry_created_at AS start_entry_created_at,
-      |  t2.latest_entry_id AS latest_entry_id
+      |  t2.latest_entry_id AS latest_entry_id,
+      |  t2.latest_entry_created_at AS latest_entry_created_at
       |FROM ($sql2) AS t1
       |INNER JOIN retrieved_source_marks AS t2 ON t1.source_id = t2.source_id
       |WHERE
@@ -39,7 +40,9 @@ object UnreadSourceAccessorQueries {
       |  u2.title AS title,
       |  u2.description AS description,
       |  u1.latest_entry_id AS latest_entry_id,
-      |  u1.start_entry_id AS start_entry_id
+      |  u1.latest_entry_created_at AS latest_entry_created_at,
+      |  u1.start_entry_id AS start_entry_id,
+      |  u1.start_entry_created_at AS start_entry_created_at
       |FROM ($sql3) as u1
       |INNER JOIN sources as u2 ON u1.source_id = u2._id
       """.stripMargin
@@ -50,7 +53,9 @@ object UnreadSourceAccessorQueries {
       |  p4.title AS title,
       |  p4.description AS description,
       |  p4.start_entry_id AS start_entry_id,
+      |  p4.start_entry_created_at AS start_entry_created_at,
       |  p4.latest_entry_id AS latest_entry_id,
+      |  p4.latest_entry_created_at AS latest_entry_created_at,
       |  p1.account_id,
       |  IFNULL(p1.rating, 100) AS rating
       |FROM ($sql4) AS p4
@@ -65,5 +70,7 @@ trait UnreadSourceColumn extends TypedFields {
   def description: String
   def rating: Int
   def start_entry_id: Option[Long]
+  def start_entry_created_at: Option[Int]
   def latest_entry_id: Long
+  def latest_entry_created_at: Int
 }
