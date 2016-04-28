@@ -40,16 +40,21 @@ class EntrySourcePositions(
   private lazy val sourceIdIndex = cursor getColumnIndex "source_id"
   private lazy val titleIndex = cursor getColumnIndex "title"
 
-  private lazy val positionMap: Map[Int, Boolean] = {
+  private lazy val pairs: Seq[(Int, Boolean)] = {
     val counts = (0 to cursor.getCount - 1) map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
     }
-    val pairs = counts.scanLeft(0 -> true){
+    counts.scanLeft(0 -> true){
       case ((position, bool), count) =>
         (position + count + 1) -> true
     }
+  }
+  private lazy val positionMap: Map[Int, Boolean] = {
     pairs.toMap
+  }
+  lazy val lastEntryPositions: Seq[Int] = {
+    pairs.view map { case (position, _) => position - 1 } dropWhile { _ < 0 }
   }
   def isSource(position: Int): Boolean = {
     positionMap.getOrElse(position, false)

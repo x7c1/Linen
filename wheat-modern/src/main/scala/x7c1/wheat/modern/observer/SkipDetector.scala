@@ -98,7 +98,15 @@ trait OnItemSkippedListener[A <: ItemSkippedEvent] {
   def onSkipped(event: A): Unit
 }
 trait OnSkipStoppedListener[A <: SkipStoppedEvent]{
+  self =>
   def onSkipStopped(event: A): Unit
+  def append(listener: OnSkipStoppedListener[A]): OnSkipStoppedListener[A] =
+    new OnSkipStoppedListener[A] {
+      override def onSkipStopped(event: A): Unit = {
+        self onSkipStopped event
+        listener onSkipStopped event
+      }
+    }
 }
 
 trait SkipPositionFinder {

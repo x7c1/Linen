@@ -54,7 +54,15 @@ trait FocusedEventFactory[A <: ItemFocusedEvent]{
 }
 
 trait OnItemFocusedListener[A <: ItemFocusedEvent] {
+  self =>
   def onFocused(event: A): Unit
+  def append(listener: OnItemFocusedListener[A]): OnItemFocusedListener[A] =
+    new OnItemFocusedListener[A] {
+      override def onFocused(event: A): Unit = {
+        self onFocused event
+        listener onFocused event
+      }
+    }
 }
 
 trait OnScrollStoppedListener {

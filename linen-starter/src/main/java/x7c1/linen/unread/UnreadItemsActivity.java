@@ -83,6 +83,12 @@ public class UnreadItemsActivity extends Activity implements ActivityControl, Se
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+		initializer.onPause();
+	}
+
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		initializer.close();

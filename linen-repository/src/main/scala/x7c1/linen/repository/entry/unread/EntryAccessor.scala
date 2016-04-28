@@ -4,15 +4,17 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.struct.EntryRecord
+import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.linen.repository.unread.{EntryKind, SourceKind, UnreadRowKind}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.Query
-import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
+import x7c1.wheat.modern.sequence.Sequence
 
 import scala.annotation.tailrec
 
 trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
+
+  def lastEntriesTo(position: Int): Seq[A]
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
@@ -101,6 +103,26 @@ class EntryAccessorBinder[A <: UnreadEntry](
   override def close(): Unit = synchronized {
     accessors foreach (_.close())
   }
+  override def lastEntriesTo(position: Int) = {
+    @tailrec
+    def loop(
+      accessors: Seq[EntryAccessor[A]],
+      remains: Int, entries: Seq[A]): Seq[A] = {
+
+      accessors match {
+        case head +: tail =>
+          val xs = entries ++ head.lastEntriesTo(remains)
+          val diff = remains - head.length
+          if (diff <= 0){
+            xs
+          } else {
+            loop(tail, diff, xs)
+          }
+        case Seq() => entries
+      }
+    }
+    loop(accessors, position, Seq())
+  }
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
@@ -127,6 +149,13 @@ class EntryAccessorImpl[A <: UnreadEntry](
     Some(kind)
   }
   override def close(): Unit = cursor.close()
+
+  override def lastEntriesTo(position: Int) = {
+    val targets = positions.lastEntryPositions.view takeWhile {_ < position}
+    targets :+ position flatMap findAt collect {
+      case UnreadEntryRow(EntryContent(entry)) => entry
+    }
+  }
 }
 
 trait EntryFactory[A <: UnreadEntry]{

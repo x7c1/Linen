@@ -10,6 +10,13 @@ trait UnreadEntry {
   def entryId: Long
   def url: String
   def createdAt: Date
+
+  def olderThan(entry: UnreadEntry): Boolean = {
+    (createdAt.timestamp < entry.createdAt.timestamp) || {
+      (createdAt.timestamp == entry.createdAt.timestamp) &&
+      (entryId < entry.entryId)
+    }
+  }
 }
 
 object UnreadEntry {

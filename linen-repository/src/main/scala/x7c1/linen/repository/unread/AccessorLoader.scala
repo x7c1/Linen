@@ -297,4 +297,8 @@ private class EntriesFooterAppender[A <: UnreadEntry](
     accessor firstEntryPositionOf sourceId
   }
   private def isLast(position: Int) = position == accessor.length
+
+  override def lastEntriesTo(position: Int) = {
+    accessor lastEntriesTo position
+  }
 }

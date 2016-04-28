@@ -37,6 +37,10 @@ class UnreadItemsDelegatee(
     setupEntryDetailArea()
     setupDrawerMenu()
   }
+  def onPause(): Unit = {
+    Log info s"[init]"
+    entryMarker.markAsRead()
+  }
   def close(): Unit = {
     Log info s"[start]"
     closeDrawerMenu()
@@ -63,6 +67,8 @@ class UnreadItemsDelegatee(
       drawer = actions.drawer
     )
   )
+  protected lazy val entryMarker = new BrowsedEntriesMarker(accessors)
+
   private lazy val database = helper.getReadableDatabase
 
   private lazy val loader = AccessorLoader(database, activity)
