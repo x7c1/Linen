@@ -10,12 +10,14 @@ import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle,
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
-import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, FooterKind, SourceKind}
+import x7c1.linen.repository.unread.{BrowsedEntriesMarker, AccessorLoader, Accessors, EntryKind, FooterKind, SourceKind}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
+
+import scala.concurrent.Future
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl,
@@ -39,7 +41,9 @@ class UnreadItemsDelegatee(
   }
   def onPause(): Unit = {
     Log info s"[init]"
-    entryMarker.markAsRead()
+
+    import x7c1.linen.repository.crawler.Implicits._
+    Future { entryMarker.markAsRead() }
   }
   def close(): Unit = {
     Log info s"[start]"
@@ -67,7 +71,7 @@ class UnreadItemsDelegatee(
       drawer = actions.drawer
     )
   )
-  protected lazy val entryMarker = new BrowsedEntriesMarker(accessors)
+  protected lazy val entryMarker = BrowsedEntriesMarker(helper, accessors)
 
   private lazy val database = helper.getReadableDatabase
 
@@ -133,12 +137,7 @@ class UnreadItemsDelegatee(
   }
 }
 
-class Accessors(
-  val source: UnreadSourceAccessor,
-  val entryOutline: EntryAccessor[UnreadOutline],
-  val entryDetail: EntryAccessor[UnreadDetail],
-  val rawSource: RawSourceAccessor
-)
+
 
 class MenuRowProviders(
   val forTitle: ViewHolderProvider[MenuRowTitle],

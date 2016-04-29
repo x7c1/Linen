@@ -4,7 +4,8 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
 import x7c1.linen.modern.action.{EntrySkipStopped, EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEvent, OutlineFocusedEventFactory}
-import x7c1.linen.modern.display.unread.{OutlineRowAdapter, PaneDragDetector}
+import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, OnOutlineSelectedListener, OutlineRowAdapter, PaneDragDetector}
+import x7c1.linen.repository.unread.BrowsedEntriesMarker
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, OnItemFocusedListener, OnSkipStoppedListener, SkipDetector, SkipPositionFinder}
 
@@ -29,7 +30,6 @@ trait OutlineAreaInitializer {
       recyclerView = layout.entryList,
       focusedEventFactory = new OutlineFocusedEventFactory(accessors.entryOutline),
       onFocused = new OutlineFocusedObserver(actions) append outlineMarker
-
     )
     layout.entryList addOnItemTouchListener PaneDragDetector.create(
       context = layout.entryList.getContext,
