@@ -20,6 +20,6 @@ case class SourceFooterContent() extends SourceRowContent
 
 object UnreadSource {
   implicit object id extends SourceIdentifiable[UnreadSource] {
-    override def sourceId(target: UnreadSource): Long = target.id
+    override def idOf(target: UnreadSource): Long = target.id
   }
 }

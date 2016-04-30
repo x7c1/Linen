@@ -1,7 +1,7 @@
 package x7c1.linen.scene.channel.menu
 
 import android.content.Context
-import x7c1.linen.repository.channel.ChannelIdentifiable
+import x7c1.linen.database.struct.ChannelIdentifiable
 import x7c1.wheat.modern.menu.popup.{PopupMenuBox, PopupMenuItem}
 
 trait OnMenuSelectedListener[A] {

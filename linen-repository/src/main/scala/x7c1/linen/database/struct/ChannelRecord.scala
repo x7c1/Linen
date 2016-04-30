@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
-import x7c1.wheat.modern.database.{Deletable, Insertable}
+import x7c1.wheat.modern.database.{EntityIdentifiable, Deletable, Insertable}
 
 trait ChannelRecord extends TypedFields {
   def _id: Long
@@ -16,6 +16,8 @@ object ChannelRecord {
   def table: String = "channels"
   def column: ChannelRecord = TypedFields.expose[ChannelRecord]
 }
+
+trait ChannelIdentifiable[A] extends EntityIdentifiable[A, Long]
 
 case class ChannelParts(
   accountId: Long,

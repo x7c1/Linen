@@ -5,7 +5,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Findable, Insertable, Query, SeqSelectable}
+import x7c1.wheat.modern.database.{EntityIdentifiable, UniqueSelectorFindable, Findable, Insertable, Query, SeqSelectable2}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -16,18 +16,35 @@ trait EntryRecord extends TypedFields {
   def url: String
   def created_at: Int --> Date
 }
+
 object EntryRecord {
   def table: String = "entries"
 
-  implicit object selectable extends SingleSelectable[EntryRecord, Long]{
-    override def query(id: Long): Query = {
+  implicit object selectorFindable
+    extends UniqueSelectorFindable[SourceIdentifiable, Seq[EntryRecord]]
+
+  implicit object findable extends Findable[EntryRecord, Long]{
+    override def reify(cursor: Cursor) = {
+      TypedCursor[EntryRecord](cursor).freezeAt(0)
+    }
+    override def query(id: Long) = {
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
       new Query(sql, Array(id.toString))
     }
-    override def fromCursor(cursor: Cursor): Option[EntryRecord] =
-      TypedCursor[EntryRecord](cursor).freezeAt(0)
+  }
+  implicit object seq extends SeqSelectable2[SourceIdentifiable, EntryRecord]{
+    override def reify(cursor: Cursor) = {
+      TypedCursor[EntryRecord](cursor)
+    }
+    override def query[X: SourceIdentifiable](target: X): Query = {
+      val sourceId = implicitly[SourceIdentifiable[X]] idOf target
+      val sql = "SELECT *, _id AS entry_id FROM entries WHERE source_id = ?"
+      new Query(sql, Array(sourceId.toString))
+    }
   }
 }
+
+trait EntryIdentifiable[A] extends EntityIdentifiable[A, Long]
 
 case class EntryParts(
   sourceId: Long,

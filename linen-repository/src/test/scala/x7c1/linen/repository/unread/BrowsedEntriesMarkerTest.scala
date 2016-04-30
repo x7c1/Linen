@@ -131,7 +131,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
           createdAt = Date.current() + (10 + n).day
         )
       })
-      val s = helper.readable.selectorOf[Seq[EntryRecord]] fromSource source0
+      val s = helper.readable.selectorOf[Seq[EntryRecord]] from source0
       println(s)
 //      println(s.selector[Seq[EntryRecord]].hoge)
 //      println(s.getClass)
@@ -139,7 +139,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
 
 //      val Right(entries2) = helper.readable.select2[Seq[EntryRecord]].by(source0)
 
-      val Right(entries) = helper.readable.selectorOf[Seq[EntryRecord]] fromSource source0
+      val Right(entries) = helper.readable.selectorOf[Seq[EntryRecord]] from source0
       assertEquals(7, entries.length)
 
       println("?????")
