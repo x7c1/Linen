@@ -60,6 +60,7 @@ private class UnreadSourceAccessorImpl(
         title = cursor.title,
         description = cursor.description,
         rating = cursor.rating,
+        accountId = cursor.account_id,
         latestEntryId = cursor.latest_entry_id,
         latestEntryCreatedAt = cursor.latest_entry_created_at,
         startEntryId = cursor.start_entry_id,
@@ -107,6 +108,8 @@ object UnreadSourceAccessor {
   def createQuery(channelId: Long, accountId: Long) = {
     val sql = UnreadSourceAccessorQueries.sql5
     new Query(sql,
-      Array(accountId.toString, channelId.toString, accountId.toString))
+      Array(
+        accountId.toString, accountId.toString,
+        channelId.toString, accountId.toString))
   }
 }

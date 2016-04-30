@@ -14,6 +14,8 @@ import scala.annotation.tailrec
 
 trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
 
+  def latestEntriesTo(position: Int): Seq[A]
+
   def lastEntriesTo(position: Int): Seq[A]
 
   def firstEntryPositionOf(sourceId: Long): Option[Int]
@@ -123,6 +125,27 @@ class EntryAccessorBinder[A <: UnreadEntry](
     }
     loop(accessors, position, Seq())
   }
+
+  override def latestEntriesTo(position: Int): Seq[A] = {
+    @tailrec
+    def loop(
+      accessors: Seq[EntryAccessor[A]],
+      remains: Int, entries: Seq[A]): Seq[A] = {
+
+      accessors match {
+        case head +: tail =>
+          val xs = entries ++ head.latestEntriesTo(remains)
+          val diff = remains - head.length
+          if (diff <= 0){
+            xs
+          } else {
+            loop(tail, diff, xs)
+          }
+        case Seq() => entries
+      }
+    }
+    loop(accessors, position, Seq())
+  }
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
@@ -156,6 +179,12 @@ class EntryAccessorImpl[A <: UnreadEntry](
       case UnreadEntryRow(EntryContent(entry)) => entry
     }
   }
+  override def latestEntriesTo(position: Int): Seq[A] = {
+    val targets = positions.latestEntryPositions.view takeWhile {_ <= position}
+    targets flatMap findAt collect {
+      case UnreadEntryRow(EntryContent(entry)) => entry
+    }
+  }
 }
 
 trait EntryFactory[A <: UnreadEntry]{
@@ -163,13 +192,14 @@ trait EntryFactory[A <: UnreadEntry]{
 }
 
 class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline] {
-  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
+  private lazy val cursor = TypedCursor[UnreadEntryRecord](rawCursor)
 
   override def createEntry(): UnreadOutline = {
     UnreadOutline(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
       url = cursor.url,
+      accountId = cursor.account_id,
       shortTitle = cursor.title,
       shortContent = cursor.content,
       createdAt = cursor.created_at.typed
@@ -190,6 +220,10 @@ class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
       createdAt = cursor.created_at.typed
     )
   }
+}
+
+trait UnreadEntryRecord extends EntryRecord {
+  def account_id: Long
 }
 
 object EntryAccessor {
@@ -228,7 +262,8 @@ object EntryAccessor {
         |  url,
         |  author,
         |  $content,
-        |  created_at
+        |  created_at,
+        |  ? AS account_id
         |FROM entries
         |WHERE ${QueryParts.where}
         |ORDER BY created_at DESC

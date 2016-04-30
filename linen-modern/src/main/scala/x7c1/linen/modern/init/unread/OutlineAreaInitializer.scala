@@ -19,10 +19,9 @@ trait OutlineAreaInitializer {
     }
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
-
     layout.entryList setAdapter new OutlineRowAdapter(
       accessors.entryOutline,
-      new OutlineSelectedObserver(actions),
+      new OutlineSelectedObserver(actions) append outlineMarker,
       unreadRowProviders.forOutlineArea,
       footerHeightOf(layout.entryList)
     )
@@ -53,12 +52,16 @@ trait OutlineAreaInitializer {
 
 class OutlineEntryMarker(helper: DatabaseHelper, marker: BrowsedEntriesMarker)
   extends OnItemFocusedListener[OutlineFocusedEvent]
+  with OnOutlineSelectedListener
   with OnSkipStoppedListener[EntrySkipStopped]{
 
   override def onFocused(event: OutlineFocusedEvent): Unit = {
-    marker noteOutlinePosition event.position
+    marker touchOutlinePosition event.position
   }
   override def onSkipStopped(event: EntrySkipStopped): Unit = {
-    marker noteOutlinePosition event.currentPosition
+    marker touchOutlinePosition event.currentPosition
+  }
+  override def onEntrySelected(event: OutlineSelectedEvent): Unit = {
+    marker touchOutlinePosition event.position
   }
 }

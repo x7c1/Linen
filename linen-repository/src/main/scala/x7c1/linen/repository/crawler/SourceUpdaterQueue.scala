@@ -7,6 +7,7 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{RetrievedSourceMarkParts, EntryParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -126,12 +127,17 @@ private class SourceUpdaterQueueImpl(
     }
     marks.headOption foreach {
       case (entryId, entry) =>
-        helper.writable insert RetrievedSourceMarkParts(
+        helper.writable replace RetrievedSourceMarkParts(
           sourceId = entry.sourceId,
           latestEntryId = entryId,
           latestEntryCreatedAt = entry.createdAt,
           updatedAt = Date.current()
-        )
+        ) match {
+          case Left(error) =>
+            Log error ThrowableFormatter.format(error){"[failed]"}
+          case Right(b) =>
+            Log info s"[done] marked:id:$b"
+        }
     }
     marks
 //    notifier.notifyDone()

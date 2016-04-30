@@ -31,6 +31,7 @@ case class UnreadOutline(
   override val entryId: Long,
   override val url: String,
   override val createdAt: Date,
+  accountId: Long,
   shortTitle: String,
   shortContent: String ) extends UnreadEntry
 

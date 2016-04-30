@@ -44,7 +44,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
 
     val latestEntries = sources.map(_.latestEntryId).flatMap { entryId =>
-      helper.readable.find[EntryRecord].by(entryId).toOption
+      helper.readable.select[EntryRecord].by(entryId).toOption
     }
     assertEquals(
       Seq("sample-entry2-1", "sample-entry1-2"),

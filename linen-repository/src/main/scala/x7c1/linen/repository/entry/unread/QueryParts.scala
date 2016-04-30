@@ -21,6 +21,7 @@ private object QueryParts {
   }
   private def toWhere(x: UnreadSource) = {
     val where = Seq(
+      x.accountId,
       x.id,
       x.startEntryCreatedAt getOrElse 0,
       x.startEntryCreatedAt getOrElse 0,

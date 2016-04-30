@@ -50,13 +50,13 @@ object UnreadSourceAccessorQueries {
   val sql5 =
     s"""SELECT
       |  p4.source_id AS source_id,
+      |  ? AS account_id,
       |  p4.title AS title,
       |  p4.description AS description,
       |  p4.start_entry_id AS start_entry_id,
       |  p4.start_entry_created_at AS start_entry_created_at,
       |  p4.latest_entry_id AS latest_entry_id,
       |  p4.latest_entry_created_at AS latest_entry_created_at,
-      |  p1.account_id,
       |  IFNULL(p1.rating, 100) AS rating
       |FROM ($sql4) AS p4
       |LEFT JOIN source_ratings AS p1
@@ -69,6 +69,7 @@ trait UnreadSourceColumn extends TypedFields {
   def title: String
   def description: String
   def rating: Int
+  def account_id: Long
   def start_entry_id: Option[Long]
   def start_entry_created_at: Option[Int]
   def latest_entry_id: Long

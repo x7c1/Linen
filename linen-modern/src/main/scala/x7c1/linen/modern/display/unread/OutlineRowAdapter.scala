@@ -40,7 +40,15 @@ class OutlineRowAdapter(
 }
 
 trait OnOutlineSelectedListener {
+  self =>
   def onEntrySelected(event: OutlineSelectedEvent): Unit
+  def append(listener: OnOutlineSelectedListener): OnOutlineSelectedListener =
+    new OnOutlineSelectedListener {
+      override def onEntrySelected(event: OutlineSelectedEvent): Unit = {
+        self onEntrySelected event
+        listener onEntrySelected event
+      }
+    }
 }
 
 case class OutlineSelectedEvent(position: Int, entry: UnreadOutline){

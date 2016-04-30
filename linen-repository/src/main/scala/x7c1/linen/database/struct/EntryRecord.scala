@@ -5,7 +5,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, Query, SingleSelectable}
+import x7c1.wheat.modern.database.{Findable, Insertable, Query, SeqSelectable}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long

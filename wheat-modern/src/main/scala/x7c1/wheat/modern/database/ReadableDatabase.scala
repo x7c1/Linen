@@ -2,11 +2,18 @@ package x7c1.wheat.modern.database
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.wheat.modern.either.{OptionLeft, OptionRight, OptionEither}
+import x7c1.wheat.modern.either.{OptionEither, OptionLeft, OptionRight}
+
+import scala.language.higherKinds
 
 
 class ReadableDatabase(db: SQLiteDatabase) {
+
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
+
+  def select[A]: MultipleSelector[A] = new MultipleSelector[A](db)
+
+  def selectorOf[A](implicit x: SelectorFindable[A]): x.Selector = x selectorFrom this
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
@@ -27,4 +34,24 @@ class SingleSelector[A](db: SQLiteDatabase){
       case e: SQLException => OptionLeft(e)
     }
   }
+}
+
+class MultipleSelector[A](db: SQLiteDatabase){
+
+  def by[B](id: B)(implicit i: MultipleSelectable[A, B]): i.Result[A] = {
+    try {
+      val query = i query id
+      val cursor = db.rawQuery(query.sql, query.selectionArgs)
+      try i fromCursor cursor
+      finally i atFinal cursor
+    } catch {
+      case e: SQLException => i onException e
+    }
+  }
+
+}
+
+trait SelectorFindable[A]{
+  type Selector
+  def selectorFrom(db: ReadableDatabase): Selector
 }

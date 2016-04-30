@@ -11,7 +11,8 @@ object EntrySourcePositions {
     val count =
       s"""SELECT
          |  _id AS entry_id,
-         |  source_id
+         |  source_id,
+         |  ? AS account_id
          |FROM entries
          |WHERE ${QueryParts.where}
          |LIMIT ${QueryParts.limit}""".stripMargin
@@ -55,6 +56,9 @@ class EntrySourcePositions(
   }
   lazy val lastEntryPositions: Seq[Int] = {
     pairs.view map { case (position, _) => position - 1 } dropWhile { _ < 0 }
+  }
+  lazy val latestEntryPositions: Seq[Int] = {
+    pairs.view map { case (position, _) => position + 1 } dropWhile { _ < 0 }
   }
   def isSource(position: Int): Boolean = {
     positionMap.getOrElse(position, false)

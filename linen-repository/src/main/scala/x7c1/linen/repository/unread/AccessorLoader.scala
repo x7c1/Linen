@@ -61,6 +61,8 @@ class AccessorLoader private (
     (account: AccountIdentifiable, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
 
+    Log info s"[init] account:${account.accountId}"
+
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
 //      remaining <- loadSourceEntries(sourceIds)
@@ -71,7 +73,7 @@ class AccessorLoader private (
 //    first onComplete loadNext
 
     val select = implicitly[ChannelSelectable[A]]
-    for {
+    val load = for {
       accessor <- startLoadingSources(
         accountId = account.accountId,
         channelId = select channelIdOf channel
@@ -87,10 +89,18 @@ class AccessorLoader private (
     } yield {
       event
     }
+    load onComplete {
+      case Success(event) =>
+        Log info s"[done] loaded:${event.loadedSources.length}"
+      case Failure(error) =>
+        Log error format(error){"[failed]"}
+    }
   }
   def restartLoading[A: ChannelSelectable]
     (account: AccountIdentifiable, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+
+    Log info s"[init] account:${account.accountId}"
 
     val select = implicitly[ChannelSelectable[A]]
     val load = for {
@@ -300,5 +310,8 @@ private class EntriesFooterAppender[A <: UnreadEntry](
 
   override def lastEntriesTo(position: Int) = {
     accessor lastEntriesTo position
+  }
+  override def latestEntriesTo(position: Int): Seq[A] = {
+    accessor latestEntriesTo position
   }
 }
