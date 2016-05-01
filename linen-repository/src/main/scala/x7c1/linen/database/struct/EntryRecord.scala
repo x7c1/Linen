@@ -1,12 +1,12 @@
 package x7c1.linen.database.struct
 
 import android.content.ContentValues
-import android.database.{Cursor, SQLException}
+import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.presets.{CollectFrom, Find}
 import x7c1.wheat.modern.database.{EntityIdentifiable, Findable2, Insertable, Query, ReadableDatabase, SeqSelectable2, SingleSelectorFactory}
-import x7c1.wheat.modern.either.OptionEither
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -44,18 +44,9 @@ object EntryRecord {
       new Query(sql, Array(sourceId.toString))
     }
   }
-  class Selector(readable: ReadableDatabase){
-    import x7c1.wheat.modern.either.Imports._
-
-    def collectFrom[X: SourceIdentifiable](target: X): Either[SQLException, Seq[EntryRecord]] = {
-      readable.select2[Seq[EntryRecord]] by target
-    }
-    def find[X: EntryIdentifiable](target: X): OptionEither[SQLException, EntryRecord] = {
-      val either = readable.select2[Option[EntryRecord]] by target
-      either.toOptionEither
-    }
-  }
-
+  class Selector(val readable: ReadableDatabase)
+    extends CollectFrom[SourceIdentifiable, EntryRecord]
+      with Find[EntryIdentifiable, EntryRecord]
 }
 
 trait EntryIdentifiable[A] extends EntityIdentifiable[A, Long]
