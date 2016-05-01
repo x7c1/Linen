@@ -11,9 +11,7 @@ class ReadableDatabase(db: SQLiteDatabase) {
 
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
 
-  def select[A]: MultipleSelector[A] = new MultipleSelector[A](db)
-
-  def select2[A]: MultipleSelector2[A] = new MultipleSelector2[A](db)
+  def select2[A]: RecordSelector[A] = new RecordSelector[A](db)
 
   def selectorOf[A](implicit x: SelectorFactory[A]): x.Selector = x createFrom this
 }
@@ -38,24 +36,10 @@ class SingleSelector[A](db: SQLiteDatabase){
   }
 }
 
-class MultipleSelector[A](db: SQLiteDatabase) {
-
-  def by[B](id: B)(implicit i: MultipleSelectable[A, B]): i.Result[A] = {
-    try {
-      val query = i query id
-      val cursor = db.rawQuery(query.sql, query.selectionArgs)
-      try i fromCursor cursor
-      finally i atFinal cursor
-    } catch {
-      case e: SQLException => i onException e
-    }
-  }
-}
-
-class MultipleSelector2[A](db: SQLiteDatabase){
+class RecordSelector[A](db: SQLiteDatabase){
 
   def by[X: I, I[T] <: RecordIdentifiable[T]](id: X)
-      (implicit i: MultipleSelectable2[I, A]): i.Result[A] = {
+      (implicit i: RecordSelectable[I, A]): i.Result[A] = {
 
     try {
       val query = i query id

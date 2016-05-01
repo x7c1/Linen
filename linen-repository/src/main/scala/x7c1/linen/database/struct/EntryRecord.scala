@@ -6,7 +6,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.presets.{CollectFrom, Find}
-import x7c1.wheat.modern.database.{EntityIdentifiable, Findable2, Insertable, Query, ReadableDatabase, SeqSelectable2, SingleSelectorFactory}
+import x7c1.wheat.modern.database.{EntityIdentifiable, RecordFindable, Insertable, Query, ReadableDatabase, SeqSelectable, SelectorProvidable}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -21,10 +21,10 @@ trait EntryRecord extends TypedFields {
 object EntryRecord {
   def table: String = "entries"
 
-  implicit object selectorFactory
-    extends SingleSelectorFactory[EntryRecord, Selector](new Selector(_))
+  implicit object providable
+    extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
-  implicit object findable extends Findable2[EntryIdentifiable, EntryRecord]{
+  implicit object findable extends RecordFindable[EntryIdentifiable, EntryRecord]{
     override def reify(cursor: Cursor): Option[EntryRecord] = {
       TypedCursor[EntryRecord](cursor) freezeAt 0
     }
@@ -34,7 +34,7 @@ object EntryRecord {
       new Query(sql, Array(id.toString))
     }
   }
-  implicit object seq extends SeqSelectable2[SourceIdentifiable, EntryRecord]{
+  implicit object seq extends SeqSelectable[SourceIdentifiable, EntryRecord]{
     override def reify(cursor: Cursor) = {
       TypedCursor[EntryRecord](cursor)
     }
