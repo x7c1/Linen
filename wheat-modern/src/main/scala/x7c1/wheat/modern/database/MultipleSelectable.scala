@@ -56,6 +56,23 @@ trait MultipleSelectable2[I[T] <: RecordIdentifiable[T], A]{
   def atFinal(cursor: Cursor): Unit
 }
 
+trait Findable2[I[T] <: RecordIdentifiable[T], A]
+  extends MultipleSelectable2[I, Option[A]]{
+
+  override type Result[X] = Either[SQLException, X]
+
+  override def fromCursor(cursor: Cursor) = {
+    Right(reify(cursor))
+  }
+  override def onException(e: SQLException) = {
+    Left(e)
+  }
+  override def atFinal(cursor: Cursor) = {
+    cursor.close()
+  }
+  def reify(cursor: Cursor): Option[A]
+}
+
 trait SeqSelectable2[I[T] <: RecordIdentifiable[T], A]
   extends MultipleSelectable2[I, Seq[A]]{
 

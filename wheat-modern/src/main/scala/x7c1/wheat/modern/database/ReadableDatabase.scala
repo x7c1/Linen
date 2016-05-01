@@ -15,7 +15,7 @@ class ReadableDatabase(db: SQLiteDatabase) {
 
   def select2[A]: MultipleSelector2[A] = new MultipleSelector2[A](db)
 
-  def selectorOf[A](implicit x: SelectorFindable[A]): x.Selector = x selectorFrom this
+  def selectorOf[A](implicit x: SelectorFactory[A]): x.Selector = x createFrom this
 }
 
 class SingleSelector[A](db: SQLiteDatabase){

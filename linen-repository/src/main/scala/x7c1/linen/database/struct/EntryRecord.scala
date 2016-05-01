@@ -1,11 +1,12 @@
 package x7c1.linen.database.struct
 
 import android.content.ContentValues
-import android.database.Cursor
+import android.database.{Cursor, SQLException}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{EntityIdentifiable, UniqueSelectorFindable, Findable, Insertable, Query, SeqSelectable2}
+import x7c1.wheat.modern.database.{EntityIdentifiable, Findable2, Insertable, Query, ReadableDatabase, SeqSelectable2, SingleSelectorFactory}
+import x7c1.wheat.modern.either.OptionEither
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -20,14 +21,15 @@ trait EntryRecord extends TypedFields {
 object EntryRecord {
   def table: String = "entries"
 
-  implicit object selectorFindable
-    extends UniqueSelectorFindable[SourceIdentifiable, Seq[EntryRecord]]
+  implicit object selectorFactory
+    extends SingleSelectorFactory[EntryRecord, Selector](new Selector(_))
 
-  implicit object findable extends Findable[EntryRecord, Long]{
-    override def reify(cursor: Cursor) = {
-      TypedCursor[EntryRecord](cursor).freezeAt(0)
+  implicit object findable extends Findable2[EntryIdentifiable, EntryRecord]{
+    override def reify(cursor: Cursor): Option[EntryRecord] = {
+      TypedCursor[EntryRecord](cursor) freezeAt 0
     }
-    override def query(id: Long) = {
+    override def query[X: EntryIdentifiable](target: X): Query = {
+      val id = implicitly[EntryIdentifiable[X]] idOf target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
       new Query(sql, Array(id.toString))
     }
@@ -42,9 +44,27 @@ object EntryRecord {
       new Query(sql, Array(sourceId.toString))
     }
   }
+  class Selector(readable: ReadableDatabase){
+    import x7c1.wheat.modern.either.Imports._
+
+    def collectFrom[X: SourceIdentifiable](target: X): Either[SQLException, Seq[EntryRecord]] = {
+      readable.select2[Seq[EntryRecord]] by target
+    }
+    def find[X: EntryIdentifiable](target: X): OptionEither[SQLException, EntryRecord] = {
+      val either = readable.select2[Option[EntryRecord]] by target
+      either.toOptionEither
+    }
+  }
+
 }
 
 trait EntryIdentifiable[A] extends EntityIdentifiable[A, Long]
+
+object EntryIdentifier {
+  implicit object entryIdentifiable extends EntryIdentifiable[Long]{
+    override def idOf(target: Long): Long = target
+  }
+}
 
 case class EntryParts(
   sourceId: Long,

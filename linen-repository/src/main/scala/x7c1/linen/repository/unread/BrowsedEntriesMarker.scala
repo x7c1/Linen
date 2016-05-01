@@ -46,7 +46,7 @@ class BrowsedEntriesMarker (
       case (sourceId, entry) =>
         Log info s"account:${entry.accountId}, ${entry.entryId}, ${entry.sourceId}"
 
-        val x1 = helper.readable.select[EntryRecord] by entry.entryId
+        val x1 = helper.readable.selectorOf[EntryRecord] find entry
         val x2 = helper.readable.find[AccountRecord] by entry.accountId
         val x3 = helper.readable.find[SourceRecord] by entry.sourceId
 

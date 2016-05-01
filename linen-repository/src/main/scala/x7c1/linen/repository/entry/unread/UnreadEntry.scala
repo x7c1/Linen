@@ -1,6 +1,7 @@
 package x7c1.linen.repository.entry.unread
 
 import android.net.Uri
+import x7c1.linen.database.struct.EntryIdentifiable
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.action.SiteVisitable
 
@@ -23,6 +24,11 @@ object UnreadEntry {
   implicit def toSiteVisitable[A <: UnreadEntry]: SiteVisitable[A] =
     new SiteVisitable[A] {
       override def targetUri(target: A) = Uri parse target.url
+    }
+
+  implicit def id[A <: UnreadEntry]: EntryIdentifiable[A] =
+    new EntryIdentifiable[A] {
+      override def idOf(target: A): Long = target.entryId
     }
 }
 

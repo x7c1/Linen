@@ -12,7 +12,7 @@ import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.dummy.DummyFactory
-import x7c1.linen.repository.entry.unread.{EntrySourcePositionsFactory, EntryAccessor, EntryContent, EntrySourcePositions, UnreadEntryRow}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositions, EntrySourcePositionsFactory, UnreadEntryRow}
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, SourceKind}
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -43,8 +43,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     assertEquals(Seq(33, 11), sources.map(_.rating))
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
 
+    import x7c1.linen.database.struct.EntryIdentifier._
     val latestEntries = sources.map(_.latestEntryId).flatMap { entryId =>
-      helper.readable.select[EntryRecord].by(entryId).toOption
+      helper.readable.selectorOf[EntryRecord].find(entryId).toOption
     }
     assertEquals(
       Seq("sample-entry2-1", "sample-entry1-2"),
