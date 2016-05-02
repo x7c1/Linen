@@ -2,11 +2,12 @@ package x7c1.linen.database.struct
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.presets.{CollectFrom, Find}
-import x7c1.wheat.modern.database.{EntityIdentifiable, RecordFindable, Insertable, Query, ReadableDatabase, SeqSelectable, SelectorProvidable}
+import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, Query, RecordFindable, SelectorProvidable, SeqSelectable}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -44,14 +45,14 @@ object EntryRecord {
       new Query(sql, Array(sourceId.toString))
     }
   }
-  class Selector(val readable: ReadableDatabase)
+  class Selector(val db: SQLiteDatabase)
     extends CollectFrom[SourceIdentifiable, EntryRecord]
       with Find[EntryIdentifiable, EntryRecord]
 }
 
 trait EntryIdentifiable[A] extends EntityIdentifiable[A, Long]
 
-object EntryIdentifier {
+object EntryIdentifiable {
   implicit object entryIdentifiable extends EntryIdentifiable[Long]{
     override def idOf(target: Long): Long = target
   }

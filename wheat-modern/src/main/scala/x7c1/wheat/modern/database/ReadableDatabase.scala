@@ -8,12 +8,7 @@ import scala.language.higherKinds
 
 
 class ReadableDatabase(db: SQLiteDatabase) {
-
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
-
-  def select2[A]: RecordSelector[A] = new RecordSelector[A](db)
-
-  def selectorOf[A](implicit x: SelectorFactory[A]): x.Selector = x createFrom this
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
@@ -36,9 +31,9 @@ class SingleSelector[A](db: SQLiteDatabase){
   }
 }
 
-class RecordSelector[A](db: SQLiteDatabase){
+class RecordSelector[A](val db: SQLiteDatabase) extends AnyVal {
 
-  def by[X: I, I[T] <: RecordIdentifiable[T]](id: X)
+  def selectBy[X: I, I[T] <: RecordIdentifiable[T]](id: X)
       (implicit i: RecordSelectable[I, A]): i.Result[A] = {
 
     try {
@@ -49,5 +44,11 @@ class RecordSelector[A](db: SQLiteDatabase){
     } catch {
       case e: SQLException => i onException e
     }
+  }
+}
+
+object RecordSelector {
+  def apply[A](db: SQLiteDatabase): RecordSelector[A] = {
+    new RecordSelector[A](db)
   }
 }
