@@ -2,7 +2,7 @@ package x7c1.wheat.modern.database.presets
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.wheat.modern.database.{RecordFindable, RecordIdentifiable, RecordSelector, SeqSelectable}
+import x7c1.wheat.modern.database.{RawFindable, RecordIdentifiable, RecordSelector, SeqSelectable}
 import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.either.OptionEither
 
@@ -22,7 +22,7 @@ trait Find[I[T] <: RecordIdentifiable[T], A]{
   protected def db: SQLiteDatabase
 
   def findBy[X: I](target: X)
-      (implicit i: RecordFindable[I, A]): OptionEither[SQLException, A] = {
+      (implicit i: RawFindable[I, A]): OptionEither[SQLException, A] = {
 
     val either = RecordSelector(db) selectBy target
     either.toOptionEither
