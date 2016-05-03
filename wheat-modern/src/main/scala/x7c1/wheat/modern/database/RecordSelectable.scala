@@ -59,8 +59,8 @@ class CursorConverter[
   }
 }
 
-trait CursorConvertible[FROM, A]{
-  def fromCursor: (FROM with TypedCursor[FROM], Int) => Option[A]
+trait CursorConvertible[FROM, TO]{
+  def fromCursor: (FROM with TypedCursor[FROM], Int) => Option[TO]
 }
 trait CursorReifiable[A] {
   def reify(cursor: Cursor): A with TypedCursor[A]
@@ -68,4 +68,18 @@ trait CursorReifiable[A] {
 
 trait RecordReifiable[A] extends CursorReifiable[A] with CursorConvertible[A, A]{
   override def fromCursor = _ freezeAt _
+}
+
+abstract class EntityFindable[
+  I[T] <: RecordIdentifiable[T],
+  FROM: CursorReifiable: ({ type L[T] = RecordFindable[I, T] })#L,
+  TO: ({ type L[T] = CursorConvertible[FROM, T] })#L
+] extends RawFindable[I, TO]{
+
+  override def reify(cursor: Cursor): Option[TO] = {
+    new CursorConverter[FROM, TO](cursor) convertAt 0
+  }
+  override def query[X: I](target: X): Query = {
+    implicitly[RecordFindable[I, FROM]] query target
+  }
 }
