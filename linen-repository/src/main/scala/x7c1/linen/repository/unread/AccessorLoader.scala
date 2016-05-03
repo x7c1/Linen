@@ -3,7 +3,7 @@ package x7c1.linen.repository.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
@@ -58,7 +58,7 @@ class AccessorLoader private (
     new EntriesFooterAppender(detailUnderlying)
   }
   def startLoading[A: ChannelSelectable]
-    (account: AccountIdentifiable, channel: A)
+    (account: AccountBase, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
 
     Log info s"[init] account:${account.accountId}"
@@ -97,7 +97,7 @@ class AccessorLoader private (
     }
   }
   def restartLoading[A: ChannelSelectable]
-    (account: AccountIdentifiable, channel: A)
+    (account: AccountBase, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
 
     Log info s"[init] account:${account.accountId}"

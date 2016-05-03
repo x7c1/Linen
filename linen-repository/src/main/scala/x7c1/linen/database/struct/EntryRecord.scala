@@ -7,7 +7,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.presets.{CollectFrom, Find}
-import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, Query, RecordFindable, SelectorProvidable, SeqSelectable}
+import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, Query, RecordFindable, RecordReifiable, SelectorProvidable, SeqSelectable}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -22,13 +22,13 @@ trait EntryRecord extends TypedFields {
 object EntryRecord {
   def table: String = "entries"
 
+  implicit object reifiable extends RecordReifiable[EntryRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[EntryRecord](cursor)
+  }
   implicit object providable
     extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
   implicit object findable extends RecordFindable[EntryIdentifiable, EntryRecord]{
-    override def reify(cursor: Cursor): Option[EntryRecord] = {
-      TypedCursor[EntryRecord](cursor) freezeAt 0
-    }
     override def query[X: EntryIdentifiable](target: X): Query = {
       val id = implicitly[EntryIdentifiable[X]] idOf target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
@@ -36,9 +36,6 @@ object EntryRecord {
     }
   }
   implicit object seq extends SeqSelectable[SourceIdentifiable, EntryRecord]{
-    override def reify(cursor: Cursor) = {
-      TypedCursor[EntryRecord](cursor)
-    }
     override def query[X: SourceIdentifiable](target: X): Query = {
       val sourceId = implicitly[SourceIdentifiable[X]] idOf target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE source_id = ?"

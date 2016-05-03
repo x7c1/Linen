@@ -3,7 +3,7 @@ package x7c1.linen.modern.display.settings
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.linen.scene.channel.menu.{MenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -64,4 +64,4 @@ case class MyChannelSubscriptionChanged(
   accountId: Long,
   channelId: Long,
   isSubscribed: Boolean
-) extends AccountIdentifiable
+) extends AccountBase

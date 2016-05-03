@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import android.database.{Cursor, SQLException}
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
@@ -21,7 +21,7 @@ object ChannelStatusRecord {
   def table: String = "channel_statuses"
   def column = TypedFields.expose[ChannelStatusRecord]
 
-  implicit def selectable[A <: AccountIdentifiable]: SingleWhere[ChannelStatusRecord, (A, Long)] =
+  implicit def selectable[A <: AccountBase]: SingleWhere[ChannelStatusRecord, (A, Long)] =
     new SingleWhere[ChannelStatusRecord, (A, Long)](table){
       override def where(id: (A, Long)): Seq[(String, String)] = id match {
         case (account, channelId) => Seq(

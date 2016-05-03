@@ -3,7 +3,9 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, SingleWhere}
+import x7c1.wheat.modern.database.RecordFindable.Where
+import x7c1.wheat.modern.database.presets.DefaultProvidable
+import x7c1.wheat.modern.database.{Insertable, RecordReifiable}
 
 
 trait account_tag_map extends TypedFields {
@@ -16,10 +18,15 @@ object account_tag_map {
 
   def table = "account_tag_map"
 
-  implicit object selectable extends SingleWhere[account_tag_map, Long](table){
-    override def where(id: Long) = Seq("account_id" -> id.toString)
-    override def fromCursor(raw: Cursor) = {
-      TypedCursor[account_tag_map](raw).freezeAt(0)
+  implicit object reifiable extends RecordReifiable[account_tag_map]{
+    override def reify(cursor: Cursor) = TypedCursor[account_tag_map](cursor)
+  }
+  implicit object providable
+    extends DefaultProvidable[AccountIdentifiable, account_tag_map]
+
+  implicit object findable extends Where[AccountIdentifiable, account_tag_map](table){
+    override def where[X](id: Long) = {
+      Seq("account_id" -> id.toString)
     }
   }
 }
@@ -39,7 +46,7 @@ object AccountTagMapParts {
         column.account_id -> target.accountId,
         column.account_tag_id -> target.accountTagId,
         column.created_at -> target.createdAt
-        )
+      )
     }
   }
 }

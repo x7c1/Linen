@@ -3,14 +3,14 @@ package x7c1.linen.repository.account.setup
 import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{AccountParts, AccountTagLabel, AccountTagMapParts, account_tags}
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.date.Date
 
 import x7c1.wheat.modern.database.{WritableDatabase, ZeroAritySingle}
 import x7c1.wheat.modern.either.OptionEither
 
 
-class TaggedAccountSetup[A <: AccountIdentifiable : ZeroAritySingle](
+class TaggedAccountSetup[A <: AccountBase : ZeroAritySingle](
   helper: DatabaseHelper,
   tagLabel: AccountTagLabel ) {
 

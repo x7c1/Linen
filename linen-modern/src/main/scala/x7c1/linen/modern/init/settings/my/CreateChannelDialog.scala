@@ -11,7 +11,7 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.ChannelParts
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -114,7 +114,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     )
     def subscribe(channelId: Long) = {
       val subscriber = new ChannelSubscriber(
-        account = AccountIdentifiable(args.clientAccountId),
+        account = AccountBase(args.clientAccountId),
         helper = helper
       )
       subscriber subscribe channelId
@@ -197,4 +197,4 @@ case class NewChannelInput(
 class ChannelCreated(
   val accountId: Long,
   val channelId: Long
-) extends AccountIdentifiable
+) extends AccountBase

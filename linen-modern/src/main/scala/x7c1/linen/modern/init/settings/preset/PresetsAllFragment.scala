@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.{LayoutInflater, View, ViewGroup}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.res.layout.{SettingPresetChannelRow, SettingPresetTabAll}
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.preset.AllPresetChannelsAccessor
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -52,7 +52,7 @@ class SubscriptionChangedUpdater(
   accountId0: Long, context: Context, helper: DatabaseHelper) extends OnChannelSubscribedListener {
 
   override def onSubscribedChanged(event: PresetChannelSubscriptionChanged): Unit = {
-    val account = new AccountIdentifiable {
+    val account = new AccountBase {
       override def accountId: Long = accountId0
     }
     val subscriber = new ChannelSubscriber(account, helper)

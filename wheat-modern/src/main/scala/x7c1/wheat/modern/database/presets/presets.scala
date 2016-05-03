@@ -21,7 +21,7 @@ trait CollectFrom [I[T] <: RecordIdentifiable[T], A]{
 trait Find[I[T] <: RecordIdentifiable[T], A]{
   protected def db: SQLiteDatabase
 
-  def find[X: I](target: X)
+  def findBy[X: I](target: X)
       (implicit i: RecordFindable[I, A]): OptionEither[SQLException, A] = {
 
     val either = RecordSelector(db) selectBy target

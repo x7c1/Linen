@@ -3,13 +3,13 @@ package x7c1.linen.repository.channel.subscribe
 import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelStatusRecord, ChannelStatusRecordParts}
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.WritableDatabase
 import x7c1.wheat.modern.either.OptionEither
 
 
-class ChannelSubscriber(account: AccountIdentifiable, helper: DatabaseHelper) {
+class ChannelSubscriber(account: AccountBase, helper: DatabaseHelper) {
   import x7c1.wheat.modern.either.Imports._
 
   def subscribe(channelId: Long): OptionEither[SQLException, Unit] = {

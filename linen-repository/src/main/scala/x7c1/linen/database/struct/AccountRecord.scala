@@ -3,7 +3,7 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{SingleWhere, Insertable}
+import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, SingleWhere}
 
 
 trait AccountRecord extends TypedFields {
@@ -21,6 +21,8 @@ object AccountRecord {
     }
   }
 }
+
+trait AccountIdentifiable[A] extends EntityIdentifiable[A, Long]
 
 case class AccountParts(
   nickname: String,

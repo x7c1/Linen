@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{account_tags, account_tag_map}
+import x7c1.linen.database.struct.{account_tag_map, account_tags}
 import x7c1.linen.repository.account.setup.PresetAccountSetup
 import x7c1.linen.repository.source.setting.SampleFactory
 
@@ -26,11 +26,11 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
     val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map].by(account1.accountId).toEither
+    val Right(Some(map)) = helper.readable.select[account_tag_map].findBy(account1).toEither
     val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id).toEither
     assertEquals("preset", tag.tag_label)
 
-    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId).toEither
+    val Right(x) = helper.readable.select[account_tag_map].findBy(firstAccount).toEither
     assertEquals(None, x)
   }
 
@@ -43,13 +43,13 @@ class PresetAccountSetupTest extends JUnitSuiteLike {
     val Right(account2) = PresetAccountSetup(helper).findOrCreate()
     assertEquals(true, account1 == account2)
 
-    val Right(Some(map)) = helper.readable.find[account_tag_map].by(account1.accountId).toEither
+    val Right(Some(map)) = helper.readable.select[account_tag_map].findBy(account1).toEither
     val Right(Some(tag)) = helper.readable.find[account_tags].by(map.account_tag_id).toEither
     assertEquals("preset", tag.tag_label)
 
     val factory = new SampleFactory(helper)
     val firstAccount = factory.createAccount()
-    val Right(x) = helper.readable.find[account_tag_map].by(firstAccount.accountId).toEither
+    val Right(x) = helper.readable.select[account_tag_map].findBy(firstAccount).toEither
     assertEquals(None, x)
   }
 
