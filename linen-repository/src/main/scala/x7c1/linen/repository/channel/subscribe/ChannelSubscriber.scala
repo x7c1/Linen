@@ -2,7 +2,7 @@ package x7c1.linen.repository.channel.subscribe
 
 import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelStatusRecord, ChannelStatusRecordParts}
+import x7c1.linen.database.struct.{ChannelStatusKey, ChannelStatusRecord, ChannelStatusRecordParts}
 import x7c1.linen.repository.account.AccountBase
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.WritableDatabase
@@ -20,7 +20,10 @@ class ChannelSubscriber(account: AccountBase, helper: DatabaseHelper) {
   }
   private case class Writer(subscribed: Boolean){
     def insertOrUpdate(channelId: Long) = {
-      val either = helper.readable.find[ChannelStatusRecord] by (account -> channelId)
+      val either = helper.selectorOf[ChannelStatusRecord] findBy ChannelStatusKey(
+        channelId = channelId,
+        accountId = account.accountId
+      )
       either.option flatMap {
         case Some(record) => update(channelId).toOptionEither
         case None => insert(channelId).toOptionEither

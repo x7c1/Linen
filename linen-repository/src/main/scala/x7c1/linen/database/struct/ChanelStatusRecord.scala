@@ -1,13 +1,11 @@
 package x7c1.linen.database.struct
 
-import android.database.{Cursor, SQLException}
-import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.repository.account.AccountBase
+import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.{Insertable, SingleWhere, Updatable, WritableDatabase}
-import x7c1.wheat.modern.either.OptionEither
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable}
+import x7c1.wheat.modern.database.{Insertable, Updatable}
 
 
 trait ChannelStatusRecord extends TypedFields {
@@ -21,19 +19,31 @@ object ChannelStatusRecord {
   def table: String = "channel_statuses"
   def column = TypedFields.expose[ChannelStatusRecord]
 
-  implicit def selectable[A <: AccountBase]: SingleWhere[ChannelStatusRecord, (A, Long)] =
-    new SingleWhere[ChannelStatusRecord, (A, Long)](table){
-      override def where(id: (A, Long)): Seq[(String, String)] = id match {
-        case (account, channelId) => Seq(
-          "account_id" -> account.accountId.toString,
-          "channel_id" -> channelId.toString
-        )
-      }
-      override def fromCursor(cursor: Cursor) = {
-        TypedCursor[ChannelStatusRecord](cursor).freezeAt(0)
-      }
-    }
+  implicit object providable
+    extends DefaultProvidable[ChannelStatusIdentifiable, ChannelStatusRecord]
+
+  implicit object reifiable extends RecordReifiable[ChannelStatusRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[ChannelStatusRecord](cursor)
+  }
+  implicit object findable extends CanFindRecord.Where[ChannelStatusIdentifiable, ChannelStatusRecord](table){
+    override def where[X](key: ChannelStatusKey) = Seq(
+      "account_id" -> key.accountId.toString,
+      "channel_id" -> key.channelId.toString
+    )
+  }
 }
+
+case class ChannelStatusKey (
+  channelId: Long,
+  accountId: Long
+)
+object ChannelStatusKey {
+  implicit object id extends ChannelStatusIdentifiable[ChannelStatusKey]{
+    override def idOf(target: ChannelStatusKey): ChannelStatusKey = target
+  }
+}
+
+trait ChannelStatusIdentifiable[A] extends Identifiable[A, ChannelStatusKey]
 
 case class ChannelStatusRecordParts(
   channelId: Long,
