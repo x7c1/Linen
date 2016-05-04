@@ -1,7 +1,7 @@
 package x7c1.linen.repository.entry.unread
 
 import android.net.Uri
-import x7c1.linen.database.struct.{SourceIdentifiable, EntryIdentifiable}
+import x7c1.linen.database.struct.{AccountIdentifiable, SourceIdentifiable, EntryIdentifiable}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.action.SiteVisitable
 
@@ -9,6 +9,7 @@ import x7c1.wheat.modern.action.SiteVisitable
 trait UnreadEntry {
   def sourceId: Long
   def entryId: Long
+  def accountId: Long
   def url: String
   def createdAt: Date
 
@@ -35,6 +36,11 @@ object UnreadEntry {
     new SourceIdentifiable[A] {
       override def idOf(target: A): Long = target.sourceId
     }
+
+  implicit def accountId[A <: UnreadEntry]: AccountIdentifiable[A] =
+    new AccountIdentifiable[A] {
+      override def idOf(target: A): Long = target.accountId
+    }
 }
 
 case class UnreadOutline(
@@ -42,7 +48,7 @@ case class UnreadOutline(
   override val entryId: Long,
   override val url: String,
   override val createdAt: Date,
-  accountId: Long,
+  override val accountId: Long,
   shortTitle: String,
   shortContent: String ) extends UnreadEntry
 
@@ -51,5 +57,6 @@ case class UnreadDetail(
   override val entryId: Long,
   override val url: String,
   override val createdAt: Date,
+  override val accountId: Long,
   fullTitle: String,
   fullContent: String ) extends UnreadEntry

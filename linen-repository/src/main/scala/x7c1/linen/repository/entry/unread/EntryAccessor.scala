@@ -208,12 +208,13 @@ class EntryOutlineFactory(rawCursor: Cursor) extends EntryFactory[UnreadOutline]
 }
 
 class EntryDetailFactory(rawCursor: Cursor) extends EntryFactory[UnreadDetail] {
-  private lazy val cursor = TypedCursor[EntryRecord](rawCursor)
+  private lazy val cursor = TypedCursor[UnreadEntryRecord](rawCursor)
 
   override def createEntry(): UnreadDetail = {
     UnreadDetail(
       entryId = cursor.entry_id,
       sourceId = cursor.source_id,
+      accountId = cursor.account_id,
       url = cursor.url,
       fullTitle = cursor.title,
       fullContent = cursor.content,

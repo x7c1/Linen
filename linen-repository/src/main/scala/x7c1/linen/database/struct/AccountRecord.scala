@@ -3,8 +3,9 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.Identifiable
-import x7c1.wheat.modern.database.{Insertable, SingleWhere}
+import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 
 
 trait AccountRecord extends TypedFields {
@@ -15,11 +16,13 @@ trait AccountRecord extends TypedFields {
 object AccountRecord {
   def table: String = "accounts"
 
-  implicit object selectable extends SingleWhere[AccountRecord, Long](table){
-    override def where(id: Long) = Seq("_id" -> id.toString)
-    override def fromCursor(cursor: Cursor) = {
-      TypedCursor[AccountRecord](cursor).freezeAt(0)
-    }
+  implicit object providable extends DefaultProvidable[AccountIdentifiable, AccountRecord]
+
+  implicit object reifiable extends RecordReifiable[AccountRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[AccountRecord](cursor)
+  }
+  implicit object findable extends CanFindRecord.Where[AccountIdentifiable, AccountRecord](table){
+    override def where[X](id: Long) = Seq("_id" -> id.toString)
   }
 }
 
