@@ -31,24 +31,6 @@ class SingleSelector[A](db: SQLiteDatabase){
   }
 }
 
-class RecordSelector[A](val db: SQLiteDatabase) extends AnyVal {
 
-  def selectBy[X: I, I[T] <: RecordIdentifiable[T]](id: X)
-      (implicit i: RecordSelectable[I, A]): i.Result[A] = {
 
-    try {
-      val query = i query id
-      val cursor = db.rawQuery(query.sql, query.selectionArgs)
-      try i fromCursor cursor
-      finally i atFinal cursor
-    } catch {
-      case e: SQLException => i onException e
-    }
-  }
-}
 
-object RecordSelector {
-  def apply[A](db: SQLiteDatabase): RecordSelector[A] = {
-    new RecordSelector[A](db)
-  }
-}

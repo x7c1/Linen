@@ -3,7 +3,8 @@ package x7c1.linen.database.control
 import android.content.Context
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.{SelectorFactory, ReadableDatabase, WritableDatabase}
+import x7c1.wheat.modern.database.selector.SelectorFactory
+import x7c1.wheat.modern.database.{ReadableDatabase, WritableDatabase}
 
 class DatabaseHelper(context: Context)
   extends SQLiteOpenHelper(context, LinenDatabase.name, null, LinenDatabase.version) {

@@ -3,7 +3,9 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Deletable, EntityIdentifiable, Insertable, RecordFindable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord
+import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.{Deletable, Insertable}
 
 trait ChannelRecord extends TypedFields {
   def _id: Long
@@ -20,12 +22,12 @@ object ChannelRecord {
   implicit object reifiable extends RecordReifiable[ChannelRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelRecord](cursor)
   }
-  implicit object findable extends RecordFindable.Where[ChannelIdentifiable, ChannelRecord](table){
+  implicit object findable extends CanFindRecord.Where[ChannelIdentifiable, ChannelRecord](table){
     override def where[X](id: Long) = Seq("_id" -> id.toString)
   }
 }
 
-trait ChannelIdentifiable[A] extends EntityIdentifiable[A, Long]
+trait ChannelIdentifiable[A] extends Identifiable[A, Long]
 
 object ChannelIdentifiable {
   implicit object id extends ChannelIdentifiable[Long]{

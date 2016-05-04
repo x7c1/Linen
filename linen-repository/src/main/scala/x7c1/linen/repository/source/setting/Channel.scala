@@ -2,8 +2,8 @@ package x7c1.linen.repository.source.setting
 
 import x7c1.linen.database.struct.{ChannelIdentifiable, ChannelRecord}
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.modern.database.presets.DefaultProvidable
-import x7c1.wheat.modern.database.{CursorConvertible, EntityFindable}
+import x7c1.wheat.modern.database.selector.presets.{CanFindEntity, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.CursorConvertible
 
 case class Channel(
   channelId: Long,
@@ -29,5 +29,5 @@ object Channel {
       }
     }
   }
-  implicit object findable extends EntityFindable[ChannelIdentifiable, ChannelRecord, Channel]
+  implicit object findable extends CanFindEntity[ChannelIdentifiable, ChannelRecord, Channel]
 }

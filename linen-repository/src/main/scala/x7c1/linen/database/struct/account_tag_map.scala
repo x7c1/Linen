@@ -3,9 +3,10 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.RecordFindable.Where
-import x7c1.wheat.modern.database.presets.DefaultProvidable
-import x7c1.wheat.modern.database.{Insertable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
+import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
+import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.RecordReifiable
 
 
 trait account_tag_map extends TypedFields {

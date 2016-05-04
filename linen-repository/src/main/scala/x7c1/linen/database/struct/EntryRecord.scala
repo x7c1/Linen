@@ -6,8 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.presets.{CollectFrom, Find}
-import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, Query, RecordFindable, RecordReifiable, SelectorProvidable, SeqSelectable}
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, Find}
+import x7c1.wheat.modern.database.selector.{SelectorProvidable, RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.{Insertable, Query}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -28,14 +29,14 @@ object EntryRecord {
   implicit object providable
     extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
-  implicit object findable extends RecordFindable[EntryIdentifiable, EntryRecord]{
+  implicit object findable extends CanFindRecord[EntryIdentifiable, EntryRecord]{
     override def query[X: EntryIdentifiable](target: X): Query = {
       val id = implicitly[EntryIdentifiable[X]] idOf target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
       new Query(sql, Array(id.toString))
     }
   }
-  implicit object seq extends SeqSelectable[SourceIdentifiable, EntryRecord]{
+  implicit object collectable extends CanCollectRecord[SourceIdentifiable, EntryRecord]{
     override def query[X: SourceIdentifiable](target: X): Query = {
       val sourceId = implicitly[SourceIdentifiable[X]] idOf target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE source_id = ?"
@@ -47,7 +48,7 @@ object EntryRecord {
       with Find[EntryIdentifiable, EntryRecord]
 }
 
-trait EntryIdentifiable[A] extends EntityIdentifiable[A, Long]
+trait EntryIdentifiable[A] extends Identifiable[A, Long]
 
 object EntryIdentifiable {
   implicit object entryIdentifiable extends EntryIdentifiable[Long]{

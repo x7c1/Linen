@@ -1,4 +1,4 @@
-package x7c1.wheat.modern.database
+package x7c1.wheat.modern.database.selector
 
 import android.database.sqlite.SQLiteDatabase
 

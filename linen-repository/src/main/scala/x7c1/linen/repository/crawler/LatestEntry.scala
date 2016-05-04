@@ -3,8 +3,8 @@ package x7c1.linen.repository.crawler
 import x7c1.linen.database.mixin.LatestEntryRecord
 import x7c1.linen.database.struct.SourceIdentifiable
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.modern.database.presets.DefaultProvidable
-import x7c1.wheat.modern.database.{CursorConvertible, EntityFindable}
+import x7c1.wheat.modern.database.selector.presets.{CanFindEntity, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.CursorConvertible
 
 
 case class LatestEntry(
@@ -28,5 +28,5 @@ object LatestEntry {
       }
     }
   }
-  implicit object findable extends EntityFindable[SourceIdentifiable, LatestEntryRecord, LatestEntry]
+  implicit object findable extends CanFindEntity[SourceIdentifiable, LatestEntryRecord, LatestEntry]
 }

@@ -3,7 +3,9 @@ package x7c1.linen.database.mixin
 import android.database.Cursor
 import x7c1.linen.database.struct.{EntryRecord, SourceIdentifiable, retrieved_source_marks}
 import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.{Query, RecordFindable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord
+import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.selector.RecordReifiable
 
 trait LatestEntryRecord extends retrieved_source_marks with EntryRecord
 
@@ -11,7 +13,7 @@ object LatestEntryRecord {
   implicit object reifiable extends RecordReifiable[LatestEntryRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LatestEntryRecord](cursor)
   }
-  implicit object findable extends RecordFindable[SourceIdentifiable, LatestEntryRecord]{
+  implicit object findable extends CanFindRecord[SourceIdentifiable, LatestEntryRecord]{
     override def query[X: SourceIdentifiable](target: X): Query = {
       val sourceId = implicitly[SourceIdentifiable[X]] idOf target
       val sql =

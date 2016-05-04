@@ -1,14 +1,16 @@
-package x7c1.wheat.modern.database
+package x7c1.wheat.modern.database.selector.presets
 
 import android.database.Cursor
+import x7c1.wheat.modern.database.selector.{CursorReifiable, CursorConvertible, CursorConverter, CanIdentify}
+import x7c1.wheat.modern.database.Query
 
-import scala.language.{reflectiveCalls, higherKinds}
+import scala.language.{higherKinds, reflectiveCalls}
 
-object RecordFindable {
+object CanFindRecord {
   abstract class Where[
-    I[T] <: RecordIdentifiable[T],
+    I[T] <: CanIdentify[T],
     A: CursorReifiable: ({ type L[T] = CursorConvertible[A, T] })#L
-  ](table: String) extends RecordFindable[I, A]{
+  ](table: String) extends CanFindRecord[I, A]{
 
     override def query[X: I](target: X): Query = {
       val id = implicitly[I[X]] idOf target
@@ -21,10 +23,10 @@ object RecordFindable {
   }
 }
 
-abstract class RecordFindable[
-  I[T] <: RecordIdentifiable[T],
+abstract class CanFindRecord[
+  I[T] <: CanIdentify[T],
   A: CursorReifiable: ({ type L[T] = CursorConvertible[A, T] })#L
-] extends RawFindable[I, A]{
+] extends CanFind[I, A]{
 
   override def reify(cursor: Cursor): Option[A] = {
     new CursorConverter[A, A](cursor) convertAt 0

@@ -4,8 +4,9 @@ import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.presets.DefaultProvidable
-import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, RecordFindable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.Insertable
 
 import scala.language.higherKinds
 
@@ -21,7 +22,7 @@ object SourceRecord {
   implicit object providable
     extends DefaultProvidable[SourceIdentifiable, SourceRecord]
 
-  implicit object findable extends RecordFindable.Where[SourceIdentifiable, SourceRecord](table){
+  implicit object findable extends CanFindRecord.Where[SourceIdentifiable, SourceRecord](table){
     override def where[X](id: Long) = Seq("_id" -> id.toString)
   }
 }
@@ -34,7 +35,7 @@ trait SourceRecord extends TypedFields {
   def created_at: Int --> Date
 }
 
-trait SourceIdentifiable[A] extends EntityIdentifiable[A, Long]
+trait SourceIdentifiable[A] extends Identifiable[A, Long]
 
 object SourceIdentifiable {
   implicit object id extends SourceIdentifiable[Long]{
