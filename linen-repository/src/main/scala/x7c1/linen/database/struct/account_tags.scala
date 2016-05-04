@@ -1,9 +1,12 @@
 package x7c1.linen.database.struct
 
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.SingleWhere
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
+import x7c1.wheat.modern.database.selector.presets.{FindBy, FindByTag}
+import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable, SelectorProvidable}
 
 trait account_tags extends TypedFields {
   def account_tag_id: Long
@@ -15,15 +18,22 @@ object account_tags {
 
   def table = "account_tags"
 
-  implicit def tagSelectable[A <: AccountTagLabel]: SingleWhere[account_tags, A] =
-    new SingleWhere[account_tags, A](table){
-      override def where(label: A) = Seq("tag_label" -> label.text)
-      override def fromCursor(raw: Cursor) = TypedCursor[account_tags](raw) freezeAt 0
-    }
-
-  implicit object idSelectable extends SingleWhere[account_tags, Long](table){
-    override def where(id: Long) = Seq("account_tag_id" -> id.toString)
-    override def fromCursor(raw: Cursor) = TypedCursor[account_tags](raw) freezeAt 0
+  implicit object reifiable extends RecordReifiable[account_tags]{
+    override def reify(cursor: Cursor) = TypedCursor[account_tags](cursor)
   }
+  implicit object labelFindable extends Where[AccountTagLabelable, account_tags](table){
+    override def where[X](label: AccountTagLabel) = Seq("tag_label" -> label.text)
+  }
+  implicit object idFindable extends Where[AccountTagIdentifiable, account_tags](table){
+    override def where[X](id: Long) = Seq("account_tag_id" -> id.toString)
+  }
+  implicit object providable
+    extends SelectorProvidable[account_tags, Selector](new Selector(_))
 
+  class Selector(val db: SQLiteDatabase)
+    extends FindBy[AccountTagIdentifiable, account_tags]
+      with FindByTag[AccountTagLabelable, account_tags]
 }
+trait AccountTagIdentifiable[A] extends Identifiable[A, Long]
+
+trait AccountTagLabelable[A] extends Identifiable[A, AccountTagLabel]

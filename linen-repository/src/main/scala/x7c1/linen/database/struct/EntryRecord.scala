@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, Find}
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, FindBy}
 import x7c1.wheat.modern.database.selector.{SelectorProvidable, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.{Insertable, Query}
 
@@ -45,7 +45,7 @@ object EntryRecord {
   }
   class Selector(val db: SQLiteDatabase)
     extends CollectFrom[SourceIdentifiable, EntryRecord]
-      with Find[EntryIdentifiable, EntryRecord]
+      with FindBy[EntryIdentifiable, EntryRecord]
 }
 
 trait EntryIdentifiable[A] extends Identifiable[A, Long]

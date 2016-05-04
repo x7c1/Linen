@@ -47,7 +47,7 @@ class TaggedAccountSetup[A <: AccountBase : ZeroAritySingle](
 
 private class AccountTagFinder(helper: DatabaseHelper){
   def findId(tag: AccountTagLabel): OptionEither[SQLException, Long] = {
-    val either = helper.readable.find[account_tags] by tag
+    val either = helper.selectorOf[account_tags] findByTag tag
     either map (_.account_tag_id)
   }
 }

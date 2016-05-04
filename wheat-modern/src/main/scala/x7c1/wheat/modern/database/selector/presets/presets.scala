@@ -18,10 +18,21 @@ trait CollectFrom [I[T] <: CanIdentify[T], A]{
   }
 }
 
-trait Find[I[T] <: CanIdentify[T], A]{
+trait FindBy[I[T] <: CanIdentify[T], A]{
   protected def db: SQLiteDatabase
 
   def findBy[X: I](target: X)
+      (implicit i: CanFind[I, A]): OptionEither[SQLException, A] = {
+
+    val either = ItemSelector(db) selectBy target
+    either.toOptionEither
+  }
+}
+
+trait FindByTag[I[T] <: CanIdentify[T], A]{
+  protected def db: SQLiteDatabase
+
+  def findByTag[X: I](target: X)
       (implicit i: CanFind[I, A]): OptionEither[SQLException, A] = {
 
     val either = ItemSelector(db) selectBy target

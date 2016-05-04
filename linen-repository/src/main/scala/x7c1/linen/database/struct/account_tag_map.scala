@@ -30,6 +30,9 @@ object account_tag_map {
       Seq("account_id" -> id.toString)
     }
   }
+  implicit object accountTagId extends AccountTagIdentifiable[account_tag_map]{
+    override def idOf(target: account_tag_map): Long = target.account_tag_id
+  }
 }
 
 case class AccountTagMapParts(

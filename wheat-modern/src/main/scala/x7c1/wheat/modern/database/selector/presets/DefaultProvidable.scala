@@ -9,4 +9,4 @@ class DefaultProvidable[I[T] <: CanIdentify[T], A]
   extends SelectorProvidable[A, DefaultSelector[I, A]](new DefaultSelector(_))
 
 class DefaultSelector[I[T] <: CanIdentify[T], A](val db: SQLiteDatabase)
-  extends Find[I, A] with CollectFrom[I, A]
+  extends FindBy[I, A] with CollectFrom[I, A]
