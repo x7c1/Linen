@@ -14,7 +14,7 @@ import x7c1.linen.repository.crawler.LoadedEntry
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.DummyEntryBinder
 import x7c1.linen.repository.entry.EntryUrl
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntrySourcePositionsFactory}
+import x7c1.linen.repository.entry.unread.{EntryContent, UnreadOutline, SourceHeadlineContent, UnreadEntryRow, EntryAccessor, EntrySourcePositionsFactory}
 import x7c1.linen.repository.source.setting.SampleFactory
 import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceRow}
 import x7c1.linen.testing.LogSetting
@@ -27,15 +27,8 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
 
   import concurrent.duration._
 
-//  ShadowLog.stream = new PrintStream(new FileOutputStream("hoge.log"), true)
-
   @Test
   def testMarkAsRead(): Unit = {
-
-//    ShadowLog.stream = System.out
-
-//    ShadowLog.setLoggable("x7c1", Log.VERBOSE)
-//    ShadowLog.setupLogging()
 
     val context = RuntimeEnvironment.application
     val helper = new DatabaseHelper(context)
@@ -120,6 +113,13 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
       assertEquals(None, s)
     }
 
+    // retrieved_source_marks
+    {
+      val OptionRight(Some(mark)) = helper.selectorOf[retrieved_source_marks] findBy source0
+      val OptionRight(Some(entry)) = helper.selectorOf[EntryRecord] findBy mark
+      assertEquals("sample entry 4", entry.title)
+    }
+
     // load new entries of source0
     {
       DummyEntryBinder(helper).bind(source0.id, (1 to 3) map { n =>
@@ -131,32 +131,9 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
           createdAt = Date.current() + (10 + n).day
         )
       })
-      val s = helper.selectorOf[EntryRecord] collectFrom source0
-      println(s)
-//      println(s.selector[Seq[EntryRecord]].hoge)
-//      println(s.getClass)
-//      println(s.hoge)
-
-//      val Right(entries2) = helper.readable.select2[Seq[EntryRecord]].by(source0)
-
       val Right(entries) = helper.selectorOf[EntryRecord] collectFrom source0
       assertEquals(7, entries.length)
-
-      println("?????")
-      entries foreach { entry =>
-        println("===")
-        println(entry.entry_id)
-        println(entry.title)
-        println(entry.created_at.typed.format)
-      }
     }
-
-    val OptionRight(Some(xx)) = helper.readable.find[retrieved_source_marks] by source0.id
-    println("----")
-    println(xx)
-    println(xx.latest_entry_id)
-    println(xx.latest_entry_created_at.typed.format)
-
 
     // SourceAccessor should include source0
     {
@@ -165,20 +142,41 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
         accountId = account.accountId,
         channelId = channel.channelId ).right.get
 
-      println("new!")
       assertEquals(3, updatedSourceAccessor.length)
+
+      val xs = (0 to updatedSourceAccessor.length - 1) flatMap updatedSourceAccessor.findAt collect {
+        case UnreadSourceRow(source: UnreadSource) => source
+      }
+      assertEquals(true, xs.exists(_.id == source0.id))
+      assertEquals(false, xs.exists(_.id == source1.id))
     }
 
+    // retrieved_source_marks should be updated
+    {
+      val OptionRight(Some(mark)) = helper.selectorOf[retrieved_source_marks] findBy source0
+      val OptionRight(Some(entry)) = helper.selectorOf[EntryRecord] findBy mark
+      assertEquals("new title 3", entry.title)
+    }
 
-    //todo:
-    // add new entries to first source
-    // test SourceAccessor which should include source1
+    // entries also should be updated
+    {
+      val updatedSourceAccessor = AccessorLoader.inspectSourceAccessor(
+        db = helper.getReadableDatabase,
+        accountId = account.accountId,
+        channelId = channel.channelId ).right.get
 
-    val sourceRow = sourceAccessor.findAt(0)
-    println(s"${sourceAccessor.length}")
-    println(sourceRow)
+      val outlineAccessor = {
+        val db = helper.getReadableDatabase
+        val sources = updatedSourceAccessor.sources
+        val positions = new EntrySourcePositionsFactory(db).create(sources)
+        EntryAccessor.forEntryOutline(db, sources, positions)
+      }
+      val Some(UnreadEntryRow(headline: SourceHeadlineContent)) = outlineAccessor.findAt(0)
+      assertEquals("title 5", headline.title)
 
-
+      val Some(UnreadEntryRow(EntryContent(outline: UnreadOutline))) = outlineAccessor.findAt(1)
+      assertEquals("new title 3", outline.shortTitle)
+    }
   }
   def createDummyEntries(sourceId: Long, count: Int) = (1 to count) map { n =>
     LoadedEntry(

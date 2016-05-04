@@ -54,7 +54,7 @@ class SourceUpdaterQueueTest extends JUnitSuiteLike {
         createdAt = Date.current() + 2.day
       )
     ))
-    val OptionRight(Some(mark)) = helper.readable.find[retrieved_source_marks] by sourceId
+    val OptionRight(Some(mark)) = helper.selectorOf[retrieved_source_marks] findBy sourceId
     assertEquals(
       updatedSource.source.validEntries.head.createdAt.format,
       mark.latest_entry_created_at.typed.format
