@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 
 import scala.language.higherKinds
 
-class RecordSelector[A](val db: SQLiteDatabase) extends AnyVal {
+class ItemSelector[A](val db: SQLiteDatabase) extends AnyVal {
 
   def selectBy[X: I, I[T] <: CanIdentify[T]](id: X)(implicit i: CanSelect[I, A]): i.Result[A] = {
     try {
@@ -19,8 +19,8 @@ class RecordSelector[A](val db: SQLiteDatabase) extends AnyVal {
   }
 }
 
-object RecordSelector {
-  def apply[A](db: SQLiteDatabase): RecordSelector[A] = {
-    new RecordSelector[A](db)
+object ItemSelector {
+  def apply[A](db: SQLiteDatabase): ItemSelector[A] = {
+    new ItemSelector[A](db)
   }
 }

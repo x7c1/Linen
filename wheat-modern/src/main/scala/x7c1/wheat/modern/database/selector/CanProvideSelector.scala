@@ -3,13 +3,13 @@ package x7c1.wheat.modern.database.selector
 import android.database.sqlite.SQLiteDatabase
 
 
-trait SelectorFactory[A]{
+trait CanProvideSelector[A]{
   type Selector
   def createFrom(db: SQLiteDatabase): Selector
 }
 
 class SelectorProvidable[A, S](selector: SQLiteDatabase => S)
-  extends SelectorFactory[A]{
+  extends CanProvideSelector[A]{
 
   override type Selector = S
 

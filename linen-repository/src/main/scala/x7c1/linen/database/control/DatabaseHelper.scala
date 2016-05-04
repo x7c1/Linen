@@ -3,7 +3,7 @@ package x7c1.linen.database.control
 import android.content.Context
 import android.database.sqlite.{SQLiteDatabase, SQLiteOpenHelper}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.selector.SelectorFactory
+import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.database.{ReadableDatabase, WritableDatabase}
 
 class DatabaseHelper(context: Context)
@@ -13,7 +13,7 @@ class DatabaseHelper(context: Context)
 
   lazy val readable = new ReadableDatabase(getReadableDatabase)
 
-  def selectorOf[A](implicit x: SelectorFactory[A]): x.Selector = {
+  def selectorOf[A](implicit x: CanProvideSelector[A]): x.Selector = {
     x createFrom getReadableDatabase
   }
   override def onConfigure(db: SQLiteDatabase) = {
