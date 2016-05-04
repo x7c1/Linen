@@ -4,7 +4,7 @@ import android.database.Cursor
 import x7c1.wheat.modern.database.selector.{CursorReifiable, CursorConvertible, CursorConverter, CanIdentify}
 import x7c1.wheat.modern.database.Query
 
-import scala.language.higherKinds
+import scala.language.{reflectiveCalls, higherKinds}
 
 abstract class CanFindEntity[
   I[T] <: CanIdentify[T],
