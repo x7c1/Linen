@@ -9,7 +9,6 @@ import scala.language.higherKinds
 
 class ReadableDatabase(db: SQLiteDatabase) {
   def find[A]: SingleSelector[A] = new SingleSelector[A](db)
-  def select[A](implicit x: SelectorFactory[A]): x.Selector = x createFrom db
 }
 
 class SingleSelector[A](db: SQLiteDatabase){
