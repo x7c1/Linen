@@ -54,8 +54,10 @@ class CursorConverter[
 
   private lazy val typed = implicitly[CursorReifiable[A]].reify(cursor)
 
+  private val fromCursor = implicitly[CursorConvertible[A, X]].fromCursor
+
   def convertAt(position: Int): Option[X] = {
-    implicitly[CursorConvertible[A, X]].fromCursor(typed, position)
+    fromCursor(typed, position)
   }
 }
 

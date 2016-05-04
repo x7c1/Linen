@@ -4,7 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, SingleWhere}
+import x7c1.wheat.modern.database.presets.DefaultProvidable
+import x7c1.wheat.modern.database.{EntityIdentifiable, Insertable, RecordFindable, RecordReifiable}
 
 import scala.language.higherKinds
 
@@ -14,13 +15,14 @@ object SourceRecord {
 
   def column = TypedFields.expose[SourceRecord]
 
-  implicit object selectable extends SingleWhere[SourceRecord, Long](table){
-    override def where(id: Long): Seq[(String, String)] = Seq(
-      "_id" -> id.toString
-    )
-    override def fromCursor(rawCursor: Cursor): Option[SourceRecord] = {
-      TypedCursor[SourceRecord](rawCursor) freezeAt 0
-    }
+  implicit object reifiable extends RecordReifiable[SourceRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[SourceRecord](cursor)
+  }
+  implicit object providable
+    extends DefaultProvidable[SourceIdentifiable, SourceRecord]
+
+  implicit object findable extends RecordFindable.Where[SourceIdentifiable, SourceRecord](table){
+    override def where[X](id: Long) = Seq("_id" -> id.toString)
   }
 }
 
@@ -33,6 +35,12 @@ trait SourceRecord extends TypedFields {
 }
 
 trait SourceIdentifiable[A] extends EntityIdentifiable[A, Long]
+
+object SourceIdentifiable {
+  implicit object id extends SourceIdentifiable[Long]{
+    override def idOf(target: Long): Long = target
+  }
+}
 
 case class SourceParts(
   title: String,

@@ -3,7 +3,7 @@ package x7c1.linen.repository.crawler
 import java.net.URL
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.SourceRecord
+import x7c1.linen.database.struct.{SourceIdentifiable, SourceRecord}
 
 object SourceInspector {
   def apply(helper: DatabaseHelper ): SourceInspector = new SourceInspector(helper)
@@ -11,7 +11,7 @@ object SourceInspector {
 
 class SourceInspector private (helper: DatabaseHelper){
 
-  def inspectSource(sourceId: Long): Either[SourceInspectorError, InspectedSource] =
+  def inspectSource[A: SourceIdentifiable](sourceId: A): Either[SourceInspectorError, InspectedSource] =
     for {
       source <- getSource(sourceId).right
       entry <- getEntry(sourceId).right
@@ -19,15 +19,15 @@ class SourceInspector private (helper: DatabaseHelper){
       InspectedSource(source, entry)
     }
 
-  private def getSource(sourceId: Long) =
-    helper.readable.find[SourceRecord] by sourceId via {
+  private def getSource[A: SourceIdentifiable](sourceId: A) =
+    helper.selectorOf[SourceRecord] findBy sourceId via {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
       case Right(Some(source)) => Right(source)
     }
 
-  private def getEntry(sourceId: Long) =
-    helper.readable.find[LatestEntry] by sourceId via {
+  private def getEntry[A: SourceIdentifiable](sourceId: A) =
+    helper.selectorOf[LatestEntry] findBy sourceId via {
       case Left(e) => Left(SqlError(e))
       case Right(x) => Right(x)
     }
