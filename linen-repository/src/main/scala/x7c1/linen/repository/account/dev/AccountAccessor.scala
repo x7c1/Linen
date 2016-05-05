@@ -43,6 +43,6 @@ case class DevAccount (accountId: Long)
 
 object DevAccount {
   implicit object id extends AccountIdentifiable[DevAccount]{
-    override def idOf(target: DevAccount): Long = target.accountId
+    override def toId = _.accountId
   }
 }

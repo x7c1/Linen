@@ -29,17 +29,17 @@ object UnreadEntry {
 
   implicit def id[A <: UnreadEntry]: EntryIdentifiable[A] =
     new EntryIdentifiable[A] {
-      override def idOf(target: A): Long = target.entryId
+      override def toId= _.entryId
     }
 
   implicit def sourceId[A <: UnreadEntry]: SourceIdentifiable[A] =
     new SourceIdentifiable[A] {
-      override def idOf(target: A): Long = target.sourceId
+      override def toId = _.sourceId
     }
 
   implicit def accountId[A <: UnreadEntry]: AccountIdentifiable[A] =
     new AccountIdentifiable[A] {
-      override def idOf(target: A): Long = target.accountId
+      override def toId = _.accountId
     }
 }
 

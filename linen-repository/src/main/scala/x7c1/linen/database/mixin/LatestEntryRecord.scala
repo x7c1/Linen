@@ -15,7 +15,7 @@ object LatestEntryRecord {
   }
   implicit object findable extends CanFindRecord[SourceIdentifiable, LatestEntryRecord]{
     override def query[X: SourceIdentifiable](target: X): Query = {
-      val sourceId = implicitly[SourceIdentifiable[X]] idOf target
+      val sourceId = implicitly[SourceIdentifiable[X]] toId target
       val sql =
         s"""SELECT
            |  t1.latest_entry_id AS latest_entry_id,

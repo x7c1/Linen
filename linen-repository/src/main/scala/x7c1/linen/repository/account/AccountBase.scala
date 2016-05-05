@@ -13,7 +13,7 @@ object AccountBase {
   }
   implicit def id[A <: AccountBase]: AccountIdentifiable[A] =
     new AccountIdentifiable[A]{
-      override def idOf(target: A) = target.accountId
+      override def toId = _.accountId
     }
 
   implicit def providable[A <: AccountBase]: DefaultProvidable[AccountIdentifiable, A] =
@@ -35,7 +35,7 @@ object PresetAccount {
     [TaggedAccountRecord, PresetAccount](select(PresetLabel))
 
   implicit object channelKey extends NamedChannelIdentifiable[(PresetAccount, PresetChannelPiece)]{
-    override def idOf(target: (PresetAccount, PresetChannelPiece)) = target match {
+    override def toId = {
       case (account, piece) =>
         NamedChannelKey(
           accountId = account.accountId,

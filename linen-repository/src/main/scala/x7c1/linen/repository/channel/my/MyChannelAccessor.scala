@@ -34,7 +34,7 @@ case class MyChannel(
 
 object MyChannel {
   implicit object id extends ChannelIdentifiable[MyChannel]{
-    override def idOf(target: MyChannel): Long = target.channelId
+    override def toId = _.channelId
   }
   implicit object deletable extends ChannelDeletable[MyChannel](_.channelId)
 }

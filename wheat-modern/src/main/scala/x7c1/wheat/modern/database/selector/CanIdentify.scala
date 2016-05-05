@@ -2,7 +2,7 @@ package x7c1.wheat.modern.database.selector
 
 trait CanIdentify[A]{
   type ID
-  def idOf(target: A): ID
+  def toId: A => ID
 }
 
 trait Identifiable[A, X] extends CanIdentify[A]{
@@ -12,5 +12,5 @@ trait Identifiable[A, X] extends CanIdentify[A]{
 trait IdEndo[A]{
   self: CanIdentify[A] =>
 
-  override def idOf(target: A) = target
+  override def toId = identity[A] _
 }

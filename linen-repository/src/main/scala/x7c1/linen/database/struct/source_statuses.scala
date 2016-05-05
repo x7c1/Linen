@@ -4,7 +4,7 @@ import android.database.Cursor
 import x7c1.linen.database.struct.source_statuses.Key
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 import x7c1.wheat.modern.database.{Insertable, Updatable}
 
@@ -21,9 +21,7 @@ object source_statuses {
   def table: String = "source_statuses"
 
   object Key {
-    implicit object id extends SourceStatusIdentifiable[Key]{
-      override def idOf(target: Key) = target
-    }
+    implicit object id extends SourceStatusIdentifiable[Key] with IdEndo[Key]
   }
   case class Key(accountId:Long, sourceId: Long)
 

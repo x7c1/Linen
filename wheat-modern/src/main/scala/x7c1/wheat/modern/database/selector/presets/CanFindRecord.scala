@@ -13,7 +13,7 @@ object CanFindRecord {
   ](table: String) extends CanFindRecord[I, A]{
 
     override def query[X: I](target: X): Query = {
-      val id = implicitly[I[X]] idOf target
+      val id = implicitly[I[X]] toId target
       val clause = where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
       val sql = s"SELECT * FROM $table WHERE $clause"
       val args = where(id) map { case (_, value) => value }

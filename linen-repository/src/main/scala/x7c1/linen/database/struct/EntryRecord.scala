@@ -31,14 +31,14 @@ object EntryRecord {
 
   implicit object findable extends CanFindRecord[EntryIdentifiable, EntryRecord]{
     override def query[X: EntryIdentifiable](target: X): Query = {
-      val id = implicitly[EntryIdentifiable[X]] idOf target
+      val id = implicitly[EntryIdentifiable[X]] toId target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
       new Query(sql, Array(id.toString))
     }
   }
   implicit object collectable extends CanCollectRecord[SourceIdentifiable, EntryRecord]{
     override def query[X: SourceIdentifiable](target: X): Query = {
-      val sourceId = implicitly[SourceIdentifiable[X]] idOf target
+      val sourceId = implicitly[SourceIdentifiable[X]] toId target
       val sql = "SELECT *, _id AS entry_id FROM entries WHERE source_id = ?"
       new Query(sql, Array(sourceId.toString))
     }

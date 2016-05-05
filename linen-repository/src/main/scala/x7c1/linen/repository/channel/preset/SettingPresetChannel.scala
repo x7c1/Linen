@@ -11,6 +11,6 @@ case class SettingPresetChannel(
 
 object SettingPresetChannel {
   implicit object id extends ChannelIdentifiable[SettingPresetChannel] {
-    override def idOf(target: SettingPresetChannel): Long = target.channelId
+    override def toId = _.channelId
   }
 }

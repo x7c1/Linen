@@ -8,7 +8,7 @@ sealed trait SourceInspectorError {
 }
 
 case class SourceNotFound[A: SourceIdentifiable](source: A) extends SourceInspectorError {
-  private val sourceId = implicitly[SourceIdentifiable[A]] idOf source
+  private val sourceId = implicitly[SourceIdentifiable[A]] toId source
   override def message: String = s"source(id:$sourceId) not found"
 }
 

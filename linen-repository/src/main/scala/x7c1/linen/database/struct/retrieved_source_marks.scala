@@ -21,7 +21,7 @@ object retrieved_source_marks {
     override def where[X](id: Long) = Seq("source_id" -> id.toString)
   }
   implicit object entryId extends EntryIdentifiable[retrieved_source_marks]{
-    override def idOf(target: retrieved_source_marks): Long = target.latest_entry_id
+    override def toId = _.latest_entry_id
   }
 }
 

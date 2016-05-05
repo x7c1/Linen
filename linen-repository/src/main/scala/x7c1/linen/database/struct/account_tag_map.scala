@@ -31,7 +31,7 @@ object account_tag_map {
     }
   }
   implicit object accountTagId extends AccountTagIdentifiable[account_tag_map]{
-    override def idOf(target: account_tag_map): Long = target.account_tag_id
+    override def toId = _.account_tag_id
   }
 }
 
