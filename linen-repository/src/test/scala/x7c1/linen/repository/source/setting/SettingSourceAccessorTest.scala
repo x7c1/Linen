@@ -78,8 +78,8 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
 class SampleFactory (helper: DatabaseHelper){
 
   lazy val db = helper.getWritableDatabase
+
   lazy val writable = helper.writable
-  lazy val readable = helper.readable
 
   def createAccount(): DevAccount = {
     val Right(id) = writable insert AccountParts(
