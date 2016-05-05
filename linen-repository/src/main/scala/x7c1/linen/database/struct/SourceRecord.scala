@@ -5,7 +5,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
-import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.Insertable
 
 import scala.language.higherKinds
@@ -38,9 +38,7 @@ trait SourceRecord extends TypedFields {
 trait SourceIdentifiable[A] extends Identifiable[A, Long]
 
 object SourceIdentifiable {
-  implicit object id extends SourceIdentifiable[Long]{
-    override def idOf(target: Long): Long = target
-  }
+  implicit object id extends SourceIdentifiable[Long] with IdEndo[Long]
 }
 
 case class SourceParts(

@@ -8,3 +8,9 @@ trait CanIdentify[A]{
 trait Identifiable[A, X] extends CanIdentify[A]{
   override type ID = X
 }
+
+trait IdEndo[A]{
+  self: CanIdentify[A] =>
+
+  override def idOf(target: A) = target
+}

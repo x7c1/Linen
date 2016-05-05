@@ -7,7 +7,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, FindBy}
-import x7c1.wheat.modern.database.selector.{SelectorProvidable, RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, SelectorProvidable, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.{Insertable, Query}
 
 trait EntryRecord extends TypedFields {
@@ -51,9 +51,7 @@ object EntryRecord {
 trait EntryIdentifiable[A] extends Identifiable[A, Long]
 
 object EntryIdentifiable {
-  implicit object entryIdentifiable extends EntryIdentifiable[Long]{
-    override def idOf(target: Long): Long = target
-  }
+  implicit object entryIdentifiable extends EntryIdentifiable[Long] with IdEndo[Long]
 }
 
 case class EntryParts(

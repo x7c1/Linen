@@ -4,7 +4,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord
-import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Deletable, Insertable}
 
 trait ChannelRecord extends TypedFields {
@@ -30,9 +30,7 @@ object ChannelRecord {
 trait ChannelIdentifiable[A] extends Identifiable[A, Long]
 
 object ChannelIdentifiable {
-  implicit object id extends ChannelIdentifiable[Long]{
-    override def idOf(target: Long): Long = target
-  }
+  implicit object id extends ChannelIdentifiable[Long] with IdEndo[Long]
 }
 
 case class ChannelParts(

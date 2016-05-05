@@ -4,7 +4,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
-import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Insertable, Updatable}
 
 
@@ -38,9 +38,9 @@ case class ChannelStatusKey (
   accountId: Long
 )
 object ChannelStatusKey {
-  implicit object id extends ChannelStatusIdentifiable[ChannelStatusKey]{
-    override def idOf(target: ChannelStatusKey): ChannelStatusKey = target
-  }
+  implicit object id
+    extends ChannelStatusIdentifiable[ChannelStatusKey]
+      with IdEndo[ChannelStatusKey]
 }
 
 trait ChannelStatusIdentifiable[A] extends Identifiable[A, ChannelStatusKey]
