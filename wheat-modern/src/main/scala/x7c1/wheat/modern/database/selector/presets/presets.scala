@@ -2,7 +2,7 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.wheat.modern.database.selector.{CanIdentify, ItemSelector}
+import x7c1.wheat.modern.database.selector.{CanIdentify, ItemSelector, SelectorProvidable}
 import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.either.OptionEither
 
@@ -16,6 +16,18 @@ trait CollectFrom [I[T] <: CanIdentify[T], A]{
 
     ItemSelector(db) selectBy target
   }
+}
+
+trait Find[A]{
+  protected def db: SQLiteDatabase
+
+  def find()(implicit i: CanFindByQuery[A]): OptionEither[SQLException, A] = {
+    val either = ItemSelector(db).select
+    either.toOptionEither
+  }
+}
+object Find {
+  type FindProvidable[A] = SelectorProvidable[A, _ <: Find[A]]
 }
 
 trait FindBy[I[T] <: CanIdentify[T], A]{

@@ -14,6 +14,14 @@ trait CanSelect[I[T] <: CanIdentify[T], A]{
   def atFinal(cursor: Cursor): Unit
 }
 
+trait CanSelectDirectly[A]{
+  type Result[_]
+  def query: Query
+  def fromCursor(cursor: Cursor): Result[A]
+  def onException(e: SQLException): Result[A]
+  def atFinal(cursor: Cursor): Unit
+}
+
 trait CursorConvertible[FROM, TO]{
   def fromCursor: (FROM with TypedCursor[FROM], Int) => Option[TO]
 }

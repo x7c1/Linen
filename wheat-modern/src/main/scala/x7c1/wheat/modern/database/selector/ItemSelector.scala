@@ -17,6 +17,16 @@ class ItemSelector[A](val db: SQLiteDatabase) extends AnyVal {
       case e: SQLException => i onException e
     }
   }
+  def select(implicit i: CanSelectDirectly[A]): i.Result[A] = {
+    try {
+      val query = i.query
+      val cursor = db.rawQuery(query.sql, query.selectionArgs)
+      try i fromCursor cursor
+      finally i atFinal cursor
+    } catch {
+      case e: SQLException => i onException e
+    }
+  }
 }
 
 object ItemSelector {

@@ -1,8 +1,10 @@
 package x7c1.linen.database.mixin
 
+import android.database.Cursor
 import x7c1.linen.database.struct.AccountTagLabel
-import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.selector.RecordReifiable
 
 trait TaggedAccountRecord extends TypedFields {
   def account_id: Long
@@ -24,4 +26,7 @@ object TaggedAccountRecord {
 
     selectionArgs = Array(label.text)
   )
+  implicit object reifiable extends RecordReifiable[TaggedAccountRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[TaggedAccountRecord](cursor)
+  }
 }
