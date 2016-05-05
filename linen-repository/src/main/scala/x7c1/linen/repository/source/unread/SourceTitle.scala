@@ -1,11 +1,12 @@
 package x7c1.linen.repository.source.unread
 
 import android.content.ContentValues
-import android.database.Cursor
-import x7c1.linen.database.struct.SourceRecord
 import x7c1.linen.database.struct.SourceRecord.table
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{SingleWhere, Updatable}
+import x7c1.linen.database.struct.{SourceIdentifiable, SourceRecord}
+import x7c1.wheat.macros.database.TypedFields
+import x7c1.wheat.modern.database.Updatable
+import x7c1.wheat.modern.database.selector.CursorConvertible
+import x7c1.wheat.modern.database.selector.presets.{CanFindEntity, DefaultProvidable}
 
 case class SourceTitle(
   sourceId: Long,
@@ -27,13 +28,14 @@ object SourceTitle {
       "_id" -> target.sourceId.toString
     )
   }
-  implicit object selectable extends SingleWhere[SourceTitle, Long](table){
-    override def where(id: Long) = Seq("_id" -> id.toString)
-    override def fromCursor(rawCursor: Cursor) = {
-      val cursor = TypedCursor[SourceRecord](rawCursor)
-      cursor.moveToFind(0){
-        SourceTitle(cursor._id, cursor.title)
-      }
-    }
+  implicit object providable extends DefaultProvidable[SourceIdentifiable, SourceTitle]
+
+  implicit object convertible extends CursorConvertible[SourceRecord, SourceTitle]{
+    override def fromCursor = cursor =>
+      SourceTitle(
+        sourceId = cursor._id,
+        title = cursor.title
+      )
   }
+  implicit object findable extends CanFindEntity[SourceIdentifiable, SourceRecord, SourceTitle]
 }
