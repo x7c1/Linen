@@ -1,11 +1,8 @@
 package x7c1.linen.repository.channel.preset
 
-import android.database.Cursor
-import x7c1.linen.database.struct.ChannelRecord
-import x7c1.linen.repository.account.PresetAccount
-import x7c1.linen.repository.source.setting.Channel
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.SingleWhere
+import x7c1.linen.database.struct.{ChannelRecord, NamedChannelIdentifiable}
+import x7c1.wheat.modern.database.selector.CursorConvertible
+import x7c1.wheat.modern.database.selector.presets.{CanFindEntity, DefaultProvidable}
 
 case class PresetChannel(
   channelId: Long,
@@ -13,25 +10,17 @@ case class PresetChannel(
   name: String
 )
 object PresetChannel {
-  implicit object selectable
-    extends SingleWhere[PresetChannel, (PresetAccount, PresetChannelPiece)](Channel.table){
-
-    override def where(id: (PresetAccount, PresetChannelPiece)) = id match {
-      case (account, channel) => Seq(
-        "account_id" -> account.accountId.toString,
-        "name" -> channel.name
-      )
-    }
-    override def fromCursor(cursor: Cursor) = {
-      TypedCursor[ChannelRecord](cursor) moveToHead reify
-    }
-    private def reify(record: ChannelRecord) =
+  implicit object convertible extends CursorConvertible[ChannelRecord, PresetChannel]{
+    override def fromCursor = cursor =>
       PresetChannel(
-        channelId = record._id,
-        accountId = record.account_id,
-        name = record.name
+        channelId = cursor._id,
+        accountId = cursor.account_id,
+        name = cursor.name
       )
   }
+  implicit object findable extends CanFindEntity[NamedChannelIdentifiable, ChannelRecord, PresetChannel]
+
+  implicit object providable extends DefaultProvidable[NamedChannelIdentifiable, PresetChannel]
 }
 
 case class PresetChannelPiece(

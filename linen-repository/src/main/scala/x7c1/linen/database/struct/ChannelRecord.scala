@@ -3,7 +3,7 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.presets.CanFindRecord
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Deletable, Insertable}
 
@@ -22,8 +22,14 @@ object ChannelRecord {
   implicit object reifiable extends RecordReifiable[ChannelRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[ChannelIdentifiable, ChannelRecord](table){
+  implicit object findable extends Where[ChannelIdentifiable, ChannelRecord](table){
     override def where[X](id: Long) = Seq("_id" -> id.toString)
+  }
+  implicit object fromName extends Where[NamedChannelIdentifiable, ChannelRecord](table){
+    override def where[X](key: NamedChannelKey) = Seq(
+      "account_id" -> key.accountId.toString,
+      "name" -> key.channelName
+    )
   }
 }
 
@@ -31,6 +37,16 @@ trait ChannelIdentifiable[A] extends Identifiable[A, Long]
 
 object ChannelIdentifiable {
   implicit object id extends ChannelIdentifiable[Long] with IdEndo[Long]
+}
+trait NamedChannelIdentifiable[A] extends Identifiable[A, NamedChannelKey]
+
+case class NamedChannelKey(
+  accountId: Long,
+  channelName: String
+)
+object NamedChannelKey {
+  implicit object id extends NamedChannelIdentifiable[NamedChannelKey]
+    with IdEndo[NamedChannelKey]
 }
 
 case class ChannelParts(
