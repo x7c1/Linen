@@ -30,7 +30,3 @@ class SingleSelector[A](db: SQLiteDatabase){
     }
   }
 }
-
-
-
-

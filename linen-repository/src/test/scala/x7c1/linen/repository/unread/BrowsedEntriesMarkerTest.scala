@@ -63,7 +63,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
 
     // confirm first source is marked as read
     {
-      val OptionRight(Some(status0)) = helper.readable.find[source_statuses] by Key(
+      val OptionRight(Some(status0)) = helper.selectorOf[source_statuses] findBy Key(
         accountId = account.accountId,
         sourceId = source0.id
       )
@@ -80,7 +80,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
 
     // confirm second source is marked as read
     {
-      val OptionRight(Some(status1)) = helper.readable.find[source_statuses] by Key(
+      val OptionRight(Some(status1)) = helper.selectorOf[source_statuses] findBy Key(
         accountId = account.accountId,
         sourceId = source1.id
       )

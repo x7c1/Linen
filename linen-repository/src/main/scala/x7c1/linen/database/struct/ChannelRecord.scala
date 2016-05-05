@@ -4,7 +4,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord
-import x7c1.wheat.modern.database.selector.{RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Deletable, Insertable}
 
 trait ChannelRecord extends TypedFields {
