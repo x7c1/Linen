@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.Cursor
-import x7c1.wheat.modern.database.selector.{CursorReifiable, CursorConvertible, CursorConverter, CanIdentify}
+import x7c1.wheat.modern.database.selector.{CursorReifiable, CursorReadable, CursorConverter, CanIdentify}
 import x7c1.wheat.modern.database.Query
 
 import scala.language.{reflectiveCalls, higherKinds}
@@ -9,7 +9,7 @@ import scala.language.{reflectiveCalls, higherKinds}
 abstract class CanFindEntity[
   I[T] <: CanIdentify[T],
   FROM: CursorReifiable: ({ type L[T] = CanFindRecord[I, T] })#L,
-  TO: ({ type L[T] = CursorConvertible[FROM, T] })#L
+  TO: ({ type L[T] = CursorReadable[FROM, T] })#L
 ] extends CanFind[I, TO]{
 
   override def reify(cursor: Cursor): Option[TO] = {

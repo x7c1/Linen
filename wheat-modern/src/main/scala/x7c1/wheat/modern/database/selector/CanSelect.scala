@@ -22,13 +22,23 @@ trait CanSelectDirectly[A]{
   def atFinal(cursor: Cursor): Unit
 }
 
-trait CursorConvertible[FROM, TO]{
-  def fromCursor: (FROM with TypedCursor[FROM], Int) => Option[TO]
+trait CursorReadable[FROM, TO]{
+  def readAt: (FROM with TypedCursor[FROM], Int) => Option[TO]
 }
+
+trait CursorConvertible[FROM, TO] extends CursorReadable[FROM, TO]{
+  override def readAt = {
+    case (cursor, position) => cursor.moveToFind(position){
+      fromCursor(cursor)
+    }
+  }
+  def fromCursor: FROM with TypedCursor[FROM] => TO
+}
+
 trait CursorReifiable[A] {
   def reify(cursor: Cursor): A with TypedCursor[A]
 }
 
-trait RecordReifiable[A] extends CursorReifiable[A] with CursorConvertible[A, A]{
-  override def fromCursor = _ freezeAt _
+trait RecordReifiable[A] extends CursorReifiable[A] with CursorReadable[A, A]{
+  override def readAt = _ freezeAt _
 }
