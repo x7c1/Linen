@@ -257,7 +257,7 @@ object EntryAccessor {
   def createCursor(db: SQLiteDatabase, sources: Seq[UnreadSource], content: String) = {
     val sql =
       s"""SELECT
-        |  _id AS entry_id,
+        |  entry_id,
         |  source_id,
         |  title,
         |  url,

@@ -7,7 +7,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, FindBy}
-import x7c1.wheat.modern.database.selector.{IdEndo, SelectorProvidable, RecordReifiable, Identifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable, SelectorProvidable}
 import x7c1.wheat.modern.database.{Insertable, Query}
 
 trait EntryRecord extends TypedFields {
@@ -29,17 +29,13 @@ object EntryRecord {
   implicit object providable
     extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
-  implicit object findable extends CanFindRecord[EntryIdentifiable, EntryRecord]{
-    override def query[X: EntryIdentifiable](target: X): Query = {
-      val id = implicitly[EntryIdentifiable[X]] toId target
-      val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
-      new Query(sql, Array(id.toString))
-    }
+  implicit object findable extends CanFindRecord.Where[EntryIdentifiable, EntryRecord](table){
+    override def where[X](id: Long) = Seq("entry_id" -> id.toString)
   }
   implicit object collectable extends CanCollectRecord[SourceIdentifiable, EntryRecord]{
     override def query[X: SourceIdentifiable](target: X): Query = {
       val sourceId = implicitly[SourceIdentifiable[X]] toId target
-      val sql = "SELECT *, _id AS entry_id FROM entries WHERE source_id = ?"
+      val sql = "SELECT * FROM entries WHERE source_id = ?"
       new Query(sql, Array(sourceId.toString))
     }
   }

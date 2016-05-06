@@ -10,7 +10,7 @@ object EntrySourcePositions {
 
     val count =
       s"""SELECT
-         |  _id AS entry_id,
+         |  entry_id,
          |  source_id,
          |  ? AS account_id
          |FROM entries

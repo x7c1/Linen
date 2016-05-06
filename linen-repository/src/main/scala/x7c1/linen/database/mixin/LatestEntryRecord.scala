@@ -23,7 +23,7 @@ object LatestEntryRecord {
            |  t2.url AS url
            |FROM retrieved_source_marks AS t1
            |INNER JOIN entries AS t2 ON
-           |  t2._id = t1.latest_entry_id AND
+           |  t2.entry_id = t1.latest_entry_id AND
            |  t2.source_id = ?
            |WHERE t1.source_id = ?
            |""".stripMargin
