@@ -2,16 +2,18 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.Cursor
 import x7c1.wheat.modern.database.Query
-import x7c1.wheat.modern.database.selector.{CanIdentify, CursorReadable, CursorReifiable}
+import x7c1.wheat.modern.database.selector.{CursorConverter, CanIdentify, CursorReadable, CursorReifiable}
 
 import scala.language.{higherKinds, reflectiveCalls}
 
-abstract class CanCollectRecord[I[T] <: CanIdentify[T], A: CursorReifiable]
-  extends CanCollect[I, A]{
+abstract class CanCollectRecord[
+  I[T] <: CanIdentify[T],
+  A: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
+] extends CanCollect[I, A]{
 
   override def fromCursor(cursor: Cursor) = {
-    val typed = implicitly[CursorReifiable[A]].reify(cursor)
-    val xs = (0 to cursor.getColumnCount - 1) flatMap { typed.freezeAt }
+    val converter = new CursorConverter[A, A](cursor)
+    val xs = (0 to cursor.getColumnCount - 1) flatMap { converter.convertAt }
     Right(xs)
   }
 }
