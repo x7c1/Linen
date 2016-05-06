@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.macros.database.TypedFields.toSelectionArgs
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
@@ -24,12 +24,12 @@ object ChannelRecord {
     override def reify(cursor: Cursor) = TypedCursor[ChannelRecord](cursor)
   }
   implicit object findable extends Where[ChannelIdentifiable, ChannelRecord](table){
-    override def where[X](id: Long) = toSelectionArgs(
+    override def where[X](id: Long) = toArgs(
       column._id -> id
     )
   }
   implicit object fromName extends Where[NamedChannelIdentifiable, ChannelRecord](table){
-    override def where[X](key: NamedChannelKey) = toSelectionArgs(
+    override def where[X](key: NamedChannelKey) = toArgs(
       column.account_id -> key.accountId,
       column.name -> key.channelName
     )
@@ -79,7 +79,7 @@ class ChannelDeletable[A](f: A => Long) extends Deletable[A]{
   import ChannelRecord.column
 
   override def tableName: String = ChannelRecord.table
-  override def where(target: A) = toSelectionArgs(
+  override def where(target: A) = toArgs(
     column._id -> f(target)
   )
 }

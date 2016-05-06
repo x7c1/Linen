@@ -38,7 +38,7 @@ object TypedFields {
 
   def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
 
-  def toSelectionArgs[A](pairs: A*): Seq[(String, String)] = macro TypedFieldsParser.toSelectionArgs[A]
+  def toArgs[A](pairs: A*): Seq[(String, String)] = macro TypedFieldsParser.toSelectionArgs[A]
 }
 
 trait FieldTransform[A, B]{

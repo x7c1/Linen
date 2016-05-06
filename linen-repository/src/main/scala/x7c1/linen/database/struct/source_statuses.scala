@@ -3,9 +3,10 @@ package x7c1.linen.database.struct
 import android.database.Cursor
 import x7c1.linen.database.struct.source_statuses.Key
 import x7c1.linen.repository.date.Date
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.{IdEndo, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Insertable, Updatable}
 
 
@@ -31,9 +32,9 @@ object source_statuses {
     override def reify(cursor: Cursor) = TypedCursor[source_statuses](cursor)
   }
   implicit object findable extends CanFindRecord.Where[SourceStatusIdentifiable, source_statuses](table){
-    override def where[X](key: Key) = Seq(
-      "source_id" -> key.sourceId.toString,
-      "account_id" -> key.accountId.toString
+    override def where[X](key: Key) = toArgs(
+      column.source_id -> key.sourceId,
+      column.account_id -> key.accountId
     )
   }
 }
@@ -78,9 +79,9 @@ object SourceStatusAsStarted {
         column.start_entry_created_at -> target.startEntryCreatedAt
       )
 
-    override def where(target: SourceStatusAsStarted) = Seq(
-      "source_id" -> target.sourceId.toString,
-      "account_id" -> target.accountId.toString
+    override def where(target: SourceStatusAsStarted) = toArgs(
+      column.source_id -> target.sourceId,
+      column.account_id -> target.accountId
     )
   }
   implicit object insertable extends Insertable[SourceStatusAsStarted]{

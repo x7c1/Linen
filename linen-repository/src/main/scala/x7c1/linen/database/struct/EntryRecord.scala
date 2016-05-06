@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
-import x7c1.wheat.macros.database.TypedFields.toSelectionArgs
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Insertable
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanFindRecord, CollectFrom, FindBy}
@@ -32,10 +32,10 @@ object EntryRecord {
     extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
   implicit object findable extends CanFindRecord.Where[EntryIdentifiable, EntryRecord](table){
-    override def where[X](id: Long) = toSelectionArgs(column.entry_id -> id)
+    override def where[X](id: Long) = toArgs(column.entry_id -> id)
   }
   implicit object collectable extends CanCollectRecord.Where[SourceIdentifiable, EntryRecord](table){
-    override def where[X](id: Long) = toSelectionArgs(column.source_id -> id)
+    override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
   class Selector(val db: SQLiteDatabase)
     extends CollectFrom[SourceIdentifiable, EntryRecord]

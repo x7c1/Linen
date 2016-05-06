@@ -2,11 +2,12 @@ package x7c1.linen.database.struct
 
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
-import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
 import x7c1.wheat.modern.database.Insertable
 import x7c1.wheat.modern.database.selector.RecordReifiable
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
+import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
 
 
 trait account_tag_map extends TypedFields {
@@ -19,6 +20,8 @@ object account_tag_map {
 
   def table = "account_tag_map"
 
+  def column = TypedFields.expose[account_tag_map]
+
   implicit object reifiable extends RecordReifiable[account_tag_map]{
     override def reify(cursor: Cursor) = TypedCursor[account_tag_map](cursor)
   }
@@ -26,9 +29,9 @@ object account_tag_map {
     extends DefaultProvidable[AccountIdentifiable, account_tag_map]
 
   implicit object findable extends Where[AccountIdentifiable, account_tag_map](table){
-    override def where[X](id: Long) = {
-      Seq("account_id" -> id.toString)
-    }
+    override def where[X](id: Long) = toArgs(
+      column.account_id -> id
+    )
   }
   implicit object accountTagId extends AccountTagIdentifiable[account_tag_map]{
     override def toId = _.account_tag_id

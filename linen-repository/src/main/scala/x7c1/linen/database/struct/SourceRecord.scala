@@ -3,10 +3,11 @@ package x7c1.linen.database.struct
 import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
-import x7c1.wheat.modern.database.selector.{IdEndo, RecordReifiable, Identifiable}
 import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 
 import scala.language.higherKinds
 
@@ -23,7 +24,7 @@ object SourceRecord {
     extends DefaultProvidable[SourceIdentifiable, SourceRecord]
 
   implicit object findable extends CanFindRecord.Where[SourceIdentifiable, SourceRecord](table){
-    override def where[X](id: Long) = Seq("_id" -> id.toString)
+    override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }
 

@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.macros.database.TypedFields.toSelectionArgs
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Insertable
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
@@ -25,7 +25,7 @@ object AccountRecord {
     override def reify(cursor: Cursor) = TypedCursor[AccountRecord](cursor)
   }
   implicit object findable extends CanFindRecord.Where[AccountIdentifiable, AccountRecord](table){
-    override def where[X](id: Long) = toSelectionArgs(column._id -> id)
+    override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }
 

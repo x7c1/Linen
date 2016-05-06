@@ -2,7 +2,7 @@ package x7c1.linen.database.struct
 
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.macros.database.TypedFields.toSelectionArgs
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
@@ -27,7 +27,7 @@ object ChannelStatusRecord {
     override def reify(cursor: Cursor) = TypedCursor[ChannelStatusRecord](cursor)
   }
   implicit object findable extends CanFindRecord.Where[ChannelStatusIdentifiable, ChannelStatusRecord](table){
-    override def where[X](key: ChannelStatusKey) = toSelectionArgs(
+    override def where[X](key: ChannelStatusKey) = toArgs(
       column.account_id -> key.accountId,
       column.channel_id -> key.channelId
     )
@@ -63,7 +63,7 @@ object ChannelStatusRecordParts {
         column.subscribed -> (if (target.subscribed) 1 else 0)
       )
     }
-    override def where(target: ChannelStatusRecordParts) = toSelectionArgs(
+    override def where(target: ChannelStatusRecordParts) = toArgs(
       column.channel_id -> target.channelId,
       column.account_id -> target.accountId
     )

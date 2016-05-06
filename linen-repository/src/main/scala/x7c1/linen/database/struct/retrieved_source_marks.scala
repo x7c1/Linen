@@ -2,6 +2,7 @@ package x7c1.linen.database.struct
 
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Insertable
 import x7c1.wheat.modern.database.selector.RecordReifiable
@@ -18,7 +19,7 @@ object retrieved_source_marks {
     override def reify(cursor: Cursor) = TypedCursor[retrieved_source_marks](cursor)
   }
   implicit object findable extends CanFindRecord.Where[SourceIdentifiable, retrieved_source_marks](table){
-    override def where[X](id: Long) = Seq("source_id" -> id.toString)
+    override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
   implicit object entryId extends EntryIdentifiable[retrieved_source_marks]{
     override def toId = _.latest_entry_id
