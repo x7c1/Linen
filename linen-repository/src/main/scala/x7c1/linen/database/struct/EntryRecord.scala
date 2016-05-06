@@ -6,9 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanCollectRecord, CollectFrom, FindBy}
+import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanFindRecord, CollectFrom, FindBy}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable, SelectorProvidable}
-import x7c1.wheat.modern.database.{Insertable, Query}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -32,12 +32,8 @@ object EntryRecord {
   implicit object findable extends CanFindRecord.Where[EntryIdentifiable, EntryRecord](table){
     override def where[X](id: Long) = Seq("entry_id" -> id.toString)
   }
-  implicit object collectable extends CanCollectRecord[SourceIdentifiable, EntryRecord]{
-    override def query[X: SourceIdentifiable](target: X): Query = {
-      val sourceId = implicitly[SourceIdentifiable[X]] toId target
-      val sql = "SELECT * FROM entries WHERE source_id = ?"
-      new Query(sql, Array(sourceId.toString))
-    }
+  implicit object collectable extends CanCollectRecord.Where[SourceIdentifiable, EntryRecord](table){
+    override def where[X](id: Long) = Seq("source_id" -> id.toString)
   }
   class Selector(val db: SQLiteDatabase)
     extends CollectFrom[SourceIdentifiable, EntryRecord]
