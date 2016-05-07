@@ -3,11 +3,11 @@ package x7c1.linen.repository.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.{UnreadSource, ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -58,8 +58,10 @@ class AccessorLoader private (
     new EntriesFooterAppender(detailUnderlying)
   }
   def startLoading[A: ChannelSelectable]
-    (account: AccountIdentifiable, channel: A)
+    (account: AccountBase, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+
+    Log info s"[init] account:${account.accountId}"
 
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -71,12 +73,14 @@ class AccessorLoader private (
 //    first onComplete loadNext
 
     val select = implicitly[ChannelSelectable[A]]
-    for {
+    val load = for {
       accessor <- startLoadingSources(
         accountId = account.accountId,
         channelId = select channelIdOf channel
       )
-      event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
+      event <- loadSourceEntries(
+        remainingSources = accessor map (_.sources) getOrElse Seq()
+      )
       _ <- Future {
         this.sourceAccessor = accessor
         updateAccessors(event)
@@ -85,15 +89,25 @@ class AccessorLoader private (
     } yield {
       event
     }
+    load onComplete {
+      case Success(event) =>
+        Log info s"[done] loaded:${event.loadedSources.length}"
+      case Failure(error) =>
+        Log error format(error){"[failed]"}
+    }
   }
   def restartLoading[A: ChannelSelectable]
-    (account: AccountIdentifiable, channel: A)
+    (account: AccountBase, channel: A)
       (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+
+    Log info s"[init] account:${account.accountId}"
 
     val select = implicitly[ChannelSelectable[A]]
     val load = for {
       accessor <- startLoadingSources(account.accountId, select channelIdOf channel)
-      event <- loadSourceEntries(accessor map (_.sourceIds) getOrElse Seq())
+      event <- loadSourceEntries(
+        remainingSources = accessor map (_.sources) getOrElse Seq()
+      )
       _ <- Future {
         close()
         this.sourceAccessor = accessor
@@ -101,11 +115,11 @@ class AccessorLoader private (
       }
       _ <- Future { onLoad(LoadCompleteEvent(channel)) }
     } yield {
-      event.remainingSourceIds
+      event.remainingSources
     }
     load onComplete {
-      case Success(sourceIds) =>
-        Log info s"[done] remains:${sourceIds.length}"
+      case Success(sources) =>
+        Log info s"[done] remains:${sources.length}"
       case Failure(e) =>
         Log error format(e, depth = 30){"[failed]"}
     }
@@ -141,44 +155,52 @@ class AccessorLoader private (
         Some(accessor)
     }
   }
-  private def loadSourceEntries(remainingSourceIds: Seq[Long]) = loaderFactory asFuture {
-    Log info s"[init] remains:${remainingSourceIds.length}"
+  private def loadSourceEntries(remainingSources: Seq[UnreadSource]) =
+    loaderFactory asFuture {
+      Log info s"[init] remains:${remainingSources.length}"
 
-    val (sourceIds, remains) = remainingSourceIds splitAt 50
-    val (outlines, details) =
-      if (sourceIds.nonEmpty) {
-        val positions = EntryAccessor.createPositionMap(database, sourceIds)
-        val outlines = Option(EntryAccessor.forEntryOutline(database, sourceIds, positions))
-        val details = Option(EntryAccessor.forEntryDetail(database, sourceIds, positions))
-        outlines -> details
-      } else {
-        None -> None
-      }
+      val (sources, remains) = remainingSources splitAt 50
+      val (outlines, details) =
+        if (sources.nonEmpty) {
+          val positions = {
+            val factory = new EntrySourcePositionsFactory(database)
+            factory create sources
+          }
+          val outlines = Option(EntryAccessor.forEntryOutline(database, sources, positions))
+          val details = Option(EntryAccessor.forEntryDetail(database, sources, positions))
+          outlines -> details
+        } else {
+          None -> None
+        }
 
-    AccessorsLoadedEvent(
-      loadedSourceIds = sourceIds,
-      remainingSourceIds = remains,
-      outlines = outlines,
-      details = details
-    )
-  }
+      AccessorsLoadedEvent(
+        loadedSources = sources,
+        remainingSources = remains,
+        outlines = outlines,
+        details = details
+      )
+    }
+
   private def updateAccessors(event: AccessorsLoadedEvent) = {
-    Log info s"[init] sourceIds.length:${event.loadedSourceIds.length}"
+    Log info s"[init] sources.length:${event.loadedSources.length}"
 
-    val sourceIds = event.loadedSourceIds
-    if (sourceIds.nonEmpty){
-      val positions = EntryAccessor.createPositionMap(database, sourceIds)
-      val outlines = EntryAccessor.forEntryOutline(database, sourceIds, positions)
-      val details = EntryAccessor.forEntryDetail(database, sourceIds, positions)
+    val sources = event.loadedSources
+    if (sources.nonEmpty){
+      val positions = {
+        val factory = new EntrySourcePositionsFactory(database)
+        factory create sources
+      }
+      val outlines = EntryAccessor.forEntryOutline(database, sources, positions)
+      val details = EntryAccessor.forEntryDetail(database, sources, positions)
       synchronized {
-        currentSourceLength += sourceIds.length
+        currentSourceLength += sources.length
         outlineAccessors += outlines
         detailAccessors += details
       }
     }
   }
   private def loadNext: Try[AccessorsLoadedEvent] => Unit = {
-    case Success(event) => loadMore(event.remainingSourceIds)
+    case Success(event) => loadMore(event.remainingSources)
     case Failure(e : IllegalStateException) =>
 
       /*
@@ -191,7 +213,7 @@ class AccessorLoader private (
 
     case Failure(e) => Log error format(e, depth = 30){"failed"}
   }
-  private def loadMore(remaining: Seq[Long]): Unit = {
+  private def loadMore(remaining: Seq[UnreadSource]): Unit = {
     Log info s"[init] remaining:${remaining.length}"
     remaining match {
       case Seq() => Log info "[done]"
@@ -200,7 +222,7 @@ class AccessorLoader private (
       }
     }
   }
-  private def loadAndUpdate(remaining: Seq[Long]) = for {
+  private def loadAndUpdate(remaining: Seq[UnreadSource]) = for {
     event <- loadSourceEntries(remaining)
     _ <- Future { updateAccessors(event) }
   } yield event
@@ -227,8 +249,8 @@ object AccessorLoader {
 }
 
 case class AccessorsLoadedEvent(
-  loadedSourceIds: Seq[Long],
-  remainingSourceIds: Seq[Long],
+  loadedSources: Seq[UnreadSource],
+  remainingSources: Seq[UnreadSource],
   outlines: Option[ClosableEntryAccessor[UnreadOutline]],
   details: Option[ClosableEntryAccessor[UnreadDetail]]
 )
@@ -285,4 +307,11 @@ private class EntriesFooterAppender[A <: UnreadEntry](
     accessor firstEntryPositionOf sourceId
   }
   private def isLast(position: Int) = position == accessor.length
+
+  override def lastEntriesTo(position: Int) = {
+    accessor lastEntriesTo position
+  }
+  override def latestEntriesTo(position: Int): Seq[A] = {
+    accessor latestEntriesTo position
+  }
 }

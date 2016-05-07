@@ -12,7 +12,7 @@ import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.dummy.DummyFactory
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, UnreadEntryRow}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositions, EntrySourcePositionsFactory, UnreadEntryRow}
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, SourceKind}
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -44,7 +44,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
 
     val latestEntries = sources.map(_.latestEntryId).flatMap { entryId =>
-      helper.readable.find[EntryRecord].by(entryId).toOption
+      helper.selectorOf[EntryRecord].findBy(entryId).toOption
     }
     assertEquals(
       Seq("sample-entry2-1", "sample-entry1-2"),
@@ -76,11 +76,13 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new DatabaseHelper(context).getReadableDatabase
-    val Some(sourceAccessor) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
-    val positions = EntryAccessor.createPositionMap(db, sourceIds)
-
-    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val sources = sourceAccessor.sources
+    val positions = {
+      val factory = new EntrySourcePositionsFactory(db)
+      factory create sources
+    }
+    val accessor = EntryAccessor.forEntryOutline(db, sources, positions)
     val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
 
     assertEquals(true, entries.exists {
@@ -102,9 +104,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new DatabaseHelper(context).getReadableDatabase
-    val Some(sourceAccessor) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
-    val query = EntryAccessor.createPositionQuery(sourceIds)
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val sources = sourceAccessor.sources
+    val query = EntrySourcePositions.createQuery(sources)
     val plans = QueryExplainer(db).explain(query)
 
 //    println(query.sql)
@@ -121,15 +123,18 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     DummyFactory.createDummies(context)(5)
 
     val db = new DatabaseHelper(context).getReadableDatabase
-    val Some(sourceAccessor) = inspectSourceAccessor(db)
-    val sourceIds = sourceAccessor.sourceIds
-    val positions = EntryAccessor.createPositionMap(db, sourceIds)
-    val accessor = EntryAccessor.forEntryOutline(db, sourceIds, positions)
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val sources = sourceAccessor.sources
+    val positions = {
+      val factory = new EntrySourcePositionsFactory(db)
+      factory create sources
+    }
+    val accessor = EntryAccessor.forEntryOutline(db, sources, positions)
 
     assertEquals(Some(SourceKind), accessor.findKindAt(0))
     assertEquals(Some(EntryKind), accessor.findKindAt(1))
   }
-  def inspectSourceAccessor(db: SQLiteDatabase) = {
+  private def inspectSourceAccessor(db: SQLiteDatabase) = {
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db)
       channel <- MyChannelAccessor.createForDebug(db, accountId).findAt(0).collect {
@@ -137,7 +142,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       }
       either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
       accessor <- either.right.toOption
-    } yield accessor
+    } yield accountId -> accessor
   }
 }
 

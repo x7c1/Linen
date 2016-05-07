@@ -9,7 +9,7 @@ import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelParts, AccountParts}
-import x7c1.linen.repository.account.dev.Account
+import x7c1.linen.repository.account.dev.DevAccount
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -78,27 +78,27 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
 class SampleFactory (helper: DatabaseHelper){
 
   lazy val db = helper.getWritableDatabase
-  lazy val writable = helper.writable
-  lazy val readable = helper.readable
 
-  def createAccount(): Account = {
+  lazy val writable = helper.writable
+
+  def createAccount(): DevAccount = {
     val Right(id) = writable insert AccountParts(
       nickname = s"sample-user",
       biography = s"sample-biography",
       createdAt = Date.current()
     )
-    Account(accountId = id)
+    DevAccount(accountId = id)
 
   }
 
-  def createChannel(owner: Account): Channel = {
+  def createChannel(owner: DevAccount): Channel = {
     val Right(id) = writable insert ChannelParts(
       accountId = owner.accountId,
       name = s"sample channel name",
       description = s"sample channel description",
       createdAt = Date.current()
     )
-    val Right(Some(channel)) = readable.find[Channel].by(id).toEither
+    val Right(Some(channel)) = helper.selectorOf[Channel].findBy(id).toEither
     channel
   }
 }

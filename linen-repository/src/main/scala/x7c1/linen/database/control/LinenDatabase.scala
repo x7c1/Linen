@@ -84,7 +84,7 @@ object LinenDatabase {
     )
     val entries = Seq(
       s"""CREATE TABLE IF NOT EXISTS entries (
-         |_id INTEGER PRIMARY KEY AUTOINCREMENT,
+         |entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
          |source_id INTEGER NOT NULL,
          |url TEXT NOT NULL,
          |title TEXT NOT NULL,
@@ -95,7 +95,7 @@ object LinenDatabase {
          |)""".stripMargin,
 
       s"""CREATE INDEX entries_source ON entries (
-         |source_id, _id)""".stripMargin,
+         |source_id, entry_id)""".stripMargin,
 
       s"""CREATE INDEX entries_source_created_at ON entries (
          |source_id, created_at)""".stripMargin,
@@ -146,7 +146,7 @@ object LinenDatabase {
          |updated_at INTEGER NOT NULL,
          |UNIQUE(source_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(latest_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
+         |FOREIGN KEY(latest_entry_id) REFERENCES entries(entry_id) ON DELETE CASCADE
          |)""".stripMargin,
 
       s"""CREATE INDEX retrieved_source_marks_created_at ON retrieved_source_marks (
@@ -161,7 +161,7 @@ object LinenDatabase {
          |created_at INTEGER NOT NULL,
          |UNIQUE(source_id, account_id),
          |FOREIGN KEY(source_id) REFERENCES sources(_id) ON DELETE CASCADE,
-         |FOREIGN KEY(start_entry_id) REFERENCES entries(_id) ON DELETE CASCADE
+         |FOREIGN KEY(start_entry_id) REFERENCES entries(entry_id) ON DELETE CASCADE
          |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
          |)""".stripMargin
     )

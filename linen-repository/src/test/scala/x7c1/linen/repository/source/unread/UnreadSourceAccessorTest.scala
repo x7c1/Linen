@@ -40,7 +40,7 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
 
     val latestEntries = sources.map(_.latestEntryId).flatMap { entryId =>
-      helper.readable.find[EntryRecord].by(entryId).toOption
+      helper.selectorOf[EntryRecord].findBy(entryId).toOption
     }
     assertEquals(
       Seq("sample-entry2-1", "sample-entry1-2"),

@@ -2,10 +2,14 @@ package x7c1.linen.database.struct
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, Query, SingleSelectable}
+import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanFindRecord, CollectFrom, FindBy}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable, SelectorProvidable}
 
 trait EntryRecord extends TypedFields {
   def entry_id: Long
@@ -16,17 +20,32 @@ trait EntryRecord extends TypedFields {
   def url: String
   def created_at: Int --> Date
 }
+
 object EntryRecord {
   def table: String = "entries"
+  def column = TypedFields.expose[EntryRecord]
 
-  implicit object selectable extends SingleSelectable[EntryRecord, Long]{
-    override def query(id: Long): Query = {
-      val sql = "SELECT *, _id AS entry_id FROM entries WHERE _id = ?"
-      new Query(sql, Array(id.toString))
-    }
-    override def fromCursor(cursor: Cursor): Option[EntryRecord] =
-      TypedCursor[EntryRecord](cursor).freezeAt(0)
+  implicit object reifiable extends RecordReifiable[EntryRecord]{
+    override def reify(cursor: Cursor) = TypedCursor[EntryRecord](cursor)
   }
+  implicit object providable
+    extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
+
+  implicit object findable extends CanFindRecord.Where[EntryIdentifiable, EntryRecord](table){
+    override def where[X](id: Long) = toArgs(column.entry_id -> id)
+  }
+  implicit object collectable extends CanCollectRecord.Where[SourceIdentifiable, EntryRecord](table){
+    override def where[X](id: Long) = toArgs(column.source_id -> id)
+  }
+  class Selector(val db: SQLiteDatabase)
+    extends CollectFrom[SourceIdentifiable, EntryRecord]
+      with FindBy[EntryIdentifiable, EntryRecord]
+}
+
+trait EntryIdentifiable[A] extends Identifiable[A, Long]
+
+object EntryIdentifiable {
+  implicit object entryIdentifiable extends EntryIdentifiable[Long] with IdEndo[Long]
 }
 
 case class EntryParts(

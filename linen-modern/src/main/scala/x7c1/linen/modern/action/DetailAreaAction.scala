@@ -86,7 +86,7 @@ class DetailAreaAction(
 
   private def updateToolBarNow(sourceId: Option[Long]): Unit = {
     sourceId flatMap
-      rawSourceAccessor.findTitleOf foreach
+      rawSourceAccessor.findTitleOf[Long] foreach
         detailArea.updateToolbar
   }
   private def updateToolbar(sourceId: Long) = task {

@@ -37,6 +37,8 @@ object TypedFields {
   def expose[A <: TypedFields]: A = macro TypedContentValues.extract[A]
 
   def toContentValues[A](pairs: A*): ContentValues = macro TypedContentValues.unwrap[A]
+
+  def toArgs[A](pairs: A*): Seq[(String, String)] = macro TypedFieldsParser.toSelectionArgs[A]
 }
 
 trait FieldTransform[A, B]{
@@ -70,6 +72,9 @@ private object TypedColumnImpl {
             because it returns 0 when target value is null
          */
         q"Option($cursor.getString($indexKey)).map(_.toLong)"
+
+      case x if x =:= typeOf[Option[Int]] =>
+        q"Option($cursor.getString($indexKey)).map(_.toInt)"
 
       case x if x <:< typeOf[FieldTransform[_, _]] =>
         val Seq(from, to) = tpe.typeArgs

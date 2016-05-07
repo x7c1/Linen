@@ -11,7 +11,7 @@ import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
-import x7c1.linen.repository.account.{AccountIdentifiable, ClientAccount}
+import x7c1.linen.repository.account.{AccountBase, ClientAccount}
 import x7c1.linen.repository.channel.my.{MyChannelAccessor, MyChannelAccessorLoader}
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.scene.channel.menu.OnChannelMenuSelected
@@ -66,7 +66,7 @@ class MyChannelsDelegatee (
     helper.close()
     Log info "[done]"
   }
-  private def reloadChannels(event: AccountIdentifiable): Unit ={
+  private def reloadChannels(event: AccountBase): Unit ={
     val client = ClientAccount(event.accountId)
     (loader reload client){ _ =>
       layout.channelList.getAdapter.notifyDataSetChanged()
@@ -126,7 +126,7 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
 class OnMyChannelSubscriptionChanged(
   context: Context,
   helper: DatabaseHelper,
-  account: AccountIdentifiable){
+  account: AccountBase){
 
   def updateSubscription(event: MyChannelSubscriptionChanged): Unit = {
     val subscriber = new ChannelSubscriber(account, helper)

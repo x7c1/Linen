@@ -3,21 +3,22 @@ package x7c1.linen.repository.account.setup
 import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{AccountParts, AccountTagLabel, AccountTagMapParts, account_tags}
-import x7c1.linen.repository.account.AccountIdentifiable
+import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.date.Date
-
-import x7c1.wheat.modern.database.{WritableDatabase, ZeroAritySingle}
+import x7c1.wheat.modern.database.WritableDatabase
+import x7c1.wheat.modern.database.selector.presets.Find.FindProvidable
+import x7c1.wheat.modern.database.selector.presets.CanFindByQuery
 import x7c1.wheat.modern.either.OptionEither
 
 
-class TaggedAccountSetup[A <: AccountIdentifiable : ZeroAritySingle](
+class TaggedAccountSetup[A <: AccountBase: CanFindByQuery: FindProvidable](
   helper: DatabaseHelper,
-  tagLabel: AccountTagLabel ) {
+  tagLabel: AccountTagLabel ){
 
   private val finder = new AccountTagFinder(helper)
 
   def findOrCreate(parts: AccountParts): Either[AccountSetupError, Long] = {
-    helper.readable.find[A]() via {
+    helper.selectorOf[A].find() via {
       case Right(Some(account)) => Right(account.accountId)
       case Right(None) => createAccount(parts)
       case Left(e) => Left(UnexpectedException(e))
@@ -47,7 +48,7 @@ class TaggedAccountSetup[A <: AccountIdentifiable : ZeroAritySingle](
 
 private class AccountTagFinder(helper: DatabaseHelper){
   def findId(tag: AccountTagLabel): OptionEither[SQLException, Long] = {
-    val either = helper.readable.find[account_tags] by tag
+    val either = helper.selectorOf[account_tags] findByTag tag
     either map (_.account_tag_id)
   }
 }
