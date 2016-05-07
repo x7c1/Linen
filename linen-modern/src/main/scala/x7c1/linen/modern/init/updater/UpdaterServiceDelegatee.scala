@@ -33,7 +33,3 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     helper.close()
   }
 }
-
-
-
-

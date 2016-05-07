@@ -53,7 +53,7 @@ private class SourceUpdaterQueueImpl(
     def elapsed() = currentTimeMillis() - start
 
     val future = sourceLoader loadSource source map { loadedSource =>
-      Log info s"[loaded] msec:${elapsed()}, source:$source"
+      Log info s"[loaded] msec:${elapsed()}, source:$source, entries(${loadedSource.validEntries.length})"
 
       if (loadedSource isModifiedFrom source){
         updateSource(loadedSource)

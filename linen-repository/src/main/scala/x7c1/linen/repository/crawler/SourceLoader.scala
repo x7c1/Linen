@@ -7,6 +7,7 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{Sy
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.TaskProvider.using
@@ -18,10 +19,36 @@ trait SourceLoader {
 }
 
 object RemoteSourceLoader extends SourceLoader {
-
   override def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource] = {
-    import collection.JavaConverters._
+    val loader = source.feedUrl.getHost match {
+      case "example.com" => ExampleLoader
+      case _ => RealLoader
+    }
+    loader loadSource source
+  }
+}
 
+private object ExampleLoader extends SourceLoader {
+  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext) = {
+    Log info s"[init] $source"
+    Future {
+      new LoadedSource(
+        sourceId = source.sourceId,
+        title = source.title,
+        description = source.description,
+        entries = createEntries()
+      )
+    }
+  }
+  private def createEntries(): Seq[Either[InvalidEntry, LoadedEntry]] = {
+    Seq()
+  }
+}
+
+private object RealLoader extends SourceLoader {
+  import collection.JavaConverters._
+
+  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext) = {
     Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
       val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
       new LoadedSource(
