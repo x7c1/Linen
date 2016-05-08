@@ -2,7 +2,7 @@ package x7c1.linen.repository.source.setting
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.linen.database.struct.{ChannelSourceMapParts, SourceParts, SourceRatingParts}
+import x7c1.linen.database.struct.{SourceIdentifiable, ChannelSourceMapParts, SourceParts, SourceRatingParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.{Query, WritableDatabase}
@@ -36,6 +36,11 @@ case class SettingSource(
   description: String,
   rating: Int
 )
+object SettingSource {
+  implicit object id extends SourceIdentifiable[SettingSource]{
+    override def toId = _.sourceId
+  }
+}
 
 trait SettingSourceRecord extends TypedFields {
   def source_id: Long

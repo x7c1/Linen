@@ -4,10 +4,10 @@ import android.app.Service
 import android.content.Intent
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.crawler.{Implicits, SourceInspector, SourceUpdaterQueue}
-import x7c1.linen.repository.dummy.DummyFactory
+import x7c1.linen.repository.crawler.{Implicits, SourceInspector}
+import x7c1.linen.repository.dummy.{DummyFactory, TraceableQueue}
 import x7c1.linen.repository.preset.PresetFactory
-import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
+import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
 import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class UpdaterMethods(
   service: Service with ServiceControl,
   helper: DatabaseHelper,
-  queue: SourceUpdaterQueue,
+  queue: TraceableQueue,
   startId: Int){
 
   import Implicits._
@@ -30,7 +30,7 @@ class UpdaterMethods(
   }
   def createDummies(max: Int): Unit = async {
     Log info "[init]"
-    val notifier = new UpdaterServiceNotifier(service, max)
+    val notifier = new UpdaterServiceNotifier(service, max, startId)
     DummyFactory.createDummies0(service)(max){ n =>
       notifier.notifyProgress(n)
     }
@@ -60,9 +60,41 @@ class UpdaterMethods(
     Log info s"[init] channel:$channelId"
 
     val factory = new SettingSourceAccessorFactory(helper.getReadableDatabase, accountId)
+    val inspector = SourceInspector(helper)
     val accessor = factory.create(channelId)
-    (0 to accessor.length - 1) flatMap accessor.findAt foreach { source =>
-      loadSource(source.sourceId)
+
+    val settingSources = (0 to accessor.length - 1) flatMap accessor.findAt
+
+    val inspectedSources = settingSources map inspector.inspectSource[SettingSource]
+    val targetSources = inspectedSources collect {
+      case Right(sources) => sources
     }
+    inspectedSources collect {
+      case Left(error) => Log error error.message
+    }
+    val end = targetSources.length
+    val notifier = new UpdaterServiceNotifier(service, end, startId)
+
+    targetSources.view map
+      queue.enqueueSource foreach onUpdated(notifier, end)
+  }
+
+  private def onUpdated[A](notifier: UpdaterServiceNotifier, end: Int): Future[A] => Unit = {
+    var progress = 0
+
+    _ onComplete { _ =>
+      synchronized {
+        progress = progress + 1
+        Log info s"[progress] $progress"
+        notifier notifyProgress progress
+
+        if (progress == end){
+          Log info s"[done] hoge"
+          notifier.notifyDone()
+          service stopSelf startId
+        }
+      }
+    }
+
   }
 }

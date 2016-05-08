@@ -5,39 +5,49 @@ import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.Builder
-import android.support.v4.content.LocalBroadcastManager
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.scene.updater.UpdaterServiceTypes.ActionTypeSample
 import x7c1.wheat.macros.logger.Log
 
-class UpdaterServiceNotifier(service: Service with ServiceControl, max: Int){
+class UpdaterServiceNotifier(
+  service: Service with ServiceControl,
+  max: Int,
+  notificationId: Int ){
 
   private def manager =
     service.getSystemService(NOTIFICATION_SERVICE).
       asInstanceOf[NotificationManager]
 
   def notifyDone(): Unit = {
+    Log info s"[init] notificationId:$notificationId"
+    /*
     val current = max
     val builder = createBuilder(current).setAutoCancel(true)
     val notification = createNotification(builder, current)
+    */
 
     /*
       need to rebuild notification for kitkat device
         rf. http://stackoverflow.com/questions/27503863/swipe-dismissing-service-notification
      */
+//    service.stopForeground(false/*removeNotification*/)
+    /*
     service stopForeground {
       val removeNotification = true
       removeNotification
     }
-    manager.notify(123, notification)
+    manager.notify(notificationId, notification)
+    */
+
+    manager.cancel(notificationId)
+
   }
   def notifyProgress(current: Int): Unit = {
     val builder = createBuilder(current)
     val notification = createNotification(builder, current)
 
-    service.startForeground(123, notification)
-    manager.notify(123, notification)
+//    service.startForeground(notificationId, notification)
+    manager.notify(notificationId, notification)
   }
   private def createNotification(builder: Builder, current: Int): Notification = {
     val style = new NotificationCompat.InboxStyle(builder)
@@ -60,6 +70,7 @@ class UpdaterServiceNotifier(service: Service with ServiceControl, max: Int){
       setSmallIcon(android.R.drawable.ic_dialog_info)
   }
 
+  /*
   var notificationId: Int = 1
 
   def inboxSample() = {
@@ -98,5 +109,6 @@ class UpdaterServiceNotifier(service: Service with ServiceControl, max: Int){
     intent.putExtra("sample-message", s"hello!!! $n")
     LocalBroadcastManager.getInstance(service).sendBroadcast(intent)
   }
+  */
 
 }

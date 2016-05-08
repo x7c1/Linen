@@ -21,7 +21,7 @@ trait SourceLoader {
 object RemoteSourceLoader extends SourceLoader {
   override def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource] = {
     val loader = source.feedUrl.getHost match {
-      case "example.com" => ExampleLoader
+      case host if host endsWith "example.com" => ExampleLoader
       case _ => RealLoader
     }
     loader loadSource source
