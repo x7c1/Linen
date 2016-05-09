@@ -69,7 +69,7 @@ class UpdaterServiceNotifier(
     new Builder(service).
       setWhen {
         /* plus notificationId to identify same startTime */
-        startTime.timestamp * 1000 + notificationId
+        startTime.timestamp.toLong * 1000 + notificationId
       }.
       setContentIntent(createPendingIntent).
       setContentTitle(s"Progress $current/$max").
