@@ -4,10 +4,9 @@ import java.lang.System.currentTimeMillis
 
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{RetrievedSourceMarkParts, EntryParts}
+import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.formatter.ThrowableFormatter
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -78,8 +77,10 @@ private class SourceUpdaterQueueImpl(
         Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
         queueMap headOption host
       }
-      onSourceDequeue(SourceDequeueEvent(source, result))
-
+      try onSourceDequeue(SourceDequeueEvent(source, result))
+      catch {
+        case e: Exception => Log error format(e){"[failed]"}
+      }
       nextSource match {
         case Some(next) => after(msec = 1000){ update(next) }
         case None => Log info s"[done] host:$host"
@@ -135,7 +136,7 @@ private class SourceUpdaterQueueImpl(
           updatedAt = Date.current()
         ) match {
           case Left(error) =>
-            Log error ThrowableFormatter.format(error){"[failed]"}
+            Log error format(error){"[failed]"}
           case Right(b) =>
             Log info s"[done] marked:id:$b"
         }
