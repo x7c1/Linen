@@ -3,7 +3,6 @@ package x7c1.linen.scene.updater
 import android.app.{Notification, NotificationManager, PendingIntent, Service}
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
-import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
@@ -52,11 +51,14 @@ class UpdaterServiceNotifier(
     manager.notify(notificationId, notification)
   }
   private def createNotification(builder: Builder, current: Int): Notification = {
+    /*
     val style = new NotificationCompat.InboxStyle(builder)
       .setSummaryText(s"inserted $current/$max")
       .setBigContentTitle("Progress")
 
     style.build()
+    */
+    builder.build()
   }
 
   private def createPendingIntent = {
