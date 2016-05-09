@@ -62,7 +62,7 @@ object DummyFactory {
     (1 to n) foreach { i =>
       val Right(sourceId) = writable insert SourceParts(
         title = s"$i-title",
-        url = s"http://${i % 3}.example.com/source-$i/$timestamp",
+        url = s"http://${i % 3 + Random.nextInt(4)}.example.com/source-$i/$timestamp",
         description = s"description-$i " + words(1,15),
         createdAt = Date.current()
       )

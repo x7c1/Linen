@@ -7,11 +7,13 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.Builder
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
+import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
 
 class UpdaterServiceNotifier(
   service: Service with ServiceControl,
   max: Int,
+  startTime: Date,
   notificationId: Int ){
 
   private def manager =
@@ -40,8 +42,8 @@ class UpdaterServiceNotifier(
     */
 
     manager.cancel(notificationId)
-
   }
+
   def notifyProgress(current: Int): Unit = {
     val builder = createBuilder(current)
     val notification = createNotification(builder, current)
@@ -63,6 +65,10 @@ class UpdaterServiceNotifier(
   }
   private def createBuilder(current: Int): Builder = {
     new Builder(service).
+      setWhen {
+        /* plus notificationId to identify same startTime */
+        startTime.timestamp * 1000 + notificationId
+      }.
       setContentIntent(createPendingIntent).
       setContentTitle(s"Progress $current/$max").
       setContentText(s"inserting").

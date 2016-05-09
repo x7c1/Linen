@@ -5,6 +5,7 @@ import android.content.Intent
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.crawler.{Implicits, SourceInspector}
+import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.{DummyFactory, TraceableQueue}
 import x7c1.linen.repository.preset.PresetFactory
 import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
@@ -30,7 +31,7 @@ class UpdaterMethods(
   }
   def createDummies(max: Int): Unit = async {
     Log info "[init]"
-    val notifier = new UpdaterServiceNotifier(service, max, startId)
+    val notifier = new UpdaterServiceNotifier(service, max, Date.current(), startId)
     DummyFactory.createDummies0(service)(max){ n =>
       notifier.notifyProgress(n)
     }
@@ -73,7 +74,7 @@ class UpdaterMethods(
       case Left(error) => Log error error.message
     }
     val end = targetSources.length
-    val notifier = new UpdaterServiceNotifier(service, end, startId)
+    val notifier = new UpdaterServiceNotifier(service, end, Date.current(), startId)
 
     targetSources.view map
       queue.enqueueSource foreach onUpdated(notifier, end)
