@@ -2,11 +2,12 @@ package x7c1.linen.repository.channel.my
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.mixin.MyChannelRecord
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.Query
-import x7c1.wheat.modern.database.selector.presets.CursorClosableSequence
+import x7c1.wheat.modern.database.selector.presets.ClosableSequence
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 
@@ -58,29 +59,13 @@ private object ClosableMyChannelAccessor {
     }
   }
   def createQuery(client: ClientAccount): Query = {
-    val sql =
-      """SELECT
-        | _id,
-        | name,
-        | description,
-        | IFNULL(c2.subscribed, 0) AS subscribed,
-        | c1.created_at AS created_at
-        |FROM channels AS c1
-        | LEFT JOIN channel_statuses AS c2
-        |   ON c1._id = c2.channel_id AND c2.account_id = ?
-        |WHERE c1.account_id = ?
-        |ORDER BY c1._id DESC""".stripMargin
-
-    new Query(sql, Array(
-      client.accountId.toString,
-      client.accountId.toString
-    ))
+    MyChannelRecord.traversable.query(client)
   }
 }
 
 private trait ClosableMyChannelAccessor
   extends MyChannelAccessor
-  with CursorClosableSequence[MyChannelRow]
+  with ClosableSequence[MyChannelRow]
 
 private class ClosableMyChannelAccessorImpl (
   rawCursor: Cursor, client: ClientAccount) extends ClosableMyChannelAccessor {

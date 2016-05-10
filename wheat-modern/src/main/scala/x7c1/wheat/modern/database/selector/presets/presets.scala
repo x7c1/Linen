@@ -22,7 +22,7 @@ trait TraverseOn[I[T] <: CanIdentify[T], A]{
   protected def db: SQLiteDatabase
 
   def traverseOn[X: I](target: X)
-      (implicit i: CanTraverse[I, A]): Either[SQLException, CursorClosableSequence[A]] = {
+      (implicit i: CanTraverse[I, A]): Either[SQLException, ClosableSequence[A]] = {
 
     ItemSelector(db) selectBy target
   }
