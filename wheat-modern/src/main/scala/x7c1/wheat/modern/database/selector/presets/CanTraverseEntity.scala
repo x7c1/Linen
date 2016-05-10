@@ -8,12 +8,12 @@ import scala.language.{reflectiveCalls, higherKinds}
 
 abstract class CanTraverseEntity[
   I[T] <: CanIdentify[T],
-  FROM: CursorReifiable: ({ type L[T] = CanTraverseRecord[I, T] })#L,
+  FROM: CursorReifiable: ({ type L[T] = CanTraverse[I, T] })#L,
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
 ] extends CanTraverse[I, TO]{
 
   override def query[X: I](target: X): Query = {
-    implicitly[CanTraverseRecord[I, FROM]] query target
+    implicitly[CanTraverse[I, FROM]] query target
   }
   override def fromCursor(cursor: Cursor): Either[SQLException, ClosableSequence[TO]] = {
     val sequence = ClosableSequence[FROM, TO](cursor)
