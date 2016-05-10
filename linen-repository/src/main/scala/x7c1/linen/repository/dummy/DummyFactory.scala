@@ -41,7 +41,7 @@ object DummyFactory {
       )
       id
     }
-    val channelAccessor = MyChannelAccessor.createForDebug(db, accountId1)
+    val channelAccessor = MyChannelAccessor.createForDebug(helper, accountId1)
     val row = channelAccessor findAt 0 collect { case x: MyChannel => x }
     val channelId = row map (_.channelId) getOrElse {
       writable insert ChannelParts(

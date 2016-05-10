@@ -20,14 +20,15 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getWritableDatabase
+    val helper = new DatabaseHelper(context)
+    val db = helper.getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(channelId) = MyChannelAccessor.createForDebug(db, accountId) findAt 0 collect {
+    val Some(channelId) = MyChannelAccessor.createForDebug(helper, accountId) findAt 0 collect {
       case x: MyChannel => x.channelId
     }
     assertEquals(2, channelId)
 
-    val channelId2 = MyChannelAccessor.createForDebug(db, accountId = 123) findAt 0
+    val channelId2 = MyChannelAccessor.createForDebug(helper, accountId = 123) findAt 0
     assertEquals(None, channelId2)
   }
 
@@ -36,9 +37,10 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getWritableDatabase
+    val helper = new DatabaseHelper(context)
+    val db = helper.getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val length = MyChannelAccessor.createForDebug(db, accountId).length
+    val length = MyChannelAccessor.createForDebug(helper, accountId).length
     assertEquals(2, length)
   }
 
@@ -47,19 +49,20 @@ class MyChannelAccessorTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getWritableDatabase
+    val helper = new DatabaseHelper(context)
+    val db = helper.getWritableDatabase
     val Some(accountId) = AccountAccessor.create(db) findAt 0 map (_.accountId)
-    val Some(c1) = MyChannelAccessor.createForDebug(db, accountId).findAt(0) collect {
+    val Some(c1) = MyChannelAccessor.createForDebug(helper, accountId).findAt(0) collect {
       case x: MyChannel => x
     }
     assertEquals("sample channel name2", c1.name)
 
-    val Some(c2) = MyChannelAccessor.createForDebug(db, accountId).findAt(1) collect {
+    val Some(c2) = MyChannelAccessor.createForDebug(helper, accountId).findAt(1) collect {
       case x: MyChannel => x
     }
     assertEquals("sample channel name1", c2.name)
 
-    val c3 = MyChannelAccessor.createForDebug(db, accountId).findAt(2)
+    val c3 = MyChannelAccessor.createForDebug(helper, accountId).findAt(2)
     assertEquals(None, c3)
   }
 }

@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.my
 
-import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.mixin.MyChannelRecord
 import x7c1.linen.database.struct.{AccountIdentifiable, ChannelDeletable, ChannelIdentifiable}
 import x7c1.linen.repository.account.ClientAccount
@@ -13,8 +13,8 @@ trait MyChannelAccessor extends Sequence[MyChannelRow]{
 }
 
 object MyChannelAccessor {
-  def createForDebug(db: SQLiteDatabase, accountId: Long): MyChannelAccessor = {
-    ClosableMyChannelAccessor.create(db, ClientAccount(accountId)) match {
+  def createForDebug(helper: DatabaseHelper, accountId: Long): MyChannelAccessor = {
+    ClosableMyChannelAccessor.create(helper, ClientAccount(accountId)) match {
       case Left(e) => throw e
       case Right(accessor) => accessor
     }

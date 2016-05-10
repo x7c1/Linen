@@ -34,7 +34,7 @@ class MyChannelsDelegatee (
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader = new MyChannelAccessorLoader(database)
+  private lazy val loader = new MyChannelAccessorLoader(helper)
 
   private lazy val onChannelCreated =
     LocalBroadcastListener[ChannelCreated]{ reloadChannels }

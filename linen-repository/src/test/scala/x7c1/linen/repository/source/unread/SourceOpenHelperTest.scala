@@ -1,6 +1,5 @@
 package x7c1.linen.repository.source.unread
 
-import android.database.sqlite.SQLiteDatabase
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,8 +74,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getReadableDatabase
-    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val helper = new DatabaseHelper(context)
+    val db = helper.getReadableDatabase
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(helper)
     val sources = sourceAccessor.sources
     val positions = {
       val factory = new EntrySourcePositionsFactory(db)
@@ -103,8 +103,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getReadableDatabase
-    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val helper = new DatabaseHelper(context)
+    val db = helper.getReadableDatabase
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(helper)
     val sources = sourceAccessor.sources
     val query = EntrySourcePositions.createQuery(sources)
     val plans = QueryExplainer(db).explain(query)
@@ -122,8 +123,9 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val context = RuntimeEnvironment.application
     DummyFactory.createDummies(context)(5)
 
-    val db = new DatabaseHelper(context).getReadableDatabase
-    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(db)
+    val helper = new DatabaseHelper(context)
+    val db = helper.getReadableDatabase
+    val Some((accountId, sourceAccessor)) = inspectSourceAccessor(helper)
     val sources = sourceAccessor.sources
     val positions = {
       val factory = new EntrySourcePositionsFactory(db)
@@ -134,10 +136,11 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     assertEquals(Some(SourceKind), accessor.findKindAt(0))
     assertEquals(Some(EntryKind), accessor.findKindAt(1))
   }
-  private def inspectSourceAccessor(db: SQLiteDatabase) = {
+  private def inspectSourceAccessor(helper: DatabaseHelper) = {
+    val db = helper.getReadableDatabase
     for {
       accountId <- AccountAccessor.findCurrentAccountId(db)
-      channel <- MyChannelAccessor.createForDebug(db, accountId).findAt(0).collect {
+      channel <- MyChannelAccessor.createForDebug(helper, accountId).findAt(0).collect {
         case x: MyChannel => x
       }
       either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
