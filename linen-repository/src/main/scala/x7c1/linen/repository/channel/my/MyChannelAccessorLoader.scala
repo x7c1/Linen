@@ -25,13 +25,13 @@ class MyChannelAccessorLoader(helper: DatabaseHelper){
     }
   }
   private def createAccessor(client: ClientAccount) = {
-    val internal = ClosableMyChannelAccessor.create(helper, client)
+    val internal = helper.selectorOf[MyChannel] traverseOn client
     internal.right map (new SourceFooterAppender(_))
   }
   private class AccessorHolder(
-    private var underlying: ClosableMyChannelAccessor) extends MyChannelAccessor {
+    private var underlying: ClosableSequence[MyChannelRow]) extends MyChannelAccessor {
 
-    def updateAccessor(accessor: ClosableMyChannelAccessor) = synchronized {
+    def updateAccessor(accessor: ClosableSequence[MyChannelRow]) = synchronized {
       underlying.closeCursor()
       underlying = accessor
     }
@@ -41,38 +41,8 @@ class MyChannelAccessorLoader(helper: DatabaseHelper){
   }
 }
 
-private object ClosableMyChannelAccessor {
-  def create(
-    helper: DatabaseHelper,
-    client: ClientAccount): Either[Exception, ClosableMyChannelAccessor] = {
-
-    try for {
-      sequence <- helper.selectorOf[MyChannel].traverseOn(client).right
-    } yield {
-      new ClosableMyChannelAccessorImpl(sequence)
-    } catch {
-      case e: Exception => Left(e)
-    }
-  }
-}
-
-private trait ClosableMyChannelAccessor
-  extends MyChannelAccessor
-  with ClosableSequence[MyChannelRow]
-
-private class ClosableMyChannelAccessorImpl (
-  sequence: ClosableSequence[MyChannel]) extends ClosableMyChannelAccessor {
-
-  override def findAt(position: Int) =
-    sequence.findAt(position)
-
-  override def length = sequence.length
-
-  override def closeCursor(): Unit = sequence.closeCursor()
-}
-
 private class SourceFooterAppender(
-  accessor: ClosableMyChannelAccessor) extends ClosableMyChannelAccessor{
+  accessor: ClosableSequence[MyChannelRow]) extends ClosableSequence[MyChannelRow]{
 
   override def findAt(position: Int) = {
     if (position == accessor.length){

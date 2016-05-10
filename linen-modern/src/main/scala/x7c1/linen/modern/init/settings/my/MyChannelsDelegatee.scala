@@ -12,7 +12,7 @@ import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayo
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.linen.repository.account.{AccountBase, ClientAccount}
-import x7c1.linen.repository.channel.my.{MyChannelAccessor, MyChannelAccessorLoader}
+import x7c1.linen.repository.channel.my.{MyChannelAccessorLoader, MyChannelRow}
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.scene.channel.menu.OnChannelMenuSelected
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -22,6 +22,7 @@ import x7c1.wheat.macros.fragment.FragmentFactory
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.sequence.Sequence
 
 class MyChannelsDelegatee (
   activity: FragmentActivity with ActivityControl with ServiceControl,
@@ -72,7 +73,7 @@ class MyChannelsDelegatee (
       layout.channelList.getAdapter.notifyDataSetChanged()
     }
   }
-  private def setAdapter(account: ClientAccount)(accessor: MyChannelAccessor) = {
+  private def setAdapter(account: ClientAccount)(accessor: Sequence[MyChannelRow]) = {
     Log info s"[init]"
     layout.channelList setAdapter new ChannelRowAdapter(
       accountId = account.accountId,
