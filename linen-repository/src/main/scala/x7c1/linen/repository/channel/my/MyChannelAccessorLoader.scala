@@ -6,6 +6,7 @@ import x7c1.linen.repository.account.ClientAccount
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.selector.presets.CursorClosableSequence
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 
@@ -77,9 +78,9 @@ private object ClosableMyChannelAccessor {
   }
 }
 
-private trait ClosableMyChannelAccessor extends MyChannelAccessor {
-  def closeCursor(): Unit
-}
+private trait ClosableMyChannelAccessor
+  extends MyChannelAccessor
+  with CursorClosableSequence[MyChannelRow]
 
 private class ClosableMyChannelAccessorImpl (
   rawCursor: Cursor, client: ClientAccount) extends ClosableMyChannelAccessor {

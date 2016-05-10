@@ -12,6 +12,7 @@ import x7c1.linen.repository.channel.my.MyChannel
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class SettingUpdaterDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
@@ -47,6 +48,13 @@ private class OnClickToLoadChannels[A: AccountIdentifiable](
   override def onClick(v: View): Unit = {
     Log info s"[init]"
 
-    helper.selectorOf[MyChannel]
+    helper.selectorOf[MyChannel] traverseOn account match {
+      case Left(e) => Log error format(e){"[failed]"}
+      case Right(sequence) =>
+        (0 to sequence.length -1) flatMap sequence.findAt foreach { channel =>
+          Log info s"$channel"
+        }
+        sequence.closeCursor()
+    }
   }
 }
