@@ -8,7 +8,9 @@ import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
 
-class ChannelCreator[A: AccountIdentifiable](helper: DatabaseHelper, account: A){
+class ChannelCreator[A: AccountIdentifiable] private (
+  helper: DatabaseHelper, account: A){
+
   private val accountId = implicitly[AccountIdentifiable[A]] toId account
 
   def createChannel(input: InputToCreate): Either[SqlError, Long] = {
@@ -39,8 +41,11 @@ class ChannelCreator[A: AccountIdentifiable](helper: DatabaseHelper, account: A)
 }
 
 object ChannelCreator {
+  def apply[A: AccountIdentifiable](helper: DatabaseHelper, account: A): ChannelCreator[A] = {
+    new ChannelCreator[A](helper, account)
+  }
   case class InputToCreate(
     channelName: String,
-    description: Option[String]
+    description: Option[String] = None
   )
 }

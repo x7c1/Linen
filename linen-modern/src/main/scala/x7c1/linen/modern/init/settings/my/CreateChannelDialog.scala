@@ -103,7 +103,7 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     )
   }
   private def createChannel(input: InputToCreate) = provide async {
-    val factory = new ChannelCreator(helper, args.clientAccountId)
+    val factory = ChannelCreator(helper, args.clientAccountId)
     factory createChannel input
   }
 
