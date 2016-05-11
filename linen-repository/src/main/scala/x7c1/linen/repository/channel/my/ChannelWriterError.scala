@@ -1,16 +1,16 @@
-package x7c1.linen.modern.init.settings.my
+package x7c1.linen.repository.channel.my
 
 import android.database.SQLException
 import x7c1.wheat.modern.formatter.ThrowableFormatter
 
-sealed trait NewChannelError {
+sealed trait ChannelWriterError {
   def message: String
   def dump: String
 }
 
-sealed trait UserInputError extends NewChannelError
+sealed trait UserInputError extends ChannelWriterError
 
-sealed trait UnexpectedError extends NewChannelError
+sealed trait UnexpectedError extends ChannelWriterError
 
 case class EmptyName() extends UserInputError {
   override def message = "name required"

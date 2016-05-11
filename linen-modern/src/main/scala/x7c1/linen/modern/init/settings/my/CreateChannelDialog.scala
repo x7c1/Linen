@@ -8,12 +8,11 @@ import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.ChannelParts
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
 import x7c1.linen.repository.account.AccountBase
-import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
-import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
+import x7c1.linen.repository.channel.my.{ChannelCreator, ChannelWriterError, EmptyName, UserInputError}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -34,7 +33,7 @@ object CreateChannelDialog {
 class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arguments]{
   lazy val args = getTypedArguments
 
-  private val provide = EitherTask.hold[NewChannelError]
+  private val provide = EitherTask.hold[ChannelWriterError]
 
   private lazy val helper = new DatabaseHelper(getActivity)
 
@@ -98,35 +97,14 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     for {
       name <- parseName.right
       description <- parseDescription.right
-    } yield NewChannelInput(
+    } yield InputToCreate(
       channelName = name,
       description = description
     )
   }
-  private def createChannel(input: NewChannelInput) = provide async {
-    Log info s"[create] account:${args.clientAccountId}"
-
-    def create() = helper.writable insert ChannelParts(
-      accountId = args.clientAccountId,
-      name = input.channelName,
-      description = input.description.getOrElse(""),
-      createdAt = Date.current()
-    )
-    def subscribe(channelId: Long) = {
-      val subscriber = new ChannelSubscriber(
-        account = AccountBase(args.clientAccountId),
-        helper = helper
-      )
-      subscriber subscribe channelId
-    }
-    // todo: use transaction
-    val either = for {
-      channelId <- create().right
-      _ <- subscribe(channelId).toEither.right
-    } yield {
-      channelId
-    }
-    either.left map { e => SqlError(e) }
+  private def createChannel(input: InputToCreate) = provide async {
+    val factory = new ChannelCreator(helper, args.clientAccountId)
+    factory createChannel input
   }
 
   private def showError(error: UserInputError) = provide ui {
@@ -188,11 +166,6 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     builder.create()
   }
 }
-
-case class NewChannelInput(
-  channelName: String,
-  description: Option[String]
-)
 
 class ChannelCreated(
   val accountId: Long,
