@@ -60,7 +60,7 @@ private class OnClickToLoadChannels[A: AccountIdentifiable](
     helper.selectorOf[SubscribedChannel] traverseOn account match {
       case Left(e) => Log error format(e){"[failed]"}
       case Right(sequence) =>
-        (0 to sequence.length - 1).view flatMap sequence.findAt foreach { channel =>
+        sequence.toSeq foreach { channel =>
           Log info s"$channel"
 
           caller.startService(activity, activity getClassOf Updater){
