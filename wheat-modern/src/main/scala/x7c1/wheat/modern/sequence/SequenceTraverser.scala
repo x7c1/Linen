@@ -6,7 +6,7 @@ package x7c1.wheat.modern.sequence
  * for example, in case of underlying with so long length.
  */
 
-trait RichSequence[A]{
+trait SequenceTraverser[A]{
 
   protected def underlying: Sequence[A]
 
@@ -18,7 +18,7 @@ trait RichSequence[A]{
   }
 }
 
-trait AllowRichSequence[A]{
-  implicit class RichSequenceImpl(
-    override protected val underlying: Sequence[A]) extends RichSequence[A]
+trait AllowTraversing[A]{
+  implicit class SequenceTraverserImpl(
+    override protected val underlying: Sequence[A]) extends SequenceTraverser[A]
 }

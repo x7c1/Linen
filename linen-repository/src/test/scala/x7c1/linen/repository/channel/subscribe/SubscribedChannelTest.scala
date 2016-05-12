@@ -11,12 +11,12 @@ import x7c1.linen.database.mixin.SubscribedChannelRecord
 import x7c1.linen.repository.channel.my.ChannelCreator
 import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
 import x7c1.linen.repository.source.setting.SampleFactory
-import x7c1.linen.testing.{LogSetting, HasRichSequence}
+import x7c1.linen.testing.{LogSetting, AllowTraversingAll}
 import x7c1.wheat.modern.database.QueryExplainer
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
-class SubscribedChannelTest extends JUnitSuiteLike with LogSetting with HasRichSequence {
+class SubscribedChannelTest extends JUnitSuiteLike with LogSetting with AllowTraversingAll {
 
   @Test
   def testTraverse() = {

@@ -4,14 +4,14 @@ import x7c1.linen.database.mixin.SubscribedChannelRecord
 import x7c1.linen.database.struct.{AccountIdentifiable, ChannelIdentifiable}
 import x7c1.wheat.modern.database.selector.CursorConvertible
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseEntity, DefaultProvidable}
-import x7c1.wheat.modern.sequence.AllowRichSequence
+import x7c1.wheat.modern.sequence.AllowTraversing
 
 case class SubscribedChannel (
   channelId: Long,
   name: String
 )
 
-object SubscribedChannel extends AllowRichSequence[SubscribedChannel]{
+object SubscribedChannel extends AllowTraversing[SubscribedChannel]{
   implicit object id extends ChannelIdentifiable[SubscribedChannel]{
     override def toId = _.channelId
   }
