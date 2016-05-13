@@ -17,8 +17,3 @@ trait SequenceTraverser[A]{
     (0 to underlying.length - 1).view flatMap underlying.findAt
   }
 }
-
-trait AllowTraversing[A]{
-  implicit class SequenceTraverserImpl(
-    override protected val underlying: Sequence[A]) extends SequenceTraverser[A]
-}

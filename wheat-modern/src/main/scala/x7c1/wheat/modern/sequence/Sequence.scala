@@ -1,10 +1,17 @@
 package x7c1.wheat.modern.sequence
 
+import x7c1.wheat.modern.features.HasShortLength
+
 import scala.annotation.tailrec
 
 trait Sequence[+A]{
   def length: Int
   def findAt(position: Int): Option[A]
+}
+
+object Sequence {
+  implicit class SequenceTraverserImpl[A: HasShortLength](
+    override protected val underlying: Sequence[A]) extends SequenceTraverser[A]
 }
 
 trait SequenceMerger[A] {
