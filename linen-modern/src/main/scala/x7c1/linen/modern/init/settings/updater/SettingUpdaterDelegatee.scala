@@ -28,7 +28,7 @@ class SettingUpdaterDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
-    layout.toolbar.setTitle("Channel Updater")
+    layout.toolbar.setTitle("Loader Schedules")
 
     IntentExpander executeBy activity.getIntent
   }

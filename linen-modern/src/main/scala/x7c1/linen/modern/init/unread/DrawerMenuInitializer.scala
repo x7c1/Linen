@@ -77,7 +77,7 @@ trait DrawerMenuInitializer {
         label of MyChannels("My Channels"),
         label of PresetChannels("Preset Channels"),
         label of ChannelOrder("Channel Order"),
-        label of UpdaterSchedule("Channel Updater")
+        label of UpdaterSchedule("Loader Schedules")
       ),
       -----,
       MenuItems(
