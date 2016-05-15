@@ -23,4 +23,12 @@
         android:text="Load now"
         />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/setting_updater_layout__schedules"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/list_background"
+        android:overScrollMode="never"
+        />
+
 </LinearLayout>

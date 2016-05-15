@@ -15,14 +15,17 @@ public class SettingUpdaterLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final Button updateChannels;
+    public final android.support.v7.widget.RecyclerView schedules;
 
     public SettingUpdaterLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
-        Button updateChannels
+        Button updateChannels,
+        android.support.v7.widget.RecyclerView schedules
     ){
         super(itemView);
         this.toolbar = toolbar;
         this.updateChannels = updateChannels;
+        this.schedules = schedules;
     }
 }

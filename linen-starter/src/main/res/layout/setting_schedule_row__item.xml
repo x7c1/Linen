@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="12dp"
+        >
+
+        <TextView
+            android:id="@+id/setting_schedule_row__item__name"
+            android:paddingTop="4dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textSize="17sp"
+            android:textColor="@color/text_primary"
+            />
+
+        <ImageButton
+            android:id="@+id/setting_schedule_row__item__menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_more_vert_24dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            />
+
+        <View
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/setting_schedule_row__item__name"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/text_tertiary"
+            />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_schedule_row__item__enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@id/border"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="12dp"
+            android:paddingStart="4dp"
+            />
+
+        <TextView
+            android:id="@+id/setting_schedule_row__item__history"
+            style="@style/SettingChannelsRowButtons"
+            android:text="HISTORY"
+            android:layout_below="@id/border"
+            android:layout_toStartOf="@id/setting_schedule_row__item__enabled"
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
