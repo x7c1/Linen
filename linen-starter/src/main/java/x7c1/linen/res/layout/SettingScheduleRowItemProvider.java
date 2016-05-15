@@ -8,17 +8,18 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.support.v7.widget.SwitchCompat;
-import x7c1.wheat.ancient.resource.ViewHolderProvider;
-import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import android.widget.TextView;
+
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingScheduleRowItem;
+import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 
-public class SettingScheduleRowItemProvider implements ViewHolderProvider<SettingScheduleRowItem> {
+public class
+SettingScheduleRowItemProvider implements ViewHolderProvider<SettingScheduleRowItem> {
 
     private final LayoutInflater inflater;
 

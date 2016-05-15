@@ -6,7 +6,7 @@ import x7c1.wheat.lore.resource.WithSingleProvider
 import x7c1.wheat.modern.resource.ViewHolderProviders
 
 object LoaderScheduleRowProviders
-  extends WithSingleProvider[LoaderScheduleRowProviders](_.forItem)}
+  extends WithSingleProvider[LoaderScheduleRowProviders](_.forItem)
 
 class LoaderScheduleRowProviders (
   val forItem: ViewHolderProvider[SettingScheduleRowItem]
