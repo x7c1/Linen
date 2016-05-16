@@ -23,7 +23,7 @@ object MenuItemKind {
 
   object UnreadChannelMenu {
     implicit object selectable extends ChannelSelectable[UnreadChannelMenu] {
-      override def channelIdOf = _.channelId
+      override def toId = _.channelId
       override def nameOf = _.body
     }
   }

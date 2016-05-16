@@ -3,6 +3,7 @@ package x7c1.linen.repository.source.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
+import x7c1.linen.database.struct.{ChannelIdentifiable, AccountIdentifiable}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.Query
@@ -78,9 +79,9 @@ private class UnreadSourceAccessorImpl(
 }
 
 object UnreadSourceAccessor {
-  def create(
+  def create[A: AccountIdentifiable, B: ChannelIdentifiable](
     db: SQLiteDatabase,
-    accountId: Long, channelId: Long): Try[ClosableSourceAccessor] = {
+    accountId: A, channelId: B): Try[ClosableSourceAccessor] = {
 
     Try {
       val cursor = UnreadSourceAccessor.createCursor(db, channelId, accountId)
@@ -101,11 +102,14 @@ object UnreadSourceAccessor {
     val pairs2 = indexed map { case ((_, _, sourceId), index) => sourceId -> index }
     pairs1.toMap -> pairs2.toMap
   }
-  def createCursor(db: SQLiteDatabase, channelId: Long, accountId: Long) = {
+  def createCursor[A: AccountIdentifiable, B: ChannelIdentifiable]
+    (db: SQLiteDatabase, channelId: B, accountId: A) = {
     val query = createQuery(channelId, accountId)
     db.rawQuery(query.sql, query.selectionArgs)
   }
-  def createQuery(channelId: Long, accountId: Long) = {
+  def createQuery[A: AccountIdentifiable, B: ChannelIdentifiable](channel: B, account: A) = {
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
+    val channelId = implicitly[ChannelIdentifiable[B]] toId channel
     val sql = UnreadSourceAccessorQueries.sql5
     new Query(sql,
       Array(

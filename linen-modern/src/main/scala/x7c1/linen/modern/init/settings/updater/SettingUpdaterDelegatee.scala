@@ -40,7 +40,7 @@ class SettingUpdaterDelegatee (
     Log info s"[init]"
     helper.close()
   }
-  def setupFor(accountId: Long): Unit ={
+  def setupFor(accountId: Long): Unit = {
     layout.updateChannels setOnClickListener new OnClickToLoadChannels(
       account = accountId,
       activity = activity,
@@ -83,4 +83,3 @@ private class OnClickToLoadChannels[A: AccountIdentifiable](
     }
   }
 }
-

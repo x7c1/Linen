@@ -7,7 +7,7 @@ case class UnreadChannel(
 
 object UnreadChannel {
   implicit object selectable extends ChannelSelectable[UnreadChannel] {
-    override def channelIdOf = _.channelId
+    override def toId = _.channelId
     override def nameOf = _.name
   }
 }
