@@ -9,23 +9,19 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
-import android.widget.Button;
 
 public class SettingUpdaterLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
-    public final Button updateChannels;
     public final android.support.v7.widget.RecyclerView schedules;
 
     public SettingUpdaterLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
-        Button updateChannels,
         android.support.v7.widget.RecyclerView schedules
     ){
         super(itemView);
         this.toolbar = toolbar;
-        this.updateChannels = updateChannels;
         this.schedules = schedules;
     }
 }

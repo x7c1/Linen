@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
-import android.widget.Button;
 import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
@@ -61,7 +60,6 @@ public class SettingUpdaterLayoutProvider implements ViewHolderProvider<SettingU
                 return new SettingUpdaterLayout(
                     view,
                     (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_updater_layout__toolbar),
-                    (Button) view.findViewById(R.id.setting_updater_layout__update_channels),
                     (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_updater_layout__schedules)
                 );
             }

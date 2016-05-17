@@ -16,13 +16,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:id="@+id/setting_updater_layout__update_channels"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Load now"
-        />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/setting_updater_layout__schedules"
         android:layout_width="match_parent"

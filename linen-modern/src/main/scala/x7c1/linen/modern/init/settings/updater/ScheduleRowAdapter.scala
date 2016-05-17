@@ -11,7 +11,8 @@ import x7c1.wheat.modern.sequence.Sequence
 
 class ScheduleRowAdapter(
   delegatee: AdapterDelegatee[SettingScheduleRow, LoaderScheduleRow],
-  providers: ScheduleTimeRowProviders
+  providers: ScheduleTimeRowProviders,
+  onMenuSelected: ScheduleSelected => Unit
 ) extends Adapter[SettingScheduleRow]{
 
   override def getItemCount = delegatee.count
@@ -25,6 +26,9 @@ class ScheduleRowAdapter(
         holder.timeRanges setAdapter new ScheduleTimeRowAdapter(
           AdapterDelegatee.create(providers, schedule.startRanges)
         )
+        holder.menu onClick { _ =>
+          onMenuSelected(PresetScheduleSelected(holder.menu))
+        }
       case (holder: SettingScheduleRowItem, schedule: LoaderSchedule) =>
         holder.name.text = schedule.name
         holder.enabled.checked = schedule.enabled

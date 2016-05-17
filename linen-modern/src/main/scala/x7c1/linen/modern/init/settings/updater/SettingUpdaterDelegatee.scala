@@ -2,8 +2,6 @@ package x7c1.linen.modern.init.settings.updater
 
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
-import android.view.View.OnClickListener
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.AccountIdentifiable
 import x7c1.linen.glue.activity.ActivityControl
@@ -18,6 +16,7 @@ import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.menu.popup.{PopupMenuBox, PopupMenuItem}
 import x7c1.wheat.modern.sequence.Sequence
 
 class SettingUpdaterDelegatee (
@@ -43,15 +42,11 @@ class SettingUpdaterDelegatee (
     helper.close()
   }
   def setupFor(accountId: Long): Unit = {
-    layout.updateChannels setOnClickListener new OnClickToLoadChannels(
-      account = accountId,
-      activity = activity,
-      helper = helper
-    )
     layout.schedules setLayoutManager new LinearLayoutManager(activity)
     layout.schedules setAdapter new ScheduleRowAdapter(
       delegatee = AdapterDelegatee.create(scheduleRowProviders, dummySchedules),
-      providers = timeRowProviders
+      providers = timeRowProviders,
+      onMenuSelected = showMenu(accountId)
     )
   }
   lazy val dummySchedules = Sequence from Seq(
@@ -75,20 +70,28 @@ class SettingUpdaterDelegatee (
         enabled = true
       )
     }
+  }
+  private def showMenu[A: AccountIdentifiable]
+    (account: A)(event: ScheduleSelected) = {
 
+    val loadNow = PopupMenuItem("Load now"){ _ =>
+      new SubscribedChannelsLoader(activity, helper) execute account
+    }
+    val items = Seq(
+      loadNow
+    )
+    PopupMenuBox(activity, event.targetView, items).show()
   }
 }
 
-private class OnClickToLoadChannels[A: AccountIdentifiable](
-  account: A,
+private class SubscribedChannelsLoader(
   activity: Activity with ActivityControl with ServiceControl,
-  helper: DatabaseHelper ) extends OnClickListener {
+  helper: DatabaseHelper ){
 
-  private val accountId = implicitly[AccountIdentifiable[A]] toId account
-
-  override def onClick(v: View): Unit = {
+  def execute[A: AccountIdentifiable](account: A): Unit = {
     Log info s"[init]"
 
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
     val caller = ServiceCaller.using[UpdaterMethods]
 
     helper.selectorOf[SubscribedChannel] traverseOn account match {
