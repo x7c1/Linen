@@ -8,18 +8,18 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.view.View;
 import android.widget.TextView;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SettingScheduleRowItem;
+import android.widget.ImageButton;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingScheduleRowItem;
 
-public class
-SettingScheduleRowItemProvider implements ViewHolderProvider<SettingScheduleRowItem> {
+public class SettingScheduleRowItemProvider implements ViewHolderProvider<SettingScheduleRowItem> {
 
     private final LayoutInflater inflater;
 
@@ -63,6 +63,7 @@ SettingScheduleRowItemProvider implements ViewHolderProvider<SettingScheduleRowI
                     view,
                     (TextView) view.findViewById(R.id.setting_schedule_row__item__name),
                     (ImageButton) view.findViewById(R.id.setting_schedule_row__item__menu),
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_schedule_row__item__time_ranges),
                     (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_schedule_row__item__enabled),
                     (TextView) view.findViewById(R.id.setting_schedule_row__item__history)
                 );

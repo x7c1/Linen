@@ -130,6 +130,7 @@
     <color name="opaque_green">#ecfff1</color>
 
     <color name="light_gray">#e6e6e6</color>
+    <color name="lighter_background_blue">#f8faff</color>
 
     <!-- this value is affected by the opacity of drawer icon (dark theme) -->
     <color name="transparent_white">#89ffffff</color>

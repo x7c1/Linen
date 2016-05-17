@@ -11,6 +11,7 @@ import x7c1.linen.glue.res.layout.SettingUpdaterLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
+import x7c1.linen.repository.loader.schedule.{ChannelLoaderSchedule, PresetLoaderSchedule, TimeRange}
 import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
@@ -22,7 +23,8 @@ import x7c1.wheat.modern.sequence.Sequence
 class SettingUpdaterDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
   layout: SettingUpdaterLayout,
-  scheduleRowProviders: LoaderScheduleRowProviders ){
+  scheduleRowProviders: LoaderScheduleRowProviders,
+  timeRowProviders: ScheduleTimeRowProviders){
 
   private lazy val helper = new DatabaseHelper(activity)
 
@@ -46,14 +48,34 @@ class SettingUpdaterDelegatee (
       activity = activity,
       helper = helper
     )
-    val dummySchedules = Sequence from Seq(
-      LoaderSchedule(name = "Load all channels", enabled = true),
-      LoaderSchedule(name = "Load source : WIRED.jp", enabled = true)
-    )
     layout.schedules setLayoutManager new LinearLayoutManager(activity)
     layout.schedules setAdapter new ScheduleRowAdapter(
-      delegatee = AdapterDelegatee.create(scheduleRowProviders, dummySchedules)
+      delegatee = AdapterDelegatee.create(scheduleRowProviders, dummySchedules),
+      providers = timeRowProviders
     )
+  }
+  lazy val dummySchedules = Sequence from Seq(
+    PresetLoaderSchedule(
+      scheduleId = 111,
+      name = "Load all channels at..",
+      enabled = true,
+      startRanges = Sequence from Seq(
+        TimeRange(3, 4),
+        TimeRange(9, 10),
+        TimeRange(15, 16)
+      )
+    )
+  ) ++ createChannelSchedules
+
+  private def createChannelSchedules = {
+    (0 to 20) map { n =>
+      ChannelLoaderSchedule(
+        scheduleId = 111 * n,
+        name = s"Load channel : $n",
+        enabled = true
+      )
+    }
+
   }
 }
 

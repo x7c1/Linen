@@ -9,8 +9,10 @@ import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SettingUpdaterLayout;
 import x7c1.linen.modern.init.settings.updater.LoaderScheduleRowProviders;
+import x7c1.linen.modern.init.settings.updater.ScheduleTimeRowProviders;
 import x7c1.linen.modern.init.settings.updater.SettingUpdaterDelegatee;
 import x7c1.linen.res.layout.SettingScheduleRowItemProvider;
+import x7c1.linen.res.layout.SettingScheduleTimeRowItemProvider;
 import x7c1.linen.res.layout.SettingUpdaterLayoutProvider;
 
 public class SettingUpdaterActivity extends BaseFragmentActivity {
@@ -31,6 +33,9 @@ public class SettingUpdaterActivity extends BaseFragmentActivity {
 				layout,
 				new LoaderScheduleRowProviders(
 						new SettingScheduleRowItemProvider(this)
+				),
+				new ScheduleTimeRowProviders(
+						new SettingScheduleTimeRowItemProvider(this)
 				)
 		);
 		this.delegatee.onCreate();
