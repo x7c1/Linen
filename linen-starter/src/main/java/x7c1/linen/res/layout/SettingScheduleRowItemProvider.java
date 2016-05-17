@@ -65,7 +65,8 @@ public class SettingScheduleRowItemProvider implements ViewHolderProvider<Settin
                     (ImageButton) view.findViewById(R.id.setting_schedule_row__item__menu),
                     (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_schedule_row__item__time_ranges),
                     (android.support.v7.widget.SwitchCompat) view.findViewById(R.id.setting_schedule_row__item__enabled),
-                    (TextView) view.findViewById(R.id.setting_schedule_row__item__history)
+                    (TextView) view.findViewById(R.id.setting_schedule_row__item__history),
+                    (TextView) view.findViewById(R.id.setting_schedule_row__item__edit_time)
                 );
             }
         };

@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.ImageButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -59,8 +58,7 @@ public class SettingScheduleTimeRowItemProvider implements ViewHolderProvider<Se
             public SettingScheduleTimeRowItem createViewHolder(View view){
                 return new SettingScheduleTimeRowItem(
                     view,
-                    (TextView) view.findViewById(R.id.setting_schedule_time_row__item__range),
-                    (ImageButton) view.findViewById(R.id.setting_schedule_time_row__item__add_time)
+                    (TextView) view.findViewById(R.id.setting_schedule_time_row__item__range)
                 );
             }
         };

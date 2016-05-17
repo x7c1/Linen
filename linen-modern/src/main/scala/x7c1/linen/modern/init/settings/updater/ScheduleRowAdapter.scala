@@ -2,8 +2,8 @@ package x7c1.linen.modern.init.settings.updater
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.Adapter
-import android.view.{View, ViewGroup}
-import x7c1.linen.glue.res.layout.{SettingScheduleTimeRowItem, SettingScheduleRow, SettingScheduleRowItem, SettingScheduleTimeRow}
+import android.view.ViewGroup
+import x7c1.linen.glue.res.layout.{SettingScheduleRow, SettingScheduleRowItem, SettingScheduleTimeRow, SettingScheduleTimeRowItem}
 import x7c1.linen.repository.loader.schedule.{LoaderSchedule, LoaderScheduleRow, PresetLoaderSchedule, TimeRange}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.modern.decorator.Imports._
@@ -53,12 +53,6 @@ class ScheduleTimeRowAdapter(
     delegatee.bindViewHolder(holder, position){
       case (holder: SettingScheduleTimeRowItem, range) =>
         holder.range.text = range.format
-
-        if (isLast(position)){
-          holder.addTime setVisibility View.VISIBLE
-        } else {
-          holder.addTime setVisibility View.GONE
-        }
     }
   }
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
@@ -66,8 +60,5 @@ class ScheduleTimeRowAdapter(
   }
   override def getItemViewType(position: Int) = {
     delegatee viewTypeAt position
-  }
-  private def isLast(position: Int) = {
-    position == delegatee.count - 1
   }
 }

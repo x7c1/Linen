@@ -19,6 +19,7 @@ public class SettingScheduleRowItem extends SettingScheduleRow {
     public final android.support.v7.widget.RecyclerView timeRanges;
     public final android.support.v7.widget.SwitchCompat enabled;
     public final TextView history;
+    public final TextView editTime;
 
     public SettingScheduleRowItem(
         View itemView,
@@ -26,7 +27,8 @@ public class SettingScheduleRowItem extends SettingScheduleRow {
         ImageButton menu,
         android.support.v7.widget.RecyclerView timeRanges,
         android.support.v7.widget.SwitchCompat enabled,
-        TextView history
+        TextView history,
+        TextView editTime
     ){
         super(itemView);
         this.name = name;
@@ -34,5 +36,6 @@ public class SettingScheduleRowItem extends SettingScheduleRow {
         this.timeRanges = timeRanges;
         this.enabled = enabled;
         this.history = history;
+        this.editTime = editTime;
     }
 }

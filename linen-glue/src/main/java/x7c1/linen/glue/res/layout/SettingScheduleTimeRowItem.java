@@ -8,20 +8,16 @@ package x7c1.linen.glue.res.layout;
 
 import android.view.View;
 import android.widget.TextView;
-import android.widget.ImageButton;
 
 public class SettingScheduleTimeRowItem extends SettingScheduleTimeRow {
 
     public final TextView range;
-    public final ImageButton addTime;
 
     public SettingScheduleTimeRowItem(
         View itemView,
-        TextView range,
-        ImageButton addTime
+        TextView range
     ){
         super(itemView);
         this.range = range;
-        this.addTime = addTime;
     }
 }
