@@ -52,7 +52,7 @@ class LoaderSchedulesDelegatee (
   lazy val dummySchedules = Sequence from Seq(
     PresetLoaderSchedule(
       scheduleId = 111,
-      name = "Load all channels at..",
+      name = "Load subscribed channels at..",
       enabled = true,
       startRanges = Sequence from Seq(
         TimeRange(3, 4),
