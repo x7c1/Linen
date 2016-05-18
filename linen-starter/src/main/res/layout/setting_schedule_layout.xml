@@ -10,14 +10,14 @@
         android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/setting_updater_layout__toolbar"
+            android:id="@+id/setting_schedule_layout__toolbar"
             style="@style/AppToolbar"
             />
 
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/setting_updater_layout__schedules"
+    android:id="@+id/setting_schedule_layout__schedules"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/list_background"

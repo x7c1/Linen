@@ -8,7 +8,7 @@ import x7c1.linen.settings.PresetChannelSourcesActivity;
 import x7c1.linen.settings.PresetChannelsActivity;
 import x7c1.linen.settings.MyChannelSourcesActivity;
 import x7c1.linen.settings.MyChannelsActivity;
-import x7c1.linen.settings.SettingUpdaterActivity;
+import x7c1.linen.settings.LoaderSchedulesActivity;
 
 import static java.lang.String.format;
 
@@ -29,8 +29,8 @@ public class Control {
 			case SettingPresetChannelSources:
 				klass = PresetChannelSourcesActivity.class;
 				break;
-			case SettingUpdater:
-				klass = SettingUpdaterActivity.class;
+			case SettingLoaderSchedule:
+				klass = LoaderSchedulesActivity.class;
 				break;
 			case CreateRecords:
 				klass = CreateRecordsActivity.class;

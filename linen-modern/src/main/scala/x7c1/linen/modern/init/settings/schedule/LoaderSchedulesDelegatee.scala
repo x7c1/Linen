@@ -1,11 +1,11 @@
-package x7c1.linen.modern.init.settings.updater
+package x7c1.linen.modern.init.settings.schedule
 
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.AccountIdentifiable
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.SettingUpdaterLayout
+import x7c1.linen.glue.res.layout.SettingScheduleLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
@@ -19,9 +19,9 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.menu.popup.{PopupMenuBox, PopupMenuItem}
 import x7c1.wheat.modern.sequence.Sequence
 
-class SettingUpdaterDelegatee (
+class LoaderSchedulesDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
-  layout: SettingUpdaterLayout,
+  layout: SettingScheduleLayout,
   scheduleRowProviders: LoaderScheduleRowProviders,
   timeRowProviders: ScheduleTimeRowProviders){
 

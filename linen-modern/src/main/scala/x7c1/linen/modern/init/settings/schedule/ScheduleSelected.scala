@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init.settings.updater
+package x7c1.linen.modern.init.settings.schedule
 
 import android.view.View
 

@@ -10,12 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
 
-public class SettingUpdaterLayout extends RecyclerView.ViewHolder {
+public class SettingScheduleLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final android.support.v7.widget.RecyclerView schedules;
 
-    public SettingUpdaterLayout(
+    public SettingScheduleLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
         android.support.v7.widget.RecyclerView schedules

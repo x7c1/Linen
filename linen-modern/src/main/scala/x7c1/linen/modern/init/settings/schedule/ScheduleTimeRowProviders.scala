@@ -1,4 +1,4 @@
-package x7c1.linen.modern.init.settings.updater
+package x7c1.linen.modern.init.settings.schedule
 
 import x7c1.linen.glue.res.layout.{SettingScheduleTimeRowItem, SettingScheduleTimeRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider

@@ -6,13 +6,13 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels, SettingUpdater}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels, SettingLoaderSchedule}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
-import x7c1.linen.modern.init.settings.updater.SettingUpdaterDelegatee
+import x7c1.linen.modern.init.settings.schedule.LoaderSchedulesDelegatee
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannelAccessor, UnreadChannelLoader}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -154,8 +154,8 @@ class OnMenuItemClick(
       Log info s"$kind"
     case _: UpdaterSchedule =>
       Log info s"$kind"
-      activity startActivity IntentFactory.using[SettingUpdaterDelegatee].
-        create(activity, activity getClassOf SettingUpdater){
+      activity startActivity IntentFactory.using[LoaderSchedulesDelegatee].
+        create(activity, activity getClassOf SettingLoaderSchedule){
           _ setupFor accountId
         }
 
