@@ -31,6 +31,7 @@
 
         <activity android:name=".settings.PresetChannelsActivity" />
         <activity android:name=".settings.PresetChannelSourcesActivity" />
+        <activity android:name=".settings.LoaderSchedulesActivity" />
 
         <activity
             android:name=".dev.CreateRecordsActivity"

@@ -1,12 +1,11 @@
 package x7c1.linen.modern.display.settings
 
-import android.support.v7.widget.RecyclerView.Adapter
-import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
 import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.linen.scene.channel.menu.{MenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.lore.resource.AdapterDelegatee
+import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.modern.decorator.Imports._
 
 class ChannelRowAdapter(
@@ -15,13 +14,8 @@ class ChannelRowAdapter(
   onSourcesSelected: ChannelSourcesSelected => Unit,
   onMenuSelected: OnMenuSelectedListener[MyChannel],
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
-) extends Adapter[SettingMyChannelRow]{
+) extends BaseAdapter(delegatee){
 
-  override def getItemCount: Int = delegatee.count
-
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    delegatee.createViewHolder(parent, viewType)
-  }
   override def onBindViewHolder(holder: SettingMyChannelRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
       case (holder: SettingMyChannelRowItem, channel: MyChannel) =>
@@ -51,7 +45,6 @@ class ChannelRowAdapter(
         // nop
     }
   }
-  override def getItemViewType(position: Int) = delegatee.viewTypeAt(position)
 }
 
 case class ChannelSourcesSelected(

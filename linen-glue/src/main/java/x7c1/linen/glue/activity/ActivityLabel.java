@@ -5,5 +5,6 @@ public enum ActivityLabel {
 	SettingMyChannelSources,
 	SettingPresetChannels,
 	SettingPresetChannelSources,
+	SettingLoaderSchedule,
 	CreateRecords
 }

@@ -1,4 +1,4 @@
-package x7c1.linen.repository.crawler
+package x7c1.linen.repository.loader.crawling
 
 import x7c1.linen.database.mixin.LatestEntryRecord
 import x7c1.linen.database.struct.SourceIdentifiable

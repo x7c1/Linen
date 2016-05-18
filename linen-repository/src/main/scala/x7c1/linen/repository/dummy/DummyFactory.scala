@@ -5,10 +5,10 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{AccountParts, ChannelParts, ChannelSourceMapParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
-import x7c1.linen.repository.crawler.{LoadedEntry, UpdatedSource}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.DummyString.words
 import x7c1.linen.repository.entry.EntryUrl
+import x7c1.linen.repository.loader.crawling.{UpdatedSource, LoadedEntry}
 import x7c1.linen.repository.source.unread.SourceTitle
 import x7c1.wheat.macros.logger.Log
 
@@ -41,7 +41,7 @@ object DummyFactory {
       )
       id
     }
-    val channelAccessor = MyChannelAccessor.createForDebug(db, accountId1)
+    val channelAccessor = MyChannelAccessor.createForDebug(helper, accountId1)
     val row = channelAccessor findAt 0 collect { case x: MyChannel => x }
     val channelId = row map (_.channelId) getOrElse {
       writable insert ChannelParts(
@@ -62,7 +62,7 @@ object DummyFactory {
     (1 to n) foreach { i =>
       val Right(sourceId) = writable insert SourceParts(
         title = s"$i-title",
-        url = s"http://example.com/source-$i/$timestamp",
+        url = s"http://${i % 3 + Random.nextInt(4)}.example.com/source-$i/$timestamp",
         description = s"description-$i " + words(1,15),
         createdAt = Date.current()
       )

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/lighter_background_blue"
+    >
+    <TextView
+        android:id="@+id/setting_schedule_time_row__item__range"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="12dp"
+        android:textSize="34sp"
+        android:textColor="@color/text_primary"
+        android:fontFamily="sans-serif-thin"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignParentTop="true"
+        android:background="@color/text_tertiary"
+        />
+
+</RelativeLayout>

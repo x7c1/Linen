@@ -1,15 +1,13 @@
 package x7c1.linen.repository.channel.my
 
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.selector.presets.ClosableSequence
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 
-class MyChannelAccessorLoader(db: SQLiteDatabase){
+class MyChannelAccessorLoader(helper: DatabaseHelper){
 
   private var accessorHolder: Option[AccessorHolder] = None
 
@@ -27,13 +25,13 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
     }
   }
   private def createAccessor(client: ClientAccount) = {
-    val internal = ClosableMyChannelAccessor.create(db, client)
+    val internal = helper.selectorOf[MyChannel] traverseOn client
     internal.right map (new SourceFooterAppender(_))
   }
   private class AccessorHolder(
-    private var underlying: ClosableMyChannelAccessor) extends MyChannelAccessor {
+    private var underlying: ClosableSequence[MyChannelRow]) extends MyChannelAccessor {
 
-    def updateAccessor(accessor: ClosableMyChannelAccessor) = synchronized {
+    def updateAccessor(accessor: ClosableSequence[MyChannelRow]) = synchronized {
       underlying.closeCursor()
       underlying = accessor
     }
@@ -43,67 +41,8 @@ class MyChannelAccessorLoader(db: SQLiteDatabase){
   }
 }
 
-private object ClosableMyChannelAccessor {
-  def create(
-    db: SQLiteDatabase,
-    client: ClientAccount): Either[Exception, ClosableMyChannelAccessor] = {
-
-    try {
-      val query = createQuery(client)
-      val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new ClosableMyChannelAccessorImpl(raw, client)
-    } catch {
-      case e: Exception => Left(e)
-    }
-  }
-  def createQuery(client: ClientAccount): Query = {
-    val sql =
-      """SELECT
-        | _id,
-        | name,
-        | description,
-        | IFNULL(c2.subscribed, 0) AS subscribed,
-        | c1.created_at AS created_at
-        |FROM channels AS c1
-        | LEFT JOIN channel_statuses AS c2
-        |   ON c1._id = c2.channel_id AND c2.account_id = ?
-        |WHERE c1.account_id = ?
-        |ORDER BY c1._id DESC""".stripMargin
-
-    new Query(sql, Array(
-      client.accountId.toString,
-      client.accountId.toString
-    ))
-  }
-}
-
-private trait ClosableMyChannelAccessor extends MyChannelAccessor {
-  def closeCursor(): Unit
-}
-
-private class ClosableMyChannelAccessorImpl (
-  rawCursor: Cursor, client: ClientAccount) extends ClosableMyChannelAccessor {
-
-  private lazy val cursor = TypedCursor[MyChannelRecord](rawCursor)
-
-  override def findAt(position: Int) =
-    (cursor moveToFind position){
-      MyChannel(
-        channelId = cursor._id,
-        name = cursor.name,
-        description = cursor.description,
-        createdAt = cursor.created_at.typed,
-        isSubscribed = cursor.subscribed == 1
-      )
-    }
-
-  override def length = rawCursor.getCount
-
-  override def closeCursor(): Unit = rawCursor.close()
-}
-
 private class SourceFooterAppender(
-  accessor: ClosableMyChannelAccessor) extends ClosableMyChannelAccessor{
+  accessor: ClosableSequence[MyChannelRow]) extends ClosableSequence[MyChannelRow]{
 
   override def findAt(position: Int) = {
     if (position == accessor.length){

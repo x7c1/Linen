@@ -6,7 +6,7 @@ import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Insertable
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
-import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable}
+import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 
 
 trait AccountRecord extends TypedFields {
@@ -30,6 +30,10 @@ object AccountRecord {
 }
 
 trait AccountIdentifiable[A] extends Identifiable[A, Long]
+
+object AccountIdentifiable {
+  implicit object id extends AccountIdentifiable[Long] with IdEndo[Long]
+}
 
 case class AccountParts(
   nickname: String,

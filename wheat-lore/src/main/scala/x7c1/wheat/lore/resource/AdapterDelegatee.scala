@@ -1,5 +1,6 @@
 package x7c1.wheat.lore.resource
 
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.ViewGroup
 import x7c1.wheat.macros.logger.Log
@@ -29,6 +30,20 @@ object AdapterDelegatee {
   ](providers: P, sequence: S): AdapterDelegatee[VH, A] = {
 
     new AdapterDelegateeImpl(providers, sequence)
+  }
+
+  abstract class BaseAdapter[VH <: ViewHolder, A]
+    (delegatee: AdapterDelegatee[VH, A]) extends RecyclerView.Adapter[VH]{
+
+    override def getItemCount = {
+      delegatee.count
+    }
+    override def getItemViewType(position: Int) = {
+      delegatee viewTypeAt position
+    }
+    override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
+      delegatee.createViewHolder(parent, viewType)
+    }
   }
 }
 

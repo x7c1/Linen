@@ -2,7 +2,7 @@ package x7c1.linen.repository.dummy
 
 import java.util.concurrent.Executor
 
-import x7c1.linen.repository.crawler.{InspectedSource, LoadedEntry, LoadedSource, SourceLoader}
+import x7c1.linen.repository.loader.crawling.{LoadedEntry, LoadedSource, InspectedSource, SourceLoader}
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -17,13 +17,13 @@ object MenuItemKind {
   case class MyChannels(body: String) extends MenuItemKind
   case class PresetChannels(body: String) extends MenuItemKind
   case class ChannelOrder(body: String) extends MenuItemKind
-  case class UpdaterSchedule(body: String) extends MenuItemKind
+  case class LoaderSchedule(body: String) extends MenuItemKind
 
   case class DevCreateDummies(body: String) extends MenuItemKind
 
   object UnreadChannelMenu {
     implicit object selectable extends ChannelSelectable[UnreadChannelMenu] {
-      override def channelIdOf = _.channelId
+      override def toId = _.channelId
       override def nameOf = _.body
     }
   }

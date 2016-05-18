@@ -3,11 +3,11 @@ package x7c1.linen.repository.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.repository.account.AccountBase
+import x7c1.linen.database.struct.{ChannelIdentifiable, AccountIdentifiable}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{UnreadSource, ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -57,11 +57,11 @@ class AccessorLoader private (
   def createDetailAccessor: EntryAccessor[UnreadDetail] = {
     new EntriesFooterAppender(detailUnderlying)
   }
-  def startLoading[A: ChannelSelectable]
-    (account: AccountBase, channel: A)
-      (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+  def startLoading[A: AccountIdentifiable, B: ChannelSelectable]
+    (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
 
-    Log info s"[init] account:${account.accountId}"
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
+    Log info s"[init] account:$accountId"
 
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -72,11 +72,10 @@ class AccessorLoader private (
 //    }
 //    first onComplete loadNext
 
-    val select = implicitly[ChannelSelectable[A]]
     val load = for {
       accessor <- startLoadingSources(
-        accountId = account.accountId,
-        channelId = select channelIdOf channel
+        account = account,
+        channel = channel
       )
       event <- loadSourceEntries(
         remainingSources = accessor map (_.sources) getOrElse Seq()
@@ -96,15 +95,14 @@ class AccessorLoader private (
         Log error format(error){"[failed]"}
     }
   }
-  def restartLoading[A: ChannelSelectable]
-    (account: AccountBase, channel: A)
-      (onLoad: LoadCompleteEvent[A] => Unit): Unit = {
+  def restartLoading[A: AccountIdentifiable, B: ChannelSelectable]
+    (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
 
-    Log info s"[init] account:${account.accountId}"
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
+    Log info s"[init] account:$accountId"
 
-    val select = implicitly[ChannelSelectable[A]]
     val load = for {
-      accessor <- startLoadingSources(account.accountId, select channelIdOf channel)
+      accessor <- startLoadingSources(account, channel)
       event <- loadSourceEntries(
         remainingSources = accessor map (_.sources) getOrElse Seq()
       )
@@ -139,10 +137,10 @@ class AccessorLoader private (
       detailAccessors.clear()
     }
   }
-  private def startLoadingSources(
-    accountId: Long, channelId: Long): Future[Option[ClosableSourceAccessor]] = loaderFactory asFuture {
+  private def startLoadingSources[A: AccountIdentifiable, B: ChannelIdentifiable]
+    (account: A, channel: B): Future[Option[ClosableSourceAccessor]] = loaderFactory asFuture {
 
-    AccessorLoader.inspectSourceAccessor(database, accountId, channelId: Long) match {
+    AccessorLoader.inspectSourceAccessor(database, account, channel) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         Seq()
@@ -236,9 +234,9 @@ object AccessorLoader {
       activity.getLoaderManager
     )
   }
-  def inspectSourceAccessor(
-    db: SQLiteDatabase, accountId: Long,
-    channelId: Long): SourceNotLoaded Either ClosableSourceAccessor =
+  def inspectSourceAccessor[A: AccountIdentifiable, B: ChannelIdentifiable](
+    db: SQLiteDatabase, accountId: A,
+    channelId: B): SourceNotLoaded Either ClosableSourceAccessor =
 
     try UnreadSourceAccessor.create(db, accountId, channelId) match {
       case Failure(exception) => Left(Abort(exception))
@@ -258,7 +256,7 @@ case class AccessorsLoadedEvent(
 case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
   private lazy val select = implicitly[ChannelSelectable[A]]
 
-  def channelId: Long = select channelIdOf channel
+  def channelId: Long = select toId channel
 
   def channelName: String = select nameOf channel
 }

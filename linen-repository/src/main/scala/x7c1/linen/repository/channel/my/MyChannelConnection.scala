@@ -40,7 +40,7 @@ class MyChannelConnection (writable: WritableDatabase, sourceId: Long){
   }
 }
 
-class MyChannelConnectionUpdater (
+class MyChannelConnectionUpdater private (
   connection: MyChannelConnection, accessor: ChannelsToAttachAccessor){
 
   private def updateIds(channelIds: Seq[Long]): Unit = {

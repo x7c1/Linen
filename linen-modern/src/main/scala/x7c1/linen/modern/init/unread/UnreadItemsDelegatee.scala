@@ -12,7 +12,7 @@ import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.repository.unread.{BrowsedEntriesMarker, AccessorLoader, Accessors, EntryKind, FooterKind, SourceKind}
+import x7c1.linen.repository.unread.{AccessorLoader, Accessors, BrowsedEntriesMarker, EntryKind, FooterKind, SourceKind}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
@@ -42,7 +42,7 @@ class UnreadItemsDelegatee(
   def onPause(): Unit = {
     Log info s"[init]"
 
-    import x7c1.linen.repository.crawler.Implicits._
+    import x7c1.linen.repository.loader.crawling.Implicits._
     Future { entryMarker.markAsRead() }
   }
   def close(): Unit = {

@@ -1,13 +1,12 @@
-package x7c1.linen.repository.crawler
+package x7c1.linen.repository.loader.crawling
 
 import java.lang.System.currentTimeMillis
 
 import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{RetrievedSourceMarkParts, EntryParts}
+import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.formatter.ThrowableFormatter
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.after
 
@@ -53,7 +52,7 @@ private class SourceUpdaterQueueImpl(
     def elapsed() = currentTimeMillis() - start
 
     val future = sourceLoader loadSource source map { loadedSource =>
-      Log info s"[loaded] msec:${elapsed()}, source:$source"
+      Log info s"[loaded] msec:${elapsed()}, source:$source, entries(${loadedSource.validEntries.length})"
 
       if (loadedSource isModifiedFrom source){
         updateSource(loadedSource)
@@ -74,10 +73,13 @@ private class SourceUpdaterQueueImpl(
       val host = source.feedUrl.getHost
       val nextSource = this synchronized {
         queueMap dequeue host
-        onSourceDequeue(SourceDequeueEvent(source, result))
 
         Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
         queueMap headOption host
+      }
+      try onSourceDequeue(SourceDequeueEvent(source, result))
+      catch {
+        case e: Exception => Log error format(e){"[failed]"}
       }
       nextSource match {
         case Some(next) => after(msec = 1000){ update(next) }
@@ -134,7 +136,7 @@ private class SourceUpdaterQueueImpl(
           updatedAt = Date.current()
         ) match {
           case Left(error) =>
-            Log error ThrowableFormatter.format(error){"[failed]"}
+            Log error format(error){"[failed]"}
           case Right(b) =>
             Log info s"[done] marked:id:$b"
         }

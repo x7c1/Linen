@@ -2,6 +2,7 @@ package x7c1.linen.repository.channel.unread
 
 import android.database.Cursor
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.ChannelIdentifiable
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.ChannelAccessorError.UnexpectedError
 import x7c1.linen.repository.channel.unread.ChannelLoaderEvent.{Done, AccessorError}
@@ -69,8 +70,7 @@ trait UnreadChannelRecord extends TypedFields {
   def name: String
 }
 
-trait ChannelSelectable[A] {
-  def channelIdOf: A => Long
+trait ChannelSelectable[A] extends ChannelIdentifiable[A]{
   def nameOf: A => String
 }
 

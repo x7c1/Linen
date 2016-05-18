@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.{DialogFragment, FragmentActivity}
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView.Adapter
-import android.view.ViewGroup
 import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
@@ -16,6 +14,7 @@ import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccess
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
+import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.CheckedState
@@ -132,16 +131,8 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
 class AttachChannelsAdapter(
   delegatee: AdapterDelegatee[SettingSourceAttachRow, ChannelToAttach],
   state: CheckedState[Long]
-) extends Adapter[SettingSourceAttachRow] {
+) extends BaseAdapter(delegatee){
 
-  override def getItemCount: Int = delegatee.count
-
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    delegatee.createViewHolder(parent, viewType)
-  }
-  override def getItemViewType(position: Int) = {
-    delegatee viewTypeAt position
-  }
   override def onBindViewHolder(holder: SettingSourceAttachRow, position: Int) = {
     delegatee.bindViewHolder(holder, position){
       case (row: SettingSourceAttachRowItem, channel) =>

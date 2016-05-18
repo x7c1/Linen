@@ -4,10 +4,10 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.EntryParts
-import x7c1.linen.repository.crawler.LoadedEntry
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.{DummyEntryBinder, DummySourceLoader}
 import x7c1.linen.repository.entry.EntryUrl
+import x7c1.linen.repository.loader.crawling.LoadedEntry
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts, SampleFactory}
 import x7c1.wheat.modern.database.WritableDatabase
 
