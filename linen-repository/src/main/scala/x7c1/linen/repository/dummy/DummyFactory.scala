@@ -5,10 +5,10 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{AccountParts, ChannelParts, ChannelSourceMapParts, SourceParts, SourceRatingParts, SourceStatusAsStarted, SourceStatusParts}
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
-import x7c1.linen.repository.crawler.{LoadedEntry, UpdatedSource}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.DummyString.words
 import x7c1.linen.repository.entry.EntryUrl
+import x7c1.linen.repository.loader.crawling.{UpdatedSource, LoadedEntry}
 import x7c1.linen.repository.source.unread.SourceTitle
 import x7c1.wheat.macros.logger.Log
 

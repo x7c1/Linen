@@ -2,7 +2,7 @@ package x7c1.linen.repository.dummy
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.SourceIdentifiable
-import x7c1.linen.repository.crawler.{LoadedEntry, SourceInspector, UpdatedSource}
+import x7c1.linen.repository.loader.crawling.{LoadedEntry, SourceInspector, UpdatedSource}
 import x7c1.wheat.modern.formatter.ThrowableFormatter
 
 import scala.concurrent.{Await, ExecutionContext}

@@ -10,11 +10,11 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.source_statuses.Key
 import x7c1.linen.database.struct.{EntryRecord, SourceParts, retrieved_source_marks, source_statuses}
 import x7c1.linen.repository.channel.my.MyChannelConnection
-import x7c1.linen.repository.crawler.LoadedEntry
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.DummyEntryBinder
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.entry.unread.{EntryContent, UnreadOutline, SourceHeadlineContent, UnreadEntryRow, EntryAccessor, EntrySourcePositionsFactory}
+import x7c1.linen.repository.loader.crawling.LoadedEntry
 import x7c1.linen.repository.source.setting.SampleFactory
 import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceRow}
 import x7c1.linen.testing.LogSetting

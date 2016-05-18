@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.IBinder
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.crawler.RemoteSourceLoader
 import x7c1.linen.repository.dummy.TraceableQueue
+import x7c1.linen.repository.loader.crawling.RemoteSourceLoader
 import x7c1.linen.scene.updater.UpdaterMethods
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType

@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels, SettingLoaderSchedule}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, UpdaterSchedule}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, LoaderSchedule}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
@@ -77,7 +77,7 @@ trait DrawerMenuInitializer {
         label of MyChannels("My Channels"),
         label of PresetChannels("Preset Channels"),
         label of ChannelOrder("Channel Order"),
-        label of UpdaterSchedule("Loader Schedules")
+        label of LoaderSchedule("Loader Schedules")
       ),
       -----,
       MenuItems(
@@ -152,7 +152,7 @@ class OnMenuItemClick(
 
     case _: ChannelOrder =>
       Log info s"$kind"
-    case _: UpdaterSchedule =>
+    case _: LoaderSchedule =>
       Log info s"$kind"
       activity startActivity IntentFactory.using[LoaderSchedulesDelegatee].
         create(activity, activity getClassOf SettingLoaderSchedule){

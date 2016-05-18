@@ -1,4 +1,4 @@
-package x7c1.linen.repository.crawler
+package x7c1.linen.repository.loader.crawling
 
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
