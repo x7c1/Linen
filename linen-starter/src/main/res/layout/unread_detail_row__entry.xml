@@ -74,7 +74,7 @@
             android:textSize="13sp"
             android:clickable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableStart="@drawable/ic_wrap_text_black_24dp"
+            android:drawableStart="@drawable/ic_wrap_text_20dp"
             android:drawablePadding="3dp"
             android:text="LATER"
             />
@@ -92,7 +92,7 @@
             android:textSize="13sp"
             android:clickable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableStart="@drawable/ic_open_in_new_black_24dp"
+            android:drawableStart="@drawable/ic_open_in_new_18dp"
             android:drawablePadding="3dp"
             android:text="OPEN"
             />

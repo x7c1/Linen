@@ -85,7 +85,7 @@
             style="@style/SettingChannelsRowButtons"
             android:layout_below="@id/border"
             android:layout_toStartOf="@id/setting_schedule_row__item__history"
-            android:drawableStart="@drawable/ic_alarm_black_24dp"
+            android:drawableStart="@drawable/ic_alarm_14dp"
             android:drawablePadding="4dp"
             android:text="EDIT"
             android:gravity="center_vertical"
