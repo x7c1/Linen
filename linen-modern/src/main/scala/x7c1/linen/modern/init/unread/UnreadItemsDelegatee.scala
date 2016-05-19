@@ -64,7 +64,7 @@ class UnreadItemsDelegatee(
         false
     }
   }
-  private def setupLoaderSchedule(): Unit ={
+  private def setupLoaderSchedule(): Unit = {
     clientAccount foreach { account =>
       ServiceCaller.using[UpdaterMethods].
         startService(activity, activity getClassOf Updater){
