@@ -1,6 +1,7 @@
 package x7c1.linen.repository.loader.schedule
 
 import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
+import x7c1.wheat.modern.features.HasShortLength
 
 case class ScheduleTime(
   hour: Hour,
@@ -33,4 +34,6 @@ object TimeRange {
       from = ScheduleTime(Hour(from), Minute(0)),
       to = ScheduleTime(Hour(to), Minute(0))
     )
+
+  implicit object short extends HasShortLength[TimeRange]
 }

@@ -1,21 +1,29 @@
 package x7c1.linen.repository.loader.schedule
 
-import x7c1.wheat.modern.database.selector.SelectorProvidable
+import android.database.sqlite.SQLiteDatabase
+import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.sequence.Sequence
 
 sealed trait LoaderScheduleRow
 
 object LoaderScheduleRow {
-  implicit object providable
-    extends SelectorProvidable[LoaderScheduleRow, ScheduleRowSelector](
-      new ScheduleRowSelector(_)
-    )
+  implicit object providable extends CanProvideSelector[LoaderScheduleRow]{
+    override type Selector = ScheduleRowSelector
+    override def createFrom(db: SQLiteDatabase) = new ScheduleRowSelector(db)
+  }
 }
 
 trait LoaderSchedule extends LoaderScheduleRow {
   def scheduleId: Long
   def name: String
   def enabled: Boolean
+}
+
+object LoaderSchedule {
+  implicit object providable extends CanProvideSelector[LoaderSchedule]{
+    override type Selector = ScheduleSelector
+    override def createFrom(db: SQLiteDatabase) = new ScheduleSelector(db)
+  }
 }
 
 case class PresetLoaderSchedule(
