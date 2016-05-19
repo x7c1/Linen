@@ -50,7 +50,7 @@ class UpdaterMethods(
   def setupLoaderSchedule(accountId: Long): Unit = Future {
     Log error s"[init]"
 
-    helper.selectorOf[LoaderSchedule] findPresetSchedule accountId via {
+    helper.selectorOf[LoaderSchedule] findPresetSchedule accountId matches {
       case Right(Some(schedule)) => LoaderScheduler(service) createOrUpdate schedule
       case Right(None) => Log error s"preset schedule not found"
       case Left(e) => Log error format(e){"[failed]"}

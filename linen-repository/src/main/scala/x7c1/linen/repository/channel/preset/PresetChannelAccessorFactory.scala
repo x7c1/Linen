@@ -11,7 +11,7 @@ class PresetChannelAccessorFactory(queryFactory: PresetChannelQueryFactory){
     helper: DatabaseHelper): Either[PresetRecordError, PresetChannelsAccessor] = {
 
     val presetAccount = helper.selectorOf[PresetAccount].find()
-    val either = presetAccount via {
+    val either = presetAccount matches {
       case Left(error) => Left(UnexpectedException(error))
       case Right(None) => Left(NoPresetAccount())
       case Right(Some(preset)) => Right(preset.accountId)

@@ -20,14 +20,14 @@ class SourceInspector private (helper: DatabaseHelper){
     }
 
   private def getSource[A: SourceIdentifiable](sourceId: A) =
-    helper.selectorOf[SourceRecord] findBy sourceId via {
+    helper.selectorOf[SourceRecord] findBy sourceId matches {
       case Left(e) => Left(SqlError(e))
       case Right(None) => Left(SourceNotFound(sourceId))
       case Right(Some(source)) => Right(source)
     }
 
   private def getEntry[A: SourceIdentifiable](sourceId: A) =
-    helper.selectorOf[LatestEntry] findBy sourceId via {
+    helper.selectorOf[LatestEntry] findBy sourceId matches {
       case Left(e) => Left(SqlError(e))
       case Right(x) => Right(x)
     }

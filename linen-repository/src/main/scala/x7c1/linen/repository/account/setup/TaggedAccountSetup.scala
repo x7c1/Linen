@@ -18,14 +18,14 @@ class TaggedAccountSetup[A <: AccountBase: CanFindByQuery: FindProvidable](
   private val finder = new AccountTagFinder(helper)
 
   def findOrCreate(parts: AccountParts): Either[AccountSetupError, Long] = {
-    helper.selectorOf[A].find() via {
+    helper.selectorOf[A].find() matches {
       case Right(Some(account)) => Right(account.accountId)
       case Right(None) => createAccount(parts)
       case Left(e) => Left(UnexpectedException(e))
     }
   }
   private def createAccount(parts: AccountParts) = {
-    finder findId tagLabel via {
+    finder findId tagLabel matches {
       case Right(Some(tagId)) =>
         bindTagWithAccount(tagId, parts).left map (UnexpectedException(_))
       case Right(None) =>
