@@ -1,13 +1,15 @@
 package x7c1.linen.repository.loader.schedule
 
-import x7c1.linen.database.struct.AccountIdentifiable
-import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
+import x7c1.wheat.modern.database.selector.SelectorProvidable
 import x7c1.wheat.modern.sequence.Sequence
 
 sealed trait LoaderScheduleRow
 
 object LoaderScheduleRow {
-  implicit object providable extends DefaultProvidable[AccountIdentifiable, LoaderScheduleRow]
+  implicit object providable
+    extends SelectorProvidable[LoaderScheduleRow, ScheduleRowSelector](
+      new ScheduleRowSelector(_)
+    )
 }
 
 trait LoaderSchedule extends LoaderScheduleRow {
