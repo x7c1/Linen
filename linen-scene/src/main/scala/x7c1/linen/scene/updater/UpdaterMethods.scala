@@ -55,6 +55,8 @@ class UpdaterMethods(
       case Right(None) => Log error s"preset schedule not found"
       case Left(e) => Log error format(e){"[failed]"}
     }
+  } onFailure {
+    case e => Log error format(e){"[abort] (unexpected)"}
   }
   def loadFromSchedule(scheduleId: Long): Unit = {
     Log info s"schedule:$scheduleId"
