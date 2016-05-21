@@ -1,17 +1,13 @@
 package x7c1.linen.scene.updater
 
 import android.app.Service
-import android.content.Intent
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.{DummyFactory, TraceableQueue}
 import x7c1.linen.repository.loader.crawling.{Implicits, SourceInspector}
-import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.linen.repository.preset.PresetFactory
 import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
-import x7c1.linen.scene.loader.crawling.LoaderScheduler
-import x7c1.wheat.macros.intent.{ExtraNotFound, IntentExpander}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.TaskAsync.async
@@ -26,11 +22,6 @@ class UpdaterMethods(
 
   import Implicits._
 
-  def execute(intent: Intent) = IntentExpander findFrom intent match {
-    case Left(e: ExtraNotFound) => Log error e.toString
-    case Left(notFound) => Log info notFound.toString
-    case Right(f) => f.apply()
-  }
   def createDummies(max: Int): Unit = async {
     Log info "[init]"
     val notifier = new UpdaterServiceNotifier(service, max, Date.current(), startId)
@@ -46,20 +37,6 @@ class UpdaterMethods(
   }
   def createDummySources(channelIds: Seq[Long]) = async {
     Log info s"$channelIds"
-  }
-  def setupLoaderSchedule(accountId: Long): Unit = Future {
-    Log error s"[init]"
-
-    helper.selectorOf[LoaderSchedule] findPresetSchedule accountId matches {
-      case Right(Some(schedule)) => LoaderScheduler(service) createOrUpdate schedule
-      case Right(None) => Log error s"preset schedule not found"
-      case Left(e) => Log error format(e){"[failed]"}
-    }
-  } onFailure {
-    case e => Log error format(e){"[abort] (unexpected)"}
-  }
-  def loadFromSchedule(scheduleId: Long): Unit = {
-    Log info s"schedule:$scheduleId"
   }
   def loadSource(sourceId: Long): Unit = {
     Log info s"[init] source-id: $sourceId"

@@ -14,8 +14,8 @@ import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.repository.unread.{AccessorLoader, Accessors, BrowsedEntriesMarker, EntryKind, FooterKind, SourceKind}
-import x7c1.linen.scene.updater.UpdaterMethods
+import x7c1.linen.repository.unread._
+import x7c1.linen.scene.loader.crawling.LoaderSchedulerMethods
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
@@ -66,7 +66,7 @@ class UnreadItemsDelegatee(
   }
   private def setupLoaderSchedule(): Unit = {
     clientAccount foreach { account =>
-      ServiceCaller.using[UpdaterMethods].
+      ServiceCaller.using[LoaderSchedulerMethods].
         startService(activity, activity getClassOf Updater){
           _ setupLoaderSchedule account.accountId
         }
