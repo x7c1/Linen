@@ -2,6 +2,7 @@ package x7c1.linen.repository.loader.schedule
 
 import android.database.sqlite.{SQLiteDatabase, SQLiteException}
 import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.repository.loader.schedule.ScheduleTime.{Minute, Hour}
 import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.either.{OptionRight, OptionEither}
 import x7c1.wheat.modern.sequence.Sequence
@@ -27,13 +28,36 @@ class ScheduleSelector(val db: SQLiteDatabase){
   ) ++ createChannelSchedules
 
   private lazy val preset = PresetLoaderSchedule(
-    scheduleId = 111,
+    scheduleId = 777,
     name = "Load channels at..",
     enabled = true,
     startRanges = Sequence from Seq(
-      TimeRange(5, 6),
-      TimeRange(13, 14),
-      TimeRange(21, 22)
+      /*
+      TimeRange(
+        startTimeId = 101,
+        ScheduleTime(Hour(22), Minute(55))
+      ),
+      TimeRange(
+        startTimeId = 102,
+        ScheduleTime(Hour(22), Minute(56))
+      ),
+      TimeRange(
+        startTimeId = 103,
+        ScheduleTime(Hour(23), Minute(18))
+      ),
+      */
+      TimeRange(
+        startTimeId = 222,
+        ScheduleTime(Hour(5), Minute(0))
+      ),
+      TimeRange(
+        startTimeId = 333,
+        ScheduleTime(Hour(13), Minute(0))
+      ),
+      TimeRange(
+        startTimeId = 444,
+        ScheduleTime(Hour(21), Minute(0))
+      )
     )
   )
   private def createChannelSchedules = {

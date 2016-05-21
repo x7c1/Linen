@@ -7,12 +7,10 @@ import x7c1.linen.database.struct.AccountIdentifiable
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingScheduleLayout
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.glue.service.ServiceLabel.Updater
-import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.loader.schedule.LoaderScheduleRow
-import x7c1.linen.scene.updater.UpdaterMethods
+import x7c1.linen.scene.loader.crawling.SubscribedChannelsLoader
 import x7c1.wheat.lore.resource.AdapterDelegatee
-import x7c1.wheat.macros.intent.{IntentExpander, ServiceCaller}
+import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -67,36 +65,11 @@ class LoaderSchedulesDelegatee (
     (account: A)(event: ScheduleSelected) = {
 
     val loadNow = PopupMenuItem("Load now"){ _ =>
-      new SubscribedChannelsLoader(activity, helper) execute account
+      SubscribedChannelsLoader(activity, helper) execute account
     }
     val items = Seq(
       loadNow
     )
     PopupMenuBox(activity, event.targetView, items).show()
-  }
-}
-
-private class SubscribedChannelsLoader(
-  activity: Activity with ActivityControl with ServiceControl,
-  helper: DatabaseHelper ){
-
-  def execute[A: AccountIdentifiable](account: A): Unit = {
-    Log info s"[init]"
-
-    val accountId = implicitly[AccountIdentifiable[A]] toId account
-    val caller = ServiceCaller.using[UpdaterMethods]
-
-    helper.selectorOf[SubscribedChannel] traverseOn account match {
-      case Left(e) => Log error format(e){"[failed]"}
-      case Right(sequence) =>
-        sequence.toSeq foreach { channel =>
-          Log info s"$channel"
-
-          caller.startService(activity, activity getClassOf Updater){
-            _.loadChannelSources(channel.channelId, accountId)
-          }
-        }
-        sequence.closeCursor()
-    }
   }
 }

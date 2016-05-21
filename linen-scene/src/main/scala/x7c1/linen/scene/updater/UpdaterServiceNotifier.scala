@@ -40,7 +40,10 @@ class UpdaterServiceNotifier(
     manager.notify(notificationId, notification)
     */
 
+    /*
+    // disable temporally for debug of scheduler
     manager.cancel(notificationId)
+    */
   }
 
   def notifyProgress(current: Int): Unit = {

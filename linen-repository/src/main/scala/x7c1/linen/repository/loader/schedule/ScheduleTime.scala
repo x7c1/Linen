@@ -7,7 +7,7 @@ import x7c1.wheat.modern.features.HasShortLength
 
 case class ScheduleTime(
   hour: Hour,
-  minute: Minute ){
+  minute: Minute = Minute(0) ){
 
   def format: String = {
     f"${hour.value}%02d:${minute.value}%02d"
@@ -21,14 +21,14 @@ case class ScheduleTime(
       x.set(Calendar.SECOND, 0)
       x
     }
-    val before = create(original = base)
+    val baseDate = create(original = base)
     val calendar =
-      if (base.getTimeInMillis < before.getTimeInMillis){
-        before
+      if (base.getTimeInMillis < baseDate.getTimeInMillis){
+        baseDate
       } else {
-        val after = create(original = before)
-        after.add(Calendar.DAY_OF_MONTH, 1)
-        after
+        val nextDate = create(original = baseDate)
+        nextDate.add(Calendar.DAY_OF_MONTH, 1)
+        nextDate
       }
 
     calendar
@@ -41,9 +41,9 @@ object ScheduleTime {
   case class Minute(value: Int)
 }
 
-case class TimeRange(
-  from: ScheduleTime,
-  to: ScheduleTime ){
+case class TimeRange(startTimeId: Long, from: ScheduleTime){
+
+  private val to = ScheduleTime(Hour(from.hour.value + 1))
 
   def format: String = {
     s"${from.format} - ${to.format}"
@@ -51,11 +51,5 @@ case class TimeRange(
 }
 
 object TimeRange {
-  def apply(from: Int, to: Int): TimeRange =
-    TimeRange(
-      from = ScheduleTime(Hour(from), Minute(0)),
-      to = ScheduleTime(Hour(to), Minute(0))
-    )
-
   implicit object short extends HasShortLength[TimeRange]
 }

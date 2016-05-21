@@ -57,7 +57,7 @@ class UpdaterMethods(
     val inspector = SourceInspector(helper)
     val accessor = factory.create(channelId)
 
-    val settingSources = (0 to accessor.length - 1) flatMap accessor.findAt
+    val settingSources = 0 until accessor.length flatMap accessor.findAt
 
     val inspectedSources = settingSources map inspector.inspectSource[SettingSource]
     val targetSources = inspectedSources collect {

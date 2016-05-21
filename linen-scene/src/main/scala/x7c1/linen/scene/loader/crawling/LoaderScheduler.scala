@@ -1,8 +1,8 @@
 package x7c1.linen.scene.loader.crawling
 
-import java.util.Calendar
+import java.util.{Calendar, TimeZone}
 
-import android.app.{Service, AlarmManager, PendingIntent}
+import android.app.Service
 import android.content.Context
 import android.net.Uri
 import x7c1.linen.database.control.DatabaseHelper
@@ -12,44 +12,55 @@ import x7c1.linen.repository.loader.crawling.Implicits
 import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule}
 import x7c1.wheat.macros.intent._
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.chrono.alarm.WindowAlarm
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-class LoaderScheduler private (context: Context, control: ServiceControl){
+import scala.concurrent.Future
+
+class LoaderScheduler[A: AccountIdentifiable] private (
+  context: Context, control: ServiceControl, account: A){
+
   def createOrUpdate(schedule: PresetLoaderSchedule) = {
+    Log info s"[init] $schedule"
+
     schedule.startRanges.toSeq.foreach { range =>
-      Log info "h:" + range.from.hour.value
-      Log info "m:" + range.from.minute.value
+      import concurrent.duration._
 
-      val manager = context.getSystemService(Context.ALARM_SERVICE).asInstanceOf[AlarmManager]
-      val pendingIntent = {
-        val intent = IntentFactory.using[UpdaterMethods].
-          create(context, control getClassOf ServiceLabel.Updater){
-            _.loadFromSchedule(schedule.scheduleId)
-          }
+      val alarm = WindowAlarm(
+        context = context,
+        window = 1.hour,
+        start = {
+          val current = Calendar getInstance TimeZone.getDefault
+          range.from calendarAfter current
+        }
+      )
+      val accountId = implicitly[AccountIdentifiable[A]] toId account
+      val intent = IntentFactory.using[LoaderSchedulerMethods].
+        create(context, control getClassOf ServiceLabel.Updater){
+          _.loadFromSchedule(schedule.scheduleId, accountId)
+        }
 
-        /*
-          todo:
-            use intent.setData() to distinguish
-            pendingIntent among different schedules
-         */
+      /*
+        use intent.setData() to distinguish
+        pendingIntent among different schedules
+      */
 
-        PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-      }
-      val msec = {
-        val calendar = Calendar.getInstance()
-        calendar setTimeInMillis System.currentTimeMillis()
-        calendar.add(Calendar.SECOND, 10)
-        calendar.getTimeInMillis
-      }
-      manager.set(AlarmManager.RTC_WAKEUP, msec, pendingIntent)
+      intent setData Uri.parse(
+        s"linen://loader.schedule/setup/${schedule.scheduleId}/${range.startTimeId}"
+      )
+      alarm perform intent
     }
   }
-}
 
+}
 object LoaderScheduler {
-  def apply(service: Service with ServiceControl): LoaderScheduler = {
+  def apply[A: AccountIdentifiable]
+    (service: Service with ServiceControl, account: A): LoaderScheduler[A] = {
+
     new LoaderScheduler(
       context = service,
-      control = service
+      control = service,
+      account: A
     )
   }
 }
@@ -72,10 +83,15 @@ class LoaderSchedulerMethods(
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}
   }
-  def loadFromSchedule(scheduleId: Long, accountId: Long): Unit = {
+
+  def loadFromSchedule(scheduleId: Long, accountId: Long): Unit = Future {
     Log info s"schedule:$scheduleId, account:$accountId"
 
     /* setup schedule again for next call */
     setupLoaderSchedule(accountId)
+
+    SubscribedChannelsLoader(service, helper).execute(accountId)
+  } onFailure {
+    case e => Log error format(e){"[abort] (unexpected)"}
   }
 }

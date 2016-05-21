@@ -11,7 +11,7 @@ import scala.reflect.macros.blackbox
 object IntentExpander {
 
   def from[A](receiver: A): IntentExpander =
-    macro IntentExpanderMacros.createRunner[A]
+    macro IntentExpanderMacros.createExpander[A]
 
   def executeBy(intent: Intent): Unit =
     macro IntentExpanderMacros.executeMethod
@@ -19,17 +19,17 @@ object IntentExpander {
   implicit class IntentExpanders(xs: Seq[IntentExpander]){
     def findRunnerOf(intent: Intent): Either[IntentNotExpanded, () => Unit] = {
       @tailrec
-      def loop(xs: Seq[IntentExpander], intent: Intent): Either[IntentNotExpanded, () => Unit] = {
+      def loop(xs: Seq[IntentExpander]): Either[IntentNotExpanded, () => Unit] = {
         xs match {
           case y +: ys => y(intent) match {
-            case Left(e: UnknownAction) => loop(ys, intent)
+            case Left(e: UnknownAction) => loop(ys)
             case Left(e) => Left(e)
             case Right(f) => Right(f)
           }
           case Seq() => Left(UnknownAction(intent.getAction))
         }
       }
-      loop(xs, intent)
+      loop(xs)
     }
   }
 }
@@ -44,7 +44,7 @@ class IntentExpanderImpl (
 
 private object IntentExpanderMacros {
 
-  def createRunner[A: c.WeakTypeTag](c: blackbox.Context)(receiver: c.Tree): c.Tree = {
+  def createExpander[A: c.WeakTypeTag](c: blackbox.Context)(receiver: c.Tree): c.Tree = {
     import c.universe._
 
     val intent = TermName(c freshName "intent")
