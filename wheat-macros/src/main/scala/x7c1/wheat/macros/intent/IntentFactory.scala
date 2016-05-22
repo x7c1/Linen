@@ -29,6 +29,12 @@ private object IntentFactoryImpl {
   }
 }
 
+class ContextHolder[A](context: Context, klass: Class[_]){
+  def buildIntent(builder: IntentBuilder[A]): Intent = {
+    builder.build(context, klass)
+  }
+}
+
 private trait IntentTreeFactory {
   val context: blackbox.Context
   import context.universe._
@@ -72,5 +78,19 @@ private trait IntentTreeFactory {
       ..${putExtras(intent)}
       $intent
     }"""
+  }
+  def newBuilder[A: WeakTypeTag](): Tree = {
+    val builder = appliedType(typeOf[IntentBuilder[_]].typeConstructor, weakTypeOf[A])
+    val intent = TermName(context freshName "intent")
+    q"""
+      new $builder {
+        override def build(context: ${typeOf[Context]}, klass: Class[_]) = {
+          val $intent = new ${typeOf[Intent]}(context, klass)
+          $intent.setAction($methodName)
+          ..${putExtras(intent)}
+          $intent
+        }
+      }
+    """
   }
 }

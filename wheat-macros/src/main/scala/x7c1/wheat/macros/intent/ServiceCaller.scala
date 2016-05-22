@@ -10,7 +10,7 @@ import scala.reflect.macros.blackbox
 object ServiceCaller {
   def using[A]: ServiceCaller[A] = new ServiceCaller[A]
 
-  def reify[A](context: Context, klass: Class[_]): A =
+  def reify[A](context: Context, klass: Class[_]): A with ContextHolder[A] =
     macro ServiceCallerImpl.reify[A]
 }
 
@@ -83,7 +83,15 @@ trait ServiceCallerTreeFactory extends PublicFieldsFinder {
             }
       """
     }
-    val tree = q"""new $serviceType { ..$methods }"""
+    val holder = appliedType(
+      typeOf[ContextHolder[_]].typeConstructor,
+      serviceType
+    )
+    val tree = q"""
+      new $holder($contextTree, $klassTree) with $serviceType {
+        ..$methods
+      }
+    """
 //    println(tree)
     tree
   }

@@ -4,11 +4,11 @@ import android.app.Service
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
+import x7c1.linen.repository.loader.crawling.Implicits._
 import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.linen.repository.loader.crawling.Implicits._
 
 import scala.concurrent.Future
 
