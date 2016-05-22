@@ -22,7 +22,7 @@ private object IntentBuilderImpl {
       override val block = f
     }
     val tree = factory.newBuilder[A]()
-    println(tree)
+//    println(tree)
     tree
   }
 }

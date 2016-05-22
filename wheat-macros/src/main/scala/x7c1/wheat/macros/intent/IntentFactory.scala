@@ -1,7 +1,7 @@
 package x7c1.wheat.macros.intent
 
 import android.content.{Context, Intent}
-import x7c1.wheat.macros.base.IntentEncoder
+import x7c1.wheat.macros.base.{IntentEncoder, TreeContext}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -35,8 +35,8 @@ class ContextHolder[A](context: Context, klass: Class[_]){
   }
 }
 
-private trait IntentTreeFactory {
-  val context: blackbox.Context
+private trait IntentTreeFactory extends TreeContext {
+
   import context.universe._
   val block: Tree
 
@@ -80,15 +80,16 @@ private trait IntentTreeFactory {
     }"""
   }
   def newBuilder[A: WeakTypeTag](): Tree = {
-    val builder = appliedType(typeOf[IntentBuilder[_]].typeConstructor, weakTypeOf[A])
-    val intent = TermName(context freshName "intent")
+    val builder = appliedType(
+      typeOf[IntentBuilder[_]].typeConstructor,
+      weakTypeOf[A]
+    )
+    val Seq(context, klass) = createTermNames("context", "klass")
+    val body = newIntent(q"$context", q"$klass")
     q"""
       new $builder {
-        override def build(context: ${typeOf[Context]}, klass: Class[_]) = {
-          val $intent = new ${typeOf[Intent]}(context, klass)
-          $intent.setAction($methodName)
-          ..${putExtras(intent)}
-          $intent
+        override def build($context: ${typeOf[Context]}, $klass: ${typeOf[Class[_]]}) = {
+          $body
         }
       }
     """
