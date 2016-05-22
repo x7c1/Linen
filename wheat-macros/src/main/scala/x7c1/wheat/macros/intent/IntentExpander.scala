@@ -132,15 +132,6 @@ trait IntentExpanderTreeFactory extends TreeContext {
     traverse(context.internal.enclosingOwner)
   }
 
-  lazy val enclosingMethod = {
-    @tailrec
-    def traverse(x: Symbol): MethodSymbol = {
-      if (x.isMethod) x.asMethod
-      else traverse(x.owner)
-    }
-    traverse(context.internal.enclosingOwner)
-  }
-
   def createMethods(intent: TermName, from: Type): Iterable[Method] = {
     val methodSymbols = from.members collect {
       case x if x.isMethod && x.isPublic =>

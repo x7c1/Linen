@@ -35,7 +35,7 @@ class LoaderScheduler[A: AccountIdentifiable] private (
         }
       )
       val accountId = implicitly[AccountIdentifiable[A]] toId account
-      val intent = IntentFactory.using[LoaderSchedulerMethods].
+      val intent = IntentFactory.using[SchedulerService].
         create(context, control getClassOf ServiceLabel.Updater){
           _.loadFromSchedule(schedule.scheduleId, accountId)
         }
@@ -62,36 +62,5 @@ object LoaderScheduler {
       control = service,
       account: A
     )
-  }
-}
-
-class LoaderSchedulerMethods(
-  service: Service with ServiceControl,
-  helper: DatabaseHelper,
-  startId: Int ){
-
-  import Implicits._
-
-  def setupLoaderSchedule(accountId: Long): Unit = Future {
-    Log error s"[init] account:$accountId"
-
-    helper.selectorOf[LoaderSchedule] findPresetSchedule accountId matches {
-      case Right(Some(schedule)) => LoaderScheduler(service, accountId) createOrUpdate schedule
-      case Right(None) => Log error s"preset schedule not found"
-      case Left(e) => Log error format(e){"[failed]"}
-    }
-  } onFailure {
-    case e => Log error format(e){"[abort] (unexpected)"}
-  }
-
-  def loadFromSchedule(scheduleId: Long, accountId: Long): Unit = Future {
-    Log info s"schedule:$scheduleId, account:$accountId"
-
-    /* setup schedule again for next call */
-    setupLoaderSchedule(accountId)
-
-    SubscribedChannelsLoader(service, helper).execute(accountId)
-  } onFailure {
-    case e => Log error format(e){"[abort] (unexpected)"}
   }
 }

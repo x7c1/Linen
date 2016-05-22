@@ -8,16 +8,14 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout._
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.glue.service.ServiceLabel.Updater
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.repository.unread._
-import x7c1.linen.scene.loader.crawling.LoaderSchedulerMethods
+import x7c1.linen.scene.loader.crawling.SchedulerService
 import x7c1.wheat.ancient.resource.ViewHolderProvider
-import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
 
@@ -66,10 +64,7 @@ class UnreadItemsDelegatee(
   }
   private def setupLoaderSchedule(): Unit = {
     clientAccount foreach { account =>
-      ServiceCaller.using[LoaderSchedulerMethods].
-        startService(activity, activity getClassOf Updater){
-          _ setupLoaderSchedule account.accountId
-        }
+      SchedulerService(activity) setupSchedule account.accountId
     }
   }
   protected lazy val helper = new DatabaseHelper(activity)
