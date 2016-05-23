@@ -22,7 +22,6 @@ class SubscribedChannelsLoader private (
       case Right(sequence) =>
         sequence.toSeq foreach { channel =>
           Log info s"$channel"
-
           QueueingService(context).loadChannelSources(channel.channelId, accountId)
         }
         sequence.closeCursor()

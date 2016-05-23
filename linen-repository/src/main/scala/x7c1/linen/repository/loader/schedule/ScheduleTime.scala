@@ -12,6 +12,14 @@ case class ScheduleTime(
   def format: String = {
     f"${hour.value}%02d:${minute.value}%02d"
   }
+  def toCalendar(base: Calendar) = {
+    val x = Calendar getInstance base.getTimeZone
+    x.setTime(base.getTime)
+    x.set(Calendar.HOUR_OF_DAY, hour.value)
+    x.set(Calendar.MINUTE, minute.value)
+    x.set(Calendar.SECOND, 0)
+    x
+  }
   def calendarAfter(base: Calendar): Calendar = {
     def create(original: Calendar) = {
       val x = Calendar getInstance original.getTimeZone

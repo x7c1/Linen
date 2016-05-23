@@ -1,5 +1,7 @@
 package x7c1.linen.repository.loader.schedule
 
+import java.util.Calendar
+
 import android.database.sqlite.SQLiteDatabase
 import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.sequence.Sequence
@@ -28,9 +30,33 @@ object LoaderSchedule {
 
 case class PresetLoaderSchedule(
   scheduleId: Long,
+  accountId: Long,
   name: String,
   enabled: Boolean,
-  startRanges: Sequence[TimeRange]) extends LoaderSchedule
+  startRanges: Sequence[TimeRange]) extends LoaderSchedule {
+
+  private def calendarsOf(base: Calendar): Seq[Calendar] = {
+    startRanges.toSeq.map(_.from toCalendar base)
+  }
+  def findNextStart(current: Calendar): Option[Calendar] = {
+    val tomorrow = {
+      val x = Calendar getInstance current.getTimeZone
+      x setTimeInMillis current.getTimeInMillis
+      x.add(Calendar.DAY_OF_MONTH, 1)
+      x
+    }
+    val baseTimes = calendarsOf(current)
+    val nextTimes = calendarsOf(tomorrow)
+    (baseTimes ++ nextTimes) find { _.getTimeInMillis > current.getTimeInMillis }
+
+    /*
+    val debug = Calendar getInstance TimeZone.getDefault
+    debug.setTimeInMillis(current.getTimeInMillis)
+    debug.add(Calendar.SECOND, 10)
+    Some(debug)
+    // */
+  }
+}
 
 case class ChannelLoaderSchedule(
   scheduleId: Long,

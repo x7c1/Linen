@@ -18,17 +18,20 @@ class ScheduleRowSelector(val db: SQLiteDatabase){
 
 class ScheduleSelector(val db: SQLiteDatabase){
   def collectBy[A: AccountIdentifiable](account: A): Either[SQLiteException, Sequence[LoaderSchedule]] = {
-    Right(dummySchedules)
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
+    Right(dummySchedules(accountId))
   }
   def findPresetSchedule[A: AccountIdentifiable](account: A): OptionEither[SQLiteException, PresetLoaderSchedule] = {
-    OptionRight(preset)
+    val accountId = implicitly[AccountIdentifiable[A]] toId account
+    OptionRight(preset(accountId))
   }
-  lazy val dummySchedules = Sequence from Seq(
-    preset
+  private def dummySchedules(accountId: Long) = Sequence from Seq(
+    preset(accountId)
   ) ++ createChannelSchedules
 
-  private lazy val preset = PresetLoaderSchedule(
+  private def preset(accountId: Long) = PresetLoaderSchedule(
     scheduleId = 777,
+    accountId = accountId,
     name = "Load channels at..",
     enabled = true,
     startRanges = Sequence from Seq(
