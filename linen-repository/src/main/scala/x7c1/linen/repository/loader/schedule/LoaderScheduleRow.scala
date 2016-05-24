@@ -1,8 +1,7 @@
 package x7c1.linen.repository.loader.schedule
 
-import java.util.Calendar
-
 import android.database.sqlite.SQLiteDatabase
+import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.sequence.Sequence
 
@@ -35,25 +34,20 @@ case class PresetLoaderSchedule(
   enabled: Boolean,
   startRanges: Sequence[TimeRange]) extends LoaderSchedule {
 
-  private def calendarsOf(base: Calendar): Seq[Calendar] = {
-    startRanges.toSeq.map(_.from toCalendar base)
+  import concurrent.duration._
+
+  private def calendarsOn(base: CalendarDate): Seq[CalendarDate] = {
+    startRanges.toSeq.map(_.from toCalendarDate base)
   }
-  def findNextStart(current: Calendar): Option[Calendar] = {
-    val tomorrow = {
-      val x = Calendar getInstance current.getTimeZone
-      x setTimeInMillis current.getTimeInMillis
-      x.add(Calendar.DAY_OF_MONTH, 1)
-      x
-    }
-    val baseTimes = calendarsOf(current)
-    val nextTimes = calendarsOf(tomorrow)
-    (baseTimes ++ nextTimes) find { _.getTimeInMillis > current.getTimeInMillis }
+  def nextStartAfter(current: CalendarDate): Option[CalendarDate] = {
+    val tomorrow = current + 1.day
+    val baseTimes = calendarsOn(current)
+    val nextTimes = calendarsOn(tomorrow)
+    (baseTimes ++ nextTimes) find {_ > current}
 
     /*
-    val debug = Calendar getInstance TimeZone.getDefault
-    debug.setTimeInMillis(current.getTimeInMillis)
-    debug.add(Calendar.SECOND, 10)
-    Some(debug)
+    val debug = CalendarDate.now()
+    Some(debug + 10.seconds)
     // */
   }
 }

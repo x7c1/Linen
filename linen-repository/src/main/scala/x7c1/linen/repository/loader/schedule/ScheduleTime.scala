@@ -3,6 +3,7 @@ package x7c1.linen.repository.loader.schedule
 import java.util.Calendar
 
 import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
+import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.features.HasShortLength
 
 case class ScheduleTime(
@@ -12,13 +13,11 @@ case class ScheduleTime(
   def format: String = {
     f"${hour.value}%02d:${minute.value}%02d"
   }
-  def toCalendar(base: Calendar) = {
-    val x = Calendar getInstance base.getTimeZone
-    x.setTime(base.getTime)
-    x.set(Calendar.HOUR_OF_DAY, hour.value)
-    x.set(Calendar.MINUTE, minute.value)
-    x.set(Calendar.SECOND, 0)
-    x
+  def toCalendarDate(base: CalendarDate): CalendarDate = {
+    base.copy(
+      hour = hour.value,
+      minute = minute.value
+    )
   }
   def calendarAfter(base: Calendar): Calendar = {
     def create(original: Calendar) = {

@@ -1,10 +1,9 @@
 package x7c1.wheat.modern.chrono.alarm
 
-import java.util.Calendar
-
 import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.app.{AlarmManager, PendingIntent}
 import android.content.{Context, Intent}
+import x7c1.wheat.calendar.CalendarDate
 
 import scala.concurrent.duration.Duration
 
@@ -36,7 +35,7 @@ class WindowAlarm private (context: Context, startMilliSeconds: Long, window: Du
 }
 
 object WindowAlarm {
-  def apply(context: Context, start: Calendar, window: Duration): WindowAlarm = {
-    new WindowAlarm(context, start.getTimeInMillis, window)
+  def apply(context: Context, start: CalendarDate, window: Duration): WindowAlarm = {
+    new WindowAlarm(context, start.toMilliseconds, window)
   }
 }

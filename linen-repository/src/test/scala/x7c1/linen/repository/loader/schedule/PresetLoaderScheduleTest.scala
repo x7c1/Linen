@@ -1,6 +1,6 @@
 package x7c1.linen.repository.loader.schedule
 
-import java.util.{Calendar, TimeZone}
+import java.util.TimeZone
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -10,6 +10,7 @@ import org.robolectric.annotation.Config
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
+import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.sequence.Sequence
 
 
@@ -21,47 +22,41 @@ class PresetLoaderScheduleTest extends JUnitSuiteLike {
   def testFindNextStart() = {
     val schedule = createPreset(accountId = 123)
 
-    // 2016-01-01 13:00
-    def create() = {
-      val current = Calendar getInstance TimeZone.getDefault
-      current.set(Calendar.YEAR, 2016)
-      current.set(Calendar.MONTH, 0)
-      current.set(Calendar.DAY_OF_MONTH, 1)
-      current.set(Calendar.HOUR_OF_DAY, 13)
-      current
-    }
+    // 2016-01-01 13:00:00
+    val current = CalendarDate(TimeZone.getDefault).copy(
+      year = 2016,
+      month = 1,
+      day = 1,
+      hour = 13,
+      minute = 0,
+      second = 0
+    )
     assertEquals("2016-01-01T21:00:00+0900", {
-      val Some(calendar) = schedule findNextStart {
+      val Some(calendar) = schedule nextStartAfter {
         // 13:15
-        val x = create()
-        x.set(Calendar.MINUTE, 15)
-        x
+        current copy (minute = 15)
       }
-      Date(calendar.getTime).format
+      Date(calendar.toDate).format
     })
     assertEquals("2016-01-01T05:00:00+0900", {
-      val Some(calendar) = schedule findNextStart {
+      val Some(calendar) = schedule nextStartAfter {
         // 04:00
-        val x = create()
-        x.set(Calendar.HOUR_OF_DAY, 4)
-        x
+        current copy (hour = 4)
       }
-      Date(calendar.getTime).format
+      Date(calendar.toDate).format
     })
     assertEquals("2016-01-02T05:00:00+0900", {
-      val Some(calendar) = schedule findNextStart {
+      val Some(calendar) = schedule nextStartAfter {
         // 23:00
-        val x = create()
-        x.set(Calendar.HOUR_OF_DAY, 23)
-        x
+        current copy (hour = 23)
       }
-      Date(calendar.getTime).format
+      Date(calendar.toDate).format
     })
 
     val emptySchedule = schedule.copy(
       startRanges = Sequence from Seq()
     )
-    assertEquals(None, emptySchedule findNextStart (current = create()))
+    assertEquals(None, emptySchedule nextStartAfter current)
   }
 
   private def createPreset(accountId: Long) = PresetLoaderSchedule(

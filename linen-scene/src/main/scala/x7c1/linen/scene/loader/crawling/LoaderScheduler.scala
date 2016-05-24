@@ -1,12 +1,11 @@
 package x7c1.linen.scene.loader.crawling
 
-import java.util.{Calendar, TimeZone}
-
 import android.content.{Context, Intent}
 import android.net.Uri
 import x7c1.linen.database.struct.AccountIdentifiable
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.schedule.PresetLoaderSchedule
+import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.macros.intent.IntentBuilder.from
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.chrono.alarm.WindowAlarm
@@ -19,8 +18,7 @@ class LoaderScheduler[A: AccountIdentifiable] private (
   def createOrUpdate(schedule: PresetLoaderSchedule) = {
     Log info s"[init] $schedule"
 
-    val current = Calendar getInstance TimeZone.getDefault
-    schedule.findNextStart(current) match {
+    schedule nextStartAfter CalendarDate.now() match {
       case Some(start) =>
         WindowAlarm(
           context = context,
