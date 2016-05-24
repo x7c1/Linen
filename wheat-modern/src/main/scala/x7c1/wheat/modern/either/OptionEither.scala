@@ -18,7 +18,7 @@ sealed abstract class OptionEither[+L, +A] {
 
   def option: OptionProjection[L, A] = OptionProjection(this)
 
-  def via[C](f: Either[L, Option[A]] => C): C = f(toEither)
+  def matches[C](f: Either[L, Option[A]] => C): C = f(toEither)
 
   def toEither: Either[L, Option[A]] = this match {
     case OptionRight(r) => Right(r)

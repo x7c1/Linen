@@ -6,13 +6,15 @@ import android.support.v7.widget.RecyclerView
 import android.view.KeyEvent
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{MenuRowLabel, MenuRowSeparator, MenuRowTitle, UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource, UnreadItemsLayout, UnreadOutlineRow, UnreadOutlineRowEntry, UnreadOutlineRowFooter, UnreadOutlineRowSource, UnreadSourceRow, UnreadSourceRowFooter, UnreadSourceRowItem}
+import x7c1.linen.glue.res.layout._
+import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
 import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
-import x7c1.linen.repository.unread.{AccessorLoader, Accessors, BrowsedEntriesMarker, EntryKind, FooterKind, SourceKind}
+import x7c1.linen.repository.unread._
+import x7c1.linen.scene.loader.crawling.SchedulerService
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
@@ -20,7 +22,7 @@ import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
 import scala.concurrent.Future
 
 class UnreadItemsDelegatee(
-  val activity: Activity with ActivityControl,
+  val activity: Activity with ActivityControl with ServiceControl,
   val layout: UnreadItemsLayout,
   val menuRowProviders: MenuRowProviders,
   val unreadRowProviders: UnreadRowProviders
@@ -38,6 +40,7 @@ class UnreadItemsDelegatee(
     setupEntryArea()
     setupEntryDetailArea()
     setupDrawerMenu()
+    setupLoaderSchedule()
   }
   def onPause(): Unit = {
     Log info s"[init]"
@@ -57,6 +60,11 @@ class UnreadItemsDelegatee(
         actions.drawer.onBack() || actions.container.onBack()
       case _ =>
         false
+    }
+  }
+  private def setupLoaderSchedule(): Unit = {
+    clientAccount foreach { account =>
+      SchedulerService(activity) setupSchedule account.accountId
     }
   }
   protected lazy val helper = new DatabaseHelper(activity)
@@ -113,7 +121,7 @@ class UnreadItemsDelegatee(
   def setupClientAccount(): Option[ClientAccount] = {
     ClientAccountSetup(helper).findOrCreate() match {
       case Left(error) =>
-        Log error error.toString
+        Log error error.detail
         None
       case Right(account) =>
         Some(account)

@@ -9,7 +9,7 @@ class RawSourceAccessor(helper: DatabaseHelper){
   private lazy val selector = helper.selectorOf[SourceTitle]
 
   def findTitleOf[A: SourceIdentifiable](sourceId: A): Option[String] = {
-    selector findBy sourceId via {
+    selector findBy sourceId matches {
       case Left(exception) =>
         Log error exception.getMessage
         None

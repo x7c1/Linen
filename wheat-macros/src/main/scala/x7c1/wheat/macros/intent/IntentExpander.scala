@@ -9,27 +9,66 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object IntentExpander {
-  def findFrom(intent: Intent): Either[IntentNotExpanded, () => Unit] =
-    macro IntentExpanderImpl.findMethod
+
+  def from[A](receiver: A): IntentExpander =
+    macro IntentExpanderMacros.createExpander[A]
 
   def executeBy(intent: Intent): Unit =
-    macro IntentExpanderImpl.executeMethod
+    macro IntentExpanderMacros.executeMethod
+
+  implicit class IntentExpanders(xs: Seq[IntentExpander]){
+    def findRunnerOf(intent: Intent): Either[IntentNotExpanded, () => Unit] = {
+      @tailrec
+      def loop(xs: Seq[IntentExpander]): Either[IntentNotExpanded, () => Unit] = {
+        xs match {
+          case y +: ys => y(intent) match {
+            case Left(e: UnknownAction) => loop(ys)
+            case Left(e) => Left(e)
+            case Right(f) => Right(f)
+          }
+          case Seq() => Left(UnknownAction(intent.getAction))
+        }
+      }
+      loop(xs)
+    }
+  }
 }
 
-private object IntentExpanderImpl {
-  def findMethod(c: blackbox.Context)(intent: c.Tree): c.Tree = {
+trait IntentExpander extends (Intent => Either[IntentNotExpanded, () => Unit])
+
+class IntentExpanderImpl (
+  f: Intent => Either[IntentNotExpanded, () => Unit]) extends IntentExpander {
+
+  override def apply(intent: Intent): Either[IntentNotExpanded, () => Unit] = f(intent)
+}
+
+private object IntentExpanderMacros {
+
+  def createExpander[A: c.WeakTypeTag](c: blackbox.Context)(receiver: c.Tree): c.Tree = {
+    import c.universe._
+
+    val intent = TermName(c freshName "intent")
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
-      override val intentTree = intent
+      override val intentTree: c.Tree = q"$intent"
+      override val receiverTree: c.Tree = receiver
     }
-    val tree = factory.findCallee
+    val finder = factory.findCallee(from = c.universe.weakTypeOf[A])
+    val tree =
+      q"""
+        new ${typeOf[IntentExpanderImpl]}(($intent: ${typeOf[Intent]}) => $finder)
+       """
+
 //    println(c.universe.showCode(tree))
     tree
   }
+
   def executeMethod(c: blackbox.Context)(intent: c.Tree): c.Tree = {
+    import c.universe._
     val factory = new IntentExpanderTreeFactory {
       override val context: c.type = c
       override val intentTree = intent
+      override val receiverTree: c.Tree = q"this"
     }
     val tree = factory.executeCallee
 //    println(c.universe.showCode(tree))
@@ -39,7 +78,15 @@ private object IntentExpanderImpl {
 
 trait IntentExpanderTreeFactory extends TreeContext {
   import context.universe._
+
+  import scala.language.existentials
+
   val intentTree: Tree
+  val receiverTree: Tree
+
+  private lazy val receiver = {
+    TermName(context freshName "receiver")
+  }
 
   class MethodParameter(
     methodFullName: String,
@@ -67,7 +114,7 @@ trait IntentExpanderTreeFactory extends TreeContext {
       cq"""
         $fullName => try {
           ..$assigns
-          Right(() => $method(..$args))
+          Right(() => $receiver.$method(..$args))
         } catch {
           case e: ${typeOf[ExtraNotFoundException]} =>
             Left(new ${typeOf[ExtraNotFound]}(e.key))
@@ -85,17 +132,8 @@ trait IntentExpanderTreeFactory extends TreeContext {
     traverse(context.internal.enclosingOwner)
   }
 
-  lazy val enclosingMethod = {
-    @tailrec
-    def traverse(x: Symbol): MethodSymbol = {
-      if (x.isMethod) x.asMethod
-      else traverse(x.owner)
-    }
-    traverse(context.internal.enclosingOwner)
-  }
-
-  def createMethods(intent: TermName): Iterable[Method] = {
-    val methodSymbols = enclosingClass.typeSignature.members collect {
+  def createMethods(intent: TermName, from: Type): Iterable[Method] = {
+    val methodSymbols = from.members collect {
       case x if x.isMethod && x.isPublic =>
         x.asMethod
     } filter {
@@ -108,7 +146,6 @@ trait IntentExpanderTreeFactory extends TreeContext {
     }
     methodSymbols map { method =>
       val params = method.paramLists.head map { param =>
-        val paramName = param.name.encodedName.toString
         new MethodParameter(
           methodFullName = method.fullName,
           paramSymbol = param,
@@ -118,17 +155,19 @@ trait IntentExpanderTreeFactory extends TreeContext {
       Method(method.name.encodedName.toString, method.fullName, params)
     }
   }
-  def findCallee = {
+  def findCallee(from: Type = enclosingClass.typeSignature) = {
     val Seq(intent, action) = createTermNames("intent", "action")
-    val methods = createMethods(intent)
+    val methods = createMethods(intent, from)
     q"""
       Option($intentTree) match {
         case Some($intent) => Option($intent.getAction) match {
-          case Some($action) => $action match {
-            case ..${methods.map(_.toCase)}
-            case _ =>
-              Left apply new ${typeOf[UnknownAction]}($action)
-          }
+          case Some($action) =>
+            val $receiver = $receiverTree
+            $action match {
+              case ..${methods.map(_.toCase)}
+              case _ =>
+                Left apply new ${typeOf[UnknownAction]}($action)
+            }
           case None =>
             Left apply new ${typeOf[NoIntentAction]}
         }
@@ -141,7 +180,7 @@ trait IntentExpanderTreeFactory extends TreeContext {
     val log = typeOf[Log].companion
     val tag = enclosingMethod.fullName
     q"""
-      val $callee = $findCallee
+      val $callee = ${findCallee()}
       $callee match {
         case Right($f) => $f()
         case Left($e) => $log.e($tag, $e.toString)

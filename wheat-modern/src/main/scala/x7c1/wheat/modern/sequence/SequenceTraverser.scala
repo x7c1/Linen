@@ -14,6 +14,6 @@ trait SequenceTraverser[A]{
     toSeq exists f
   }
   def toSeq: Seq[A] = {
-    (0 to underlying.length - 1).view flatMap underlying.findAt
+    (0 until underlying.length).view flatMap underlying.findAt
   }
 }
