@@ -35,6 +35,7 @@ targets = [
   "wheat-macros",
   "wheat-ancient",
   "wheat-lore",
+  "wheat-calendar",
   "linen-glue",
   "linen-repository",
   "linen-scene",

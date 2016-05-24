@@ -54,12 +54,15 @@ object LinenBuild extends Build with LinenSettings {
   lazy val `wheat-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath).
-    dependsOn(`wheat-macros`)
+    dependsOn(`wheat-macros`, `wheat-calendar`)
 
   lazy val `wheat-lore` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-modern`, `wheat-ancient`)
+
+  lazy val `wheat-calendar` = project.
+    settings(linenSettings:_*)
 
   lazy val `linen-repository` = project.
     settings(linenSettings:_*).
