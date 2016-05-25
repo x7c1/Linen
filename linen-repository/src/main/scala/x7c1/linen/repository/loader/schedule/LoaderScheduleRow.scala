@@ -1,6 +1,7 @@
 package x7c1.linen.repository.loader.schedule
 
 import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.mixin.LoaderScheduleWithKind
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.database.selector.CanProvideSelector
 import x7c1.wheat.modern.features.HasShortLength
@@ -17,8 +18,10 @@ object LoaderScheduleRow {
 
 trait LoaderSchedule extends LoaderScheduleRow {
   def scheduleId: Long
+  def accountId: Long
   def name: String
   def enabled: Boolean
+  def nextStartAfter(current: CalendarDate): Option[CalendarDate]
 }
 
 object LoaderSchedule {
@@ -41,7 +44,7 @@ case class PresetLoaderSchedule(
   private def calendarsOn(base: CalendarDate): Seq[CalendarDate] = {
     startRanges.toSeq.map(_.from toCalendarDate base)
   }
-  def nextStartAfter(current: CalendarDate): Option[CalendarDate] = {
+  override def nextStartAfter(current: CalendarDate): Option[CalendarDate] = {
     val tomorrow = current + 1.day
     val baseTimes = calendarsOn(current)
     val nextTimes = calendarsOn(tomorrow)
@@ -53,13 +56,35 @@ case class PresetLoaderSchedule(
     // */
   }
 }
+object PresetLoaderSchedule {
+  def apply(
+    record: LoaderScheduleWithKind,
+    ranges: Sequence[TimeRange]): PresetLoaderSchedule = {
+
+    PresetLoaderSchedule(
+      scheduleId = record.schedule_id,
+      accountId = record.account_id,
+      name = "Load channels at..",
+      enabled = record.enabled == 1,
+      startRanges = ranges
+    )
+  }
+}
 
 case class ChannelLoaderSchedule(
   scheduleId: Long,
+  accountId: Long,
   name: String,
-  enabled: Boolean ) extends LoaderSchedule
+  enabled: Boolean ) extends LoaderSchedule {
+
+  override def nextStartAfter(current: CalendarDate) = None
+}
 
 case class SourceLoaderSchedule(
   scheduleId: Long,
+  accountId: Long,
   name: String,
-  enabled: Boolean ) extends LoaderSchedule
+  enabled: Boolean ) extends LoaderSchedule {
+
+  override def nextStartAfter(current: CalendarDate) = None
+}

@@ -43,7 +43,7 @@ private class SchedulerServiceImpl(
   startId: Int ) extends SchedulerService {
 
   override def setupSchedule(accountId: Long): Unit = Future {
-    PresetScheduleSetup(helper).setupPresetSchedule(accountId)
+    PresetScheduleSetup(helper) setupFor accountId
     setupAllSchedules()
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}
@@ -91,7 +91,7 @@ private class SchedulerServiceImpl(
   }
 
   override def scheduleNextLoader(scheduleId: Long): Unit = Future {
-    LoaderScheduler(service) setupNextLoader scheduleId
+    LoaderScheduler(service, helper) setupNextLoader scheduleId
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}
   }

@@ -1,33 +1,47 @@
 package x7c1.linen.repository.loader.schedule
 
-import android.database.sqlite.{SQLiteDatabase, SQLiteException}
-import x7c1.linen.database.struct.AccountIdentifiable
-import x7c1.linen.repository.loader.schedule.ScheduleTime.{Minute, Hour}
-import x7c1.wheat.modern.database.selector.CanProvideSelector
-import x7c1.wheat.modern.either.{OptionRight, OptionEither}
+import android.database.SQLException
+import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.mixin.LoaderScheduleWithKind
+import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleLike, LoaderScheduleTimeRecord}
+import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
+import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
+import x7c1.wheat.modern.database.selector.presets.ClosableSequence
+import x7c1.wheat.modern.either.{OptionEither, OptionRight}
+import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.sequence.Sequence
 
-class ScheduleRowSelector(val db: SQLiteDatabase){
-
-  def selectorOf[A](implicit x: CanProvideSelector[A]): x.Selector = x createFrom db
-
-  def collectBy[A: AccountIdentifiable](account: A): Either[SQLiteException, Sequence[LoaderScheduleRow]] = {
-    selectorOf[LoaderSchedule].collectBy(account)
+class ScheduleRowSelector(db: SQLiteDatabase){
+  def collectBy[A: AccountIdentifiable](account: A): Either[SQLException, Sequence[LoaderScheduleRow]] = {
+    db.selectorOf[LoaderSchedule].collectBy(account)
   }
 }
 
 class ScheduleSelector(val db: SQLiteDatabase){
-  def collectBy[A: AccountIdentifiable](account: A): Either[SQLiteException, Sequence[LoaderSchedule]] = {
+
+  def collectBy[A: AccountIdentifiable](account: A): Either[SQLException, Sequence[LoaderSchedule]] = {
     val accountId = implicitly[AccountIdentifiable[A]] toId account
     Right(dummySchedules(accountId))
   }
-  def findPresetSchedule[A: AccountIdentifiable](account: A): OptionEither[SQLiteException, PresetLoaderSchedule] = {
+  def traverseAll(): Either[SQLException, ClosableSequence[LoaderSchedule]] = {
+    LoaderSchedules toTraverseAll db
+  }
+  def findBy[A: LoaderScheduleLike](schedule: A): OptionEither[SQLException, LoaderSchedule] = {
+    for {
+      schedule <- db.selectorOf[LoaderScheduleWithKind].findBy(schedule)
+      times <- db.selectorOf[LoaderScheduleTimeRecord].collectFrom(schedule).toOptionEither
+    } yield PresetLoaderSchedule(
+      record = schedule,
+      ranges = TimeRange fromTimeRecords times
+    )
+  }
+  def findPresetSchedule[A: AccountIdentifiable](account: A): OptionEither[SQLException, PresetLoaderSchedule] = {
     val accountId = implicitly[AccountIdentifiable[A]] toId account
     OptionRight(preset(accountId))
   }
-  private def dummySchedules(accountId: Long) = Sequence from Seq(
+  private def dummySchedules(accountId: Long): Sequence[LoaderSchedule] = Sequence from Seq(
     preset(accountId)
-  ) ++ createChannelSchedules
+  ) ++ createChannelSchedules(accountId)
 
   private def preset(accountId: Long) = PresetLoaderSchedule(
     scheduleId = 777,
@@ -37,36 +51,31 @@ class ScheduleSelector(val db: SQLiteDatabase){
     startRanges = Sequence from Seq(
       /*
       TimeRange(
-        startTimeId = 101,
         ScheduleTime(Hour(22), Minute(55))
       ),
       TimeRange(
-        startTimeId = 102,
         ScheduleTime(Hour(22), Minute(56))
       ),
       TimeRange(
-        startTimeId = 103,
         ScheduleTime(Hour(23), Minute(18))
       ),
       */
       TimeRange(
-        startTimeId = 222,
         ScheduleTime(Hour(5), Minute(0))
       ),
       TimeRange(
-        startTimeId = 333,
         ScheduleTime(Hour(13), Minute(0))
       ),
       TimeRange(
-        startTimeId = 444,
         ScheduleTime(Hour(21), Minute(0))
       )
     )
   )
-  private def createChannelSchedules = {
+  private def createChannelSchedules(accountId: Long) = {
     (0 to 20) map { n =>
       ChannelLoaderSchedule(
         scheduleId = 111 * n,
+        accountId = accountId,
         name = s"Load channel : $n",
         enabled = true
       )

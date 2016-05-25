@@ -15,3 +15,13 @@ class SelectorProvidable[A, S](selector: SQLiteDatabase => S)
 
   override def createFrom(db: SQLiteDatabase) = selector(db)
 }
+
+object SelectorProvidable {
+  object Implicits {
+    implicit class SelectorProvidableDatabase(val db: SQLiteDatabase) extends AnyVal {
+      def selectorOf[A](implicit x: CanProvideSelector[A]): x.Selector = {
+        x createFrom db
+      }
+    }
+  }
+}

@@ -11,5 +11,6 @@ class DefaultProvidable[I[T] <: CanIdentify[T], A]
 class DefaultSelector[I[T] <: CanIdentify[T], A](val db: SQLiteDatabase)
   extends Find[A]
     with FindBy[I, A]
+    with TraverseAll[A]
     with TraverseOn[I, A]
     with CollectFrom[I, A]

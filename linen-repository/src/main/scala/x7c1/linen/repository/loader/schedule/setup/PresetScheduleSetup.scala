@@ -5,7 +5,7 @@ import x7c1.linen.database.struct.AccountIdentifiable
 
 class PresetScheduleSetup private (helper: DatabaseHelper){
 
-  def setupPresetSchedule[A: AccountIdentifiable](account: A) = {
+  def setupFor[A: AccountIdentifiable](account: A) = {
     /*
     def create() = for {
       kind <- findKindOfAllChannels
