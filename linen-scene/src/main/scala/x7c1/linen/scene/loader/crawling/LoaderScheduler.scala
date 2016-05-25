@@ -2,7 +2,7 @@ package x7c1.linen.scene.loader.crawling
 
 import android.content.{Context, Intent}
 import android.net.Uri
-import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.database.struct.LoaderScheduleLike
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.schedule.PresetLoaderSchedule
 import x7c1.wheat.calendar.CalendarDate
@@ -31,9 +31,8 @@ class LoaderScheduler[A: AccountIdentifiable] private (
     }
   }
   private def createIntent(schedule: PresetLoaderSchedule): Intent = {
-    val accountId = implicitly[AccountIdentifiable[A]] toId account
     val intent = SchedulerService(context) buildIntent from {
-      _.loadFromSchedule(schedule.scheduleId, accountId)
+      _.loadFromSchedule(schedule.scheduleId)
     }
     intent setData Uri.parse(
       s"linen://loader.schedule/setup/${schedule.accountId}/${schedule.scheduleId}"
@@ -44,12 +43,9 @@ class LoaderScheduler[A: AccountIdentifiable] private (
 }
 
 object LoaderScheduler {
-  def apply[A: AccountIdentifiable]
-    (context: Context with ServiceControl, account: A): LoaderScheduler[A] = {
-
+  def apply(context: Context with ServiceControl): LoaderScheduler = {
     new LoaderScheduler(
-      context = context,
-      account: A
+      context = context
     )
   }
 }

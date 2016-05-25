@@ -2,7 +2,7 @@ package x7c1.linen.scene.loader.crawling
 
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleLike}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.wheat.macros.logger.Log

@@ -3,19 +3,8 @@ package x7c1.linen.repository.loader.schedule.setup
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.AccountIdentifiable
 
-class PresetScheduleSetup (helper: DatabaseHelper){
+class PresetScheduleSetup private (helper: DatabaseHelper){
 
-  def findOrCreate[A: AccountIdentifiable](account: A) = {
-
-    /*
-    helper.selectorOf[PresetLoaderSchedule] findBy account matches {
-      case Right(None) => initPresetSchedule(account)
-      case Right(Some(schedule)) => Right(???)
-      case Left(e) => Left(e)
-    }
-    */
-
-  }
   def setupPresetSchedule[A: AccountIdentifiable](account: A) = {
     /*
     def create() = for {
@@ -75,4 +64,8 @@ class PresetScheduleSetup (helper: DatabaseHelper){
     }
   }
   */
+}
+
+object PresetScheduleSetup {
+  def apply(helper: DatabaseHelper): PresetScheduleSetup = new PresetScheduleSetup(helper)
 }

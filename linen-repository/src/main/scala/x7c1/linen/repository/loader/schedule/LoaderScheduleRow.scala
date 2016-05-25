@@ -3,6 +3,7 @@ package x7c1.linen.repository.loader.schedule
 import android.database.sqlite.SQLiteDatabase
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.database.selector.CanProvideSelector
+import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
 
 sealed trait LoaderScheduleRow
@@ -25,6 +26,7 @@ object LoaderSchedule {
     override type Selector = ScheduleSelector
     override def createFrom(db: SQLiteDatabase) = new ScheduleSelector(db)
   }
+  implicit object short extends HasShortLength[LoaderSchedule]
 }
 
 case class PresetLoaderSchedule(
