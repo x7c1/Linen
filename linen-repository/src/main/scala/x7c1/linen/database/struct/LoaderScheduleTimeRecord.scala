@@ -6,14 +6,11 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, Query}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
+import x7c1.wheat.modern.database.{Insertable, Query}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 trait LoaderScheduleTimeRecord extends TypedFields {
   def schedule_time_id: Long
@@ -66,12 +63,7 @@ object LoaderScheduleTimeRecord {
     implicit object short extends HasShortLength[LoaderScheduleTimeRecord]
 
     def groupByScheduleId: Map[Long, Seq[LoaderScheduleTimeRecord]] = {
-      val map = mutable.Map[Long, ListBuffer[LoaderScheduleTimeRecord]]()
-      xs.toSeq.foreach { time =>
-        val buffer = map.getOrElseUpdate(time.schedule_id, ListBuffer())
-        buffer += time
-      }
-      map.toMap
+      xs.toSeq.groupBy(_.schedule_id)
     }
   }
   class Selector(protected val db: SQLiteDatabase)
