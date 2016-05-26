@@ -38,10 +38,12 @@ object LoaderScheduleTimeRecord {
   implicit object traverseOn extends CanTraverseRecord[AccountIdentifiable, LoaderScheduleTimeRecord]{
     override def query[X: AccountIdentifiable](target: X) = {
       val sql =
-        """SELECT * FROM loader_schedule_times as t1
-          | LEFT JOIN loader_schedules as t2 ON t1.schedule_id = t2.schedule_id
+        """SELECT *
+          | FROM loader_schedule_times AS t1
+          | LEFT JOIN loader_schedules AS t2
+          |  ON t1.schedule_id = t2.schedule_id
           | WHERE t2.account_id = ?
-          | """.stripMargin
+          |""".stripMargin
 
       val accountId = implicitly[AccountIdentifiable[X]] toId target
       Query(sql, Array(accountId.toString))

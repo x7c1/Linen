@@ -13,5 +13,9 @@ case class KindNotFound(kind: LoaderScheduleKind) extends PresetScheduleSetupErr
 }
 
 case class SqlError(e: SQLException) extends PresetScheduleSetupError {
-  override def message = format(e){"[failed]"}
+  override def message =
+    Seq(
+      format(e){"[unexpected]"},
+      format(e.getCause){"[cause]"}
+    ) mkString "\n"
 }

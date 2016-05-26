@@ -11,6 +11,8 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 class PresetScheduleSetup private (helper: DatabaseHelper){
 
   def setupFor[A: AccountIdentifiable](account: A) = {
+    Log info s"[init] $account"
+
     def create() = for {
       kind <- findPresetKind.right
       scheduleId <- insertSchedule(account, kind).right
@@ -21,10 +23,11 @@ class PresetScheduleSetup private (helper: DatabaseHelper){
     findPresetSchedule(account) matches {
       case Right(Some(x)) => //nop, already created
       case Right(None) => create() match {
-        case Left(error) => Log error error.message
+        case Left(error) => Log error s"[create-failed] ${error.message}"
         case Right(scheduleId) => Log info s"schedule(id:$scheduleId) created"
       }
-      case Left(e) => Log error format(e){"[failed]"}
+      case Left(e) =>
+        Log error format(e){"[failed]"}
     }
   }
   private def findPresetSchedule[A: AccountIdentifiable](account: A) = {

@@ -66,15 +66,12 @@ class PresetLoaderScheduleTest extends JUnitSuiteLike {
     enabled = true,
     startRanges = Sequence from Seq(
       TimeRange(
-        startTimeId = 222,
         ScheduleTime(Hour(5), Minute(0))
       ),
       TimeRange(
-        startTimeId = 333,
         ScheduleTime(Hour(13), Minute(0))
       ),
       TimeRange(
-        startTimeId = 444,
         ScheduleTime(Hour(21), Minute(0))
       )
     )

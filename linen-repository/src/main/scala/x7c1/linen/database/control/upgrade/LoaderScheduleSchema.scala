@@ -21,7 +21,7 @@ object LoaderScheduleSchema {
       |schedule_kind_id INTEGER NOT NULL,
       |enabled INTEGER NOT NULL,
       |created_at INTEGER NOT NULL,
-      |FOREIGN KEY(schedule_kind_id) REFERENCES loder_schedule_kinds(schedule_kind_id) ON DELETE CASCADE,
+      |FOREIGN KEY(schedule_kind_id) REFERENCES loader_schedule_kinds(schedule_kind_id) ON DELETE CASCADE,
       |FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
       |)""".stripMargin,
 
