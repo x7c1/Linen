@@ -1,5 +1,7 @@
 package x7c1.linen.database.control
 
+import x7c1.linen.database.control.upgrade.LoaderScheduleSchema
+
 object LinenDatabase {
 
   val name: String = "linen-db"
@@ -183,6 +185,7 @@ object LinenDatabase {
     Upgrade(20160418)(
       "ALTER TABLE entries ADD COLUMN author TEXT NOT NULL DEFAULT ''"
     )
+    ,Upgrade(20160524)(LoaderScheduleSchema.init:_*)
   )
 }
 
