@@ -40,7 +40,7 @@ class LoaderSchedulesDelegatee (
     helper.close()
   }
   def setupFor(accountId: Long): Unit = {
-    helper.selectorOf[LoaderScheduleRow] collectBy accountId match {
+    helper.selectorOf[LoaderScheduleRow] traverseOn accountId match {
       case Right(schedules) =>
         val adapter = createAdapter(accountId, schedules)
         layout.schedules setLayoutManager new LinearLayoutManager(activity)

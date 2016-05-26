@@ -2,8 +2,9 @@ package x7c1.linen.repository.loader.schedule
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
+import x7c1.linen.repository.loader.schedule.selector.{PresetScheduleSelector, ScheduleRowSelector, ScheduleSelector}
 import x7c1.wheat.calendar.CalendarDate
-import x7c1.wheat.modern.database.selector.CanProvideSelector
+import x7c1.wheat.modern.database.selector.{CanProvideSelector, SelectorProvidable}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
 
@@ -69,6 +70,11 @@ object PresetLoaderSchedule {
       startRanges = ranges
     )
   }
+  implicit object providable
+    extends SelectorProvidable[PresetLoaderSchedule, PresetScheduleSelector](
+      new PresetScheduleSelector(_)
+    )
+
 }
 
 case class ChannelLoaderSchedule(
