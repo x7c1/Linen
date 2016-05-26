@@ -1,11 +1,12 @@
 package x7c1.linen.database.struct
 
+import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.{Insertable, Query}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 import x7c1.wheat.modern.features.HasShortLength
@@ -26,7 +27,7 @@ object LoaderScheduleTimeRecord {
 
   def table = "loader_schedule_times"
 
-  def columns = TypedFields.expose[LoaderScheduleTimeRecord]
+  def column = TypedFields.expose[LoaderScheduleTimeRecord]
 
   implicit object reifiable extends RecordReifiable[LoaderScheduleTimeRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleTimeRecord](cursor)
@@ -53,7 +54,7 @@ object LoaderScheduleTimeRecord {
     extends CanCollectRecord.Where[LoaderScheduleLike, LoaderScheduleTimeRecord](table){
 
     override def where[X](id: Long) = toArgs(
-      columns.schedule_id -> id
+      column.schedule_id -> id
     )
   }
   implicit object scheduleId extends LoaderScheduleLike[LoaderScheduleTimeRecord]{
@@ -75,4 +76,25 @@ object LoaderScheduleTimeRecord {
     extends CollectFrom[LoaderScheduleLike, LoaderScheduleTimeRecord]
       with TraverseAll[LoaderScheduleTimeRecord]
       with TraverseOn[AccountIdentifiable, LoaderScheduleTimeRecord]
+}
+
+case class ScheduleTimeParts(
+  scheduleId: Long,
+  startHour: Int,
+  startMinute: Int,
+  createdAt: Date
+)
+
+object ScheduleTimeParts {
+  import LoaderScheduleTimeRecord.column
+  implicit object insertable extends Insertable[ScheduleTimeParts]{
+    override def tableName: String = LoaderScheduleTimeRecord.table
+    override def toContentValues(target: ScheduleTimeParts): ContentValues =
+      TypedFields.toContentValues(
+        column.schedule_id -> target.scheduleId,
+        column.start_hour -> target.startHour,
+        column.start_minute -> target.startMinute,
+        column.created_at -> target.createdAt
+      )
+  }
 }

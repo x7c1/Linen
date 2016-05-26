@@ -1,9 +1,10 @@
 package x7c1.linen.database.struct
 
+import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.modern.database.{Insertable, Query}
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseRecordByQuery, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 
@@ -12,6 +13,7 @@ trait LoaderScheduleRecord extends TypedFields {
   def account_id: Long
   def schedule_kind_id: Long
   def enabled: Int
+  def created_at: Int --> Date
 }
 
 object LoaderScheduleRecord {
@@ -32,22 +34,31 @@ object LoaderScheduleRecord {
     )
 }
 
+case class LoaderScheduleParts(
+  accountId: Long,
+  kindId: Long,
+  enabled: Boolean,
+  createdAt: Date
+)
+
+object LoaderScheduleParts {
+  import LoaderScheduleRecord.column
+
+  implicit object insertable extends Insertable[LoaderScheduleParts]{
+    override def tableName: String = LoaderScheduleRecord.table
+    override def toContentValues(target: LoaderScheduleParts): ContentValues = {
+      TypedFields.toContentValues(
+        column.account_id -> target.accountId,
+        column.schedule_kind_id -> target.kindId,
+        column.enabled -> (if (target.enabled) 1 else 0),
+        column.created_at -> target.createdAt
+      )
+    }
+  }
+}
+
 trait LoaderScheduleLike[A] extends Identifiable[A, Long]
 
 object LoaderScheduleLike {
   implicit object id extends LoaderScheduleLike[Long] with IdEndo[Long]
-}
-
-trait LoaderScheduleKindRecord extends TypedFields {
-  def schedule_kind_id: Long
-  def schedule_kind_label: String
-  def created_at: Int --> Date
-}
-
-sealed class LoaderScheduleKind private (val label: String)
-
-object LoaderScheduleKind {
-  case object AllChannels extends LoaderScheduleKind("all_channels")
-  case object SingleChannel extends LoaderScheduleKind("single_channel")
-  case object SingleSource extends LoaderScheduleKind("single_source")
 }
