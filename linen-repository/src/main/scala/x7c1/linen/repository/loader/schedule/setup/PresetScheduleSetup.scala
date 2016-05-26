@@ -49,27 +49,16 @@ class PresetScheduleSetup private (helper: DatabaseHelper){
   private def insertTimes[A: LoaderScheduleLike](schedule: A) = {
     val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
     val current = Date.current()
-    val timePartsList = Seq(
+    val defaultHours = Seq(5, 13, 21)
+
+    defaultHours map { hour =>
       ScheduleTimeParts(
         scheduleId = scheduleId,
-        startHour = 5,
-        startMinute = 0,
-        createdAt = current
-      ),
-      ScheduleTimeParts(
-        scheduleId = scheduleId,
-        startHour = 13,
-        startMinute = 0,
-        createdAt = current
-      ),
-      ScheduleTimeParts(
-        scheduleId = scheduleId,
-        startHour = 21,
+        startHour = hour,
         startMinute = 0,
         createdAt = current
       )
-    )
-    timePartsList map { parts =>
+    } map { parts =>
       helper.writable insert parts
     } collect {
       case Left(e) => Log error format(e){"[failed]"}
