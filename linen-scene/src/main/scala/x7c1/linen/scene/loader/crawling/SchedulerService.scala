@@ -56,16 +56,6 @@ private class SchedulerServiceImpl(
       case Left(e) =>
         Log error format(e){"[failed]"}
     }
-
-    /*
-    Log error s"[init] account:$accountId"
-
-    helper.selectorOf[LoaderSchedule] findPresetSchedule accountId matches {
-      case Right(Some(schedule)) => LoaderScheduler(service, accountId) createOrUpdate schedule
-      case Right(None) => Log error s"preset schedule not found"
-      case Left(e) => Log error format(e){"[failed]"}
-    }
-    */
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}
   }
@@ -77,15 +67,6 @@ private class SchedulerServiceImpl(
 
     SubscribedChannelsLoader(service, helper) loadFromSchedule scheduleId
 
-    /*
-    Log info s"schedule:$scheduleId, account:$accountId"
-
-    /* setup schedule again for next call */
-//    setupAllSchedules(accountId)
-    scheduleLoader(scheduleId)
-
-    SubscribedChannelsLoader(service, helper).execute(accountId)
-    */
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}
   }
