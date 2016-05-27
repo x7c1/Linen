@@ -28,7 +28,7 @@ class ScheduleRowAdapter(
           AdapterDelegatee.create(providers, Sequence from schedule.startRanges)
         )
         holder.menu onClick { _ =>
-          onMenuSelected(PresetScheduleSelected(holder.menu))
+          onMenuSelected(ScheduleSelected(schedule.scheduleId, holder.menu))
         }
       case (holder: SettingScheduleRowItem, schedule: LoaderSchedule) =>
         holder.name.text = schedule.name

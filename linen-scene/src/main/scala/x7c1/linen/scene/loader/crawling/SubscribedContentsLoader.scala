@@ -16,7 +16,7 @@ class SubscribedContentsLoader private (
   def loadFromSchedule[A: LoaderScheduleLike](schedule: A): Unit = {
     helper.selectorOf[LoaderSchedule] findBy schedule matches {
       case Right(Some(x: PresetLoaderSchedule)) =>
-        execute(x.accountId)
+        loadSubscribedChannels(x.accountId)
       case Right(Some(x)) =>
         val id = implicitly[LoaderScheduleLike[A]] toId schedule
         Log error s"not implemented yet (id:$id, name:${x.name})"
@@ -27,7 +27,7 @@ class SubscribedContentsLoader private (
         Log error format(e){"[failed]"}
     }
   }
-  def execute[A: AccountIdentifiable](account: A): Unit = {
+  private def loadSubscribedChannels[A: AccountIdentifiable](account: A): Unit = {
     Log info s"[init]"
 
     val accountId = implicitly[AccountIdentifiable[A]] toId account
