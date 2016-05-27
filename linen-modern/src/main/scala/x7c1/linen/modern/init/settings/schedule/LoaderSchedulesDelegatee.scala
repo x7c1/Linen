@@ -65,7 +65,7 @@ class LoaderSchedulesDelegatee (
     (account: A)(event: ScheduleSelected) = {
 
     val loadNow = PopupMenuItem("Load now"){ _ =>
-      SubscribedChannelsLoader(activity, helper) execute account
+      SubscribedContentsLoader(activity, helper) execute account
     }
     val items = Seq(
       loadNow

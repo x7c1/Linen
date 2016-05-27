@@ -65,7 +65,7 @@ private class SchedulerServiceImpl(
     /* setup schedule again for next call */
     scheduleNextLoader(scheduleId)
 
-    SubscribedChannelsLoader(service, helper) loadFromSchedule scheduleId
+    SubscribedContentsLoader(service, helper) loadFromSchedule scheduleId
 
   } onFailure {
     case e => Log error format(e){"[abort] (unexpected)"}

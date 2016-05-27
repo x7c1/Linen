@@ -9,7 +9,7 @@ import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedu
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-class SubscribedChannelsLoader private (
+class SubscribedContentsLoader private (
   context: Context with ServiceControl,
   helper: DatabaseHelper ){
 
@@ -44,11 +44,11 @@ class SubscribedChannelsLoader private (
   }
 }
 
-object SubscribedChannelsLoader {
+object SubscribedContentsLoader {
   def apply(
     context: Context with ServiceControl,
-    helper: DatabaseHelper): SubscribedChannelsLoader = {
+    helper: DatabaseHelper): SubscribedContentsLoader = {
 
-    new SubscribedChannelsLoader(context, helper)
+    new SubscribedContentsLoader(context, helper)
   }
 }

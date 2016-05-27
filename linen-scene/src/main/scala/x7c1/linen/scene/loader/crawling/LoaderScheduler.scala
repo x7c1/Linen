@@ -19,26 +19,43 @@ class LoaderScheduler private (
   import concurrent.duration._
 
   def setupNextLoader[A: LoaderScheduleLike](schedule: A): Unit = {
+    find(schedule) foreach { existent =>
+      createOrUpdate(existent)
+    }
+  }
+  private def find[A: LoaderScheduleLike](schedule: A) = {
     helper.selectorOf[LoaderSchedule] findBy schedule matches {
-      case Right(Some(x)) => createOrUpdate(x)
+      case Right(Some(existent)) =>
+        Some(existent)
       case Right(None) =>
         val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
-        Log error s"schedule not found (schedule-id:$scheduleId)"
+        Log error s"schedule not found (id:$scheduleId)"
+        None
       case Left(e) =>
-        Log error format(e){"[failed]"}
+        Log error format(e.getCause){"[failed]"}
+        None
     }
+  }
+  private def createAlarmOf(schedule: LoaderSchedule) = {
+    WindowAlarm(
+      context = context,
+      intent = createIntent(schedule)
+    )
   }
   private def createOrUpdate(schedule: LoaderSchedule) = {
     Log info s"[init] $schedule"
 
     schedule nextStartAfter CalendarDate.now() match {
       case Some(start) =>
-        WindowAlarm(
-          context = context,
+        createAlarmOf(schedule) triggerInTime (
           window = 1.hour,
-//          window = 10.seconds,
-          start = start
-        ) perform createIntent(schedule)
+          startMilliSeconds = start.toMilliseconds
+
+          /* debug
+          window = 10.seconds,
+          startMilliSeconds = (CalendarDate.now() + 10.seconds).toMilliseconds
+          // */
+        )
       case None =>
         Log warn s"time not found: (schedule:${schedule.scheduleId})"
     }
