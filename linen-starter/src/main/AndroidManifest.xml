@@ -14,7 +14,8 @@
         <activity
             android:name=".unread.UnreadItemsActivity"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,21 +25,34 @@
 
         <activity
             android:name=".settings.MyChannelsActivity"
-            >
-        </activity>
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            />
+
+            <activity
+                android:name=".settings.MyChannelSourcesActivity"
+                android:parentActivityName=".settings.MyChannelsActivity"
+                />
 
         <activity
-            android:name=".settings.MyChannelSourcesActivity"
-            >
-        </activity>
+            android:name=".settings.PresetChannelsActivity"
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            />
 
-        <activity android:name=".settings.PresetChannelsActivity" />
-        <activity android:name=".settings.PresetChannelSourcesActivity" />
-        <activity android:name=".settings.LoaderSchedulesActivity" />
+            <activity
+                android:name=".settings.PresetChannelSourcesActivity"
+                android:parentActivityName=".settings.PresetChannelsActivity"
+                />
+
+        <activity
+            android:name=".settings.LoaderSchedulesActivity"
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            />
 
         <activity
             android:name=".dev.CreateRecordsActivity"
-            android:label="create dummies">
+            android:label="create dummies"
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            >
         </activity>
 
         <service
