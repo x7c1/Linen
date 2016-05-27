@@ -3,8 +3,9 @@ package x7c1.linen.database.struct
 import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
+import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, Query}
+import x7c1.wheat.modern.database.{Insertable, Query, Updatable}
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseRecordByQuery, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 
@@ -52,6 +53,21 @@ object LoaderScheduleParts {
         column.schedule_kind_id -> target.kindId,
         column.enabled -> (if (target.enabled) 1 else 0),
         column.created_at -> target.createdAt
+      )
+    }
+  }
+  case class ToChangeState(
+    scheduleId: Long,
+    enabled: Boolean
+  )
+  object ToChangeState {
+    implicit object updatable extends Updatable[ToChangeState]{
+      override def tableName = LoaderScheduleRecord.table
+      override def toContentValues(target: ToChangeState) = TypedFields toContentValues (
+        column.enabled -> (if (target.enabled) 1 else 0)
+      )
+      override def where(target: ToChangeState) = toArgs(
+        column.schedule_id -> target.scheduleId
       )
     }
   }

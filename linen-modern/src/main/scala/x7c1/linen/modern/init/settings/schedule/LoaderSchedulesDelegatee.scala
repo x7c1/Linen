@@ -8,7 +8,7 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingScheduleLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.schedule.LoaderScheduleRow
-import x7c1.linen.scene.loader.crawling.SubscribedChannelsLoader
+import x7c1.linen.scene.loader.crawling.SubscribedContentsLoader
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
@@ -58,7 +58,8 @@ class LoaderSchedulesDelegatee (
         sequence = schedules
       ),
       providers = timeRowProviders,
-      onMenuSelected = showMenu(account)
+      onMenuSelected = showMenu(account),
+      onStateChanged = new OnScheduleStateChanged(activity, helper).onStateChanged
     )
   }
   private def showMenu[A: AccountIdentifiable]

@@ -19,9 +19,22 @@ class LoaderScheduler private (
   import concurrent.duration._
 
   def setupNextLoader[A: LoaderScheduleLike](schedule: A): Unit = {
-    find(schedule) foreach { existent =>
-      createOrUpdate(existent)
+    val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+    find(schedule) foreach {
+      case existent if existent.enabled =>
+        createOrUpdate(existent)
+        Log info s"[done] schedule updated: (id:$scheduleId)"
+      case existent =>
+        createAlarmOf(existent).cancel()
+        Log info s"[done] schedule canceled: (id:$scheduleId)"
     }
+  }
+  def cancelSchedule[A: LoaderScheduleLike](schedule: A): Unit = {
+    find(schedule) foreach { existent =>
+      createAlarmOf(existent).cancel()
+    }
+    val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+    Log info s"[done] schedule canceled: (id:$scheduleId)"
   }
   private def find[A: LoaderScheduleLike](schedule: A) = {
     helper.selectorOf[LoaderSchedule] findBy schedule matches {
@@ -65,7 +78,7 @@ class LoaderScheduler private (
       _.loadFromSchedule(schedule.scheduleId)
     }
     intent setData Uri.parse(
-      s"linen://loader.schedule/setup/${schedule.accountId}/${schedule.scheduleId}"
+      s"linen://loader.schedule/setup/${schedule.scheduleId}"
     )
     intent
   }

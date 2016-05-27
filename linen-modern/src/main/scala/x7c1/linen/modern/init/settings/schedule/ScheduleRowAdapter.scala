@@ -11,7 +11,8 @@ import x7c1.wheat.modern.sequence.Sequence
 class ScheduleRowAdapter(
   delegatee: AdapterDelegatee[SettingScheduleRow, LoaderScheduleRow],
   providers: ScheduleTimeRowProviders,
-  onMenuSelected: ScheduleSelected => Unit
+  onMenuSelected: ScheduleSelected => Unit,
+  onStateChanged: ScheduleStateChanged => Unit
 ) extends BaseAdapter(delegatee){
 
   override def onBindViewHolder(holder: SettingScheduleRow, position: Int) = {
@@ -19,6 +20,9 @@ class ScheduleRowAdapter(
       case (holder: SettingScheduleRowItem, schedule: PresetLoaderSchedule) =>
         holder.name.text = schedule.name
         holder.enabled.checked = schedule.enabled
+        holder.enabled onCheckedChanged { event =>
+          onStateChanged(ScheduleStateChanged(schedule.scheduleId, event.isChecked))
+        }
         holder.timeRanges setLayoutManager new LinearLayoutManager(holder.itemView.context)
         holder.timeRanges setAdapter new ScheduleTimeRowAdapter(
           AdapterDelegatee.create(providers, Sequence from schedule.startRanges)
@@ -37,6 +41,11 @@ class ScheduleRowAdapter(
     AdapterDelegatee.create(providers, Sequence.from[TimeRange](Seq()))
   )
 }
+
+case class ScheduleStateChanged(
+  scheduleId: Long,
+  enabled: Boolean
+)
 
 class ScheduleTimeRowAdapter(
   delegatee: AdapterDelegatee[SettingScheduleTimeRow, TimeRange]
