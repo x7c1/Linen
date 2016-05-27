@@ -5,8 +5,6 @@ import java.util.Calendar
 import x7c1.linen.database.struct.LoaderScheduleTimeRecord
 import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
 import x7c1.wheat.calendar.CalendarDate
-import x7c1.wheat.modern.features.HasShortLength
-import x7c1.wheat.modern.sequence.Sequence
 
 case class ScheduleTime(
   hour: Hour,
@@ -48,6 +46,13 @@ object ScheduleTime {
   case class Hour(value: Int)
 
   case class Minute(value: Int)
+
+  def fromRecord(record: LoaderScheduleTimeRecord): ScheduleTime = {
+    ScheduleTime(
+      Hour(record.start_hour),
+      Minute(record.start_minute)
+    )
+  }
 }
 
 case class TimeRange(from: ScheduleTime){
@@ -57,18 +62,4 @@ case class TimeRange(from: ScheduleTime){
   def format: String = {
     s"${from.format} - ${to.format}"
   }
-}
-
-object TimeRange {
-  implicit object short extends HasShortLength[TimeRange]
-
-  def fromTimeRecords(times: Seq[LoaderScheduleTimeRecord]) =
-    Sequence from times.map { time =>
-      TimeRange(
-        ScheduleTime(
-          Hour(time.start_hour),
-          Minute(time.start_minute)
-        )
-      )
-    }
 }

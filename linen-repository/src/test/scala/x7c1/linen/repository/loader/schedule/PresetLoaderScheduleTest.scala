@@ -11,7 +11,6 @@ import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.loader.schedule.ScheduleTime.{Hour, Minute}
 import x7c1.wheat.calendar.CalendarDate
-import x7c1.wheat.modern.sequence.Sequence
 
 
 @Config(manifest=Config.NONE)
@@ -54,7 +53,7 @@ class PresetLoaderScheduleTest extends JUnitSuiteLike {
     })
 
     val emptySchedule = schedule.copy(
-      startRanges = Sequence from Seq()
+      times = Seq()
     )
     assertEquals(None, emptySchedule nextStartAfter current)
   }
@@ -64,16 +63,10 @@ class PresetLoaderScheduleTest extends JUnitSuiteLike {
     accountId = accountId,
     name = "Load channels at..",
     enabled = true,
-    startRanges = Sequence from Seq(
-      TimeRange(
-        ScheduleTime(Hour(5), Minute(0))
-      ),
-      TimeRange(
-        ScheduleTime(Hour(13), Minute(0))
-      ),
-      TimeRange(
-        ScheduleTime(Hour(21), Minute(0))
-      )
+    times = Seq(
+      ScheduleTime(Hour(5), Minute(0)),
+      ScheduleTime(Hour(13), Minute(0)),
+      ScheduleTime(Hour(21), Minute(0))
     )
   )
 }

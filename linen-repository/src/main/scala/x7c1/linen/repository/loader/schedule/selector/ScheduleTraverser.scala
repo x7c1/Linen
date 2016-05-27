@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
 import x7c1.linen.database.struct.LoaderScheduleKind.AllChannels
 import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleTimeRecord}
-import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, TimeRange}
+import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, ScheduleTime}
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
 import x7c1.wheat.modern.database.selector.presets.ClosableSequence
 
@@ -48,7 +48,10 @@ trait ScheduleTraverser {
 
       private val toSchedule = PartialFunction[LoaderScheduleWithKind, LoaderSchedule]{
         case record if record.schedule_kind_label == AllChannels.label =>
-          PresetLoaderSchedule(record, TimeRange fromTimeRecords timesMap(record.schedule_id))
+          PresetLoaderSchedule(
+            record,
+            timesMap(record.schedule_id) map ScheduleTime.fromRecord
+          )
       }
     }
 

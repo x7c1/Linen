@@ -4,7 +4,7 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
 import x7c1.linen.database.struct.{LoaderScheduleLike, LoaderScheduleTimeRecord}
-import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, TimeRange}
+import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, ScheduleTime}
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
 import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.either.OptionEither
@@ -67,7 +67,7 @@ trait ScheduleFinder {
       times <- db.selectorOf[LoaderScheduleTimeRecord].collectFrom(schedule).toOptionEither
     } yield PresetLoaderSchedule(
       record = schedule,
-      ranges = TimeRange fromTimeRecords times
+      times = times map ScheduleTime.fromRecord
     )
   }
 

@@ -6,7 +6,6 @@ import x7c1.linen.repository.loader.schedule.selector.{PresetScheduleSelector, S
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.database.selector.{CanProvideSelector, SelectorProvidable}
 import x7c1.wheat.modern.features.HasShortLength
-import x7c1.wheat.modern.sequence.Sequence
 
 sealed trait LoaderScheduleRow
 
@@ -38,12 +37,14 @@ case class PresetLoaderSchedule(
   accountId: Long,
   name: String,
   enabled: Boolean,
-  startRanges: Sequence[TimeRange]) extends LoaderSchedule {
+  private val times: Seq[ScheduleTime]) extends LoaderSchedule {
 
   import concurrent.duration._
 
+  val startRanges: Seq[TimeRange] = times map TimeRange.apply
+
   private def calendarsOn(base: CalendarDate): Seq[CalendarDate] = {
-    startRanges.toSeq.map(_.from toCalendarDate base)
+    startRanges.map(_.from toCalendarDate base)
   }
   override def nextStartAfter(current: CalendarDate): Option[CalendarDate] = {
     val tomorrow = current + 1.day
@@ -60,14 +61,14 @@ case class PresetLoaderSchedule(
 object PresetLoaderSchedule {
   def apply(
     record: LoaderScheduleWithKind,
-    ranges: Sequence[TimeRange]): PresetLoaderSchedule = {
+    times: Seq[ScheduleTime]): PresetLoaderSchedule = {
 
     PresetLoaderSchedule(
       scheduleId = record.schedule_id,
       accountId = record.account_id,
       name = "Load channels at..",
       enabled = record.enabled == 1,
-      startRanges = ranges
+      times = times
     )
   }
   implicit object providable

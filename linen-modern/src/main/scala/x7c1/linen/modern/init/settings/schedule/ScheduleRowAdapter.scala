@@ -21,7 +21,7 @@ class ScheduleRowAdapter(
         holder.enabled.checked = schedule.enabled
         holder.timeRanges setLayoutManager new LinearLayoutManager(holder.itemView.context)
         holder.timeRanges setAdapter new ScheduleTimeRowAdapter(
-          AdapterDelegatee.create(providers, schedule.startRanges)
+          AdapterDelegatee.create(providers, Sequence from schedule.startRanges)
         )
         holder.menu onClick { _ =>
           onMenuSelected(PresetScheduleSelected(holder.menu))
