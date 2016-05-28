@@ -31,6 +31,18 @@ sealed abstract class OptionEither[+L, +A] {
   }
 }
 
+object OptionEither {
+  implicit class DecoratorForNestedOption[+A, +B](
+    val underlying: OptionEither[A, Option[B]]) extends AnyVal {
+
+    def flatten: OptionEither[A, B] = underlying match {
+      case OptionRight(Some(Some(b))) => OptionRight(b)
+      case OptionRight(_) => OptionRight(None)
+      case OptionLeft(a) => OptionLeft(a)
+    }
+  }
+}
+
 final case class OptionProjection[+L, +A](either: OptionEither[L, A]){
 
   def map[B](f: Option[A] => B): OptionEither[L, B] =
