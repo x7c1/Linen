@@ -8,8 +8,8 @@ import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.TraceableQueue
-import x7c1.linen.repository.loader.crawling.SourceInspector
-import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
+import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
+import x7c1.linen.repository.loader.crawling.{ChannelLoaderQueueing, SourceInspector}
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.either.OptionRight
@@ -63,51 +63,23 @@ private class QueueingServiceImpl(
   override def loadChannelSources(channelId: Long, accountId: Long) = Future {
     Log info s"[init] channel:$channelId"
 
-    val factory = new SettingSourceAccessorFactory(helper.getReadableDatabase, accountId)
-    val inspector = SourceInspector(helper)
-    val accessor = factory.create(channelId)
-
-    val settingSources = 0 until accessor.length flatMap accessor.findAt
-
-    val inspectedSources = settingSources map inspector.inspectSource[SettingSource]
-    val targetSources = inspectedSources collect {
-      case Right(sources) => sources
-    }
-    inspectedSources collect {
-      case Left(error) => Log error error.message
-    }
-    val end = targetSources.length
-
     val OptionRight(Some(channel)) = helper.selectorOf[ChannelRecord] findBy channelId
     val notifier = new ChannelNotifier(
       service = service,
-      max = end,
       startTime = Date.current(),
       channelName = channel.name,
       notificationId = startId
     )
-    targetSources.view map
-      queue.enqueueSource foreach onUpdated(notifier, end)
-
+    ChannelLoaderQueueing(helper, queue).start(accountId, channelId){
+      case OnProgress(current, max) =>
+        Log info s"[progress] $current ${channel.name}"
+        notifier.notifyProgress(current, max)
+      case OnDone(max) =>
+        Log info s"[done] $max ${channel.name}"
+        notifier.notifyDone()
+    }
   } onFailure {
     case e => Log error format(e){"[abort]"}
-  }
-  private def onUpdated[A](notifier: ChannelNotifier, end: Int): Future[A] => Unit = {
-    var progress = 0
-
-    _ onComplete { _ =>
-      synchronized {
-        progress = progress + 1
-        Log info s"[progress] $progress"
-        notifier notifyProgress progress
-
-        if (progress == end){
-          Log info s"[done] hoge"
-          notifier.notifyDone()
-          service stopSelf startId
-        }
-      }
-    }
   }
   override def loadSubscribedChannels(accountId: Long) = Future {
     Log info s"[init]"

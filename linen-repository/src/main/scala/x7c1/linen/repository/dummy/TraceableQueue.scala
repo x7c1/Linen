@@ -1,7 +1,8 @@
 package x7c1.linen.repository.dummy
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.repository.loader.crawling.{InspectedSource, SourceLoader, UpdatedSource, SourceDequeueEvent, SourceUpdaterQueue}
+import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
+import x7c1.linen.repository.loader.crawling.{InspectedSource, QueueingEvent, SourceDequeueEvent, SourceLoader, SourceUpdaterQueue, UpdatedSource}
 import x7c1.wheat.macros.logger.Log
 
 import scala.collection.mutable

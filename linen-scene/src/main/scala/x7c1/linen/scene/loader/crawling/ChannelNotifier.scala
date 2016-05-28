@@ -9,13 +9,12 @@ import x7c1.wheat.modern.decorator.Imports._
 
 class ChannelNotifier (
   service: Service with ServiceControl,
-  max: Int,
   startTime: Date,
   channelName: String,
   notificationId: Int ){
 
-  def notifyProgress(current: Int): Unit = {
-    val builder = createBuilder(current)
+  def notifyProgress(current: Int, max: Int): Unit = {
+    val builder = createBuilder(current, max)
     val notification = builder.build()
     service.notificationManager.notify(notificationId, notification)
   }
@@ -26,7 +25,7 @@ class ChannelNotifier (
     val notificationIntent = new Intent(service, service getClassOf ServiceLabel.Updater)
     PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
   }
-  private def createBuilder(current: Int): Builder = {
+  private def createBuilder(current: Int, max: Int): Builder = {
     new Builder(service).
       setWhen {
         /* plus notificationId to identify same startTime */
