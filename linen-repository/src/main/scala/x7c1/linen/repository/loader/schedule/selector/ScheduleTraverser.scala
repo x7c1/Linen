@@ -3,13 +3,12 @@ package x7c1.linen.repository.loader.schedule.selector
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
-import x7c1.linen.database.struct.LoaderScheduleKind.AllChannels
 import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleTimeRecord}
-import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, ScheduleTime}
+import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
 import x7c1.wheat.modern.database.selector.presets.ClosableSequence
 
-trait ScheduleTraverser {
+trait ScheduleTraverser { self: ScheduleSelector =>
   protected def db: SQLiteDatabase
 
   type Traversed = Either[SQLException, ClosableSequence[LoaderSchedule]]
@@ -40,19 +39,13 @@ trait ScheduleTraverser {
         schedules.closeCursor()
       }
       override def findAt(position: Int) = {
-        schedules.findAt(position) collect toSchedule
+        schedules.findAt(position) flatMap { record =>
+          createSchedule(record, timesMap(record.schedule_id))
+        }
       }
       override def length: Int = schedules.length
 
       private val timesMap = times.groupByScheduleId
-
-      private val toSchedule = PartialFunction[LoaderScheduleWithKind, LoaderSchedule]{
-        case record if record.schedule_kind_label == AllChannels.label =>
-          PresetLoaderSchedule(
-            record,
-            timesMap(record.schedule_id) map ScheduleTime.fromRecord
-          )
-      }
     }
 
 }

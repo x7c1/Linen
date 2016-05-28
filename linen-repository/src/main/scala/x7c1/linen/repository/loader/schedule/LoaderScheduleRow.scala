@@ -75,7 +75,6 @@ object PresetLoaderSchedule {
     extends SelectorProvidable[PresetLoaderSchedule, PresetScheduleSelector](
       new PresetScheduleSelector(_)
     )
-
 }
 
 case class ChannelLoaderSchedule(
