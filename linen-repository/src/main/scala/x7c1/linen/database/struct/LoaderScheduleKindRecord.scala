@@ -17,23 +17,23 @@ object LoaderScheduleKindRecord {
   def table = "loader_schedule_kinds"
   def column = TypedFields.expose[LoaderScheduleKindRecord]
 
-  implicit object id extends ScheduleKindIdentifiable[LoaderScheduleKindRecord]{
+  implicit object id extends HasScheduleKindId[LoaderScheduleKindRecord]{
     override def toId = _.schedule_kind_id
   }
   implicit object reifiable extends RecordReifiable[LoaderScheduleKindRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleKindRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[ScheduleKindLabelable, LoaderScheduleKindRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasScheduleKindLabel, LoaderScheduleKindRecord](table){
     override def where[X](id: LoaderScheduleKind) = toArgs(
       column.schedule_kind_label -> id
     )
   }
   implicit object providable extends DefaultProvidable[
-    ScheduleKindLabelable,
+    HasScheduleKindLabel,
     LoaderScheduleKindRecord
   ]
 }
 
-trait ScheduleKindIdentifiable[A] extends Identifiable[A, Long]
+trait HasScheduleKindId[A] extends Identifiable[A, Long]
 
-trait ScheduleKindLabelable[A] extends Identifiable[A, LoaderScheduleKind]
+trait HasScheduleKindLabel[A] extends Identifiable[A, LoaderScheduleKind]

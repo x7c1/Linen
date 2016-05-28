@@ -20,8 +20,8 @@ object LoaderScheduleKind {
   }
   case class UnknownKind(override val label: String) extends LoaderScheduleKind
 
-  implicit def labelable[A <: LoaderScheduleKind]: ScheduleKindLabelable[A] = {
-    new ScheduleKindLabelable[A] with IdEndo[A]
+  implicit def labelable[A <: LoaderScheduleKind]: HasScheduleKindLabel[A] = {
+    new HasScheduleKindLabel[A] with IdEndo[A]
   }
   implicit object convertible extends FieldConvertible[String, LoaderScheduleKind]{
     override def wrap(value: String): LoaderScheduleKind = {

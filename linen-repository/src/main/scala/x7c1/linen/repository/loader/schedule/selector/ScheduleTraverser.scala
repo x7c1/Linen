@@ -3,7 +3,7 @@ package x7c1.linen.repository.loader.schedule.selector
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
-import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleTimeRecord}
+import x7c1.linen.database.struct.{HasAccountId, LoaderScheduleTimeRecord}
 import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
 import x7c1.wheat.modern.database.selector.presets.ClosableSequence
@@ -21,7 +21,7 @@ trait ScheduleTraverser { self: ScheduleSelector =>
       createFrom(times, schedules)
     }
   }
-  def traverseOn[A: AccountIdentifiable](account: A): Traversed = {
+  def traverseOn[A: HasAccountId](account: A): Traversed = {
     for {
       times <- db.selectorOf[LoaderScheduleTimeRecord].traverseOn(account).right
       schedules <- db.selectorOf[LoaderScheduleWithKind].traverseOn(account).right

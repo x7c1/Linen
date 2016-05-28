@@ -1,15 +1,15 @@
 package x7c1.linen.scene.channel.menu
 
 import android.view.View
-import x7c1.linen.database.struct.ChannelIdentifiable
+import x7c1.linen.database.struct.HasChannelId
 import x7c1.linen.repository.channel.my.MyChannel
 import x7c1.linen.repository.channel.preset.SettingPresetChannel
 
-class MenuSelected[A: ChannelIdentifiable] private (
+class MenuSelected[A: HasChannelId] private (
   val targetView: View,
   val channel: A){
 
-  def channelId: Long = implicitly[ChannelIdentifiable[A]] toId channel
+  def channelId: Long = implicitly[HasChannelId[A]] toId channel
 }
 
 object MenuSelected {

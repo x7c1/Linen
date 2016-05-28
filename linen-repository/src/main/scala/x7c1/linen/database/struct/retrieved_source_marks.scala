@@ -13,15 +13,15 @@ object retrieved_source_marks {
   val column = TypedFields.expose[retrieved_source_marks]
 
   implicit object providable
-    extends DefaultProvidable[SourceIdentifiable, retrieved_source_marks]
+    extends DefaultProvidable[HasSourceId, retrieved_source_marks]
 
   implicit object reifiable extends RecordReifiable[retrieved_source_marks]{
     override def reify(cursor: Cursor) = TypedCursor[retrieved_source_marks](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[SourceIdentifiable, retrieved_source_marks](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceId, retrieved_source_marks](table){
     override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
-  implicit object entryId extends EntryIdentifiable[retrieved_source_marks]{
+  implicit object entryId extends HasEntryId[retrieved_source_marks]{
     override def toId = _.latest_entry_id
   }
 }

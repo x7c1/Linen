@@ -23,12 +23,12 @@ object ChannelRecord {
   implicit object reifiable extends RecordReifiable[ChannelRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelRecord](cursor)
   }
-  implicit object findable extends Where[ChannelIdentifiable, ChannelRecord](table){
+  implicit object findable extends Where[HasChannelId, ChannelRecord](table){
     override def where[X](id: Long) = toArgs(
       column._id -> id
     )
   }
-  implicit object fromName extends Where[NamedChannelIdentifiable, ChannelRecord](table){
+  implicit object fromName extends Where[HasNamedChannelKey, ChannelRecord](table){
     override def where[X](key: NamedChannelKey) = toArgs(
       column.account_id -> key.accountId,
       column.name -> key.channelName
@@ -36,19 +36,19 @@ object ChannelRecord {
   }
 }
 
-trait ChannelIdentifiable[A] extends Identifiable[A, Long]
+trait HasChannelId[A] extends Identifiable[A, Long]
 
-object ChannelIdentifiable {
-  implicit object id extends ChannelIdentifiable[Long] with IdEndo[Long]
+object HasChannelId {
+  implicit object id extends HasChannelId[Long] with IdEndo[Long]
 }
-trait NamedChannelIdentifiable[A] extends Identifiable[A, NamedChannelKey]
+trait HasNamedChannelKey[A] extends Identifiable[A, NamedChannelKey]
 
 case class NamedChannelKey(
   accountId: Long,
   channelName: String
 )
 object NamedChannelKey {
-  implicit object id extends NamedChannelIdentifiable[NamedChannelKey]
+  implicit object id extends HasNamedChannelKey[NamedChannelKey]
     with IdEndo[NamedChannelKey]
 }
 

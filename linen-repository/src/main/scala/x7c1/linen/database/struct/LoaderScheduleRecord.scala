@@ -24,7 +24,7 @@ object LoaderScheduleRecord {
   def column = TypedFields.expose[LoaderScheduleRecord]
 
   implicit object providable
-    extends DefaultProvidable[AccountIdentifiable, LoaderScheduleRecord]
+    extends DefaultProvidable[HasAccountId, LoaderScheduleRecord]
 
   implicit object reifiable extends RecordReifiable[LoaderScheduleRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleRecord](cursor)
@@ -73,8 +73,8 @@ object LoaderScheduleParts {
   }
 }
 
-trait LoaderScheduleLike[A] extends Identifiable[A, Long]
+trait HasLoaderScheduleId[A] extends Identifiable[A, Long]
 
-object LoaderScheduleLike {
-  implicit object id extends LoaderScheduleLike[Long] with IdEndo[Long]
+object HasLoaderScheduleId {
+  implicit object id extends HasLoaderScheduleId[Long] with IdEndo[Long]
 }

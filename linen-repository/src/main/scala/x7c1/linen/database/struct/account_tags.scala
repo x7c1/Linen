@@ -24,19 +24,19 @@ object account_tags {
   implicit object reifiable extends RecordReifiable[account_tags]{
     override def reify(cursor: Cursor) = TypedCursor[account_tags](cursor)
   }
-  implicit object labelFindable extends Where[AccountTagLabelable, account_tags](table){
+  implicit object labelFindable extends Where[HasAccountTagLabel, account_tags](table){
     override def where[X](label: AccountTagLabel) = toArgs(column.tag_label -> label.text)
   }
-  implicit object idFindable extends Where[AccountTagIdentifiable, account_tags](table){
+  implicit object idFindable extends Where[HasAccountTagId, account_tags](table){
     override def where[X](id: Long) = toArgs(column.account_tag_id -> id)
   }
   implicit object providable
     extends SelectorProvidable[account_tags, Selector](new Selector(_))
 
   class Selector(val db: SQLiteDatabase)
-    extends FindBy[AccountTagIdentifiable, account_tags]
-      with FindByTag[AccountTagLabelable, account_tags]
+    extends FindBy[HasAccountTagId, account_tags]
+      with FindByTag[HasAccountTagLabel, account_tags]
 }
-trait AccountTagIdentifiable[A] extends Identifiable[A, Long]
+trait HasAccountTagId[A] extends Identifiable[A, Long]
 
-trait AccountTagLabelable[A] extends Identifiable[A, AccountTagLabel]
+trait HasAccountTagLabel[A] extends Identifiable[A, AccountTagLabel]

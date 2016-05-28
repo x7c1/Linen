@@ -1,7 +1,7 @@
 package x7c1.linen.repository.entry.unread
 
 import android.net.Uri
-import x7c1.linen.database.struct.{AccountIdentifiable, SourceIdentifiable, EntryIdentifiable}
+import x7c1.linen.database.struct.{HasAccountId, HasEntryId, HasSourceId}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.action.SiteVisitable
 
@@ -27,18 +27,18 @@ object UnreadEntry {
       override def targetUri(target: A) = Uri parse target.url
     }
 
-  implicit def id[A <: UnreadEntry]: EntryIdentifiable[A] =
-    new EntryIdentifiable[A] {
+  implicit def id[A <: UnreadEntry]: HasEntryId[A] =
+    new HasEntryId[A] {
       override def toId= _.entryId
     }
 
-  implicit def sourceId[A <: UnreadEntry]: SourceIdentifiable[A] =
-    new SourceIdentifiable[A] {
+  implicit def sourceId[A <: UnreadEntry]: HasSourceId[A] =
+    new HasSourceId[A] {
       override def toId = _.sourceId
     }
 
-  implicit def accountId[A <: UnreadEntry]: AccountIdentifiable[A] =
-    new AccountIdentifiable[A] {
+  implicit def accountId[A <: UnreadEntry]: HasAccountId[A] =
+    new HasAccountId[A] {
       override def toId = _.accountId
     }
 }

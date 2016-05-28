@@ -19,20 +19,20 @@ object AccountRecord {
   def table: String = "accounts"
   def column = TypedFields.expose[AccountRecord]
 
-  implicit object providable extends DefaultProvidable[AccountIdentifiable, AccountRecord]
+  implicit object providable extends DefaultProvidable[HasAccountId, AccountRecord]
 
   implicit object reifiable extends RecordReifiable[AccountRecord]{
     override def reify(cursor: Cursor) = TypedCursor[AccountRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[AccountIdentifiable, AccountRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasAccountId, AccountRecord](table){
     override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }
 
-trait AccountIdentifiable[A] extends Identifiable[A, Long]
+trait HasAccountId[A] extends Identifiable[A, Long]
 
-object AccountIdentifiable {
-  implicit object id extends AccountIdentifiable[Long] with IdEndo[Long]
+object HasAccountId {
+  implicit object id extends HasAccountId[Long] with IdEndo[Long]
 }
 
 case class AccountParts(

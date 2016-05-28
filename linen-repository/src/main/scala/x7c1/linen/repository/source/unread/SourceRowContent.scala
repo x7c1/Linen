@@ -1,6 +1,6 @@
 package x7c1.linen.repository.source.unread
 
-import x7c1.linen.database.struct.SourceIdentifiable
+import x7c1.linen.database.struct.HasSourceId
 
 sealed trait SourceRowContent
 
@@ -19,7 +19,7 @@ case class UnreadSource(
 case class SourceFooterContent() extends SourceRowContent
 
 object UnreadSource {
-  implicit object id extends SourceIdentifiable[UnreadSource] {
+  implicit object id extends HasSourceId[UnreadSource] {
     override def toId = _.id
   }
 }

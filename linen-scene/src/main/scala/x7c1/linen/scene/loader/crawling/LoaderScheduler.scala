@@ -3,7 +3,7 @@ package x7c1.linen.scene.loader.crawling
 import android.content.{Context, Intent}
 import android.net.Uri
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.LoaderScheduleLike
+import x7c1.linen.database.struct.HasLoaderScheduleId
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.wheat.calendar.CalendarDate
@@ -18,8 +18,8 @@ class LoaderScheduler private (
 
   import concurrent.duration._
 
-  def setupNextLoader[A: LoaderScheduleLike](schedule: A): Unit = {
-    val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+  def setupNextLoader[A: HasLoaderScheduleId](schedule: A): Unit = {
+    val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
     find(schedule) foreach {
       case existent if existent.enabled =>
         createOrUpdate(existent)
@@ -29,19 +29,19 @@ class LoaderScheduler private (
         Log info s"[done] schedule canceled: (id:$scheduleId)"
     }
   }
-  def cancelSchedule[A: LoaderScheduleLike](schedule: A): Unit = {
+  def cancelSchedule[A: HasLoaderScheduleId](schedule: A): Unit = {
     find(schedule) foreach { existent =>
       createAlarmOf(existent).cancel()
     }
-    val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+    val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
     Log info s"[done] schedule canceled: (id:$scheduleId)"
   }
-  private def find[A: LoaderScheduleLike](schedule: A) = {
+  private def find[A: HasLoaderScheduleId](schedule: A) = {
     helper.selectorOf[LoaderSchedule] findBy schedule matches {
       case Right(Some(existent)) =>
         Some(existent)
       case Right(None) =>
-        val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+        val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
         Log error s"schedule not found (id:$scheduleId)"
         None
       case Left(e) =>

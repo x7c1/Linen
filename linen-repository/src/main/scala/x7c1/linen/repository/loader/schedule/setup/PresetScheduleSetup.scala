@@ -2,7 +2,7 @@ package x7c1.linen.repository.loader.schedule.setup
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.LoaderScheduleKind.AllChannels
-import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleKindRecord, LoaderScheduleLike, LoaderScheduleParts, ScheduleKindIdentifiable, ScheduleTimeParts}
+import x7c1.linen.database.struct.{HasAccountId, HasLoaderScheduleId, HasScheduleKindId, LoaderScheduleKindRecord, LoaderScheduleParts, ScheduleTimeParts}
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.loader.schedule.PresetLoaderSchedule
 import x7c1.wheat.macros.logger.Log
@@ -10,7 +10,7 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class PresetScheduleSetup private (helper: DatabaseHelper){
 
-  def setupFor[A: AccountIdentifiable](account: A) = {
+  def setupFor[A: HasAccountId](account: A) = {
     Log info s"[init] $account"
 
     def create() = for {
@@ -30,7 +30,7 @@ class PresetScheduleSetup private (helper: DatabaseHelper){
         Log error format(e){"[failed]"}
     }
   }
-  private def findPresetSchedule[A: AccountIdentifiable](account: A) = {
+  private def findPresetSchedule[A: HasAccountId](account: A) = {
     helper.selectorOf[PresetLoaderSchedule] findBy account
   }
   private def findPresetKind = {
@@ -40,17 +40,17 @@ class PresetScheduleSetup private (helper: DatabaseHelper){
       case Left(e) => Left(SqlError(e))
     }
   }
-  private def insertSchedule[A: AccountIdentifiable, B: ScheduleKindIdentifiable](account: A, kind: B) = {
+  private def insertSchedule[A: HasAccountId, B: HasScheduleKindId](account: A, kind: B) = {
     val either = helper.writable insert LoaderScheduleParts(
-      accountId = implicitly[AccountIdentifiable[A]] toId account,
-      kindId = implicitly[ScheduleKindIdentifiable[B]] toId kind,
+      accountId = implicitly[HasAccountId[A]] toId account,
+      kindId = implicitly[HasScheduleKindId[B]] toId kind,
       enabled = true,
       createdAt = Date.current()
     )
     either.left.map(SqlError)
   }
-  private def insertTimes[A: LoaderScheduleLike](schedule: A) = {
-    val scheduleId = implicitly[LoaderScheduleLike[A]] toId schedule
+  private def insertTimes[A: HasLoaderScheduleId](schedule: A) = {
+    val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
     val current = Date.current()
     val defaultHours = Seq(5, 13, 21)
 

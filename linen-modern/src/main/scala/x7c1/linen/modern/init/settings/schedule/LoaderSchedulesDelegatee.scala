@@ -4,7 +4,7 @@ package x7c1.linen.modern.init.settings.schedule
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.SettingScheduleLayout
 import x7c1.linen.glue.service.ServiceControl
@@ -50,7 +50,7 @@ class LoaderSchedulesDelegatee (
         Log error format(e){"[failed]"}
     }
   }
-  private def createAdapter[A: AccountIdentifiable]
+  private def createAdapter[A: HasAccountId]
     (account: A, schedules: Sequence[LoaderScheduleRow]) = {
 
     new ScheduleRowAdapter(
@@ -63,7 +63,7 @@ class LoaderSchedulesDelegatee (
       onStateChanged = new OnScheduleStateChanged(activity, helper).onStateChanged
     )
   }
-  private def showMenu[A: AccountIdentifiable]
+  private def showMenu[A: HasAccountId]
     (account: A)(event: ScheduleSelected) = {
 
     val loadNow = PopupMenuItem("Load now"){ _ =>

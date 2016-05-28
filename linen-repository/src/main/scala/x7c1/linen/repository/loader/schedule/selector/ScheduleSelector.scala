@@ -4,7 +4,7 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.LoaderScheduleWithKind
 import x7c1.linen.database.struct.LoaderScheduleKind.AllChannels
-import x7c1.linen.database.struct.{LoaderScheduleLike, LoaderScheduleTimeRecord}
+import x7c1.linen.database.struct.{HasLoaderScheduleId, LoaderScheduleTimeRecord}
 import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule, ScheduleTime}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits._
@@ -32,7 +32,7 @@ class ScheduleSelector(
 trait ScheduleFinder { self: ScheduleSelector =>
   protected def db: SQLiteDatabase
 
-  def findBy[A: LoaderScheduleLike](schedule: A): OptionEither[SQLException, LoaderSchedule] = {
+  def findBy[A: HasLoaderScheduleId](schedule: A): OptionEither[SQLException, LoaderSchedule] = {
     val either = for {
       schedule <- db.selectorOf[LoaderScheduleWithKind].findBy(schedule)
       times <- db.selectorOf[LoaderScheduleTimeRecord].collectFrom(schedule).toOptionEither

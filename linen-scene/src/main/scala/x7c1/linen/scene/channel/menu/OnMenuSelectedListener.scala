@@ -1,7 +1,7 @@
 package x7c1.linen.scene.channel.menu
 
 import android.content.Context
-import x7c1.linen.database.struct.ChannelIdentifiable
+import x7c1.linen.database.struct.HasChannelId
 import x7c1.wheat.modern.menu.popup.{PopupMenuBox, PopupMenuItem}
 
 trait OnMenuSelectedListener[A] {
@@ -9,7 +9,7 @@ trait OnMenuSelectedListener[A] {
 }
 
 object OnMenuSelectedListener {
-  def create[A: ChannelIdentifiable](context: Context)
+  def create[A: HasChannelId](context: Context)
     (f: MenuSelected[A] => Seq[PopupMenuItem]): OnMenuSelectedListener[A] = {
 
     new OnMenuSelectedListener[A]{

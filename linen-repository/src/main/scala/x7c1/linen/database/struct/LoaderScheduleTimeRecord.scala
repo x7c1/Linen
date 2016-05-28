@@ -32,8 +32,8 @@ object LoaderScheduleTimeRecord {
   implicit object traverseAll extends CanTraverseRecordByQuery[LoaderScheduleTimeRecord](
     Query("SELECT * FROM loader_schedule_times")
   )
-  implicit object traverseOn extends CanTraverseRecord[AccountIdentifiable, LoaderScheduleTimeRecord]{
-    override def query[X: AccountIdentifiable](target: X) = {
+  implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleTimeRecord]{
+    override def query[X: HasAccountId](target: X) = {
       val sql =
         """SELECT *
           | FROM loader_schedule_times AS t1
@@ -42,7 +42,7 @@ object LoaderScheduleTimeRecord {
           | WHERE t2.account_id = ?
           |""".stripMargin
 
-      val accountId = implicitly[AccountIdentifiable[X]] toId target
+      val accountId = implicitly[HasAccountId[X]] toId target
       Query(sql, Array(accountId.toString))
     }
   }
@@ -50,13 +50,13 @@ object LoaderScheduleTimeRecord {
     extends SelectorProvidable[LoaderScheduleTimeRecord, Selector](new Selector(_))
 
   implicit object collect
-    extends CanCollectRecord.Where[LoaderScheduleLike, LoaderScheduleTimeRecord](table){
+    extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord](table){
 
     override def where[X](id: Long) = toArgs(
       column.schedule_id -> id
     )
   }
-  implicit object scheduleId extends LoaderScheduleLike[LoaderScheduleTimeRecord]{
+  implicit object scheduleId extends HasLoaderScheduleId[LoaderScheduleTimeRecord]{
     override def toId = _.schedule_id
   }
   implicit class RichSequence(xs: Sequence[LoaderScheduleTimeRecord]){
@@ -67,9 +67,9 @@ object LoaderScheduleTimeRecord {
     }
   }
   class Selector(protected val db: SQLiteDatabase)
-    extends CollectFrom[LoaderScheduleLike, LoaderScheduleTimeRecord]
+    extends CollectFrom[HasLoaderScheduleId, LoaderScheduleTimeRecord]
       with TraverseAll[LoaderScheduleTimeRecord]
-      with TraverseOn[AccountIdentifiable, LoaderScheduleTimeRecord]
+      with TraverseOn[HasAccountId, LoaderScheduleTimeRecord]
 }
 
 case class ScheduleTimeParts(

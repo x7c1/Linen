@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.struct.{ChannelRecord, NamedChannelIdentifiable}
+import x7c1.linen.database.struct.{ChannelRecord, HasNamedChannelKey}
 import x7c1.wheat.modern.database.selector.CursorConvertible
 import x7c1.wheat.modern.database.selector.presets.{CanFindEntity, DefaultProvidable}
 
@@ -18,9 +18,9 @@ object PresetChannel {
         name = cursor.name
       )
   }
-  implicit object findable extends CanFindEntity[NamedChannelIdentifiable, ChannelRecord, PresetChannel]
+  implicit object findable extends CanFindEntity[HasNamedChannelKey, ChannelRecord, PresetChannel]
 
-  implicit object providable extends DefaultProvidable[NamedChannelIdentifiable, PresetChannel]
+  implicit object providable extends DefaultProvidable[HasNamedChannelKey, PresetChannel]
 }
 
 case class PresetChannelPiece(

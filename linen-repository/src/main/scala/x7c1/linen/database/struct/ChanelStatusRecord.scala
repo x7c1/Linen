@@ -21,12 +21,12 @@ object ChannelStatusRecord {
   def column = TypedFields.expose[ChannelStatusRecord]
 
   implicit object providable
-    extends DefaultProvidable[ChannelStatusIdentifiable, ChannelStatusRecord]
+    extends DefaultProvidable[HasChannelStatusKey, ChannelStatusRecord]
 
   implicit object reifiable extends RecordReifiable[ChannelStatusRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelStatusRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[ChannelStatusIdentifiable, ChannelStatusRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasChannelStatusKey, ChannelStatusRecord](table){
     override def where[X](key: ChannelStatusKey) = toArgs(
       column.account_id -> key.accountId,
       column.channel_id -> key.channelId
@@ -40,11 +40,11 @@ case class ChannelStatusKey (
 )
 object ChannelStatusKey {
   implicit object id
-    extends ChannelStatusIdentifiable[ChannelStatusKey]
+    extends HasChannelStatusKey[ChannelStatusKey]
       with IdEndo[ChannelStatusKey]
 }
 
-trait ChannelStatusIdentifiable[A] extends Identifiable[A, ChannelStatusKey]
+trait HasChannelStatusKey[A] extends Identifiable[A, ChannelStatusKey]
 
 case class ChannelStatusRecordParts(
   channelId: Long,

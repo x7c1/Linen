@@ -31,21 +31,21 @@ object EntryRecord {
   implicit object providable
     extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
 
-  implicit object findable extends CanFindRecord.Where[EntryIdentifiable, EntryRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord](table){
     override def where[X](id: Long) = toArgs(column.entry_id -> id)
   }
-  implicit object collectable extends CanCollectRecord.Where[SourceIdentifiable, EntryRecord](table){
+  implicit object collectable extends CanCollectRecord.Where[HasSourceId, EntryRecord](table){
     override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
   class Selector(val db: SQLiteDatabase)
-    extends CollectFrom[SourceIdentifiable, EntryRecord]
-      with FindBy[EntryIdentifiable, EntryRecord]
+    extends CollectFrom[HasSourceId, EntryRecord]
+      with FindBy[HasEntryId, EntryRecord]
 }
 
-trait EntryIdentifiable[A] extends Identifiable[A, Long]
+trait HasEntryId[A] extends Identifiable[A, Long]
 
-object EntryIdentifiable {
-  implicit object entryIdentifiable extends EntryIdentifiable[Long] with IdEndo[Long]
+object HasEntryId {
+  implicit object entryId extends HasEntryId[Long] with IdEndo[Long]
 }
 
 case class EntryParts(

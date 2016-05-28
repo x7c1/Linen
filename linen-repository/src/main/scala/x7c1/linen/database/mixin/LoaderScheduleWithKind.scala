@@ -2,7 +2,7 @@ package x7c1.linen.database.mixin
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.{AccountIdentifiable, LoaderScheduleKindRecord, LoaderScheduleLike, LoaderScheduleRecord}
+import x7c1.linen.database.struct.{HasAccountId, HasLoaderScheduleId, LoaderScheduleKindRecord, LoaderScheduleRecord}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.database.Query
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanTraverseRecord, CanTraverseRecordByQuery, Find, FindBy, TraverseAll, TraverseOn}
@@ -13,7 +13,7 @@ trait LoaderScheduleWithKind
     with LoaderScheduleKindRecord
 
 object LoaderScheduleWithKind {
-  implicit object id extends LoaderScheduleLike[LoaderScheduleWithKind]{
+  implicit object id extends HasLoaderScheduleId[LoaderScheduleWithKind]{
     override def toId = _.schedule_id
   }
   implicit object providable
@@ -22,9 +22,9 @@ object LoaderScheduleWithKind {
   implicit object reifiable extends RecordReifiable[LoaderScheduleWithKind]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleWithKind](cursor)
   }
-  implicit object findable extends CanFindRecord[LoaderScheduleLike, LoaderScheduleWithKind]{
-    override def query[X: LoaderScheduleLike](target: X): Query = {
-      val scheduleId = implicitly[LoaderScheduleLike[X]] toId target
+  implicit object findable extends CanFindRecord[HasLoaderScheduleId, LoaderScheduleWithKind]{
+    override def query[X: HasLoaderScheduleId](target: X): Query = {
+      val scheduleId = implicitly[HasLoaderScheduleId[X]] toId target
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
         | INNER JOIN loader_schedule_kinds as t2
@@ -35,8 +35,8 @@ object LoaderScheduleWithKind {
       Query(sql, Array(scheduleId.toString))
     }
   }
-  implicit object traverseOn extends CanTraverseRecord[AccountIdentifiable, LoaderScheduleWithKind]{
-    override def query[X: AccountIdentifiable](target: X): Query = {
+  implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleWithKind]{
+    override def query[X: HasAccountId](target: X): Query = {
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
         | INNER JOIN loader_schedule_kinds as t2
@@ -44,7 +44,7 @@ object LoaderScheduleWithKind {
         |WHERE t1.account_id = ?
       """.stripMargin
 
-      val accountId = implicitly[AccountIdentifiable[X]] toId target
+      val accountId = implicitly[HasAccountId[X]] toId target
       Query(sql, Array(accountId.toString))
     }
   }
@@ -62,7 +62,7 @@ object LoaderScheduleWithKind {
 
   class Selector(protected val db: SQLiteDatabase)
     extends Find[LoaderScheduleWithKind]
-      with FindBy[LoaderScheduleLike, LoaderScheduleWithKind]
-      with TraverseOn[AccountIdentifiable, LoaderScheduleWithKind]
+      with FindBy[HasLoaderScheduleId, LoaderScheduleWithKind]
+      with TraverseOn[HasAccountId, LoaderScheduleWithKind]
       with TraverseAll[LoaderScheduleWithKind]
 }
