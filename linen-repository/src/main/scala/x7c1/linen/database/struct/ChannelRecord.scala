@@ -5,6 +5,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
+import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 import x7c1.wheat.modern.database.{Deletable, Insertable}
 
@@ -34,6 +35,7 @@ object ChannelRecord {
       column.name -> key.channelName
     )
   }
+  implicit object providable extends DefaultProvidable[HasChannelId, ChannelRecord]
 }
 
 trait HasChannelId[A] extends Identifiable[A, Long]

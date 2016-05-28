@@ -77,12 +77,22 @@ private class QueueingServiceImpl(
       case Left(error) => Log error error.message
     }
     val end = targetSources.length
-    val notifier = new UpdaterServiceNotifier(service, end, Date.current(), startId)
 
+    val OptionRight(Some(channel)) = helper.selectorOf[ChannelRecord] findBy channelId
+    val notifier = new ChannelNotifier(
+      service = service,
+      max = end,
+      startTime = Date.current(),
+      channelName = channel.name,
+      notificationId = startId
+    )
     targetSources.view map
       queue.enqueueSource foreach onUpdated(notifier, end)
+
+  } onFailure {
+    case e => Log error format(e){"[abort]"}
   }
-  private def onUpdated[A](notifier: UpdaterServiceNotifier, end: Int): Future[A] => Unit = {
+  private def onUpdated[A](notifier: ChannelNotifier, end: Int): Future[A] => Unit = {
     var progress = 0
 
     _ onComplete { _ =>
