@@ -3,14 +3,16 @@ package x7c1.linen.scene.loader.crawling
 import android.app.Service
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.ChannelRecord
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
+import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.dummy.TraceableQueue
 import x7c1.linen.repository.loader.crawling.SourceInspector
 import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
-import x7c1.linen.scene.updater.UpdaterServiceNotifier
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.either.OptionRight
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 import scala.concurrent.Future
@@ -18,6 +20,7 @@ import scala.concurrent.Future
 trait QueueingService {
   def loadSource(sourceId: Long): Unit
   def loadChannelSources(channelId: Long, accountId: Long): Unit
+  def loadSubscribedChannels(accountId: Long): Unit
 }
 
 object QueueingService {
@@ -95,6 +98,19 @@ private class QueueingServiceImpl(
         }
       }
     }
-
+  }
+  override def loadSubscribedChannels(accountId: Long) = Future {
+    Log info s"[init]"
+    helper.selectorOf[SubscribedChannel] traverseOn accountId match {
+      case Left(e) => Log error format(e){"[failed]"}
+      case Right(sequence) =>
+        sequence.toSeq foreach { channel =>
+          Log info s"$channel"
+          QueueingService(service).loadChannelSources(channel.channelId, accountId)
+        }
+        sequence.closeCursor()
+    }
+  } onFailure {
+    case e => Log error format(e){"[abort]"}
   }
 }
