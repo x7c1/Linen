@@ -2,7 +2,6 @@ package x7c1.linen.repository.loader.crawling
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
-import x7c1.linen.repository.dummy.TraceableQueue
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
 import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
 import x7c1.wheat.macros.logger.Log

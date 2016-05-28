@@ -7,9 +7,8 @@ import x7c1.linen.database.struct.ChannelRecord
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.dummy.TraceableQueue
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
-import x7c1.linen.repository.loader.crawling.{ChannelLoaderQueueing, SourceInspector}
+import x7c1.linen.repository.loader.crawling.{ChannelLoaderQueueing, SourceInspector, TraceableQueue}
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.either.OptionRight
