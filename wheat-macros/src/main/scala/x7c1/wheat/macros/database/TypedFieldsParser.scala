@@ -41,9 +41,21 @@ object TypedFieldsParser {
     def forPrimitive(left: Tree, right: Tree) = {
       q"(${parser.getColumn(left)}, $right.toString)"
     }
+    def forConvertible(left: Tree, right: Tree) = left.tpe.typeArgs match {
+      case Seq(from, to) if to =:= right.tpe =>
+        val convertible = appliedType(
+          typeOf[FieldConvertible[_, _]].typeConstructor,
+          from,
+          to
+        )
+        val value = q"implicitly[$convertible].unwrap($right).toString"
+        q"(${parser.getColumn(left)}, $value)"
+    }
     def toStringPairs: ((Tree, Tree)) => Tree = {
       case (left, right) if left.tpe.widen =:= right.tpe.widen =>
         forPrimitive(left, right)
+      case (left, right) if left.tpe <:< typeOf[FieldTransform[_, _]] =>
+        forConvertible(left, right)
       case (left, right) =>
         throw new IllegalArgumentException(
           s"type inconsistent: ${parser.getColumn(left)}:[${left.tpe}] != $right:[${right.tpe}]")

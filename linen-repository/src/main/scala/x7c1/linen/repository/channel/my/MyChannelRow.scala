@@ -1,10 +1,10 @@
 package x7c1.linen.repository.channel.my
 
 import x7c1.linen.database.mixin.MyChannelRecord
-import x7c1.linen.database.struct.{AccountIdentifiable, ChannelDeletable, ChannelIdentifiable}
+import x7c1.linen.database.struct.{ChannelDeletable, HasAccountId, HasChannelId}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.database.selector.CursorConvertible
-import x7c1.wheat.modern.database.selector.presets.{DefaultProvidable, CanTraverseEntity}
+import x7c1.wheat.modern.database.selector.presets.{CanTraverseEntity, DefaultProvidable}
 
 sealed trait MyChannelRow
 
@@ -16,7 +16,7 @@ case class MyChannel(
   isSubscribed: Boolean ) extends MyChannelRow
 
 object MyChannel {
-  implicit object id extends ChannelIdentifiable[MyChannel]{
+  implicit object id extends HasChannelId[MyChannel]{
     override def toId = _.channelId
   }
   implicit object deletable extends ChannelDeletable[MyChannel](_.channelId)
@@ -31,9 +31,9 @@ object MyChannel {
         isSubscribed = cursor.subscribed == 1
       )
   }
-  implicit object traversable extends CanTraverseEntity[AccountIdentifiable, MyChannelRecord, MyChannel]
+  implicit object traversable extends CanTraverseEntity[HasAccountId, MyChannelRecord, MyChannel]
 
-  implicit object providable extends DefaultProvidable[AccountIdentifiable, MyChannel]
+  implicit object providable extends DefaultProvidable[HasAccountId, MyChannel]
 }
 
 case class MyChannelFooter() extends MyChannelRow

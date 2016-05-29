@@ -3,7 +3,7 @@ package x7c1.linen.repository.source.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.widget.RecyclerView.ViewHolder
-import x7c1.linen.database.struct.{ChannelIdentifiable, AccountIdentifiable}
+import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.Query
@@ -14,7 +14,7 @@ import scala.util.Try
 trait UnreadSourceAccessor extends Sequence[UnreadSourceRow] {
 
   def sources: Seq[UnreadSource] = {
-    (0 to length - 1).view flatMap findAt collect {
+    (0 until length).view flatMap findAt collect {
       case UnreadSourceRow(x: UnreadSource) => x
     }
   }
@@ -79,7 +79,7 @@ private class UnreadSourceAccessorImpl(
 }
 
 object UnreadSourceAccessor {
-  def create[A: AccountIdentifiable, B: ChannelIdentifiable](
+  def create[A: HasAccountId, B: HasChannelId](
     db: SQLiteDatabase,
     accountId: A, channelId: B): Try[ClosableSourceAccessor] = {
 
@@ -91,7 +91,7 @@ object UnreadSourceAccessor {
   }
   private def createMaps(rawCursor: Cursor) = {
     val cursor = TypedCursor[UnreadSourceColumn](rawCursor)
-    val sorted = (0 to rawCursor.getCount - 1) flatMap { n =>
+    val sorted = 0 until rawCursor.getCount flatMap { n =>
       cursor.moveToFind(n)((n, cursor.rating, cursor.source_id))
     } sortWith {
       case ((_, rating1, _), (_, rating2, _)) =>
@@ -102,14 +102,14 @@ object UnreadSourceAccessor {
     val pairs2 = indexed map { case ((_, _, sourceId), index) => sourceId -> index }
     pairs1.toMap -> pairs2.toMap
   }
-  def createCursor[A: AccountIdentifiable, B: ChannelIdentifiable]
+  def createCursor[A: HasAccountId, B: HasChannelId]
     (db: SQLiteDatabase, channelId: B, accountId: A) = {
     val query = createQuery(channelId, accountId)
     db.rawQuery(query.sql, query.selectionArgs)
   }
-  def createQuery[A: AccountIdentifiable, B: ChannelIdentifiable](channel: B, account: A) = {
-    val accountId = implicitly[AccountIdentifiable[A]] toId account
-    val channelId = implicitly[ChannelIdentifiable[B]] toId channel
+  def createQuery[A: HasAccountId, B: HasChannelId](channel: B, account: A) = {
+    val accountId = implicitly[HasAccountId[A]] toId account
+    val channelId = implicitly[HasChannelId[B]] toId channel
     val sql = UnreadSourceAccessorQueries.sql5
     new Query(sql,
       Array(

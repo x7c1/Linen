@@ -63,7 +63,6 @@ class UpdaterServiceNotifier(
     */
     builder.build()
   }
-
   private def createPendingIntent = {
     val notificationIntent = new Intent(service, service getClassOf Updater)
     PendingIntent.getService(service, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)

@@ -19,10 +19,12 @@ trait CursorReadable[FROM, TO]{
 }
 
 trait CursorConvertible[FROM, TO] extends CursorReadable[FROM, TO]{
+  protected lazy val convert = fromCursor
+
   override def readAt = {
-    case (cursor, position) => cursor.moveToFind(position){
-      fromCursor(cursor)
-    }
+    case (cursor, position) => synchronized(cursor.moveToFind(position){
+      convert(cursor)
+    })
   }
   def fromCursor: FROM with TypedCursor[FROM] => TO
 }

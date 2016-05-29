@@ -21,9 +21,9 @@ object SourceRecord {
     override def reify(cursor: Cursor) = TypedCursor[SourceRecord](cursor)
   }
   implicit object providable
-    extends DefaultProvidable[SourceIdentifiable, SourceRecord]
+    extends DefaultProvidable[HasSourceId, SourceRecord]
 
-  implicit object findable extends CanFindRecord.Where[SourceIdentifiable, SourceRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceId, SourceRecord](table){
     override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }
@@ -36,10 +36,10 @@ trait SourceRecord extends TypedFields {
   def created_at: Int --> Date
 }
 
-trait SourceIdentifiable[A] extends Identifiable[A, Long]
+trait HasSourceId[A] extends Identifiable[A, Long]
 
-object SourceIdentifiable {
-  implicit object id extends SourceIdentifiable[Long] with IdEndo[Long]
+object HasSourceId {
+  implicit object id extends HasSourceId[Long] with IdEndo[Long]
 }
 
 case class SourceParts(

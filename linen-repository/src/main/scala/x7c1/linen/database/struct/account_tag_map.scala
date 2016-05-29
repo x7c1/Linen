@@ -26,14 +26,14 @@ object account_tag_map {
     override def reify(cursor: Cursor) = TypedCursor[account_tag_map](cursor)
   }
   implicit object providable
-    extends DefaultProvidable[AccountIdentifiable, account_tag_map]
+    extends DefaultProvidable[HasAccountId, account_tag_map]
 
-  implicit object findable extends Where[AccountIdentifiable, account_tag_map](table){
+  implicit object findable extends Where[HasAccountId, account_tag_map](table){
     override def where[X](id: Long) = toArgs(
       column.account_id -> id
     )
   }
-  implicit object accountTagId extends AccountTagIdentifiable[account_tag_map]{
+  implicit object accountTagId extends HasAccountTagId[account_tag_map]{
     override def toId = _.account_tag_id
   }
 }

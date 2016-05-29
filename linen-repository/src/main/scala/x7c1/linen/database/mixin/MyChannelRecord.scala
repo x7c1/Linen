@@ -1,7 +1,7 @@
 package x7c1.linen.database.mixin
 
 import android.database.Cursor
-import x7c1.linen.database.struct.{AccountIdentifiable, ChannelStatusRecord, ChannelRecord}
+import x7c1.linen.database.struct.{ChannelRecord, ChannelStatusRecord, HasAccountId}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Query
 import x7c1.wheat.modern.database.selector.RecordReifiable
@@ -17,8 +17,8 @@ object MyChannelRecord {
   implicit object reifiable extends RecordReifiable[MyChannelRecord]{
     override def reify(cursor: Cursor) = TypedCursor[MyChannelRecord](cursor)
   }
-  implicit object traversable extends CanTraverseRecord[AccountIdentifiable, MyChannelRecord]{
-    override def query[X: AccountIdentifiable](target: X): Query = {
+  implicit object traversable extends CanTraverseRecord[HasAccountId, MyChannelRecord]{
+    override def query[X: HasAccountId](target: X): Query = {
       val sql =
         """SELECT
           | _id,
@@ -32,7 +32,7 @@ object MyChannelRecord {
           |WHERE c1.account_id = ?
           |ORDER BY c1._id DESC""".stripMargin
 
-      val id = implicitly[AccountIdentifiable[X]] toId target
+      val id = implicitly[HasAccountId[X]] toId target
       new Query(sql, Array(id.toString, id.toString))
     }
   }

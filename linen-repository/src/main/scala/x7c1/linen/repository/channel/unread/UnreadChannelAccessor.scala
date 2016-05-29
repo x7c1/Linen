@@ -2,10 +2,10 @@ package x7c1.linen.repository.channel.unread
 
 import android.database.Cursor
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.ChannelIdentifiable
+import x7c1.linen.database.struct.HasChannelId
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.ChannelAccessorError.UnexpectedError
-import x7c1.linen.repository.channel.unread.ChannelLoaderEvent.{Done, AccessorError}
+import x7c1.linen.repository.channel.unread.ChannelLoaderEvent.{AccessorError, Done}
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
@@ -70,7 +70,7 @@ trait UnreadChannelRecord extends TypedFields {
   def name: String
 }
 
-trait ChannelSelectable[A] extends ChannelIdentifiable[A]{
+trait ChannelSelectable[A] extends HasChannelId[A]{
   def nameOf: A => String
 }
 

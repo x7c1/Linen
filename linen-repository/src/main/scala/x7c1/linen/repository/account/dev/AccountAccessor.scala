@@ -1,7 +1,7 @@
 package x7c1.linen.repository.account.dev
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.database.struct.HasAccountId
 
 trait AccountAccessor {
   def findAt(position: Int): Option[DevAccount]
@@ -42,7 +42,7 @@ object AccountAccessor {
 case class DevAccount (accountId: Long)
 
 object DevAccount {
-  implicit object id extends AccountIdentifiable[DevAccount]{
+  implicit object id extends HasAccountId[DevAccount]{
     override def toId = _.accountId
   }
 }

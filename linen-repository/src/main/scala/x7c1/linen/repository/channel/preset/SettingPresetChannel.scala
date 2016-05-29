@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.linen.database.struct.ChannelIdentifiable
+import x7c1.linen.database.struct.HasChannelId
 
 case class SettingPresetChannel(
   channelId: Long,
@@ -10,7 +10,7 @@ case class SettingPresetChannel(
 )
 
 object SettingPresetChannel {
-  implicit object id extends ChannelIdentifiable[SettingPresetChannel] {
+  implicit object id extends HasChannelId[SettingPresetChannel] {
     override def toId = _.channelId
   }
 }

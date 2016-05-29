@@ -2,41 +2,83 @@ package x7c1.linen.scene.loader.crawling
 
 import android.content.{Context, Intent}
 import android.net.Uri
-import x7c1.linen.database.struct.AccountIdentifiable
+import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.HasLoaderScheduleId
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.loader.schedule.PresetLoaderSchedule
+import x7c1.linen.repository.loader.schedule.LoaderSchedule
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.macros.intent.IntentBuilder.from
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.chrono.alarm.WindowAlarm
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-class LoaderScheduler[A: AccountIdentifiable] private (
-  context: Context with ServiceControl, account: A){
+class LoaderScheduler private (
+  context: Context with ServiceControl,
+  helper: DatabaseHelper ){
 
   import concurrent.duration._
 
-  def createOrUpdate(schedule: PresetLoaderSchedule) = {
+  def setupNextLoader[A: HasLoaderScheduleId](schedule: A): Unit = {
+    val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
+    find(schedule) foreach {
+      case existent if existent.enabled =>
+        createOrUpdate(existent)
+        Log info s"[done] schedule updated: (id:$scheduleId)"
+      case existent =>
+        createAlarmOf(existent).cancel()
+        Log info s"[done] schedule canceled: (id:$scheduleId)"
+    }
+  }
+  def cancelSchedule[A: HasLoaderScheduleId](schedule: A): Unit = {
+    find(schedule) foreach { existent =>
+      createAlarmOf(existent).cancel()
+    }
+    val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
+    Log info s"[done] schedule canceled: (id:$scheduleId)"
+  }
+  private def find[A: HasLoaderScheduleId](schedule: A) = {
+    helper.selectorOf[LoaderSchedule] findBy schedule matches {
+      case Right(Some(existent)) =>
+        Some(existent)
+      case Right(None) =>
+        val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
+        Log error s"schedule not found (id:$scheduleId)"
+        None
+      case Left(e) =>
+        Log error format(e.getCause){"[failed]"}
+        None
+    }
+  }
+  private def createAlarmOf(schedule: LoaderSchedule) = {
+    WindowAlarm(
+      context = context,
+      intent = createIntent(schedule)
+    )
+  }
+  private def createOrUpdate(schedule: LoaderSchedule) = {
     Log info s"[init] $schedule"
 
     schedule nextStartAfter CalendarDate.now() match {
       case Some(start) =>
-        WindowAlarm(
-          context = context,
+        createAlarmOf(schedule) triggerInTime (
           window = 1.hour,
-//          window = 10.seconds,
-          start = start
-        ) perform createIntent(schedule)
+          startMilliSeconds = start.toMilliseconds
+
+          /* debug
+          window = 10.seconds,
+          startMilliSeconds = (CalendarDate.now() + 10.seconds).toMilliseconds
+          // */
+        )
       case None =>
         Log warn s"time not found: (schedule:${schedule.scheduleId})"
     }
   }
-  private def createIntent(schedule: PresetLoaderSchedule): Intent = {
-    val accountId = implicitly[AccountIdentifiable[A]] toId account
+  private def createIntent(schedule: LoaderSchedule): Intent = {
     val intent = SchedulerService(context) buildIntent from {
-      _.loadFromSchedule(schedule.scheduleId, accountId)
+      _.loadFromSchedule(schedule.scheduleId)
     }
     intent setData Uri.parse(
-      s"linen://loader.schedule/setup/${schedule.accountId}/${schedule.scheduleId}"
+      s"linen://loader.schedule/setup/${schedule.scheduleId}"
     )
     intent
   }
@@ -44,12 +86,10 @@ class LoaderScheduler[A: AccountIdentifiable] private (
 }
 
 object LoaderScheduler {
-  def apply[A: AccountIdentifiable]
-    (context: Context with ServiceControl, account: A): LoaderScheduler[A] = {
-
+  def apply(context: Context with ServiceControl, helper: DatabaseHelper): LoaderScheduler = {
     new LoaderScheduler(
       context = context,
-      account: A
+      helper = helper
     )
   }
 }

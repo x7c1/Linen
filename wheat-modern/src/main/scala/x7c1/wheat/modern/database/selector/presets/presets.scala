@@ -18,6 +18,15 @@ trait CollectFrom [I[T] <: CanIdentify[T], A]{
   }
 }
 
+trait TraverseAll[A]{
+  protected def db: SQLiteDatabase
+
+  def traverseAll()(implicit i: CanTraverseByQuery[A]): Either[SQLException, ClosableSequence[A]] = {
+    val either = ItemSelector(db).select
+    either
+  }
+}
+
 trait TraverseOn[I[T] <: CanIdentify[T], A]{
   protected def db: SQLiteDatabase
 

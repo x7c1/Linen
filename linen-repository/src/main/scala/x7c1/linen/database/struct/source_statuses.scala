@@ -22,16 +22,16 @@ object source_statuses {
   def table: String = "source_statuses"
 
   object Key {
-    implicit object id extends SourceStatusIdentifiable[Key] with IdEndo[Key]
+    implicit object id extends HasSourceStatusKey[Key] with IdEndo[Key]
   }
   case class Key(accountId:Long, sourceId: Long)
 
-  implicit object providable extends DefaultProvidable[SourceStatusIdentifiable, source_statuses]
+  implicit object providable extends DefaultProvidable[HasSourceStatusKey, source_statuses]
 
   implicit object reifiable extends RecordReifiable[source_statuses]{
     override def reify(cursor: Cursor) = TypedCursor[source_statuses](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[SourceStatusIdentifiable, source_statuses](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceStatusKey, source_statuses](table){
     override def where[X](key: Key) = toArgs(
       column.source_id -> key.sourceId,
       column.account_id -> key.accountId
@@ -39,7 +39,7 @@ object source_statuses {
   }
 }
 
-trait SourceStatusIdentifiable[A] extends Identifiable[A, Key]
+trait HasSourceStatusKey[A] extends Identifiable[A, Key]
 
 case class SourceStatusParts(
   sourceId: Long,

@@ -2,7 +2,8 @@ package x7c1.linen.repository.source.setting
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.linen.database.struct.{SourceIdentifiable, ChannelSourceMapParts, SourceParts, SourceRatingParts}
+import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.{ChannelSourceMapParts, HasAccountId, HasChannelId, HasSourceId, SourceParts, SourceRatingParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.{Query, WritableDatabase}
@@ -37,7 +38,7 @@ case class SettingSource(
   rating: Int
 )
 object SettingSource {
-  implicit object id extends SourceIdentifiable[SettingSource]{
+  implicit object id extends HasSourceId[SettingSource]{
     override def toId = _.sourceId
   }
 }
@@ -53,7 +54,8 @@ class SettingSourceAccessorFactory(
   db: SQLiteDatabase,
   accountId: Long ){
 
-  def create(channelId: Long): SettingSourceAccessor = {
+  def create[A: HasChannelId](channel: A): SettingSourceAccessor = {
+    val channelId = implicitly[HasChannelId[A]] toId channel
     val cursor = createCursor(channelId)
     new SettingSourceAccessorImpl(cursor)
   }
@@ -85,6 +87,17 @@ class SettingSourceAccessorFactory(
       """.stripMargin
 
     new Query(sql2, Array(accountId.toString, channelId.toString))
+  }
+}
+
+object SettingSourceAccessorFactory {
+  def apply[A: HasAccountId](
+    helper: DatabaseHelper,
+    account: A): SettingSourceAccessorFactory = {
+
+    val db = helper.getReadableDatabase
+    val accountId = implicitly[HasAccountId[A]] toId account
+    new SettingSourceAccessorFactory(db, accountId)
   }
 }
 

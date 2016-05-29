@@ -2,7 +2,7 @@ package x7c1.linen.repository.source.unread
 
 import android.content.ContentValues
 import x7c1.linen.database.struct.SourceRecord.table
-import x7c1.linen.database.struct.{SourceIdentifiable, SourceRecord}
+import x7c1.linen.database.struct.{HasSourceId, SourceRecord}
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.database.Updatable
 import x7c1.wheat.modern.database.selector.CursorConvertible
@@ -28,7 +28,7 @@ object SourceTitle {
       "_id" -> target.sourceId.toString
     )
   }
-  implicit object providable extends DefaultProvidable[SourceIdentifiable, SourceTitle]
+  implicit object providable extends DefaultProvidable[HasSourceId, SourceTitle]
 
   implicit object convertible extends CursorConvertible[SourceRecord, SourceTitle]{
     override def fromCursor = cursor =>
@@ -37,5 +37,5 @@ object SourceTitle {
         title = cursor.title
       )
   }
-  implicit object findable extends CanFindEntity[SourceIdentifiable, SourceRecord, SourceTitle]
+  implicit object findable extends CanFindEntity[HasSourceId, SourceRecord, SourceTitle]
 }

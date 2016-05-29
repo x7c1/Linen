@@ -16,6 +16,12 @@ class Query(
   }
 }
 
+object Query {
+  def apply(sql: String, selectionArgs: Array[String] = Array()): Query = {
+    new Query(sql, selectionArgs)
+  }
+}
+
 trait QueryPlanColumn extends TypedFields {
   def detail: String
 }
@@ -30,7 +36,7 @@ class QueryExplainer(db: SQLiteDatabase){
     val rawCursor = db.rawQuery(query.toExplain.sql, query.selectionArgs)
     val cursor = TypedCursor[QueryPlanColumn](rawCursor)
     try {
-      (0 to rawCursor.getCount - 1) flatMap { n =>
+      0 until rawCursor.getCount flatMap { n =>
         cursor.moveToFind(n){
           QueryPlan(detail = cursor.detail)
         }
