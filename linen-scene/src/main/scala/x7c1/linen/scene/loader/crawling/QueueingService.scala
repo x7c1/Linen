@@ -30,18 +30,16 @@ object QueueingService {
   def reify(
     service: Service with ServiceControl,
     helper: DatabaseHelper,
-    queue: TraceableQueue,
-    startId: Int): QueueingService = {
+    queue: TraceableQueue ): QueueingService = {
 
-    new QueueingServiceImpl(service, helper, queue, startId)
+    new QueueingServiceImpl(service, helper, queue)
   }
 }
 
 private class QueueingServiceImpl(
   service: Service with ServiceControl,
   helper: DatabaseHelper,
-  queue: TraceableQueue,
-  startId: Int ) extends QueueingService {
+  queue: TraceableQueue ) extends QueueingService {
 
   import x7c1.linen.repository.loader.crawling.Implicits._
 
