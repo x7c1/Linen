@@ -1,5 +1,7 @@
 package x7c1.linen.repository.loader.crawling
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
@@ -33,20 +35,22 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
     (sources: Seq[InspectedSource])
     (callback: QueueingEvent => Unit)(implicit x: ExecutionContext) = {
 
-    var progress = 0
+    val progress = new AtomicInteger(0)
     val max = sources.length
 
-    def onProgress() = synchronized {
-      progress = progress + 1
+    def onProgress() = {
+      val current = progress.incrementAndGet()
       callback apply OnProgress(
-        current = progress,
+        current = current,
         max = max
       )
-      if (progress == max){
+      if (current == max){
         callback apply OnDone(max)
       }
     }
-    sources foreach { source =>
+    if (max == 0){
+      callback apply OnDone(max)
+    } else sources foreach { source =>
       queue.enqueueSource(source) onComplete { _ => onProgress() }
     }
   }

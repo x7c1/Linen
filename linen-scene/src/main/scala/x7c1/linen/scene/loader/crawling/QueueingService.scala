@@ -4,9 +4,9 @@ import android.app.Service
 import android.content.{Context, Intent}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
-import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.loader.crawling.ChannelLoaderRunner.{AllSourcesLoaded, ChannelLoaderError, ChannelSourceLoaded}
-import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, OnChannelLoaderListener, SourceInspector, TraceableQueue}
+import x7c1.linen.repository.loader.crawling.PresetLoaderRunner.{AllChannelsLoaded, ChannelLoaded, PresetLoaderError}
+import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, OnChannelLoaderListener, OnPresetLoaderListener, PresetLoaderRunner, SourceInspector, TraceableQueue}
 import x7c1.linen.repository.notification.ProgressContent
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
@@ -74,16 +74,17 @@ private class QueueingServiceImpl(
     case e => Log error format(e){"[abort]"}
   }
   override def loadSubscribedChannels(accountId: Long) = Future {
-    Log info s"[init]"
-    helper.selectorOf[SubscribedChannel] traverseOn accountId match {
-      case Left(e) => Log error format(e){"[failed]"}
-      case Right(sequence) =>
-        sequence.toSeq foreach { channel =>
-          Log info s"$channel"
-          QueueingService(service).loadChannelSources(channel.channelId, accountId)
-        }
-        sequence.closeCursor()
-    }
+    Log info s"[init] account:$accountId"
+
+    val intent = new Intent(service, service getClassOf ServiceLabel.Updater)
+    val runner = PresetLoaderRunner(
+      context = service,
+      helper = helper,
+      queue = queue,
+      presetLoaderListener = new OnPresetLoader(intent),
+      channelLoaderListener = new OnPresetChannelLoader(intent)
+    )
+    runner.startLoading(accountId)
   } onFailure {
     case e => Log error format(e){"[abort]"}
   }
@@ -111,5 +112,45 @@ private class OnChannelLoader(intent: Intent) extends OnChannelLoaderListener {
   }
   override def onError(error: ChannelLoaderError) = {
     Log error error.detail
+  }
+}
+
+private class OnPresetLoader(intent: Intent) extends OnPresetLoaderListener {
+  override def onProgress(event: ChannelLoaded) = {
+    event.notifier show ProgressContent(
+      title = "Loading channels..",
+      text = s"${event.current}/${event.max} channels loaded.",
+      max = event.max,
+      progress = event.current,
+      intent = intent
+    )
+  }
+  override def onError(error: PresetLoaderError) = {
+    Log error error.detail
+  }
+  override def onComplete(event: AllChannelsLoaded) = {
+    event.notifier show ProgressContent(
+      title = "Loading completed",
+      text = s"${event.max} channels loaded.",
+      max = event.max,
+      progress = event.max,
+      intent = intent
+    )
+    Log info s"[done]"
+  }
+}
+
+private class OnPresetChannelLoader(intent: Intent) extends OnChannelLoaderListener {
+  private val base = new OnChannelLoader(intent)
+
+  override def onProgress(event: ChannelSourceLoaded): Unit = {
+    base.onProgress(event)
+  }
+  override def onError(error: ChannelLoaderError): Unit = {
+    base.onError(error)
+  }
+  override def onComplete(event: AllSourcesLoaded): Unit = {
+    base.onComplete(event)
+    event.notifier.hide()
   }
 }

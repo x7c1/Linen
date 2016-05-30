@@ -1,6 +1,6 @@
 package x7c1.linen.database.struct
 
-import x7c1.linen.database.struct.NotificationContentKind.{ChannelLoaderKind, ScheduleLoaderKind, SourceLoaderKind, UnknownKind}
+import x7c1.linen.database.struct.NotificationContentKind.{ChannelLoaderKind, PresetLoaderKind, SourceLoaderKind, UnknownKind}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.modern.database.Insertable
@@ -33,12 +33,12 @@ object NotificationKey {
     }
     override def contentKind = ChannelLoaderKind
   }
-  case class ScheduleLoaderKey[A: HasLoaderScheduleId](schedule: A) extends NotificationKey {
+  case class PresetLoaderKey[A: HasAccountId](account: A) extends NotificationKey {
     override val contentKey = {
-      val scheduleId = implicitly[HasLoaderScheduleId[A]] toId schedule
-      s"schedule:$scheduleId"
+      val id = implicitly[HasAccountId[A]] toId account
+      s"account:$id"
     }
-    override def contentKind = ScheduleLoaderKind
+    override def contentKind = PresetLoaderKind
   }
   implicit def key[A <: NotificationKey]: HasNotificationKey[A] = {
     new HasNotificationKey[A] with IdEndo[A]

@@ -101,7 +101,7 @@ object ChannelLoaderRunner {
       s"channel(id:$channelId) not found"
     }
   }
-  case class UnexpectedError(detail: String)extends ChannelLoaderError
+  case class UnexpectedError(detail: String) extends ChannelLoaderError
 }
 
 trait OnChannelLoaderListener {

@@ -28,6 +28,9 @@ class ProgressNotifier private (
     val notification = builder.build()
     context.notificationManager.notify(notificationId, notification)
   }
+  def hide(): Unit = {
+    context.notificationManager.cancel(notificationId)
+  }
 }
 object ProgressNotifier {
   def apply(

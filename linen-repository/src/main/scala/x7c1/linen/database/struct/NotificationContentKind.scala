@@ -15,15 +15,15 @@ object NotificationContentKind {
   case object ChannelLoaderKind extends NotificationContentKind {
     override def text: String = "channel_loader"
   }
-  case object ScheduleLoaderKind extends NotificationContentKind {
-    override def text: String = "schedule_loader"
+  case object PresetLoaderKind extends NotificationContentKind {
+    override def text: String = "preset_loader"
   }
   implicit object convertible extends FieldConvertible[String, NotificationContentKind]{
     override def wrap(text: String) = {
       val kinds = Seq(
         SourceLoaderKind,
         ChannelLoaderKind,
-        ScheduleLoaderKind
+        PresetLoaderKind
       )
       kinds.find(_.text == text) getOrElse UnknownKind(text)
     }
