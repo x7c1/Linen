@@ -1,17 +1,15 @@
 package x7c1.linen.scene.loader.crawling
 
 import android.app.Service
-import android.content.Context
+import android.content.{Context, Intent}
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.ChannelRecord
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
-import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
-import x7c1.linen.repository.loader.crawling.{ChannelLoaderQueueing, SourceInspector, TraceableQueue}
+import x7c1.linen.repository.loader.crawling.ChannelLoaderRunner.{AllSourcesLoaded, ChannelLoaderError, ChannelSourceLoaded}
+import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, OnChannelLoaderListener, SourceInspector, TraceableQueue}
+import x7c1.linen.repository.notification.ProgressContent
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.either.OptionRight
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 import scala.concurrent.Future
@@ -62,21 +60,18 @@ private class QueueingServiceImpl(
   override def loadChannelSources(channelId: Long, accountId: Long) = Future {
     Log info s"[init] channel:$channelId"
 
-    val OptionRight(Some(channel)) = helper.selectorOf[ChannelRecord] findBy channelId
-    val notifier = new ChannelNotifier(
-      service = service,
-      startTime = Date.current(),
-      channelName = channel.name,
-      notificationId = startId
+    val runner = ChannelLoaderRunner(
+      context = service,
+      helper = helper,
+      queue = queue,
+      listener = new OnChannelLoader(
+        intent = new Intent(service, service getClassOf ServiceLabel.Updater)
+      )
     )
-    ChannelLoaderQueueing(helper, queue).start(accountId, channelId){
-      case OnProgress(current, max) =>
-        Log info s"[progress] $current ${channel.name}"
-        notifier.notifyProgress(current, max)
-      case OnDone(max) =>
-        Log info s"[done] $max ${channel.name}"
-        notifier.notifyDone()
-    }
+    runner.startLoading(
+      account = accountId,
+      channel = channelId
+    )
   } onFailure {
     case e => Log error format(e){"[abort]"}
   }
@@ -93,5 +88,30 @@ private class QueueingServiceImpl(
     }
   } onFailure {
     case e => Log error format(e){"[abort]"}
+  }
+}
+
+private class OnChannelLoader(intent: Intent) extends OnChannelLoaderListener {
+  override def onProgress(event: ChannelSourceLoaded) = {
+    event.notifier show ProgressContent(
+      title = s"Channel : ${event.channelName}",
+      text = s"${event.current}/${event.max} loaded",
+      max = event.max,
+      progress = event.current,
+      intent = intent
+    )
+  }
+  override def onComplete(event: AllSourcesLoaded) = {
+    event.notifier show ProgressContent(
+      title = s"Channel : ${event.channelName}",
+      text = s"${event.max}/${event.max} done",
+      max = event.max,
+      progress = event.max,
+      intent = intent
+    )
+    Log info s"[done] ${event.channelName}"
+  }
+  override def onError(error: ChannelLoaderError) = {
+    Log error error.detail
   }
 }

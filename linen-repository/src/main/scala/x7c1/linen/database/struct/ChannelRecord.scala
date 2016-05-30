@@ -36,6 +36,10 @@ object ChannelRecord {
     )
   }
   implicit object providable extends DefaultProvidable[HasChannelId, ChannelRecord]
+
+  implicit object id extends HasChannelId[ChannelRecord]{
+    override def toId = _._id
+  }
 }
 
 trait HasChannelId[A] extends Identifiable[A, Long]

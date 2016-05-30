@@ -9,4 +9,3 @@ object QueueingEvent {
 
   case class OnDone(max: Int) extends QueueingEvent
 }
-

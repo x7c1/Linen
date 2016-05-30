@@ -27,4 +27,8 @@ object Channel {
       )
   }
   implicit object findable extends CanFindEntity[HasChannelId, ChannelRecord, Channel]
+
+  implicit object id extends HasChannelId[Channel]{
+    override def toId = _.channelId
+  }
 }
