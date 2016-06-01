@@ -3,7 +3,6 @@ package x7c1.wheat.modern.sequence
 import x7c1.wheat.modern.features.HasShortLength
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
 import scala.language.higherKinds
 
 trait Sequence[+A]{
@@ -26,33 +25,12 @@ object Sequence {
   implicit class map[A, F[_] <: Sequence[_]](
     override protected val underlying: F[A]) extends SequenceMapping[A, F]
 
-  implicit object canMapFrom extends CanMapFrom[Sequence]{
-    override def mapFrom[A, B](fa: Sequence[A])(f: A => B) =
-      new Sequence[B] {
-        override def findAt(position: Int) = fa findAt position map f
-        override def length = fa.length
-      }
-  }
+  implicit object canMapFrom extends DefaultCanMapFrom
+
   implicit class filter[A: HasShortLength, F[_] <: Sequence[_]](
     override protected val underlying: F[A]) extends SequenceFilter[A, F]
 
-  implicit object canFilterFrom extends CanFilterFrom[Sequence]{
-    override def filterFrom[A](fa: Sequence[A])(f: A => Boolean) =
-      new Sequence[A] {
-        lazy val (find, size) = {
-          val cache = ListBuffer[Int]()
-          (0 until fa.length).view.foreach {
-            case n if fa findAt n exists f => cache += n
-            case  _ => //nop
-          }
-          cache.lift -> cache.length
-        }
-        override def findAt(position: Int): Option[A] = {
-          find(position) flatMap fa.findAt
-        }
-        override def length: Int = size
-      }
-  }
+  implicit object canFilterFrom extends DefaultCanFilterFrom
 }
 
 trait SequenceMerger[A] {
