@@ -34,12 +34,12 @@ trait DrawerMenuInitializer {
       val defaultWidth = displaySize.x - converter.dipToPixel(65)
       params.width = min(maxWidth, defaultWidth)
     }
-    channelLoader -> clientAccount match {
-      case (Some(loader), Some(account)) =>
+    clientAccount match {
+      case Some(account) =>
         layout.menuList setAdapter new DrawerMenuRowAdapter(
-          items = createMenuItems(account, loader.accessor)
+          items = createMenuItems(account, channelLoader.sequence)
         )
-        loader.startLoading().
+        channelLoader.startLoading(account).
           flatMap(onChannelSubscriptionChanged.notifyAdapter).
           map(reader.onMenuLoaded).
           execute()
@@ -52,10 +52,8 @@ trait DrawerMenuInitializer {
   def closeDrawerMenu(): Unit = {
     onChannelSubscriptionChanged unregisterFrom activity
   }
-  protected lazy val channelLoader = clientAccount match {
-    case Some(account) => Some(new UnreadChannelLoader(helper, account))
-    case None => None
-  }
+  protected lazy val channelLoader = UnreadChannelSelector.createLoader(helper)
+
   protected lazy val onChannelSubscriptionChanged =
     new OnChannelSubscriptionChanged(layout, channelLoader)
 

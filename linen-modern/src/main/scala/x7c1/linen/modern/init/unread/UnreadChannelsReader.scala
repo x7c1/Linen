@@ -13,8 +13,8 @@ class UnreadChannelsReader(
   loader: => AccessorLoader,
   onLoaded: OnAccessorsLoadedListener ) {
 
-  def onMenuLoaded(e: Done): Unit = {
-    e.headChannel match {
+  def onMenuLoaded(e: Done[UnreadChannel]): Unit = {
+    e.sequence.findAt(0) match {
       case Some(channel) =>
         loadChannel(channel)
       case None =>

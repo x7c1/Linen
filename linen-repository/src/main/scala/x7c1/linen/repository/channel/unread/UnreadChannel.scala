@@ -15,4 +15,6 @@ object UnreadChannel {
   }
   implicit object providable
     extends SelectorProvidable[UnreadChannel, UnreadChannelSelector](new UnreadChannelSelector(_))
+
+  implicit object traverse extends ToTraverse
 }
