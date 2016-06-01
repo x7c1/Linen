@@ -20,8 +20,6 @@ class UnreadChannelLoader(helper: DatabaseHelper, client: ClientAccount){
 
   lazy val accessor: Sequence[UnreadChannel] = holder
 
-  accessor.map(_.name).length
-
   def startLoading(): CallbackTask[ChannelLoaderEvent] = async {
     Log info s"[start]"
     helper.selectorOf[UnreadChannel].traverseOn(client)
@@ -29,10 +27,8 @@ class UnreadChannelLoader(helper: DatabaseHelper, client: ClientAccount){
     case Right(loadedAccessor) =>
       Log info s"[done]"
 
-      loadedAccessor.map(_.name).closeCursor()
-
       holder updateAccessor loadedAccessor
-      new Done(client, loadedAccessor.findAt(0))
+      new Done(loadedAccessor.findAt(0))
     case Left(error) =>
       Log info s"[failed]"
       new AccessorError(error)
