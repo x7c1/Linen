@@ -2,9 +2,9 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.{Cursor, SQLException}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanSelect, CursorReadable, CursorReifiable}
-import x7c1.wheat.modern.sequence.Sequence
+import x7c1.wheat.modern.sequence.{CanMapFrom, Sequence}
 
-import scala.language.{reflectiveCalls, higherKinds}
+import scala.language.{higherKinds, reflectiveCalls}
 
 abstract class CanTraverse [I[T] <: CanIdentify[T], A]
   extends CanSelect[I, ClosableSequence[A]]{
@@ -35,5 +35,13 @@ object ClosableSequence {
       override def findAt(position: Int) = read(typed, position)
       override def length = cursor.getCount
     }
+  }
+  implicit object canMapFrom extends CanMapFrom[ClosableSequence]{
+    override def mapFrom[A, B](fa: ClosableSequence[A])(f: A => B): ClosableSequence[B] =
+      new ClosableSequence[B] {
+        override def closeCursor() = fa.closeCursor()
+        override def findAt(position: Int) = fa.findAt(position) map f
+        override def length = fa.length
+      }
   }
 }

@@ -38,9 +38,13 @@ object EitherTask {
   type | [A, B] = EitherTask[A, B]
 
   def apply[L, R](f: => Either[L, R]): L | R = apply { _(f) }
+
   def apply[L, R](f: (Either[L, R] => Unit) => Unit): L | R = new EitherTask(f)
+
   def fromEither[L, R](x: Either[L, R]): L | R = new EitherTask(_(x))
+
   def hold[L]: LeftApplied[L] = new LeftApplied[L]
+
   def await[L](msec: Int): L | Unit = {
     EitherTask(g => TaskAsync.after(msec){
       g(Right({}))
