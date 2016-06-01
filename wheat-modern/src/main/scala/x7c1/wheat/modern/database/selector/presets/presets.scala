@@ -37,6 +37,10 @@ trait TraverseOn[I[T] <: CanIdentify[T], A]{
   }
 }
 
+object TraverseOn {
+  type TraverseOnProvidable[I[T] <: CanIdentify[T], A] = SelectorProvidable[A, _ <: TraverseOn[I, A]]
+}
+
 trait Find[A]{
   protected def db: SQLiteDatabase
 

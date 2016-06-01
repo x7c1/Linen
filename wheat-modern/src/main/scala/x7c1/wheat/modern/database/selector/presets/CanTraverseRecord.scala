@@ -8,7 +8,7 @@ import scala.language.{higherKinds, reflectiveCalls}
 abstract class CanTraverseRecord[
   I[T] <: CanIdentify[T],
   A: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
-] extends CanTraverse[I, A]{
+] extends CanTraverseBySelect[I, A]{
 
   override def fromCursor(cursor: Cursor): Either[SQLException, ClosableSequence[A]] = {
     val sequence = ClosableSequence[A, A](cursor)

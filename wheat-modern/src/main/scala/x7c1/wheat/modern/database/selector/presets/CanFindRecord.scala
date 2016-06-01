@@ -22,7 +22,7 @@ object CanFindRecord {
 abstract class CanFindRecord[
   I[T] <: CanIdentify[T],
   A: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
-] extends CanFind[I, A]{
+] extends CanFindBySelect[I, A]{
 
   override def reify(cursor: Cursor): Option[A] = {
     new CursorConverter[A, A](cursor) convertAt 0
