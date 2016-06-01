@@ -6,21 +6,22 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingMyChannels, SettingPresetChannels, SettingLoaderSchedule}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu, LoaderSchedule}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.linen.modern.init.settings.schedule.LoaderSchedulesDelegatee
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannelAccessor, UnreadChannelLoader}
+import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel, UnreadChannelLoader}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.menu.{MenuItem, MenuItems, SingleMenuItem}
+import x7c1.wheat.modern.sequence.Sequence
 
 trait DrawerMenuInitializer {
   self: UnreadItemsDelegatee =>
@@ -59,7 +60,7 @@ trait DrawerMenuInitializer {
     new OnChannelSubscriptionChanged(layout, channelLoader)
 
   private def createMenuItems(
-    account: ClientAccount, accessor: UnreadChannelAccessor): MenuItems[MenuRow] = {
+    account: ClientAccount, accessor: Sequence[UnreadChannel]): MenuItems[MenuRow] = {
 
     val onClick = new OnMenuItemClick(activity, account.accountId, onChannelSelected)
     val title = new DrawerMenuTitleFactory(menuRowProviders.forTitle)
@@ -100,7 +101,7 @@ trait DrawerMenuInitializer {
 class UnreadChannelsMenu(
   viewHolderProvider: ViewHolderProvider[MenuRowLabel],
   label: DrawerMenuLabelFactory,
-  accessor: UnreadChannelAccessor) extends MenuItem[MenuRowLabel]{
+  accessor: Sequence[UnreadChannel]) extends MenuItem[MenuRowLabel]{
 
   override def length = Math.max(accessor.length, 1)
 

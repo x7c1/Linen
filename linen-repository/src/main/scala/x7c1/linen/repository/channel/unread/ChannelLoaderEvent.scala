@@ -1,6 +1,8 @@
 package x7c1.linen.repository.channel.unread
 
+import android.database.SQLException
 import x7c1.linen.repository.account.ClientAccount
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 sealed trait ChannelLoaderEvent
 
@@ -9,7 +11,7 @@ object ChannelLoaderEvent {
     val client: ClientAccount,
     val headChannel: Option[UnreadChannel] ) extends ChannelLoaderEvent
 
-  class AccessorError(error: ChannelAccessorError) extends ChannelLoaderEvent {
-    def detail: String = error.detail
+  class AccessorError(e: SQLException) extends ChannelLoaderEvent {
+    def detail: String = format(e.getCause){"[failed]"}
   }
 }
