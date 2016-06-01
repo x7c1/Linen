@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.unread
 
-import x7c1.linen.repository.channel.unread.selector.UnreadChannelSelector
+import x7c1.linen.repository.channel.unread.selector.{ToTraverse, UnreadChannelSelector}
 import x7c1.wheat.modern.database.selector.SelectorProvidable
 
 case class UnreadChannel(

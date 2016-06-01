@@ -34,20 +34,20 @@ class OnChannelSubscriptionChanged (
     listeners foreach { _ unregisterFrom context }
   }
   private lazy val onCreateMyChannel =
-    LocalBroadcastListener[ChannelCreated]{ _ => update() }
+    LocalBroadcastListener(update[ChannelCreated])
 
   private lazy val onDeleteMyChannel =
-    LocalBroadcastListener[MyChannelDeleted]{ _ => update() }
+    LocalBroadcastListener(update[MyChannelDeleted])
 
   private lazy val onSubscribeMyChannel =
-    LocalBroadcastListener[MyChannelSubscriptionChanged]{ event => update() }
+    LocalBroadcastListener(update[MyChannelSubscriptionChanged])
 
   private lazy val onSubscribePresetChannel =
-    LocalBroadcastListener[PresetChannelSubscriptionChanged]{ event => update() }
+    LocalBroadcastListener(update[PresetChannelSubscriptionChanged])
 
-  private def update() = {
-    val task = loader map (_.startLoading() flatMap notifyAdapter)
-    task foreach (_.execute())
+  private def update[A: HasAccountId](account: A) = {
+    val task = loader.startLoading(account) flatMap notifyAdapter
+    task.execute()
   }
   def notifyAdapter(event: LoaderEvent[UnreadChannel]) = CallbackTask[Done[UnreadChannel]]{ f =>
     Log error s"[init] $event"

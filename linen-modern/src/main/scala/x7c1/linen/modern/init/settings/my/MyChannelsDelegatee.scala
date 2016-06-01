@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
@@ -38,10 +39,10 @@ class MyChannelsDelegatee (
   private lazy val loader = new MyChannelAccessorLoader(helper)
 
   private lazy val onChannelCreated =
-    LocalBroadcastListener[ChannelCreated]{ reloadChannels }
+    LocalBroadcastListener{ reloadChannels[ChannelCreated] }
 
   private lazy val onSubscriptionChanged =
-    LocalBroadcastListener[MyChannelSubscriptionChanged]{ reloadChannels }
+    LocalBroadcastListener{ reloadChannels[MyChannelSubscriptionChanged] }
 
   def setup(): Unit = {
     onChannelCreated registerTo activity
@@ -67,9 +68,8 @@ class MyChannelsDelegatee (
     helper.close()
     Log info "[done]"
   }
-  private def reloadChannels(event: AccountBase): Unit ={
-    val client = ClientAccount(event.accountId)
-    (loader reload client){ _ =>
+  private def reloadChannels[A: HasAccountId](event: A): Unit ={
+    (loader reload event){ _ =>
       layout.channelList.getAdapter.notifyDataSetChanged()
     }
   }

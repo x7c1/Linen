@@ -1,11 +1,10 @@
 package x7c1.linen.modern.init.unread
 
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.linen.repository.channel.unread.{ChannelLoaderEvent, ChannelSelectable}
-import ChannelLoaderEvent.Done
-import x7c1.linen.repository.channel.unread.ChannelSelectable
+import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel}
 import x7c1.linen.repository.unread.AccessorLoader
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.Done
 
 
 class UnreadChannelsReader(

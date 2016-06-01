@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.my
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.repository.account.ClientAccount
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequence
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -11,7 +11,7 @@ class MyChannelAccessorLoader(helper: DatabaseHelper){
 
   private var accessorHolder: Option[AccessorHolder] = None
 
-  def reload(client: ClientAccount)(f: MyChannelAccessor => Unit): Unit = {
+  def reload[A: HasAccountId](client: A)(f: MyChannelAccessor => Unit): Unit = {
     accessorHolder -> createAccessor(client) match {
       case (Some(holder), Right(accessor)) =>
         holder updateAccessor accessor
@@ -24,7 +24,7 @@ class MyChannelAccessorLoader(helper: DatabaseHelper){
         Log error format(exception){"[unexpected]"}
     }
   }
-  private def createAccessor(client: ClientAccount) = {
+  private def createAccessor[A: HasAccountId](client: A) = {
     val internal = helper.selectorOf[MyChannel] traverseOn client
     internal.right map (new SourceFooterAppender(_))
   }

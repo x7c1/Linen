@@ -14,7 +14,8 @@ import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.linen.modern.init.settings.schedule.LoaderSchedulesDelegatee
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel, UnreadChannelLoader}
+import x7c1.linen.repository.channel.unread.selector.UnreadChannelSelector
+import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log

@@ -25,6 +25,7 @@ private class PresetChannelAccessorImpl(
     cursor.moveToFind(position){
       SettingPresetChannel(
         channelId = cursor.channel_id,
+        accountId = accountId,
         name = cursor.name,
         description = cursor.description,
         isSubscribed = cursor.subscribed == 1
