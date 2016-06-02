@@ -1,7 +1,7 @@
 package x7c1.linen.modern.action
 
 import x7c1.linen.modern.display.unread.{DetailSelectedEvent, OutlineSelectedEvent, SourceSelectedEvent}
-import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadDetail, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowContent, UnreadDetail, UnreadOutline}
 import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.observer.{FocusedEventFactory, ItemFocusedEvent, ItemSkippedEvent, ItemSkippedEventFactory, SkipStoppedEvent, SkipStoppedEventFactory}
@@ -93,7 +93,7 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
 
 class OutlineFocusedEvent(
   override val position: Int,
-  entry: UnreadEntryRow[UnreadOutline]) extends ItemFocusedEvent {
+  entry: EntryRowContent[UnreadOutline]) extends ItemFocusedEvent {
   val sourceId: Option[Long] = entry.sourceId
 }
 
@@ -109,7 +109,7 @@ class OutlineFocusedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkippedEvent(
   override val nextPosition: Int,
-  nextEntry: UnreadEntryRow[UnreadOutline] ) extends ItemSkippedEvent {
+  nextEntry: EntryRowContent[UnreadOutline] ) extends ItemSkippedEvent {
   val nextSourceId: Option[Long] = nextEntry.sourceId
 }
 
@@ -125,7 +125,7 @@ class EntrySkippedEventFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class EntrySkipStopped(
   override val currentPosition: Int,
-  currentEntry: UnreadEntryRow[UnreadOutline] ) extends SkipStoppedEvent {
+  currentEntry: EntryRowContent[UnreadOutline] ) extends SkipStoppedEvent {
   val currentSourceId: Option[Long] = currentEntry.sourceId
 }
 
@@ -141,7 +141,7 @@ class EntrySkipStoppedFactory(entryAccessor: EntryAccessor[UnreadOutline])
 
 class DetailFocusedEvent(
   override val position: Int,
-  entry: UnreadEntryRow[UnreadDetail] ) extends ItemFocusedEvent {
+  entry: EntryRowContent[UnreadDetail] ) extends ItemFocusedEvent {
   val sourceId: Option[Long] = entry.sourceId
 }
 

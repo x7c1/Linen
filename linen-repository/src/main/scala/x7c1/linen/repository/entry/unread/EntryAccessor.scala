@@ -12,7 +12,7 @@ import x7c1.wheat.modern.sequence.Sequence
 
 import scala.annotation.tailrec
 
-trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
+trait EntryAccessor[+A <: UnreadEntry] extends Sequence[EntryRowContent[A]] {
 
   def latestEntriesTo(position: Int): Seq[A]
 
@@ -27,7 +27,7 @@ trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
     (block: PartialFunction[(B, EntryRowContent[A]), Unit]) = {
 
     findAt(position) -> holder match {
-      case (Some(UnreadEntryRow(item)), _) if block isDefinedAt (holder, item) =>
+      case (Some(item), _) if block isDefinedAt (holder, item) =>
         block(holder, item)
       case (item, _) =>
         Log error s"unknown item:$item, holder:$holder"
@@ -44,14 +44,6 @@ trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
 
 trait ClosableEntryAccessor[+A <: UnreadEntry] extends EntryAccessor[A]{
   def close(): Unit
-}
-
-case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
-  def sourceId: Option[Long] = content match {
-    case SourceHeadlineContent(sourceId, title) => Some(sourceId)
-    case EntryContent(entry) => Some(entry.sourceId)
-    case FooterContent() => None
-  }
 }
 
 class EntryAccessorBinder[A <: UnreadEntry](
@@ -157,8 +149,8 @@ class EntryAccessorImpl[A <: UnreadEntry](
 
   override def findAt(position: Int) = {
     sequence.findAt(position) map {
-      case Left(source) => UnreadEntryRow(source)
-      case Right(entry) => UnreadEntryRow(EntryContent(entry))
+      case Left(source) => source
+      case Right(entry) => EntryContent(entry)
     }
   }
   override lazy val length = {
@@ -176,13 +168,13 @@ class EntryAccessorImpl[A <: UnreadEntry](
   override def lastEntriesTo(position: Int) = {
     val targets = positions.lastEntryPositions.view takeWhile {_ < position}
     targets :+ position flatMap findAt collect {
-      case UnreadEntryRow(EntryContent(entry)) => entry
+      case EntryContent(entry) => entry
     }
   }
   override def latestEntriesTo(position: Int): Seq[A] = {
     val targets = positions.latestEntryPositions.view takeWhile {_ <= position}
     targets flatMap findAt collect {
-      case UnreadEntryRow(EntryContent(entry)) => entry
+      case EntryContent(entry) => entry
     }
   }
 }

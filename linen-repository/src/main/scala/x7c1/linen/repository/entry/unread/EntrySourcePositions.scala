@@ -80,7 +80,7 @@ class EntrySourcePositions(
       case true =>
         val id = cursor getLong sourceIdIndex
         Some(new SourceHeadlineContent(
-          sourceId = id,
+          rawSourceId = id,
           title = cursor getString titleIndex
         ))
       case false => None

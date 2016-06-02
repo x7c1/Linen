@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor, UnreadSourceRow}
 import x7c1.wheat.macros.logger.Log
@@ -173,9 +173,7 @@ class AccessorLoader private (
 
       AccessorsLoadedEvent(
         loadedSources = sources,
-        remainingSources = remains,
-        outlines = outlines,
-        details = details
+        remainingSources = remains
       )
     }
 
@@ -248,9 +246,7 @@ object AccessorLoader {
 
 case class AccessorsLoadedEvent(
   loadedSources: Seq[UnreadSource],
-  remainingSources: Seq[UnreadSource],
-  outlines: Option[ClosableEntryAccessor[UnreadOutline]],
-  details: Option[ClosableEntryAccessor[UnreadDetail]]
+  remainingSources: Seq[UnreadSource]
 )
 
 case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
@@ -285,7 +281,7 @@ private class EntriesFooterAppender[A <: UnreadEntry](
 
   override def findAt(position: Int) = {
     if (isLast(position)){
-      Some(UnreadEntryRow(FooterContent()))
+      Some(FooterContent())
     } else {
       accessor.findAt(position)
     }
