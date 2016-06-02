@@ -65,7 +65,7 @@ class EntrySourcePositions(
   }
 
   def toHeadlines: SequenceHeadlines[SourceHeadlineContent] = {
-    val list = (0 to cursor.getCount - 1) map { i =>
+    val list = 0 until cursor.getCount map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
     }
@@ -98,15 +98,15 @@ class EntrySourcePositionsFactory(db: SQLiteDatabase){
     val cursor = createCursor(sources)
     val countIndex = cursor getColumnIndex "count"
     val sourceIdIndex = cursor getColumnIndex "source_id"
-    val list = (0 to cursor.getCount - 1).view map { i =>
+    val list = (0 until cursor.getCount).view map { i =>
       cursor moveToPosition i
       cursor.getLong(sourceIdIndex) -> cursor.getInt(countIndex)
     }
-    val pairs = list.scanLeft(0L -> (0, 0)){
-      case ((_, (previous, sum)), (sourceId, count)) =>
-        sourceId -> (count + 1, previous + sum)
+    val pairs = list.scanLeft(0L -> 0 -> 0){
+      case (((_, previous), sum), (sourceId, count)) =>
+        sourceId -> (count + 1) -> (previous + sum)
     } map {
-      case (sourceId, (count, position)) =>
+      case ((sourceId, count), position) =>
         sourceId -> (position + 1)
     }
     new EntrySourcePositions(cursor, pairs.toMap)

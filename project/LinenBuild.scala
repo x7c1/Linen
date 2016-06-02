@@ -14,7 +14,9 @@ object LinenBuild extends Build with LinenSettings {
     scalaVersion := "2.11.7",
     scalacOptions ++= Seq(
       "-deprecation",
-      "-feature"
+      "-feature",
+      "-unchecked",
+      "-Xlint"
     ),
     libraryDependencies += testLibrary,
     logLevel in assembly := Level.Error
