@@ -1,30 +1,23 @@
 package x7c1.linen.modern.display.unread
 
-import android.support.v7.widget.RecyclerView.Adapter
-import android.view.ViewGroup
 import x7c1.linen.glue.res.layout.{UnreadDetailRow, UnreadDetailRowEntry, UnreadDetailRowFooter, UnreadDetailRowSource}
-import x7c1.linen.modern.init.unread.DetailListProviders
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, SourceHeadlineContent, UnreadDetail, UnreadEntry}
+import x7c1.linen.repository.entry.unread.{EntryContent, EntryRowContent, SourceHeadlineContent, UnreadDetail, UnreadEntry}
+import x7c1.wheat.lore.resource.AdapterDelegatee
+import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.action.SiteVisitable
 import x7c1.wheat.modern.decorator.Imports._
 
 
 class DetailRowAdapter(
-  entryAccessor: EntryAccessor[UnreadDetail],
+  delegatee: AdapterDelegatee[UnreadDetailRow, EntryRowContent[UnreadDetail]],
   selectedListener: OnDetailSelectedListener,
   visitSelectedListener: OnEntryVisitListener[UnreadDetail],
   laterSelectedListener: OnLaterSelectedListener,
-  providers: DetailListProviders,
-  footerHeight: => Int ) extends Adapter[UnreadDetailRow] {
+  footerHeight: => Int ) extends BaseAdapter(delegatee) {
 
-  override def getItemCount = entryAccessor.length
-
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
-    providers.createViewHolder(parent, viewType)
-  }
   override def onBindViewHolder(holder: UnreadDetailRow, position: Int): Unit = {
-    entryAccessor.bindViewHolder(holder, position){
+    delegatee.bindViewHolder(holder, position){
       case (row: UnreadDetailRowEntry, EntryContent(entry)) =>
         row.title.text = entry.fullTitle
         row.content setHtmlWithoutImage entry.fullContent
@@ -48,9 +41,6 @@ class DetailRowAdapter(
         Log info s"footer"
     }
   }
-  override def getItemViewType(position: Int) = viewTypeAt(position)
-
-  private lazy val viewTypeAt = providers createViewTyper entryAccessor
 }
 
 trait OnDetailSelectedListener {

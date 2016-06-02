@@ -2,12 +2,10 @@ package x7c1.linen.repository.entry.unread
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.linen.repository.unread.{EntryKind, SourceKind, UnreadRowKind}
 import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.annotation.tailrec
@@ -21,25 +19,6 @@ trait EntryAccessor[+A <: UnreadEntry] extends Sequence[EntryRowContent[A]] {
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
   def findKindAt(position: Int): Option[UnreadRowKind]
-
-  def bindViewHolder[B <: ViewHolder]
-    (holder: B, position: Int)
-    (block: PartialFunction[(B, EntryRowContent[A]), Unit]) = {
-
-    findAt(position) -> holder match {
-      case (Some(item), _) if block isDefinedAt (holder, item) =>
-        block(holder, item)
-      case (item, _) =>
-        Log error s"unknown item:$item, holder:$holder"
-    }
-  }
-  def createPositionMap[B](f: UnreadRowKind => B): Int => B = {
-    position => findKindAt(position) match {
-      case Some(kind) => f(kind)
-      case None =>
-        throw new IllegalArgumentException(s"row-kind not defined at $position")
-    }
-  }
 }
 
 trait ClosableEntryAccessor[+A <: UnreadEntry] extends EntryAccessor[A]{

@@ -9,9 +9,9 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout._
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
+import x7c1.linen.modern.init.unread.entry.{DetailListProviders, OutlineListProviders}
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
-import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
 import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
 import x7c1.linen.repository.unread._
 import x7c1.linen.scene.loader.crawling.SchedulerService
@@ -145,8 +145,6 @@ class UnreadItemsDelegatee(
   }
 }
 
-
-
 class MenuRowProviders(
   val forTitle: ViewHolderProvider[MenuRowTitle],
   val forLabel: ViewHolderProvider[MenuRowLabel],
@@ -177,47 +175,4 @@ class SourceListProviders(
       }
       provider.layoutId
   }
-}
-
-trait EntryRowProviders{
-  self: ViewHolderProviders[_] =>
-
-  def forSource: ViewHolderProvider[_]
-  def forEntry: ViewHolderProvider[_]
-  def forFooter: ViewHolderProvider[_]
-
-  def createViewTyper[A <: UnreadEntry](accessor: EntryAccessor[A]): Int => Int = {
-    val map = accessor createPositionMap {
-      case SourceKind => forSource
-      case EntryKind => forEntry
-      case FooterKind => forFooter
-    }
-    position => map(position).layoutId
-  }
-}
-
-class OutlineListProviders(
-  val forSource: ViewHolderProvider[UnreadOutlineRowSource],
-  val forEntry: ViewHolderProvider[UnreadOutlineRowEntry],
-  val forFooter: ViewHolderProvider[UnreadOutlineRowFooter]
-) extends ViewHolderProviders[UnreadOutlineRow] with EntryRowProviders {
-
-  override protected val all = Seq(
-    forSource,
-    forEntry,
-    forFooter
-  )
-}
-
-class DetailListProviders(
-  val forSource: ViewHolderProvider[UnreadDetailRowSource],
-  val forEntry: ViewHolderProvider[UnreadDetailRowEntry],
-  val forFooter: ViewHolderProvider[UnreadDetailRowFooter]
-) extends ViewHolderProviders[UnreadDetailRow] with EntryRowProviders {
-
-  override protected val all = Seq(
-    forSource,
-    forEntry,
-    forFooter
-  )
 }

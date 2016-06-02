@@ -4,8 +4,9 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.modern.action.observer.{OutlineFocusedObserver, OutlineSelectedObserver, OutlineSkipStoppedObserver, OutlineSkippedObserver}
 import x7c1.linen.modern.action.{EntrySkipStopped, EntrySkipStoppedFactory, EntrySkippedEventFactory, OutlineFocusedEvent, OutlineFocusedEventFactory}
-import x7c1.linen.modern.display.unread.{OutlineSelectedEvent, OnOutlineSelectedListener, OutlineRowAdapter, PaneDragDetector}
+import x7c1.linen.modern.display.unread.{OnOutlineSelectedListener, OutlineRowAdapter, OutlineSelectedEvent, PaneDragDetector}
 import x7c1.linen.repository.unread.BrowsedEntriesMarker
+import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, OnItemFocusedListener, OnSkipStoppedListener, SkipDetector, SkipPositionFinder}
 
@@ -20,9 +21,11 @@ trait OutlineAreaInitializer {
     val manager = new LinearLayoutManager(layout.entryList.getContext)
     layout.entryList setLayoutManager manager
     layout.entryList setAdapter new OutlineRowAdapter(
-      accessors.entryOutline,
+      AdapterDelegatee.create(
+        providers = unreadRowProviders.forOutlineArea,
+        sequence = accessors.entryOutline
+      ),
       new OutlineSelectedObserver(actions) append outlineMarker,
-      unreadRowProviders.forOutlineArea,
       footerHeightOf(layout.entryList)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(
