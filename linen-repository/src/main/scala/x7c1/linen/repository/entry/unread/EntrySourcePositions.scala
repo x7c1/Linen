@@ -42,7 +42,7 @@ class EntrySourcePositions(
   private lazy val titleIndex = cursor getColumnIndex "title"
 
   private lazy val pairs: Seq[(Int, Boolean)] = {
-    val counts = (0 to cursor.getCount - 1) map { i =>
+    val counts = 0 until cursor.getCount map { i =>
       cursor moveToPosition i
       cursor.getInt(countIndex)
     }

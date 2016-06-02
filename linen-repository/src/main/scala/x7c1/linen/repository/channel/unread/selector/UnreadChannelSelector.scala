@@ -20,9 +20,10 @@ object UnreadChannelSelector {
   }
 }
 
-class ToTraverse extends CanTraverse[HasAccountId, UnreadChannel]{
+private[unread] class CanTraverseImpl extends CanTraverse[HasAccountId, UnreadChannel]{
   override def extract[A: HasAccountId](db: SQLiteDatabase, account: A) = {
-    db.selectorOf[SubscribedChannel].traverseOn(account).right map (_ map toUnreadChannel)
+    val either = db.selectorOf[SubscribedChannel].traverseOn(account).right
+    either map (_ map toUnreadChannel)
   }
   private def toUnreadChannel(channel: SubscribedChannel): UnreadChannel = {
     UnreadChannel(
