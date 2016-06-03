@@ -53,7 +53,7 @@ class PaneContainer(
 
   private lazy val width = {
     val length = view.getChildCount
-    val children = 0 to (length - 1) map view.getChildAt
+    val children = 0 until length map view.getChildAt
     children.foldLeft(0){_ + _.getWidth} - displayWidth
   }
   def scrollBy(x: Int): Unit = {

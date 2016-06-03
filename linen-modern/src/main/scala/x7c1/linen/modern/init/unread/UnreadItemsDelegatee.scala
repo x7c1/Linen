@@ -10,14 +10,15 @@ import x7c1.linen.glue.res.layout._
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
 import x7c1.linen.modern.init.unread.entry.{DetailListProviders, OutlineListProviders}
+import x7c1.linen.modern.init.unread.source.SourceListProviders
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
-import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.repository.source.unread.RawSourceAccessor
 import x7c1.linen.repository.unread._
 import x7c1.linen.scene.loader.crawling.SchedulerService
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
+import x7c1.wheat.modern.resource.MetricsConverter
 
 import scala.concurrent.Future
 
@@ -157,22 +158,4 @@ class UnreadRowProviders(
   val forDetailArea: DetailListProviders
 )
 
-class SourceListProviders(
-  val forItem: ViewHolderProvider[UnreadSourceRowItem],
-  val forFooter: ViewHolderProvider[UnreadSourceRowFooter]
-) extends ViewHolderProviders[UnreadSourceRow] {
 
-  override protected val all = Seq(
-    forItem,
-    forFooter
-  )
-  def createViewTyper(accessor: UnreadSourceAccessor): Int => Int = {
-    position =>
-      val provider = if (position == accessor.length - 1){
-        forFooter
-      } else {
-        forItem
-      }
-      provider.layoutId
-  }
-}

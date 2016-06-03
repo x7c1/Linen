@@ -16,7 +16,7 @@ import x7c1.linen.repository.entry.EntryUrl
 import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositionsFactory, SourceHeadlineContent, UnreadOutline}
 import x7c1.linen.repository.loader.crawling.LoadedEntry
 import x7c1.linen.repository.source.setting.SampleFactory
-import x7c1.linen.repository.source.unread.{UnreadSource, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.linen.testing.LogSetting
 import x7c1.wheat.modern.either.OptionRight
 
@@ -103,10 +103,10 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
 
       assertEquals(2, updatedSourceAccessor.length)
 
-      val Some(UnreadSourceRow(s2: UnreadSource)) = updatedSourceAccessor findAt 0
+      val Some(s2: UnreadSource) = updatedSourceAccessor findAt 0
       assertEquals("title 2", s2.title)
 
-      val Some(UnreadSourceRow(s1: UnreadSource)) = updatedSourceAccessor findAt 1
+      val Some(s1: UnreadSource) = updatedSourceAccessor findAt 1
       assertEquals("title 1", s1.title)
 
       val s = updatedSourceAccessor findAt 2
@@ -145,7 +145,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
       assertEquals(3, updatedSourceAccessor.length)
 
       val xs = 0 until updatedSourceAccessor.length flatMap updatedSourceAccessor.findAt collect {
-        case UnreadSourceRow(source: UnreadSource) => source
+        case source: UnreadSource => source
       }
       assertEquals(true, xs.exists(_.id == source0.id))
       assertEquals(false, xs.exists(_.id == source1.id))

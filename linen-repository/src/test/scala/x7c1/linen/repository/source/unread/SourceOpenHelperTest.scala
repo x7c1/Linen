@@ -36,8 +36,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       fixture.channel1.channelId,
       fixture.account1.accountId
     )
-    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt) collect {
-      case UnreadSourceRow(x: UnreadSource) => x
+    val sources = 0 until accessor.length flatMap accessor.findAt collect {
+      case x: UnreadSource => x
     }
     assertEquals(Seq(33, 11), sources.map(_.rating))
     assertEquals(Seq("description2", "description1"), sources.map(_.description))

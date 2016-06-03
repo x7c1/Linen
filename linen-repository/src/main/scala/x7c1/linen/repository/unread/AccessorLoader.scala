@@ -7,7 +7,7 @@ import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
@@ -262,7 +262,7 @@ private class SourceFooterAppender(
 
   override def findAt(position: Int) = {
     if (isLast(position)){
-      Some(UnreadSourceRow(SourceFooterContent()))
+      Some(SourceFooterContent())
     } else {
       accessor findAt position
     }

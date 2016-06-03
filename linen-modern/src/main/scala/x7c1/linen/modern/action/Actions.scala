@@ -58,8 +58,11 @@ class SourceFocusedEventFactory(sourceAccessor: UnreadSourceAccessor)
   extends FocusedEventFactory[SourceFocusedEvent] {
 
   override def createAt(position: Int) = {
-    sourceAccessor findAt position map { row =>
-      SourceFocusedEvent(position, row.source)
+    sourceAccessor findAt position map {
+      case row: UnreadSource =>
+        SourceFocusedEvent(position, Some(row))
+      case _ =>
+        SourceFocusedEvent(position, None)
     }
   }
 }
@@ -85,8 +88,11 @@ class SourceSkipStoppedFactory(sourceAccessor: UnreadSourceAccessor)
   extends SkipStoppedEventFactory[SourceSkipStopped]{
 
   override def createAt(current: Int) = {
-    sourceAccessor findAt current map { row =>
-      SourceSkipStopped(current, row.source)
+    sourceAccessor findAt current map {
+      case row: UnreadSource =>
+        SourceSkipStopped(current, Some(row))
+      case _ =>
+        SourceSkipStopped(current, None)
     }
   }
 }
