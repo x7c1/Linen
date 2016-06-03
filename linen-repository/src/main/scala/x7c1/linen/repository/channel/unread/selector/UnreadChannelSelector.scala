@@ -5,6 +5,7 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.channel.unread.UnreadChannel
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenceLoader, TraverseOn}
 
@@ -18,7 +19,7 @@ object UnreadChannelSelector {
   def createLoader(helper: DatabaseHelper): UnreadChannelLoader = {
     ClosableSequenceLoader[HasAccountId, UnreadChannel](helper.getReadableDatabase)
   }
-  implicit def reify: SQLiteDatabase => UnreadChannelSelector = new UnreadChannelSelector(_)
+  implicit def reify: CanReify[UnreadChannelSelector] = new UnreadChannelSelector(_)
 }
 
 private[unread] class CanTraverseImpl extends CanTraverse[HasAccountId, UnreadChannel]{

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
 import x7c1.wheat.modern.database.selector.presets.{FindBy, FindByTag}
 import x7c1.wheat.modern.database.selector.{Identifiable, RecordReifiable, SelectorProvidable}
@@ -37,7 +38,7 @@ object account_tags {
       with FindByTag[HasAccountTagLabel, account_tags]
 
   object Selector {
-    implicit def reify: SQLiteDatabase => Selector = new Selector(_)
+    implicit def reify: CanReify[Selector] = new Selector(_)
   }
 }
 trait HasAccountTagId[A] extends Identifiable[A, Long]

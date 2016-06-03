@@ -4,6 +4,7 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.repository.loader.schedule.{LoaderSchedule, PresetLoaderSchedule}
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.either.OptionEither
@@ -21,5 +22,5 @@ class PresetScheduleSelector(protected val db: SQLiteDatabase){
 }
 
 object PresetScheduleSelector {
-  implicit def reify: SQLiteDatabase => PresetScheduleSelector = new PresetScheduleSelector(_)
+  implicit def reify: CanReify[PresetScheduleSelector] = new PresetScheduleSelector(_)
 }

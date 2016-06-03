@@ -1,6 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.sqlite.SQLiteDatabase
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.{CanIdentify, SelectorProvidable}
 
 import scala.language.higherKinds
@@ -16,7 +17,7 @@ class DefaultSelector[I[T] <: CanIdentify[T], A](val db: SQLiteDatabase)
     with CollectFrom[I, A]
 
 object DefaultSelector {
-  implicit def reify[I[T] <: CanIdentify[T], A]: SQLiteDatabase => DefaultSelector[I, A] = {
+  implicit def reify[I[T] <: CanIdentify[T], A]: CanReify[DefaultSelector[I, A]] = {
     new DefaultSelector(_)
   }
 }
