@@ -12,7 +12,7 @@ case class SourceHeadlineContent(
 }
 
 case class EntryContent[+A <: UnreadEntry](entry: A) extends EntryRowContent[A] {
-  override def sourceId: Option[Long] = None
+  override def sourceId: Option[Long] = Some(entry.sourceId)
 }
 
 case class FooterContent() extends EntryRowContent[Nothing] {
