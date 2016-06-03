@@ -70,14 +70,13 @@ class MyChannelsDelegatee (
     helper.close()
     Log info "[done]"
   }
-  private def reloadChannels[A: HasAccountId](event: A): Unit ={
-    val task = loader.startLoading(event) map {
+  private def reloadChannels[A: HasAccountId](event: A): Unit = {
+    loader startLoading event apply {
       case Done(_) =>
-        layout.channelList.getAdapter.notifyDataSetChanged()
+        layout.channelList runUi { _.getAdapter.notifyDataSetChanged() }
       case SqlError(e) =>
         Log error format(e.getCause){"[failed]"}
     }
-    task.execute()
   }
   private def setAdapter[A: HasAccountId](account: A)(accessor: Sequence[MyChannelRow]) = {
     Log info s"[init]"
