@@ -30,12 +30,15 @@ object account_tags {
   implicit object idFindable extends Where[HasAccountTagId, account_tags](table){
     override def where[X](id: Long) = toArgs(column.account_tag_id -> id)
   }
-  implicit object providable
-    extends SelectorProvidable[account_tags, Selector](new Selector(_))
+  implicit object providable extends SelectorProvidable[account_tags, Selector]
 
   class Selector(val db: SQLiteDatabase)
     extends FindBy[HasAccountTagId, account_tags]
       with FindByTag[HasAccountTagLabel, account_tags]
+
+  object Selector {
+    implicit def reify: SQLiteDatabase => Selector = new Selector(_)
+  }
 }
 trait HasAccountTagId[A] extends Identifiable[A, Long]
 

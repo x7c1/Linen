@@ -16,8 +16,7 @@ object UnreadChannel {
     override def toId = _.channelId
     override def nameOf = _.name
   }
-  implicit object providable
-    extends SelectorProvidable[UnreadChannel, UnreadChannelSelector](new UnreadChannelSelector(_))
+  implicit object providable extends SelectorProvidable[UnreadChannel, UnreadChannelSelector]
 
   implicit object traverse extends CanTraverseImpl
 }

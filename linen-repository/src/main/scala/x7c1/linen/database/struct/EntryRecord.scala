@@ -28,8 +28,7 @@ object EntryRecord {
   implicit object reifiable extends RecordReifiable[EntryRecord]{
     override def reify(cursor: Cursor) = TypedCursor[EntryRecord](cursor)
   }
-  implicit object providable
-    extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
+  implicit object providable extends SelectorProvidable[EntryRecord, Selector]
 
   implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord](table){
     override def where[X](id: Long) = toArgs(column.entry_id -> id)
@@ -40,6 +39,10 @@ object EntryRecord {
   class Selector(val db: SQLiteDatabase)
     extends CollectFrom[HasSourceId, EntryRecord]
       with FindBy[HasEntryId, EntryRecord]
+
+  object Selector {
+    implicit def reify: SQLiteDatabase => Selector = new Selector(_)
+  }
 }
 
 trait HasEntryId[A] extends Identifiable[A, Long]

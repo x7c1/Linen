@@ -19,3 +19,7 @@ class PresetScheduleSelector(protected val db: SQLiteDatabase){
     either.toOptionEither
   }
 }
+
+object PresetScheduleSelector {
+  implicit def reify: SQLiteDatabase => PresetScheduleSelector = new PresetScheduleSelector(_)
+}

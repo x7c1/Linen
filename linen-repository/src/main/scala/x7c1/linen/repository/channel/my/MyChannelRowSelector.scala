@@ -8,6 +8,10 @@ import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenc
 class MyChannelRowSelector (protected val db: SQLiteDatabase)
   extends TraverseOn[HasAccountId, MyChannelRow]
 
+object MyChannelRowSelector {
+  implicit def reify: SQLiteDatabase => MyChannelRowSelector = new MyChannelRowSelector(_)
+}
+
 private[channel] class CanTraverseImpl extends CanTraverse[HasAccountId, MyChannelRow]{
   override def extract[X: HasAccountId](db: SQLiteDatabase, account: X) = {
     val internal = db.selectorOf[MyChannel] traverseOn account

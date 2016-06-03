@@ -18,6 +18,7 @@ object UnreadChannelSelector {
   def createLoader(helper: DatabaseHelper): UnreadChannelLoader = {
     ClosableSequenceLoader[HasAccountId, UnreadChannel](helper.getReadableDatabase)
   }
+  implicit def reify: SQLiteDatabase => UnreadChannelSelector = new UnreadChannelSelector(_)
 }
 
 private[unread] class CanTraverseImpl extends CanTraverse[HasAccountId, UnreadChannel]{

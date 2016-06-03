@@ -17,7 +17,7 @@ object LoaderScheduleWithKind {
     override def toId = _.schedule_id
   }
   implicit object providable
-    extends SelectorProvidable[LoaderScheduleWithKind, Selector](new Selector(_))
+    extends SelectorProvidable[LoaderScheduleWithKind, Selector]
 
   implicit object reifiable extends RecordReifiable[LoaderScheduleWithKind]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleWithKind](cursor)
@@ -65,4 +65,8 @@ object LoaderScheduleWithKind {
       with FindBy[HasLoaderScheduleId, LoaderScheduleWithKind]
       with TraverseOn[HasAccountId, LoaderScheduleWithKind]
       with TraverseAll[LoaderScheduleWithKind]
+
+  object Selector {
+    implicit def reify: SQLiteDatabase => Selector = new Selector(_)
+  }
 }

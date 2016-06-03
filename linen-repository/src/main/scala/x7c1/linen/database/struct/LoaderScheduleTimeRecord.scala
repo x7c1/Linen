@@ -46,8 +46,7 @@ object LoaderScheduleTimeRecord {
       Query(sql, Array(accountId.toString))
     }
   }
-  implicit object providable
-    extends SelectorProvidable[LoaderScheduleTimeRecord, Selector](new Selector(_))
+  implicit object providable extends SelectorProvidable[LoaderScheduleTimeRecord, Selector]
 
   implicit object collect
     extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord](table){
@@ -70,6 +69,10 @@ object LoaderScheduleTimeRecord {
     extends CollectFrom[HasLoaderScheduleId, LoaderScheduleTimeRecord]
       with TraverseAll[LoaderScheduleTimeRecord]
       with TraverseOn[HasAccountId, LoaderScheduleTimeRecord]
+
+  object Selector {
+    implicit def reify: SQLiteDatabase => Selector = new Selector(_)
+  }
 }
 
 case class ScheduleTimeParts(

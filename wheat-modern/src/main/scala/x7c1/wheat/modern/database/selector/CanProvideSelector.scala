@@ -10,19 +10,11 @@ trait CanProvideSelector[A]{
   def createFrom(db: SQLiteDatabase): Selector
 }
 
-class SelectorProvidable2[A, S: ({type L[X] = SQLiteDatabase => X})#L] extends CanProvideSelector[A]{
+class SelectorProvidable[A, S: ({type L[X] = SQLiteDatabase => X})#L] extends CanProvideSelector[A]{
   override type Selector = S
   override def createFrom(db: SQLiteDatabase): S = {
     implicitly[SQLiteDatabase => S] apply db
   }
-}
-
-class SelectorProvidable[A, S](selector: SQLiteDatabase => S)
-  extends CanProvideSelector[A]{
-
-  override type Selector = S
-
-  override def createFrom(db: SQLiteDatabase) = selector(db)
 }
 
 object SelectorProvidable {
