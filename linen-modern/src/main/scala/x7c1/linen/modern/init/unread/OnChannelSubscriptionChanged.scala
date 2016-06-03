@@ -50,7 +50,6 @@ class OnChannelSubscriptionChanged (
     task.execute()
   }
   def notifyAdapter(event: LoaderEvent[UnreadChannel]) = CallbackTask[Done[UnreadChannel]]{ f =>
-    Log error s"[init] $event"
     event match {
       case e: Done[UnreadChannel] =>
         Log info s"[done] ${e.sequence.length}"

@@ -3,10 +3,16 @@ package x7c1.linen.repository.channel.my
 import x7c1.linen.database.mixin.MyChannelRecord
 import x7c1.linen.database.struct.{ChannelDeletable, HasAccountId, HasChannelId}
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.modern.database.selector.CursorConvertible
+import x7c1.wheat.modern.database.selector.{CursorConvertible, SelectorProvidable}
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseEntity, DefaultProvidable}
 
 sealed trait MyChannelRow
+
+object MyChannelRow {
+  implicit object traverse extends CanTraverseImpl
+  implicit object providable
+    extends SelectorProvidable[MyChannelRow, MyChannelRowSelector](new MyChannelRowSelector(_))
+}
 
 case class MyChannel(
   channelId: Long,

@@ -2,14 +2,13 @@ package x7c1.linen.repository.channel.subscribe
 
 import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelStatusKey, ChannelStatusRecord, ChannelStatusRecordParts}
-import x7c1.linen.repository.account.AccountBase
+import x7c1.linen.database.struct.{ChannelStatusKey, ChannelStatusRecord, ChannelStatusRecordParts, HasAccountId}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.WritableDatabase
 import x7c1.wheat.modern.either.OptionEither
 
 
-class ChannelSubscriber(account: AccountBase, helper: DatabaseHelper) {
+class ChannelSubscriber[X: HasAccountId](account: X, helper: DatabaseHelper) {
   import x7c1.wheat.modern.either.Imports._
 
   def subscribe(channelId: Long): OptionEither[SQLException, Unit] = {
@@ -22,7 +21,7 @@ class ChannelSubscriber(account: AccountBase, helper: DatabaseHelper) {
     def insertOrUpdate(channelId: Long) = {
       val either = helper.selectorOf[ChannelStatusRecord] findBy ChannelStatusKey(
         channelId = channelId,
-        accountId = account.accountId
+        accountId = implicitly[HasAccountId[X]] toId account
       )
       either.option flatMap {
         case Some(record) => update(channelId).toOptionEither
@@ -36,7 +35,7 @@ class ChannelSubscriber(account: AccountBase, helper: DatabaseHelper) {
       val either = WritableDatabase.transaction(helper.getWritableDatabase){ writable =>
         f(writable, ChannelStatusRecordParts(
           channelId = channelId,
-          accountId = account.accountId,
+          accountId = implicitly[HasAccountId[X]] toId account,
           subscribed = subscribed
         ))
       }

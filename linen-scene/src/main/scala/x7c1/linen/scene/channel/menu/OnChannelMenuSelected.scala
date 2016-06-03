@@ -14,15 +14,15 @@ import x7c1.wheat.modern.menu.popup.PopupMenuItem
 
 
 object OnChannelMenuSelected {
-  def forMyChannel(
+  def forMyChannel[A: HasAccountId](
     activity: Activity with ServiceControl,
-    accountId: Long,
+    account: A,
     helper: DatabaseHelper,
     onDeleted: MyChannelDeleted => Unit ): OnMenuSelectedListener[MyChannel] = {
 
     Log info s"[init]"
     OnMenuSelectedListener.create(activity){ event =>
-      val factory = new MenuItemFactory(activity, accountId)
+      val factory = new MenuItemFactory(activity, implicitly[HasAccountId[A]] toId account)
       Seq(
         factory.toLoadSources(event.channelId),
         factory.toDeleteChannel(helper, event.channel, onDeleted)

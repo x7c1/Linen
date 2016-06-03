@@ -8,13 +8,15 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.modern.decorator.Imports._
 
-class ChannelRowAdapter(
-  accountId: Long,
+class ChannelRowAdapter[A: HasAccountId](
+  account: A,
   delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
   onMenuSelected: OnMenuSelectedListener[MyChannel],
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends BaseAdapter(delegatee){
+
+  private val accountId = implicitly[HasAccountId[A]] toId account
 
   override def onBindViewHolder(holder: SettingMyChannelRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
