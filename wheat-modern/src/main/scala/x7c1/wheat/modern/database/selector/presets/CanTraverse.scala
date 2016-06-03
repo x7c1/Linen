@@ -6,8 +6,7 @@ import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.TaskProvider.async
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
-import x7c1.wheat.modern.database.selector.presets.TraverseOn.TraverseOnProvidable
-import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanSelect, CursorReadable, CursorReifiable}
+import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanProvideSelector, CanSelect, CursorReadable, CursorReifiable}
 import x7c1.wheat.modern.sequence.{CanMapFrom, Sequence}
 
 import scala.language.{higherKinds, reflectiveCalls}
@@ -55,7 +54,11 @@ object ClosableSequence {
 }
 
 class ClosableSequenceLoader[I[T] <: CanIdentify[T], A] private
-  (db: SQLiteDatabase)(implicit x1: CanTraverse[I, A], x2: TraverseOnProvidable[I, A]){
+  (db: SQLiteDatabase)
+  (implicit
+    x1: CanTraverse[I, A],
+    x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
+  ){
 
   private val holder = new SequenceHolder
 
@@ -92,9 +95,11 @@ object ClosableSequenceLoader {
   case class SqlError[A](cause: SQLException) extends LoaderEvent[A]
 
   def apply[I[T] <: CanIdentify[T], A]
-    (db: SQLiteDatabase)(implicit
+    (db: SQLiteDatabase)
+    (implicit
       x1: CanTraverse[I, A],
-      x2: TraverseOnProvidable[I, A]): ClosableSequenceLoader[I, A] = {
+      x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
+    ): ClosableSequenceLoader[I, A] = {
 
     new ClosableSequenceLoader(db)
   }

@@ -2,10 +2,19 @@ package x7c1.wheat.modern.database.selector
 
 import android.database.sqlite.SQLiteDatabase
 
+import scala.language.reflectiveCalls
+
 
 trait CanProvideSelector[A]{
   type Selector
   def createFrom(db: SQLiteDatabase): Selector
+}
+
+class SelectorProvidable2[A, S: ({type L[X] = SQLiteDatabase => X})#L] extends CanProvideSelector[A]{
+  override type Selector = S
+  override def createFrom(db: SQLiteDatabase): S = {
+    implicitly[SQLiteDatabase => S] apply db
+  }
 }
 
 class SelectorProvidable[A, S](selector: SQLiteDatabase => S)
