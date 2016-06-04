@@ -1,34 +1,32 @@
 package x7c1.wheat.modern.sequence
 
-import scala.collection.mutable.ListBuffer
+import scala.annotation.tailrec
 import scala.language.higherKinds
 
 trait SequenceFilter[A, F[_] <: Sequence[_]]{
   protected def underlying: F[A]
 
   def filter(f: A => Boolean)(implicit x: CanFilterFrom[F]): F[A] = {
-    x.filterFrom(underlying)(f)
+    val fa = underlying.asInstanceOf[Sequence[A]]
+
+    @tailrec
+    def loop(n: Int, hit: Int, map: Map[Int, Int]): Map[Int, Int] = n match {
+      case _ if n == fa.length => map
+      case _ if fa findAt n exists f => loop(n + 1, hit + 1, map + (hit -> n))
+      case _ => loop(n + 1, hit, map)
+    }
+    x.asFiltered(underlying)(loop(0, 0, Map()))
   }
 }
 
 trait CanFilterFrom[F[_]]{
-  def filterFrom[A](fa: F[A])(f: A => Boolean): F[A]
+  def asFiltered[A](fa: F[A])(filtered: Map[Int, Int]): F[A]
 }
 
 private[sequence] class DefaultCanFilterFrom extends CanFilterFrom[Sequence]{
-  override def filterFrom[A](fa: Sequence[A])(f: A => Boolean) =
+  override def asFiltered[A](fa: Sequence[A])(filtered: Map[Int, Int]) =
     new Sequence[A] {
-      val (find, size) = {
-        val cache = ListBuffer[Int]()
-        (0 until fa.length).view.foreach {
-          case n if fa findAt n exists f => cache += n
-          case  _ => //nop
-        }
-        cache.lift -> cache.length
-      }
-      override def findAt(position: Int): Option[A] = {
-        find(position) flatMap fa.findAt
-      }
-      override def length: Int = size
+      override def findAt(position: Int) = filtered get position flatMap fa.findAt
+      override def length = filtered.size
     }
 }

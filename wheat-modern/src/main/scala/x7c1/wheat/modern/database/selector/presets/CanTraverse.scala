@@ -7,7 +7,7 @@ import x7c1.wheat.modern.callback.TaskProvider.async
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
 import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanProvideSelector, CanSelect, CursorReadable, CursorReifiable}
-import x7c1.wheat.modern.sequence.{CanMapFrom, Sequence}
+import x7c1.wheat.modern.sequence.{CanFilterFrom, CanMapFrom, Sequence}
 
 import scala.language.{higherKinds, reflectiveCalls}
 
@@ -49,6 +49,14 @@ object ClosableSequence {
         override def closeCursor() = fa.closeCursor()
         override def findAt(position: Int) = fa.findAt(position) map f
         override def length = fa.length
+      }
+  }
+  implicit object canFilterFrom extends CanFilterFrom[ClosableSequence]{
+    override def asFiltered[A](fa: ClosableSequence[A])(filtered: Map[Int, Int]) =
+      new ClosableSequence[A] {
+        override def closeCursor() = fa.closeCursor()
+        override def findAt(position: Int) = filtered get position flatMap fa.findAt
+        override def length = filtered.size
       }
   }
 }
