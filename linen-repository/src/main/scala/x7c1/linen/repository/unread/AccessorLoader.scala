@@ -121,19 +121,6 @@ class AccessorLoader private (
       Log info s"[init] remains:${remainingSources.length}"
 
       val (sources, remains) = remainingSources splitAt 50
-      val (outlines, details) =
-        if (sources.nonEmpty) {
-          val positions = {
-            val factory = new EntrySourcePositionsFactory(database)
-            factory create sources
-          }
-          val outlines = Option(EntryAccessor.forEntryOutline(database, sources, positions))
-          val details = Option(EntryAccessor.forEntryDetail(database, sources, positions))
-          outlines -> details
-        } else {
-          None -> None
-        }
-
       AccessorsLoadedEvent(
         loadedSources = sources,
         remainingSources = remains
