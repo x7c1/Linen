@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowsBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
@@ -13,7 +13,6 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -24,8 +23,6 @@ class AccessorLoader private (
   context: Context,
   loaderManager: LoaderManager ){
 
-  private val outlineAccessors = ListBuffer[ClosableEntryAccessor[UnreadOutline]]()
-  private val detailAccessors = ListBuffer[ClosableEntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
     context = context,
     loaderManager = loaderManager,
@@ -46,13 +43,12 @@ class AccessorLoader private (
     }
     new SourceFooterAppender(underlying)
   }
-  private lazy val outlineUnderlying = new EntryAccessorBinder(outlineAccessors)
+  private lazy val outlineUnderlying = EntryRowsBinder[UnreadOutline]()
 
   def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
     new EntriesFooterAppender(outlineUnderlying)
   }
-
-  private lazy val detailUnderlying = new EntryAccessorBinder(detailAccessors)
+  private lazy val detailUnderlying = EntryRowsBinder[UnreadDetail]()
 
   def createDetailAccessor: EntryAccessor[UnreadDetail] = {
     new EntriesFooterAppender(detailUnderlying)
@@ -133,8 +129,6 @@ class AccessorLoader private (
 
       currentSourceLength = 0
       sourceAccessor = None
-      outlineAccessors.clear()
-      detailAccessors.clear()
     }
   }
   private def startLoadingSources[A: HasAccountId, B: HasChannelId]
@@ -143,11 +137,9 @@ class AccessorLoader private (
     AccessorLoader.inspectSourceAccessor(database, account, channel) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
-        Seq()
         None
       case Left(empty) =>
         Log info empty.message
-        Seq()
         None
       case Right(accessor) =>
         Some(accessor)
@@ -190,8 +182,8 @@ class AccessorLoader private (
       val details = EntryAccessor.forEntryDetail(database, sources, positions)
       synchronized {
         currentSourceLength += sources.length
-        outlineAccessors += outlines
-        detailAccessors += details
+        outlineUnderlying append outlines
+        detailUnderlying append details
       }
     }
   }

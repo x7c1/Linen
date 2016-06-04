@@ -9,6 +9,7 @@ import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 trait EntryAccessor[+A <: UnreadEntry] extends Sequence[EntryRowContent[A]] {
 
@@ -25,9 +26,12 @@ trait ClosableEntryAccessor[+A <: UnreadEntry] extends EntryAccessor[A]{
   def close(): Unit
 }
 
-class EntryAccessorBinder[A <: UnreadEntry](
-  accessors: Seq[ClosableEntryAccessor[A]]) extends ClosableEntryAccessor[A]{
+class EntryRowsBinder[A <: UnreadEntry] private (
+  accessors: ListBuffer[ClosableEntryAccessor[A]]) extends ClosableEntryAccessor[A]{
 
+  def append(sequence: ClosableEntryAccessor[A]): Unit = {
+    accessors += sequence
+  }
   override def findAt(position: Int) = {
     findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
       accessor.findAt(position - prev)
@@ -75,6 +79,7 @@ class EntryAccessorBinder[A <: UnreadEntry](
 
   override def close(): Unit = synchronized {
     accessors foreach (_.close())
+    accessors.clear()
   }
   override def lastEntriesTo(position: Int) = {
     @tailrec
@@ -116,6 +121,12 @@ class EntryAccessorBinder[A <: UnreadEntry](
       }
     }
     loop(accessors, position, Seq())
+  }
+}
+
+object EntryRowsBinder {
+  def apply[A <: UnreadEntry](): EntryRowsBinder[A] = {
+    new EntryRowsBinder[A](new ListBuffer())
   }
 }
 
