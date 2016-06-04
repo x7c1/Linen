@@ -53,11 +53,8 @@ class AccessorLoader private (
   def createDetailAccessor: EntryAccessor[UnreadDetail] = {
     new EntriesFooterAppender(detailUnderlying)
   }
-  def startLoading[A: HasAccountId, B: ChannelSelectable]
+  def reload[A: HasAccountId, B: ChannelSelectable]
     (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
-
-    val accountId = implicitly[HasAccountId[A]] toId account
-    Log info s"[init] account:$accountId"
 
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -67,32 +64,6 @@ class AccessorLoader private (
 //      remaining
 //    }
 //    first onComplete loadNext
-
-    val load = for {
-      accessor <- startLoadingSources(
-        account = account,
-        channel = channel
-      )
-      event <- loadSourceEntries(
-        remainingSources = accessor map (_.sources) getOrElse Seq()
-      )
-      _ <- Future {
-        this.sourceAccessor = accessor
-        updateAccessors(event)
-      }
-      _ <- Future { onLoad(LoadCompleteEvent(channel)) }
-    } yield {
-      event
-    }
-    load onComplete {
-      case Success(event) =>
-        Log info s"[done] loaded:${event.loadedSources.length}"
-      case Failure(error) =>
-        Log error format(error){"[failed]"}
-    }
-  }
-  def restartLoading[A: HasAccountId, B: ChannelSelectable]
-    (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
 
     val accountId = implicitly[HasAccountId[A]] toId account
     Log info s"[init] account:$accountId"
