@@ -1,8 +1,14 @@
 package x7c1.linen.repository.source.unread
 
 import x7c1.linen.database.struct.HasSourceId
+import x7c1.linen.repository.source.unread.selector.SourceRowSelector
+import x7c1.wheat.modern.database.selector.SelectorProvidable
 
 sealed trait SourceRowContent
+
+object SourceRowContent {
+  implicit object providable extends SelectorProvidable[SourceRowContent, SourceRowSelector]
+}
 
 case class UnreadSource(
   id: Long,

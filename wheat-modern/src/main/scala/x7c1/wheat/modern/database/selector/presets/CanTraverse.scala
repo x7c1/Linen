@@ -81,7 +81,10 @@ class ClosableSequenceLoader[I[T] <: CanIdentify[T], A] private
     case Left(e) =>
       SqlError(e)
   }
-  private class SequenceHolder extends Sequence[A]{
+  def closeCursor(): Unit = {
+    holder.closeCursor()
+  }
+  private class SequenceHolder extends ClosableSequence[A]{
     private var underlying: Option[ClosableSequence[A]] = None
 
     def updateSequence(sequence: ClosableSequence[A]) = synchronized {
@@ -94,12 +97,16 @@ class ClosableSequenceLoader[I[T] <: CanIdentify[T], A] private
     override def findAt(position: Int) = {
       underlying flatMap (_ findAt position)
     }
+    override def closeCursor() = synchronized {
+      underlying foreach (_.closeCursor())
+      underlying = None
+    }
   }
 }
 
 object ClosableSequenceLoader {
   sealed trait LoaderEvent[A]
-  case class Done[A](sequence: ClosableSequence[A]) extends LoaderEvent[A]
+  case class Done[A](sequence: Sequence[A]) extends LoaderEvent[A]
   case class SqlError[A](cause: SQLException) extends LoaderEvent[A]
 
   def apply[I[T] <: CanIdentify[T], A]

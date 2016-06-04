@@ -7,7 +7,7 @@ import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowContent, EntrySourcePositionsFactory, UnreadDetail, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor}
+import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceNotLoaded, SourceRowContent, UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -29,20 +29,11 @@ class AccessorLoader private (
     loaderManager = loaderManager,
     startLoaderId = 0
   )
-  private var sourceAccessor: Option[ClosableSourceAccessor] = None
-  private var currentSourceLength: Int = 0
-
+  private lazy val sourceUnderlying = {
+    database.selectorOf[SourceRowContent].createHolder
+  }
   def createSourceAccessor: UnreadSourceAccessor = {
-    val underlying = new UnreadSourceAccessor {
-      override def findAt(position: Int) = {
-        sourceAccessor.flatMap(_ findAt position)
-      }
-      override def positionOf(sourceId: Long): Option[Int] = {
-        sourceAccessor.flatMap(_ positionOf sourceId)
-      }
-      override def length: Int = currentSourceLength
-    }
-    new SourceFooterAppender(underlying)
+    sourceUnderlying
   }
 
   private lazy val outlineUnderlying = {
@@ -81,7 +72,7 @@ class AccessorLoader private (
       )
       _ <- Future {
         close()
-        this.sourceAccessor = accessor
+        accessor foreach sourceUnderlying.updateSequence
         updateAccessors(event)
       }
       _ <- Future { onLoad(LoadCompleteEvent(channel)) }
@@ -102,10 +93,7 @@ class AccessorLoader private (
     synchronized {
       outlineUnderlying.close()
       detailUnderlying.close()
-      sourceAccessor foreach (_.close())
-
-      currentSourceLength = 0
-      sourceAccessor = None
+      sourceUnderlying.close()
     }
   }
   private def startLoadingSources[A: HasAccountId, B: HasChannelId]
@@ -145,7 +133,7 @@ class AccessorLoader private (
       val outlines = EntryAccessor.forEntryOutline(database, sources, positions)
       val details = EntryAccessor.forEntryDetail(database, sources, positions)
       synchronized {
-        currentSourceLength += sources.length
+        sourceUnderlying addLength sources.length
         outlineUnderlying append outlines
         detailUnderlying append details
       }
@@ -209,23 +197,4 @@ case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
   private lazy val select = implicitly[ChannelSelectable[A]]
 
   def channelName: String = select nameOf channel
-}
-
-private class SourceFooterAppender(
-  accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {
-
-  override def findAt(position: Int) = {
-    if (isLast(position)){
-      Some(SourceFooterContent())
-    } else {
-      accessor findAt position
-    }
-  }
-  override def positionOf(sourceId: Long) = accessor positionOf sourceId
-
-  override def length: Int = {
-    // +1 to append Footer
-    accessor.length + 1
-  }
-  private def isLast(position: Int) = position == accessor.length
 }
