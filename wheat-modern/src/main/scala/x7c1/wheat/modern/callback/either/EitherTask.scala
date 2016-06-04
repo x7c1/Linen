@@ -4,7 +4,8 @@ import x7c1.wheat.modern.callback.either.EitherTask.|
 import x7c1.wheat.modern.patch.TaskAsync
 import x7c1.wheat.modern.tasks.UiThread
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.language.reflectiveCalls
 
 class EitherTask [L, R] private (f: (Either[L, R] => Unit) => Unit){
 
@@ -55,6 +56,15 @@ object EitherTask {
   }
   def ui[L, R](f: => R): L | R = EitherTask { g =>
     UiThread run g(Right(f))
+  }
+  def future[L: ({type F[X] = Throwable => X})#F, R]
+    (f: => Either[L, R])(implicit x: ExecutionContext): L | R = {
+
+    EitherTask { g =>
+      Future(f) recover {
+        case e => Left(implicitly[Throwable => L] apply e)
+      } map g
+    }
   }
 }
 
