@@ -110,9 +110,9 @@ class UnreadItemsDelegatee(
     )
   )
   lazy val accessors = new Accessors(
-    source = loader.createSourceAccessor,
-    entryOutline = loader.createOutlineAccessor,
-    entryDetail = loader.createDetailAccessor,
+    source = loader.sources,
+    entryOutline = loader.outlines,
+    entryDetail = loader.details,
     rawSource = new RawSourceAccessor(helper)
   )
   lazy val actions = setupActions()

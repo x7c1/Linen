@@ -32,23 +32,17 @@ class AccessorLoader private (
   private lazy val sourceUnderlying = {
     database.selectorOf[SourceRowContent].createHolder
   }
-  def createSourceAccessor: UnreadSourceAccessor = {
-    sourceUnderlying
-  }
+  def sources: UnreadSourceAccessor = sourceUnderlying
 
   private lazy val outlineUnderlying = {
     database.selectorOf[EntryRowContent[UnreadOutline]].createBinder
   }
-  def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
-    outlineUnderlying
-  }
+  def outlines: EntryAccessor[UnreadOutline] = outlineUnderlying
 
   private lazy val detailUnderlying = {
     database.selectorOf[EntryRowContent[UnreadDetail]].createBinder
   }
-  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
-    detailUnderlying
-  }
+  def details: EntryAccessor[UnreadDetail] = detailUnderlying
 
   def reload[A: HasAccountId, B: ChannelSelectable]
     (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
