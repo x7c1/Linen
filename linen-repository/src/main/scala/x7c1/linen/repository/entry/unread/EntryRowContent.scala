@@ -1,7 +1,16 @@
 package x7c1.linen.repository.entry.unread
 
+import x7c1.linen.repository.entry.unread.selector.EntryRowSelector
+import x7c1.wheat.modern.database.selector.SelectorProvidable
+
 sealed trait EntryRowContent[+A <: UnreadEntry] {
   def sourceId: Option[Long]
+}
+
+object EntryRowContent {
+  implicit def providable[A <: UnreadEntry]: SelectorProvidable[EntryRowContent[A], EntryRowSelector[A]] = {
+    new SelectorProvidable[EntryRowContent[A], EntryRowSelector[A]]
+  }
 }
 
 case class SourceHeadlineContent(

@@ -5,10 +5,11 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowsBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowContent, EntrySourcePositionsFactory, UnreadDetail, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
 import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
@@ -43,16 +44,21 @@ class AccessorLoader private (
     }
     new SourceFooterAppender(underlying)
   }
-  private lazy val outlineUnderlying = EntryRowsBinder[UnreadOutline]()
 
+  private lazy val outlineUnderlying = {
+    database.selectorOf[EntryRowContent[UnreadOutline]].createBinder
+  }
   def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
-    new EntriesFooterAppender(outlineUnderlying)
+    outlineUnderlying
   }
-  private lazy val detailUnderlying = EntryRowsBinder[UnreadDetail]()
 
-  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
-    new EntriesFooterAppender(detailUnderlying)
+  private lazy val detailUnderlying = {
+    database.selectorOf[EntryRowContent[UnreadDetail]].createBinder
   }
+  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
+    detailUnderlying
+  }
+
   def reload[A: HasAccountId, B: ChannelSelectable]
     (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
 
@@ -202,8 +208,6 @@ case class AccessorsLoadedEvent(
 case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
   private lazy val select = implicitly[ChannelSelectable[A]]
 
-  def channelId: Long = select toId channel
-
   def channelName: String = select nameOf channel
 }
 
@@ -224,38 +228,4 @@ private class SourceFooterAppender(
     accessor.length + 1
   }
   private def isLast(position: Int) = position == accessor.length
-}
-
-private class EntriesFooterAppender[A <: UnreadEntry](
-  accessor: EntryAccessor[A]) extends EntryAccessor[A]{
-
-  override def findAt(position: Int) = {
-    if (isLast(position)){
-      Some(FooterContent())
-    } else {
-      accessor.findAt(position)
-    }
-  }
-  override def length = {
-    // +1 to append Footer
-    accessor.length + 1
-  }
-  override def findKindAt(position: Int) = {
-    if (isLast(position)){
-      Some(FooterKind)
-    } else {
-      accessor findKindAt position
-    }
-  }
-  override def firstEntryPositionOf(sourceId: Long) = {
-    accessor firstEntryPositionOf sourceId
-  }
-  private def isLast(position: Int) = position == accessor.length
-
-  override def lastEntriesTo(position: Int) = {
-    accessor lastEntriesTo position
-  }
-  override def latestEntriesTo(position: Int): Seq[A] = {
-    accessor latestEntriesTo position
-  }
 }
