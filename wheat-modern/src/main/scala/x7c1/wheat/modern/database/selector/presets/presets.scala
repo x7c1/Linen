@@ -37,6 +37,16 @@ trait TraverseOn[I[T] <: CanIdentify[T], A]{
   }
 }
 
+trait DetectFrom[I[T] <: CanIdentify[T], A]{
+  protected def db: SQLiteDatabase
+
+  def detectFrom[X: I](target: X)
+    (implicit i: CanDetect[I, A]): Either[SQLException, Boolean] = {
+
+    ItemSelector(db) selectBy target
+  }
+}
+
 trait Find[A]{
   protected def db: SQLiteDatabase
 
