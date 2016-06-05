@@ -1,17 +1,16 @@
 package x7c1.linen.repository.entry.unread
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
 
 trait EntryRowsBinder[A <: UnreadEntry] extends ClosableEntryAccessor[A]{
   def append(sequence: ClosableEntryAccessor[A]): Unit
 }
 
 private class EntryRowsBinderImpl[A <: UnreadEntry] (
-  accessors: ListBuffer[ClosableEntryAccessor[A]]) extends EntryRowsBinder[A]{
+  private var accessors: Vector[ClosableEntryAccessor[A]]) extends EntryRowsBinder[A]{
 
   def append(sequence: ClosableEntryAccessor[A]): Unit = {
-    accessors += sequence
+    accessors :+= sequence
   }
   override def findAt(position: Int) = {
     findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
@@ -60,7 +59,7 @@ private class EntryRowsBinderImpl[A <: UnreadEntry] (
 
   override def close(): Unit = synchronized {
     accessors foreach (_.close())
-    accessors.clear()
+    accessors = Vector()
   }
   override def lastEntriesTo(position: Int) = {
     @tailrec
@@ -107,6 +106,6 @@ private class EntryRowsBinderImpl[A <: UnreadEntry] (
 
 object EntryRowsBinder {
   def apply[A <: UnreadEntry](): EntryRowsBinder[A] = {
-    new EntryRowsBinderImpl[A](new ListBuffer())
+    new EntryRowsBinderImpl[A](Vector())
   }
 }
