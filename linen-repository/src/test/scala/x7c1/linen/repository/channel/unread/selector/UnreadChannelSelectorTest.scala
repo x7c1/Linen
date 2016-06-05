@@ -7,7 +7,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.SourceParts
+import x7c1.linen.database.mixin.UnreadChannelRecord
+import x7c1.linen.database.struct.{ChannelStatusKey, SourceParts}
 import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
 import x7c1.linen.repository.channel.my.{ChannelCreator, MyChannelConnection}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
@@ -20,6 +21,7 @@ import x7c1.linen.repository.loader.crawling.LoadedEntry
 import x7c1.linen.repository.source.setting.SampleFactory
 import x7c1.linen.repository.unread.{AccessorLoader, BrowsedEntriesMarker}
 import x7c1.linen.testing.{AllowTraversingAll, LogSetting}
+import x7c1.wheat.modern.database.QueryExplainer
 
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
@@ -110,6 +112,55 @@ class UnreadChannelSelectorTest extends JUnitSuiteLike with AllowTraversingAll w
       val Right(channels) = helper.selectorOf[UnreadChannel].traverseOn(account)
       assertEquals(0, channels.length)
     }
+  }
+
+  @Test
+  def testQueryPlanForTraverseOn(): Unit = {
+    val context = RuntimeEnvironment.application
+    val helper = new DatabaseHelper(context)
+    val factory = new SampleFactory(helper)
+    val account = factory.createAccount()
+
+    val channelId1 = locally {// create first channel
+      val Right(channelId) = ChannelCreator(helper, account) createChannel InputToCreate(
+        channelName = "foo1"
+      )
+      createSources(channelId, sources = 5, entries = 4) foreach { sourceId =>
+        val connection = new MyChannelConnection(helper.writable, sourceId)
+        connection attachTo Seq(channelId)
+      }
+      channelId
+    }
+    locally {// create second channel
+      val Right(channelId) = ChannelCreator(helper, account) createChannel InputToCreate(
+        channelName = "foo2"
+      )
+      createSources(channelId, sources = 5, entries = 4) foreach { sourceId =>
+        val connection = new MyChannelConnection(helper.writable, sourceId)
+        connection attachTo Seq(channelId)
+      }
+      channelId
+    }
+    locally {// before browsing
+      val Right(all) = helper.selectorOf[SubscribedChannel].traverseOn(account)
+      assertEquals(2, all.length)
+      assertEquals(1, all.filter(_.name == "foo1").length)
+      assertEquals(1, all.filter(_.name == "foo2").length)
+
+      val Right(channels) = helper.selectorOf[UnreadChannel].traverseOn(account)
+      assertEquals(2, channels.length)
+      assertEquals(1, channels.filter(_.name == "foo1").length)
+      assertEquals(1, channels.filter(_.name == "foo2").length)
+    }
+    val query = UnreadChannelRecord.toDetect query ChannelStatusKey(
+      channelId = channelId1,
+      accountId = account.accountId
+    )
+    val plans = QueryExplainer(helper.getReadableDatabase) explain query
+    assertEquals(
+      "USE TEMP B-TREE",
+      false, plans.exists(_.useTempBtree)
+    )
   }
   def createDummyEntries(sourceId: Long, count: Int) = (1 to count) map { n =>
     LoadedEntry(
