@@ -42,6 +42,7 @@ class SourceRowHolderImpl extends SourceRowHolder {
   override def close(): Unit = synchronized {
     underlying foreach {_.close()}
     underlying = None
+    currentLength = 0
   }
 }
 
