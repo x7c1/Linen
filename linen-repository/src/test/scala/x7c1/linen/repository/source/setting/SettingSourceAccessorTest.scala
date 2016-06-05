@@ -59,7 +59,7 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
       explain(accessorFactory createQuery channel1.channelId)
 
     assertEquals("USE TEMP B-TREE",
-      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
+      false, plans.exists(_.useTempBtree))
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {
