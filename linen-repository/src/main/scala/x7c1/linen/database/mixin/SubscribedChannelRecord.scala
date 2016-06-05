@@ -23,6 +23,7 @@ object SubscribedChannelRecord {
       val sql =
         """SELECT
           | channel_id,
+          | c1.account_id as account_id,
           | name
           |FROM channel_statuses AS c1
           | INNER JOIN channels AS c2

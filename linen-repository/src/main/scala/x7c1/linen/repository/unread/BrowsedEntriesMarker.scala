@@ -14,7 +14,7 @@ class BrowsedEntriesMarker (
 
   def touchOutlinePosition(position: Int): Unit = {
     outlinePosition match {
-      case Some(current) if current >= position =>
+      case Some(current) if current >= position => // nop
       case _ => outlinePosition = Some(position)
     }
   }

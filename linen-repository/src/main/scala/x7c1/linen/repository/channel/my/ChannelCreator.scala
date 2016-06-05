@@ -2,7 +2,6 @@ package x7c1.linen.repository.channel.my
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelParts, HasAccountId}
-import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.repository.date.Date
@@ -24,7 +23,7 @@ class ChannelCreator[A: HasAccountId] private (
     )
     def subscribe(channelId: Long) = {
       val subscriber = new ChannelSubscriber(
-        account = AccountBase(accountId),
+        account = account,
         helper = helper
       )
       subscriber subscribe channelId
