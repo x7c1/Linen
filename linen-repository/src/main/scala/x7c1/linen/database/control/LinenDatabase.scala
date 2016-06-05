@@ -1,6 +1,6 @@
 package x7c1.linen.database.control
 
-import x7c1.linen.database.control.upgrade.LoaderScheduleSchema
+import x7c1.linen.database.control.upgrade.{LoaderScheduleSchema, NotificationIdSchema}
 
 object LinenDatabase {
 
@@ -12,10 +12,10 @@ object LinenDatabase {
   }
   def upgradesFrom(oldVersion: Int): Seq[Upgrade] =
     (upgrades foldLeft Seq[Upgrade]()){
-      case (queries, update) if oldVersion < update.version =>
-        queries :+ update
-      case (queries, _) =>
-        queries
+      case (xs, x) if oldVersion < x.version =>
+        xs :+ x
+      case (xs, _) =>
+        xs
     }
 
   def defaults: Seq[String] = {
@@ -186,6 +186,7 @@ object LinenDatabase {
       "ALTER TABLE entries ADD COLUMN author TEXT NOT NULL DEFAULT ''"
     )
     ,Upgrade(20160524)(LoaderScheduleSchema.init:_*)
+    ,Upgrade(20160529)(NotificationIdSchema.init:_*)
   )
 }
 

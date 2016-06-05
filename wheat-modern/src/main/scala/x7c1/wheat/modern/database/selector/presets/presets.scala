@@ -2,7 +2,7 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.wheat.modern.database.selector.{CanIdentify, ItemSelector, SelectorProvidable}
+import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector, ItemSelector}
 import x7c1.wheat.modern.either.Imports._
 import x7c1.wheat.modern.either.OptionEither
 
@@ -46,7 +46,7 @@ trait Find[A]{
   }
 }
 object Find {
-  type FindProvidable[A] = SelectorProvidable[A, _ <: Find[A]]
+  type FindProvidable[A] = CanProvideSelector[A]{ type Selector <: Find[A] }
 }
 
 trait FindBy[I[T] <: CanIdentify[T], A]{

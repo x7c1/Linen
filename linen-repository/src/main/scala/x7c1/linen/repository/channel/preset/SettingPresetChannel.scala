@@ -4,6 +4,7 @@ import x7c1.linen.database.struct.HasChannelId
 
 case class SettingPresetChannel(
   channelId: Long,
+  accountId: Long,
   name: String,
   description: String,
   isSubscribed: Boolean

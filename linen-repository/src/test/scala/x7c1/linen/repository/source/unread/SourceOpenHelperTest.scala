@@ -11,7 +11,7 @@ import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.account.dev.AccountAccessor
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelAccessor}
 import x7c1.linen.repository.dummy.DummyFactory
-import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositions, EntrySourcePositionsFactory, UnreadEntryRow}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryContent, EntrySourcePositions, EntrySourcePositionsFactory}
 import x7c1.linen.repository.unread.{AccessorLoader, EntryKind, SourceKind}
 import x7c1.wheat.modern.database.QueryExplainer
 
@@ -36,8 +36,8 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       fixture.channel1.channelId,
       fixture.account1.accountId
     )
-    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt) collect {
-      case UnreadSourceRow(x: UnreadSource) => x
+    val sources = 0 until accessor.length flatMap accessor.findAt collect {
+      case x: UnreadSource => x
     }
     assertEquals(Seq(33, 11), sources.map(_.rating))
     assertEquals(Seq("description2", "description1"), sources.map(_.description))
@@ -83,16 +83,16 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       factory create sources
     }
     val accessor = EntryAccessor.forEntryOutline(db, sources, positions)
-    val entries = (0 to accessor.length - 1).flatMap(accessor.findAt)
+    val entries = 0 until accessor.length flatMap accessor.findAt
 
     assertEquals(true, entries.exists {
-      case UnreadEntryRow(EntryContent(entry)) =>
+      case EntryContent(entry) =>
         entry.shortTitle == "5-1 entry title"
       case _ =>
         false
     })
     assertEquals(false, entries.exists {
-      case UnreadEntryRow(EntryContent(entry)) =>
+      case EntryContent(entry) =>
         entry.shortTitle == "3-1 entry title"
       case _ =>
         false

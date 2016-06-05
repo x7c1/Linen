@@ -72,9 +72,7 @@ object PresetLoaderSchedule {
     )
   }
   implicit object providable
-    extends SelectorProvidable[PresetLoaderSchedule, PresetScheduleSelector](
-      new PresetScheduleSelector(_)
-    )
+    extends SelectorProvidable[PresetLoaderSchedule, PresetScheduleSelector]
 }
 
 case class ChannelLoaderSchedule(

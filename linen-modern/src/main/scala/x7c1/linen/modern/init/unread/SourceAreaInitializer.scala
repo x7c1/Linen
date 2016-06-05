@@ -5,6 +5,7 @@ import android.view.Gravity.START
 import x7c1.linen.modern.action.observer.{SourceFocusedObserver, SourceSelectedObserver, SourceSkipStoppedObserver, SourceSkippedObserver}
 import x7c1.linen.modern.action.{SourceFocusedEventFactory, SourceSkipStoppedFactory, SourceSkippedEventFactory}
 import x7c1.linen.modern.display.unread.{PaneDragDetector, SourceRowAdapter}
+import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.observer.{FocusDetector, SkipDetector, SkipPositionFinder}
 
@@ -19,9 +20,11 @@ trait SourceAreaInitializer {
     val manager = new LinearLayoutManager(layout.sourceList.getContext)
     layout.sourceList setLayoutManager manager
     layout.sourceList setAdapter new SourceRowAdapter(
-      accessors.source,
+      AdapterDelegatee.create(
+        providers = unreadRowProviders.forSourceArea,
+        sequence = accessors.source
+      ),
       new SourceSelectedObserver(actions),
-      unreadRowProviders.forSourceArea,
       footerHeightOf(layout.sourceList)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(

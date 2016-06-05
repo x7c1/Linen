@@ -82,7 +82,7 @@ private class SourceUpdaterQueueImpl(
         case e: Exception => Log error format(e){"[failed]"}
       }
       nextSource match {
-        case Some(next) => after(msec = 1000){ update(next) }
+        case Some(next) => after(msec = 750){ update(next) }
         case None => Log info s"[done] host:$host"
       }
     }

@@ -8,9 +8,9 @@ import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.res.layout.SettingMyChannelCreate
 import x7c1.linen.modern.init.settings.my.CreateChannelDialog.Arguments
-import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
 import x7c1.linen.repository.channel.my.{ChannelCreator, ChannelWriterError, EmptyName, UserInputError}
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -170,4 +170,9 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
 class ChannelCreated(
   val accountId: Long,
   val channelId: Long
-) extends AccountBase
+)
+object ChannelCreated {
+  implicit object account extends HasAccountId[ChannelCreated]{
+    override def toId = _.accountId
+  }
+}

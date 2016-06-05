@@ -6,6 +6,7 @@ import x7c1.linen.modern.action.observer.{DetailSelectedObserver, DetailSkippedO
 import x7c1.linen.modern.action.{DetailFocusedEventFactory, EntrySkipStoppedFactory, EntrySkippedEventFactory}
 import x7c1.linen.modern.display.unread.{DetailRowAdapter, LaterSelectedEvent, OnEntryVisitListener, OnLaterSelectedListener, PaneDragDetector}
 import x7c1.linen.repository.entry.unread.UnreadEntry
+import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.action.{PocketSender, SiteVisitable, SiteVisitor}
 import x7c1.wheat.modern.decorator.Imports._
@@ -22,11 +23,13 @@ trait DetailAreaInitializer {
     val manager = new LinearLayoutManager(layout.entryDetailList.getContext)
     layout.entryDetailList setLayoutManager manager
     layout.entryDetailList setAdapter new DetailRowAdapter(
-      accessors.entryDetail,
+      AdapterDelegatee.create(
+        providers = unreadRowProviders.forDetailArea,
+        sequence = accessors.entryDetail
+      ),
       new DetailSelectedObserver(actions),
       new OnEntryVisit(activity),
       new OnEntryLater(activity),
-      unreadRowProviders.forDetailArea,
       footerHeightOf(layout.entryDetailList)
     )
     val forFocus = FocusDetector.forLinearLayoutManager(

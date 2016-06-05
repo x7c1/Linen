@@ -32,8 +32,8 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
       fixture.account2.accountId,
       fixture.channel1.channelId
     )
-    val sources = (0 to accessor.length - 1).flatMap(accessor.findAt) collect {
-      case UnreadSourceRow(x: UnreadSource) => x
+    val sources = 0 until accessor.length flatMap accessor.findAt collect {
+      case x: UnreadSource => x
     }
     // default rating is 100
     assertEquals(Seq(100, 100), sources.map(_.rating))

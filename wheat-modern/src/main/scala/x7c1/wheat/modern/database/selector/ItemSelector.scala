@@ -1,21 +1,13 @@
 package x7c1.wheat.modern.database.selector
 
-import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 
 import scala.language.higherKinds
 
 class ItemSelector[A](val db: SQLiteDatabase) extends AnyVal {
 
-  def selectBy[X: I, I[T] <: CanIdentify[T]](id: X)(implicit i: CanSelect[I, A]): i.Result[A] = {
-    try {
-      val query = i query id
-      val cursor = db.rawQuery(query.sql, query.selectionArgs)
-      try i fromCursor cursor
-      finally i atFinal cursor
-    } catch {
-      case e: SQLException => i onException e
-    }
+  def selectBy[X: I, I[T] <: CanIdentify[T]](id: X)(implicit i: CanExtract[I, A]): i.Result[A] = {
+    i.extract(db, id)
   }
   def select(implicit i: CanSelect[UnitIdentifiable, A]): i.Result[A] = {
     selectBy[Unit, UnitIdentifiable]({})

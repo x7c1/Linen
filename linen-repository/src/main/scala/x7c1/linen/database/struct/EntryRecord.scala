@@ -8,6 +8,7 @@ import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanFindRecord, CollectFrom, FindBy}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable, SelectorProvidable}
 
@@ -28,8 +29,7 @@ object EntryRecord {
   implicit object reifiable extends RecordReifiable[EntryRecord]{
     override def reify(cursor: Cursor) = TypedCursor[EntryRecord](cursor)
   }
-  implicit object providable
-    extends SelectorProvidable[EntryRecord, Selector](new Selector(_))
+  implicit object providable extends SelectorProvidable[EntryRecord, Selector]
 
   implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord](table){
     override def where[X](id: Long) = toArgs(column.entry_id -> id)
@@ -40,6 +40,10 @@ object EntryRecord {
   class Selector(val db: SQLiteDatabase)
     extends CollectFrom[HasSourceId, EntryRecord]
       with FindBy[HasEntryId, EntryRecord]
+
+  object Selector {
+    implicit def reify: CanReify[Selector] = new Selector(_)
+  }
 }
 
 trait HasEntryId[A] extends Identifiable[A, Long]

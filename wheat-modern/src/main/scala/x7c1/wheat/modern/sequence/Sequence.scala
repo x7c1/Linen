@@ -3,6 +3,7 @@ package x7c1.wheat.modern.sequence
 import x7c1.wheat.modern.features.HasShortLength
 
 import scala.annotation.tailrec
+import scala.language.higherKinds
 
 trait Sequence[+A]{
   def length: Int
@@ -10,8 +11,6 @@ trait Sequence[+A]{
 }
 
 object Sequence {
-  implicit class SequenceTraverserImpl[A: HasShortLength](
-    override protected val underlying: Sequence[A]) extends SequenceTraverser[A]
 
   def from[A](xs: Seq[A]): Sequence[A] = new Sequence[A] {
     override def findAt(position: Int) = position match {
@@ -20,6 +19,18 @@ object Sequence {
     }
     override def length: Int = xs.length
   }
+  implicit class traverse[A: HasShortLength](
+    override protected val underlying: Sequence[A]) extends SequenceTraverser[A]
+
+  implicit class map[A, F[_] <: Sequence[_]](
+    override protected val underlying: F[A]) extends SequenceMapping[A, F]
+
+  implicit object canMapFrom extends DefaultCanMapFrom
+
+  implicit class filter[A: HasShortLength, F[_] <: Sequence[_]](
+    override protected val underlying: F[A]) extends SequenceFilter[A, F]
+
+  implicit object canFilterFrom extends DefaultCanFilterFrom
 }
 
 trait SequenceMerger[A] {

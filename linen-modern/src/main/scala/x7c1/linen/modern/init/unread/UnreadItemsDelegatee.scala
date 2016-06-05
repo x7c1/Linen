@@ -9,15 +9,16 @@ import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout._
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.unread.{DetailArea, OutlineArea, PaneContainer, SourceArea}
+import x7c1.linen.modern.init.unread.entry.{DetailListProviders, OutlineListProviders}
+import x7c1.linen.modern.init.unread.source.SourceListProviders
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
-import x7c1.linen.repository.entry.unread.{EntryAccessor, UnreadEntry}
-import x7c1.linen.repository.source.unread.{RawSourceAccessor, UnreadSourceAccessor}
+import x7c1.linen.repository.source.unread.RawSourceAccessor
 import x7c1.linen.repository.unread._
 import x7c1.linen.scene.loader.crawling.SchedulerService
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.resource.{MetricsConverter, ViewHolderProviders}
+import x7c1.wheat.modern.resource.MetricsConverter
 
 import scala.concurrent.Future
 
@@ -109,9 +110,9 @@ class UnreadItemsDelegatee(
     )
   )
   lazy val accessors = new Accessors(
-    source = loader.createSourceAccessor,
-    entryOutline = loader.createOutlineAccessor,
-    entryDetail = loader.createDetailAccessor,
+    source = loader.sources,
+    entryOutline = loader.outlines,
+    entryDetail = loader.details,
     rawSource = new RawSourceAccessor(helper)
   )
   lazy val actions = setupActions()
@@ -145,8 +146,6 @@ class UnreadItemsDelegatee(
   }
 }
 
-
-
 class MenuRowProviders(
   val forTitle: ViewHolderProvider[MenuRowTitle],
   val forLabel: ViewHolderProvider[MenuRowLabel],
@@ -159,65 +158,4 @@ class UnreadRowProviders(
   val forDetailArea: DetailListProviders
 )
 
-class SourceListProviders(
-  val forItem: ViewHolderProvider[UnreadSourceRowItem],
-  val forFooter: ViewHolderProvider[UnreadSourceRowFooter]
-) extends ViewHolderProviders[UnreadSourceRow] {
 
-  override protected val all = Seq(
-    forItem,
-    forFooter
-  )
-  def createViewTyper(accessor: UnreadSourceAccessor): Int => Int = {
-    position =>
-      val provider = if (position == accessor.length - 1){
-        forFooter
-      } else {
-        forItem
-      }
-      provider.layoutId
-  }
-}
-
-trait EntryRowProviders{
-  self: ViewHolderProviders[_] =>
-
-  def forSource: ViewHolderProvider[_]
-  def forEntry: ViewHolderProvider[_]
-  def forFooter: ViewHolderProvider[_]
-
-  def createViewTyper[A <: UnreadEntry](accessor: EntryAccessor[A]): Int => Int = {
-    val map = accessor createPositionMap {
-      case SourceKind => forSource
-      case EntryKind => forEntry
-      case FooterKind => forFooter
-    }
-    position => map(position).layoutId
-  }
-}
-
-class OutlineListProviders(
-  val forSource: ViewHolderProvider[UnreadOutlineRowSource],
-  val forEntry: ViewHolderProvider[UnreadOutlineRowEntry],
-  val forFooter: ViewHolderProvider[UnreadOutlineRowFooter]
-) extends ViewHolderProviders[UnreadOutlineRow] with EntryRowProviders {
-
-  override protected val all = Seq(
-    forSource,
-    forEntry,
-    forFooter
-  )
-}
-
-class DetailListProviders(
-  val forSource: ViewHolderProvider[UnreadDetailRowSource],
-  val forEntry: ViewHolderProvider[UnreadDetailRowEntry],
-  val forFooter: ViewHolderProvider[UnreadDetailRowFooter]
-) extends ViewHolderProviders[UnreadDetailRow] with EntryRowProviders {
-
-  override protected val all = Seq(
-    forSource,
-    forEntry,
-    forFooter
-  )
-}

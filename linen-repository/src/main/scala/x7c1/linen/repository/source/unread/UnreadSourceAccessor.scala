@@ -2,46 +2,25 @@ package x7c1.linen.repository.source.unread
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.Query
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.util.Try
 
-trait UnreadSourceAccessor extends Sequence[UnreadSourceRow] {
+trait UnreadSourceAccessor extends Sequence[SourceRowContent] {
 
   def sources: Seq[UnreadSource] = {
     (0 until length).view flatMap findAt collect {
-      case UnreadSourceRow(x: UnreadSource) => x
+      case x: UnreadSource => x
     }
   }
   def positionOf(sourceId: Long): Option[Int]
-
-  def bindViewHolder[B <: ViewHolder]
-    (holder: B, position: Int)
-    (block: PartialFunction[(B, SourceRowContent), Unit]) = {
-
-    findAt(position) -> holder match {
-      case (Some(UnreadSourceRow(item)), _) if block isDefinedAt (holder, item) =>
-        block(holder, item)
-      case (item, _) =>
-        Log error s"unknown item:$item, holder:$holder"
-    }
-  }
 }
 
 trait ClosableSourceAccessor extends UnreadSourceAccessor {
   def close(): Unit
-}
-
-case class UnreadSourceRow(content: SourceRowContent){
-  def source: Option[UnreadSource] = content match {
-    case x: UnreadSource => Some(x)
-    case _ => None
-  }
 }
 
 private class UnreadSourceAccessorImpl(
@@ -55,7 +34,7 @@ private class UnreadSourceAccessorImpl(
     if (position > length - 1) {
       None
     } else (cursor moveToFind positionMap(position)){
-      UnreadSourceRow apply UnreadSource(
+      UnreadSource(
         id = cursor.source_id,
         url = "dummy",
         title = cursor.title,

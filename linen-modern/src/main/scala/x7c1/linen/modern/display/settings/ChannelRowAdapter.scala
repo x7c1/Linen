@@ -1,20 +1,22 @@
 package x7c1.linen.modern.display.settings
 
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
-import x7c1.linen.repository.account.AccountBase
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.linen.scene.channel.menu.{MenuSelected, OnMenuSelectedListener}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.modern.decorator.Imports._
 
-class ChannelRowAdapter(
-  accountId: Long,
+class ChannelRowAdapter[A: HasAccountId](
+  account: A,
   delegatee: AdapterDelegatee[SettingMyChannelRow, MyChannelRow],
   onSourcesSelected: ChannelSourcesSelected => Unit,
   onMenuSelected: OnMenuSelectedListener[MyChannel],
   onSubscriptionChanged: MyChannelSubscriptionChanged => Unit
 ) extends BaseAdapter(delegatee){
+
+  private val accountId = implicitly[HasAccountId[A]] toId account
 
   override def onBindViewHolder(holder: SettingMyChannelRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
@@ -57,4 +59,9 @@ case class MyChannelSubscriptionChanged(
   accountId: Long,
   channelId: Long,
   isSubscribed: Boolean
-) extends AccountBase
+)
+object MyChannelSubscriptionChanged {
+  implicit object account extends HasAccountId[MyChannelSubscriptionChanged]{
+    override def toId = _.accountId
+  }
+}

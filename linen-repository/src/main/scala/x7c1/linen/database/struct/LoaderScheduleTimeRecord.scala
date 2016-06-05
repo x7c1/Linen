@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 import x7c1.wheat.modern.database.{Insertable, Query}
@@ -46,8 +47,7 @@ object LoaderScheduleTimeRecord {
       Query(sql, Array(accountId.toString))
     }
   }
-  implicit object providable
-    extends SelectorProvidable[LoaderScheduleTimeRecord, Selector](new Selector(_))
+  implicit object providable extends SelectorProvidable[LoaderScheduleTimeRecord, Selector]
 
   implicit object collect
     extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord](table){
@@ -70,6 +70,10 @@ object LoaderScheduleTimeRecord {
     extends CollectFrom[HasLoaderScheduleId, LoaderScheduleTimeRecord]
       with TraverseAll[LoaderScheduleTimeRecord]
       with TraverseOn[HasAccountId, LoaderScheduleTimeRecord]
+
+  object Selector {
+    implicit def reify: CanReify[Selector] = new Selector(_)
+  }
 }
 
 case class ScheduleTimeParts(

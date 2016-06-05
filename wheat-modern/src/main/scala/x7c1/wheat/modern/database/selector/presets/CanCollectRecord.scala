@@ -9,7 +9,7 @@ import scala.language.{higherKinds, reflectiveCalls}
 abstract class CanCollectRecord[
   I[T] <: CanIdentify[T],
   A: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
-] extends CanCollect[I, A]{
+] extends CanCollectBySelect[I, A]{
 
   override def fromCursor(cursor: Cursor) = {
     val converter = new CursorConverter[A, A](cursor)

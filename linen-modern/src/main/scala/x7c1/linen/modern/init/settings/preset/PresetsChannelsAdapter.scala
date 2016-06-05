@@ -44,6 +44,7 @@ class PresetsChannelsAdapter(
       holder.switchSubscribe onChangedManually { e =>
         listener onSubscribedChanged PresetChannelSubscriptionChanged(
           channel.channelId,
+          channel.accountId,
           e.isChecked,
           location )
       }

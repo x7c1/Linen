@@ -63,9 +63,9 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
   }
 
   def toMaps(cursor: Cursor): Seq[Map[String, String]] = {
-    (0 to cursor.getCount - 1) map { i =>
+    0 until cursor.getCount map { i =>
       cursor moveToPosition i
-      val pairs = (0 to cursor.getColumnCount - 1) map { i =>
+      val pairs = 0 until cursor.getColumnCount map { i =>
         val column = cursor.getColumnName(i)
         val value = cursor.getString(i)
         column -> value

@@ -30,17 +30,15 @@ object SchedulerService {
 
   def reify(
     service: Service with ServiceControl,
-    helper: DatabaseHelper,
-    startId: Int ): SchedulerService = {
+    helper: DatabaseHelper ): SchedulerService = {
 
-    new SchedulerServiceImpl(service, helper, startId)
+    new SchedulerServiceImpl(service, helper)
   }
 }
 
 private class SchedulerServiceImpl(
   service: Service with ServiceControl,
-  helper: DatabaseHelper,
-  startId: Int ) extends SchedulerService {
+  helper: DatabaseHelper ) extends SchedulerService {
 
   override def setupSchedule(accountId: Long): Unit = Future {
     PresetScheduleSetup(helper) setupFor accountId

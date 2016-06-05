@@ -1,17 +1,36 @@
 package x7c1.wheat.modern.database.selector
 
+import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.database.Query
 
 import scala.language.{higherKinds, reflectiveCalls}
 
-trait CanSelect[I[T] <: CanIdentify[T], A]{
+trait CanExtract[I[T] <: CanIdentify[T], A]{
   type Result[_]
+  def extract[X: I](db: SQLiteDatabase, id: X): Result[A]
+}
+
+trait CanSelect[I[T] <: CanIdentify[T], A] extends CanExtract[I, A]{
   def query[X: I](target: X): Query
+
   def fromCursor(cursor: Cursor): Result[A]
+
   def onException(e: SQLException): Result[A]
+
   def atFinal(cursor: Cursor): Unit
+
+  override def extract[X: I](db: SQLiteDatabase, id: X): Result[A] =
+    try {
+      val query = this.query(id)
+      val cursor = db.rawQuery(query.sql, query.selectionArgs)
+      try fromCursor(cursor)
+      finally atFinal(cursor)
+    } catch {
+      case e: SQLException => onException(e)
+    }
+
 }
 
 trait CursorReadable[FROM, TO]{

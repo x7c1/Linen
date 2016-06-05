@@ -8,14 +8,14 @@ import scala.language.{reflectiveCalls, higherKinds}
 
 abstract class CanFindEntity[
   I[T] <: CanIdentify[T],
-  FROM: CursorReifiable: ({ type L[T] = CanFind[I, T] })#L,
+  FROM: CursorReifiable: ({ type L[T] = CanFindBySelect[I, T] })#L,
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
-] extends CanFind[I, TO]{
+] extends CanFindBySelect[I, TO]{
 
   override def reify(cursor: Cursor): Option[TO] = {
     new CursorConverter[FROM, TO](cursor) convertAt 0
   }
   override def query[X: I](target: X): Query = {
-    implicitly[CanFind[I, FROM]] query target
+    implicitly[CanFindBySelect[I, FROM]] query target
   }
 }

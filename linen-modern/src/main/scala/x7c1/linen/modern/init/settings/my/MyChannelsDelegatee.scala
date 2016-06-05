@@ -6,13 +6,13 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.SettingMyChannelSources
 import x7c1.linen.glue.res.layout.{SettingMyChannelCreate, SettingMyChannelsLayout}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
-import x7c1.linen.repository.account.{AccountBase, ClientAccount}
-import x7c1.linen.repository.channel.my.{MyChannelAccessorLoader, MyChannelRow}
+import x7c1.linen.repository.channel.my.MyChannelRow
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
 import x7c1.linen.scene.channel.menu.OnChannelMenuSelected
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -21,7 +21,10 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.fragment.FragmentFactory
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
 import x7c1.wheat.modern.decorator.Imports._
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.sequence.Sequence
 
 class MyChannelsDelegatee (
@@ -35,13 +38,13 @@ class MyChannelsDelegatee (
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader = new MyChannelAccessorLoader(helper)
+  private lazy val loader = ClosableSequenceLoader[HasAccountId, MyChannelRow](helper.getReadableDatabase)
 
   private lazy val onChannelCreated =
-    LocalBroadcastListener[ChannelCreated]{ reloadChannels }
+    LocalBroadcastListener{ reloadChannels[ChannelCreated] }
 
   private lazy val onSubscriptionChanged =
-    LocalBroadcastListener[MyChannelSubscriptionChanged]{ reloadChannels }
+    LocalBroadcastListener{ reloadChannels[MyChannelSubscriptionChanged] }
 
   def setup(): Unit = {
     onChannelCreated registerTo activity
@@ -56,8 +59,8 @@ class MyChannelsDelegatee (
     IntentExpander executeBy activity.getIntent
   }
   def showMyChannels(accountId: Long) = {
-    val account = ClientAccount(accountId)
-    loader.reload(account){ setAdapter(account) }
+    setAdapter(accountId)(loader.sequence)
+    reloadChannels(accountId)
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
   def close(): Unit = {
@@ -67,25 +70,25 @@ class MyChannelsDelegatee (
     helper.close()
     Log info "[done]"
   }
-  private def reloadChannels(event: AccountBase): Unit ={
-    val client = ClientAccount(event.accountId)
-    (loader reload client){ _ =>
-      layout.channelList.getAdapter.notifyDataSetChanged()
+  private def reloadChannels[A: HasAccountId](event: A): Unit = {
+    loader startLoading event apply {
+      case Done(_) =>
+        layout.channelList runUi { _.getAdapter.notifyDataSetChanged() }
+      case SqlError(e) =>
+        Log error format(e.getCause){"[failed]"}
     }
   }
-  private def setAdapter(account: ClientAccount)(accessor: Sequence[MyChannelRow]) = {
+  private def setAdapter[A: HasAccountId](account: A)(accessor: Sequence[MyChannelRow]) = {
     Log info s"[init]"
     layout.channelList setAdapter new ChannelRowAdapter(
-      accountId = account.accountId,
+      account = account,
       delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
       onMenuSelected = OnChannelMenuSelected.forMyChannel(
         activity = activity,
-        accountId = account.accountId,
+        account = account,
         helper = helper,
-        onDeleted = _ => (loader reload account){ _ =>
-          layout.channelList.getAdapter.notifyDataSetChanged()
-        }
+        onDeleted = _ => reloadChannels(account)
       ),
       onSubscriptionChanged = {
         val listener = new OnMyChannelSubscriptionChanged(
@@ -124,10 +127,10 @@ class OnChannelSourcesSelected(activity: Activity with ActivityControl){
   }
 }
 
-class OnMyChannelSubscriptionChanged(
+class OnMyChannelSubscriptionChanged[A: HasAccountId](
   context: Context,
   helper: DatabaseHelper,
-  account: AccountBase){
+  account: A){
 
   def updateSubscription(event: MyChannelSubscriptionChanged): Unit = {
     val subscriber = new ChannelSubscriber(account, helper)

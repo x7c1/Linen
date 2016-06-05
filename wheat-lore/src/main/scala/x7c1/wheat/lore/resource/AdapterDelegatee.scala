@@ -68,8 +68,8 @@ private class AdapterDelegateeImpl[
     (block: PartialFunction[(VH, A), Unit]) = {
 
     sequence.findAt(position) -> holder match {
-      case (Some(item), _) if block isDefinedAt (holder, item) =>
-        block(holder, item)
+      case (Some(item), _) if block isDefinedAt holder -> item =>
+        block(holder -> item)
       case (item, _) =>
         Log error s"unknown item:$item, holder:$holder"
     }

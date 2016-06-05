@@ -2,17 +2,13 @@ package x7c1.linen.repository.entry.unread
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.support.v7.widget.RecyclerView.ViewHolder
 import x7c1.linen.database.struct.EntryRecord
 import x7c1.linen.repository.source.unread.UnreadSource
 import x7c1.linen.repository.unread.{EntryKind, SourceKind, UnreadRowKind}
 import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.sequence.Sequence
 
-import scala.annotation.tailrec
-
-trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
+trait EntryAccessor[+A <: UnreadEntry] extends Sequence[EntryRowContent[A]] {
 
   def latestEntriesTo(position: Int): Seq[A]
 
@@ -21,131 +17,10 @@ trait EntryAccessor[+A <: UnreadEntry] extends Sequence[UnreadEntryRow[A]] {
   def firstEntryPositionOf(sourceId: Long): Option[Int]
 
   def findKindAt(position: Int): Option[UnreadRowKind]
-
-  def bindViewHolder[B <: ViewHolder]
-    (holder: B, position: Int)
-    (block: PartialFunction[(B, EntryRowContent[A]), Unit]) = {
-
-    findAt(position) -> holder match {
-      case (Some(UnreadEntryRow(item)), _) if block isDefinedAt (holder, item) =>
-        block(holder, item)
-      case (item, _) =>
-        Log error s"unknown item:$item, holder:$holder"
-    }
-  }
-  def createPositionMap[B](f: UnreadRowKind => B): Int => B = {
-    position => findKindAt(position) match {
-      case Some(kind) => f(kind)
-      case None =>
-        throw new IllegalArgumentException(s"row-kind not defined at $position")
-    }
-  }
 }
 
 trait ClosableEntryAccessor[+A <: UnreadEntry] extends EntryAccessor[A]{
   def close(): Unit
-}
-
-case class UnreadEntryRow[+A <: UnreadEntry](content: EntryRowContent[A]){
-  def sourceId: Option[Long] = content match {
-    case SourceHeadlineContent(sourceId, title) => Some(sourceId)
-    case EntryContent(entry) => Some(entry.sourceId)
-    case FooterContent() => None
-  }
-}
-
-class EntryAccessorBinder[A <: UnreadEntry](
-  accessors: Seq[ClosableEntryAccessor[A]]) extends ClosableEntryAccessor[A]{
-
-  override def findAt(position: Int) = {
-    findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
-      accessor.findAt(position - prev)
-    }
-  }
-
-  override def length: Int = {
-    accessors.foldLeft(0){ _ + _.length }
-  }
-
-  override def firstEntryPositionOf(sourceId: Long): Option[Int] = {
-    @tailrec
-    def loop(accessors: Seq[EntryAccessor[A]], prev: Int): Option[Int] =
-      accessors match {
-        case x +: xs => x.firstEntryPositionOf(sourceId) match {
-          case Some(s) => Some(prev + s)
-          case None => loop(xs, x.length + prev)
-        }
-        case Seq() => None
-      }
-
-    loop(accessors, 0)
-  }
-
-  override def findKindAt(position: Int) = {
-    findAccessor(accessors, position, 0) flatMap { case (accessor, prev) =>
-      accessor.findKindAt(position - prev)
-    }
-  }
-
-  @tailrec
-  private def findAccessor(
-    accessors: Seq[EntryAccessor[A]],
-    position: Int,
-    prev: Int): Option[(EntryAccessor[A], Int)] = {
-
-    accessors match {
-      case x +: xs => x.length + prev match {
-        case sum if sum > position => Some(x -> prev)
-        case sum => findAccessor(xs, position, sum)
-      }
-      case Seq() => None
-    }
-  }
-
-  override def close(): Unit = synchronized {
-    accessors foreach (_.close())
-  }
-  override def lastEntriesTo(position: Int) = {
-    @tailrec
-    def loop(
-      accessors: Seq[EntryAccessor[A]],
-      remains: Int, entries: Seq[A]): Seq[A] = {
-
-      accessors match {
-        case head +: tail =>
-          val xs = entries ++ head.lastEntriesTo(remains)
-          val diff = remains - head.length
-          if (diff <= 0){
-            xs
-          } else {
-            loop(tail, diff, xs)
-          }
-        case Seq() => entries
-      }
-    }
-    loop(accessors, position, Seq())
-  }
-
-  override def latestEntriesTo(position: Int): Seq[A] = {
-    @tailrec
-    def loop(
-      accessors: Seq[EntryAccessor[A]],
-      remains: Int, entries: Seq[A]): Seq[A] = {
-
-      accessors match {
-        case head +: tail =>
-          val xs = entries ++ head.latestEntriesTo(remains)
-          val diff = remains - head.length
-          if (diff <= 0){
-            xs
-          } else {
-            loop(tail, diff, xs)
-          }
-        case Seq() => entries
-      }
-    }
-    loop(accessors, position, Seq())
-  }
 }
 
 class EntryAccessorImpl[A <: UnreadEntry](
@@ -157,8 +32,8 @@ class EntryAccessorImpl[A <: UnreadEntry](
 
   override def findAt(position: Int) = {
     sequence.findAt(position) map {
-      case Left(source) => UnreadEntryRow(source)
-      case Right(entry) => UnreadEntryRow(EntryContent(entry))
+      case Left(source) => source
+      case Right(entry) => EntryContent(entry)
     }
   }
   override lazy val length = {
@@ -176,13 +51,13 @@ class EntryAccessorImpl[A <: UnreadEntry](
   override def lastEntriesTo(position: Int) = {
     val targets = positions.lastEntryPositions.view takeWhile {_ < position}
     targets :+ position flatMap findAt collect {
-      case UnreadEntryRow(EntryContent(entry)) => entry
+      case EntryContent(entry) => entry
     }
   }
   override def latestEntriesTo(position: Int): Seq[A] = {
     val targets = positions.latestEntryPositions.view takeWhile {_ <= position}
     targets flatMap findAt collect {
-      case UnreadEntryRow(EntryContent(entry)) => entry
+      case EntryContent(entry) => entry
     }
   }
 }

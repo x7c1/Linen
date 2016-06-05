@@ -28,8 +28,8 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
 
     val expanders = Seq(
       IntentExpander from new UpdaterMethods(service, helper, startId),
-      IntentExpander from QueueingService.reify(service, helper, queue, startId),
-      IntentExpander from SchedulerService.reify(service, helper, startId)
+      IntentExpander from QueueingService.reify(service, helper, queue),
+      IntentExpander from SchedulerService.reify(service, helper)
     )
     expanders findRunnerOf intent match {
       case Left(e) => Log error e.message

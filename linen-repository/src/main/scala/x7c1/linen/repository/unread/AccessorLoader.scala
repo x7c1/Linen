@@ -5,15 +5,15 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
 import x7c1.linen.repository.channel.unread.ChannelSelectable
-import x7c1.linen.repository.entry.unread.{ClosableEntryAccessor, EntryAccessor, EntryAccessorBinder, EntrySourcePositionsFactory, FooterContent, UnreadDetail, UnreadEntry, UnreadEntryRow, UnreadOutline}
+import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowContent, EntrySourcePositionsFactory, UnreadDetail, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
-import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceFooterContent, SourceNotLoaded, UnreadSource, UnreadSourceAccessor, UnreadSourceRow}
+import x7c1.linen.repository.source.unread.{ClosableSourceAccessor, SourceNotLoaded, SourceRowContent, UnreadSource, UnreadSourceAccessor}
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.patch.FiniteLoaderFactory
 import x7c1.wheat.modern.patch.TaskAsync.after
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -24,44 +24,28 @@ class AccessorLoader private (
   context: Context,
   loaderManager: LoaderManager ){
 
-  private val outlineAccessors = ListBuffer[ClosableEntryAccessor[UnreadOutline]]()
-  private val detailAccessors = ListBuffer[ClosableEntryAccessor[UnreadDetail]]()
   private val loaderFactory = new FiniteLoaderFactory(
     context = context,
     loaderManager = loaderManager,
     startLoaderId = 0
   )
-  private var sourceAccessor: Option[ClosableSourceAccessor] = None
-  private var currentSourceLength: Int = 0
-
-  def createSourceAccessor: UnreadSourceAccessor = {
-    val underlying = new UnreadSourceAccessor {
-      override def findAt(position: Int) = {
-        sourceAccessor.flatMap(_ findAt position)
-      }
-      override def positionOf(sourceId: Long): Option[Int] = {
-        sourceAccessor.flatMap(_ positionOf sourceId)
-      }
-      override def length: Int = currentSourceLength
-    }
-    new SourceFooterAppender(underlying)
+  private lazy val sourceUnderlying = {
+    database.selectorOf[SourceRowContent].createHolder
   }
-  private lazy val outlineUnderlying = new EntryAccessorBinder(outlineAccessors)
+  def sources: UnreadSourceAccessor = sourceUnderlying
 
-  def createOutlineAccessor: EntryAccessor[UnreadOutline] = {
-    new EntriesFooterAppender(outlineUnderlying)
+  private lazy val outlineUnderlying = {
+    database.selectorOf[EntryRowContent[UnreadOutline]].createBinder
   }
+  def outlines: EntryAccessor[UnreadOutline] = outlineUnderlying
 
-  private lazy val detailUnderlying = new EntryAccessorBinder(detailAccessors)
-
-  def createDetailAccessor: EntryAccessor[UnreadDetail] = {
-    new EntriesFooterAppender(detailUnderlying)
+  private lazy val detailUnderlying = {
+    database.selectorOf[EntryRowContent[UnreadDetail]].createBinder
   }
-  def startLoading[A: HasAccountId, B: ChannelSelectable]
+  def details: EntryAccessor[UnreadDetail] = detailUnderlying
+
+  def reload[A: HasAccountId, B: ChannelSelectable]
     (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
-
-    val accountId = implicitly[HasAccountId[A]] toId account
-    Log info s"[init] account:$accountId"
 
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -71,32 +55,6 @@ class AccessorLoader private (
 //      remaining
 //    }
 //    first onComplete loadNext
-
-    val load = for {
-      accessor <- startLoadingSources(
-        account = account,
-        channel = channel
-      )
-      event <- loadSourceEntries(
-        remainingSources = accessor map (_.sources) getOrElse Seq()
-      )
-      _ <- Future {
-        this.sourceAccessor = accessor
-        updateAccessors(event)
-      }
-      _ <- Future { onLoad(LoadCompleteEvent(channel)) }
-    } yield {
-      event
-    }
-    load onComplete {
-      case Success(event) =>
-        Log info s"[done] loaded:${event.loadedSources.length}"
-      case Failure(error) =>
-        Log error format(error){"[failed]"}
-    }
-  }
-  def restartLoading[A: HasAccountId, B: ChannelSelectable]
-    (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
 
     val accountId = implicitly[HasAccountId[A]] toId account
     Log info s"[init] account:$accountId"
@@ -108,7 +66,7 @@ class AccessorLoader private (
       )
       _ <- Future {
         close()
-        this.sourceAccessor = accessor
+        accessor foreach sourceUnderlying.updateSequence
         updateAccessors(event)
       }
       _ <- Future { onLoad(LoadCompleteEvent(channel)) }
@@ -129,12 +87,7 @@ class AccessorLoader private (
     synchronized {
       outlineUnderlying.close()
       detailUnderlying.close()
-      sourceAccessor foreach (_.close())
-
-      currentSourceLength = 0
-      sourceAccessor = None
-      outlineAccessors.clear()
-      detailAccessors.clear()
+      sourceUnderlying.close()
     }
   }
   private def startLoadingSources[A: HasAccountId, B: HasChannelId]
@@ -143,11 +96,9 @@ class AccessorLoader private (
     AccessorLoader.inspectSourceAccessor(database, account, channel) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
-        Seq()
         None
       case Left(empty) =>
         Log info empty.message
-        Seq()
         None
       case Right(accessor) =>
         Some(accessor)
@@ -158,24 +109,9 @@ class AccessorLoader private (
       Log info s"[init] remains:${remainingSources.length}"
 
       val (sources, remains) = remainingSources splitAt 50
-      val (outlines, details) =
-        if (sources.nonEmpty) {
-          val positions = {
-            val factory = new EntrySourcePositionsFactory(database)
-            factory create sources
-          }
-          val outlines = Option(EntryAccessor.forEntryOutline(database, sources, positions))
-          val details = Option(EntryAccessor.forEntryDetail(database, sources, positions))
-          outlines -> details
-        } else {
-          None -> None
-        }
-
       AccessorsLoadedEvent(
         loadedSources = sources,
-        remainingSources = remains,
-        outlines = outlines,
-        details = details
+        remainingSources = remains
       )
     }
 
@@ -191,9 +127,9 @@ class AccessorLoader private (
       val outlines = EntryAccessor.forEntryOutline(database, sources, positions)
       val details = EntryAccessor.forEntryDetail(database, sources, positions)
       synchronized {
-        currentSourceLength += sources.length
-        outlineAccessors += outlines
-        detailAccessors += details
+        sourceUnderlying addLength sources.length
+        outlineUnderlying append outlines
+        detailUnderlying append details
       }
     }
   }
@@ -248,68 +184,11 @@ object AccessorLoader {
 
 case class AccessorsLoadedEvent(
   loadedSources: Seq[UnreadSource],
-  remainingSources: Seq[UnreadSource],
-  outlines: Option[ClosableEntryAccessor[UnreadOutline]],
-  details: Option[ClosableEntryAccessor[UnreadDetail]]
+  remainingSources: Seq[UnreadSource]
 )
 
 case class LoadCompleteEvent[A: ChannelSelectable](channel: A){
   private lazy val select = implicitly[ChannelSelectable[A]]
 
-  def channelId: Long = select toId channel
-
   def channelName: String = select nameOf channel
-}
-
-private class SourceFooterAppender(
-  accessor: UnreadSourceAccessor) extends UnreadSourceAccessor {
-
-  override def findAt(position: Int) = {
-    if (isLast(position)){
-      Some(UnreadSourceRow(SourceFooterContent()))
-    } else {
-      accessor findAt position
-    }
-  }
-  override def positionOf(sourceId: Long) = accessor positionOf sourceId
-
-  override def length: Int = {
-    // +1 to append Footer
-    accessor.length + 1
-  }
-  private def isLast(position: Int) = position == accessor.length
-}
-
-private class EntriesFooterAppender[A <: UnreadEntry](
-  accessor: EntryAccessor[A]) extends EntryAccessor[A]{
-
-  override def findAt(position: Int) = {
-    if (isLast(position)){
-      Some(UnreadEntryRow(FooterContent()))
-    } else {
-      accessor.findAt(position)
-    }
-  }
-  override def length = {
-    // +1 to append Footer
-    accessor.length + 1
-  }
-  override def findKindAt(position: Int) = {
-    if (isLast(position)){
-      Some(FooterKind)
-    } else {
-      accessor findKindAt position
-    }
-  }
-  override def firstEntryPositionOf(sourceId: Long) = {
-    accessor firstEntryPositionOf sourceId
-  }
-  private def isLast(position: Int) = position == accessor.length
-
-  override def lastEntriesTo(position: Int) = {
-    accessor lastEntriesTo position
-  }
-  override def latestEntriesTo(position: Int): Seq[A] = {
-    accessor latestEntriesTo position
-  }
 }
