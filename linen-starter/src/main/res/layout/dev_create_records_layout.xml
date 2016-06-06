@@ -59,6 +59,10 @@
 
     <View style="@style/DevCreateRecordsMenuSeparator" />
 
+    <include layout="@layout/dev_init_records" />
+
+    <View style="@style/DevCreateRecordsMenuSeparator" />
+
     <Button
         android:id="@+id/dev_create_records_layout__create_dummies"
         android:layout_width="wrap_content"
@@ -72,13 +76,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="create preset"
-        />
-
-    <Button
-        android:id="@+id/dev_create_records_layout__delete_database"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="delete database"
         />
 
 </LinearLayout>
