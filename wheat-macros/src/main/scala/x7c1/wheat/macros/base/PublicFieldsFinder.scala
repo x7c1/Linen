@@ -8,7 +8,11 @@ trait PublicFieldsFinder extends TreeContext {
       filter(_.isConstructor).map(_.asMethod).
       find(_.paramLists exists (_.nonEmpty))
   }
-
+  def findConstructorsOf(targetType: Type): Seq[MethodSymbol] = {
+    targetType.members.
+      filter(_.isConstructor).map(_.asMethod).
+      filter(_.paramLists exists (_.nonEmpty)).toSeq
+  }
   def methodsOf(targetType: Type): Iterable[MethodSymbol] = {
     targetType.members collect {
       case x if x.isMethod && x.isPublic => x.asMethod

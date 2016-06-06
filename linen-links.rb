@@ -33,6 +33,7 @@ targets = [
   "wheat-build",
   "wheat-modern",
   "wheat-macros",
+  "wheat-macros-sample",
   "wheat-ancient",
   "wheat-lore",
   "wheat-calendar",
