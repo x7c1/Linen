@@ -19,7 +19,7 @@ object ReificationImpl {
       override val context: c.type = c
     }
     val tree = factory createConstructor c.weakTypeOf[A]
-    println(tree)
+//    println(tree)
     tree
   }
 }
