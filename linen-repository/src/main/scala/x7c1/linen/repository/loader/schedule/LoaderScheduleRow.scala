@@ -10,10 +10,7 @@ import x7c1.wheat.modern.features.HasShortLength
 sealed trait LoaderScheduleRow
 
 object LoaderScheduleRow {
-  implicit object providable extends CanProvideSelector[LoaderScheduleRow]{
-    override type Selector = ScheduleRowSelector
-    override def createFrom(db: SQLiteDatabase) = new ScheduleRowSelector(db)
-  }
+  implicit object providable extends SelectorProvidable[LoaderScheduleRow, ScheduleRowSelector]
 }
 
 trait LoaderSchedule extends LoaderScheduleRow {
