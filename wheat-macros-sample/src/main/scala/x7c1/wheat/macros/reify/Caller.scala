@@ -36,7 +36,21 @@ case class Param1(
   foo1: String,
   bar1: Int
 )
-case class Param2(
+trait Param2 {
+  def foo2: Int
+  def bar2: Long
+}
+object Param2 {
+  def apply(foo2: Int, bar2: Long): Param2 = {
+    val (tmp1, tmp2) = (foo2, bar2)
+    new Param2 {
+      override val foo2: Int = tmp1
+      override val bar2: Long = tmp2
+    }
+  }
+}
+
+case class SubParam2(
+  baz3: Int,
   foo2: Int,
-  bar2: Long
-)
+  bar2: Long ) extends Param2
