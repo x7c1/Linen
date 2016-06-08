@@ -35,7 +35,3 @@ object UnreadChannelRecord {
 class UnreadChannelRecordSelector(
   override protected val db: SQLiteDatabase
 ) extends DetectFrom[HasChannelStatusKey, UnreadChannelRecord]
-
-object UnreadChannelRecordSelector {
-  implicit class reify(db: SQLiteDatabase) extends UnreadChannelRecordSelector(db)
-}
