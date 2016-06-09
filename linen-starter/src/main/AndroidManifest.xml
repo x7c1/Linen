@@ -44,6 +44,11 @@
                 />
 
         <activity
+            android:name=".settings.ChannelOrderActivity"
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            />
+
+        <activity
             android:name=".settings.LoaderSchedulesActivity"
             android:parentActivityName=".unread.UnreadItemsActivity"
             />

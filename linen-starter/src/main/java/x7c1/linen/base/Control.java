@@ -4,6 +4,7 @@ import x7c1.linen.UpdaterService;
 import x7c1.linen.dev.CreateRecordsActivity;
 import x7c1.linen.glue.activity.ActivityLabel;
 import x7c1.linen.glue.service.ServiceLabel;
+import x7c1.linen.settings.ChannelOrderActivity;
 import x7c1.linen.settings.PresetChannelSourcesActivity;
 import x7c1.linen.settings.PresetChannelsActivity;
 import x7c1.linen.settings.MyChannelSourcesActivity;
@@ -28,6 +29,9 @@ public class Control {
 				break;
 			case SettingPresetChannelSources:
 				klass = PresetChannelSourcesActivity.class;
+				break;
+			case SettingChannelOrder:
+				klass = ChannelOrderActivity.class;
 				break;
 			case SettingLoaderSchedule:
 				klass = LoaderSchedulesActivity.class;

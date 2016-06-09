@@ -6,11 +6,12 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannelOrder, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
 import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
+import x7c1.linen.modern.init.settings.order.ChannelOrderDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
 import x7c1.linen.modern.init.settings.schedule.LoaderSchedulesDelegatee
 import x7c1.linen.repository.account.ClientAccount
@@ -152,6 +153,10 @@ class OnMenuItemClick(
 
     case _: ChannelOrder =>
       Log info s"$kind"
+      activity startActivity IntentFactory.using[ChannelOrderDelegatee].
+        create(activity, activity getClassOf SettingChannelOrder){
+          _ showChannels accountId
+        }
     case _: LoaderSchedule =>
       Log info s"$kind"
       activity startActivity IntentFactory.using[LoaderSchedulesDelegatee].
