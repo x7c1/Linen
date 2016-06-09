@@ -1,78 +1,29 @@
 package x7c1.linen.repository.channel.my
 
-import android.database.Cursor
+import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.ChannelRecord
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
+import x7c1.linen.database.mixin.ChannelsToAttachRecord
+import x7c1.linen.database.mixin.ChannelsToAttachRecord.HasKey
+import x7c1.wheat.modern.database.selector.presets.CanTraverseEntity
+import x7c1.wheat.modern.database.selector.{CursorConvertible, SelectorProvidable}
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.collection.immutable.IndexedSeq
 
 trait ChannelsToAttachAccessor extends Sequence[ChannelToAttach]{
 
-  def collectAttached: IndexedSeq[Long] = (0 to length - 1) flatMap findAt collect {
+  def collectAttached: IndexedSeq[Long] = 0 until length flatMap findAt collect {
     case x if x.isAttached => x.channelId
   }
-  def collectDetached: IndexedSeq[Long] = (0 to length - 1) flatMap findAt collect {
+  def collectDetached: IndexedSeq[Long] = 0 until length flatMap findAt collect {
     case x if ! x.isAttached => x.channelId
   }
-  def collectAll: IndexedSeq[Long] = (0 to length - 1) flatMap findAt map (_.channelId)
+  def collectAll: IndexedSeq[Long] = 0 until length flatMap findAt map (_.channelId)
 }
 
-object ChannelsToAttachAccessor {
-  def create(
-    db: SQLiteDatabase,
-    accountId: Long,
-    sourceId: Long ): Either[Exception, ChannelsToAttachAccessor] = {
-
-    try {
-      val query = createQuery(accountId, sourceId)
-      val raw = db.rawQuery(query.sql, query.selectionArgs)
-      Right apply new ChannelsToAttachImpl(raw)
-    } catch {
-      case e: Exception => Left(e)
-    }
-  }
-  def createQuery(accountId: Long, sourceId: Long): Query = {
-    val sql =
-      """SELECT
-        | c1._id AS _id,
-        | c1.name AS name,
-        | c2.source_id AS attached_source_id
-        |FROM channels AS c1
-        | LEFT JOIN channel_source_map AS c2 ON
-        |   c1._id = c2.channel_id AND
-        |   c2.source_id = ?
-        |WHERE
-        | c1.account_id = ?
-        |""".stripMargin
-
-    new Query(sql, Array(
-      sourceId.toString,
-      accountId.toString
-    ))
-  }
-}
-
-trait ChannelsToAttachRecord extends ChannelRecord {
-  def attached_source_id: Option[Long]
-}
-
-private class ChannelsToAttachImpl(rawCursor: Cursor) extends ChannelsToAttachAccessor {
-
-  private lazy val cursor = TypedCursor[ChannelsToAttachRecord](rawCursor)
-
-  override def length = rawCursor.getCount
-
-  override def findAt(position: Int) =
-    (cursor moveToFind position){
-      new ChannelToAttach(
-        channelId = cursor._id,
-        channelName = cursor.name,
-        isAttached = cursor.attached_source_id.nonEmpty
-      )
-    }
+private class ChannelsToAttachImpl(xs: Sequence[ChannelToAttach]) extends ChannelsToAttachAccessor {
+  override def length = xs.length
+  override def findAt(position: Int) = xs findAt position
 }
 
 class ChannelToAttach (
@@ -80,3 +31,24 @@ class ChannelToAttach (
   val channelName: String,
   val isAttached: Boolean
 )
+
+object ChannelToAttach {
+  implicit object convert extends CursorConvertible[ChannelsToAttachRecord, ChannelToAttach]{
+    override def fromCursor = cursor =>
+      new ChannelToAttach(
+        channelId = cursor._id,
+        channelName = cursor.name,
+        isAttached = cursor.attached_source_id.nonEmpty
+      )
+  }
+  implicit object traverse extends CanTraverseEntity[HasKey, ChannelsToAttachRecord, ChannelToAttach]
+
+  implicit object providable extends SelectorProvidable[ChannelToAttach, ChannelToAttachSelector]
+}
+
+class ChannelToAttachSelector(db: SQLiteDatabase){
+  def traverseOn[A: HasKey](key: A): Either[SQLException, ChannelsToAttachAccessor] = {
+    val i = implicitly[CanTraverseEntity[HasKey, ChannelsToAttachRecord, ChannelToAttach]]
+    i.extract(db, key).right map { new ChannelsToAttachImpl(_) }
+  }
+}
