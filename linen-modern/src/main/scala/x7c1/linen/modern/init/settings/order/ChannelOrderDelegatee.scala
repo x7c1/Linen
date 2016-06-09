@@ -35,9 +35,11 @@ class ChannelOrderDelegatee (
   }
   def onDestroy(): Unit = {
     Log info s"[init]"
+    helper.close()
   }
-  private lazy val helper = new DatabaseHelper(activity)
-
+  private lazy val helper = {
+    new DatabaseHelper(activity)
+  }
   private lazy val loader = {
     ClosableSequenceLoader[HasAccountId, SubscribedChannel](helper.getReadableDatabase)
   }
