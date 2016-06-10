@@ -8,16 +8,20 @@ package x7c1.linen.glue.res.layout;
 
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 public class SettingChannelOrderRowItem extends SettingChannelOrderRow {
 
     public final TextView name;
+    public final ImageView startDragging;
 
     public SettingChannelOrderRowItem(
         View itemView,
-        TextView name
+        TextView name,
+        ImageView startDragging
     ){
         super(itemView);
         this.name = name;
+        this.startDragging = startDragging;
     }
 }

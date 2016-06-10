@@ -3,8 +3,8 @@ package x7c1.linen.modern.init.settings.order
 import android.app.Activity
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import android.support.v7.widget.helper.ItemTouchHelper.{Callback, DOWN, UP}
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
@@ -29,14 +29,16 @@ class ChannelOrderDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
+    val touchHelper = new ItemTouchHelper(new DragControl)
     val manager = new LinearLayoutManager(activity)
     layout.channelList setLayoutManager manager
+
     layout.channelList setAdapter new ChannelOrderRowAdapter(
-      AdapterDelegatee.create(providers, loader.sequence)
+      delegatee = AdapterDelegatee.create(providers, loader.sequence),
+      onDragStart = holder => touchHelper startDrag holder
     )
-    val helper = new ItemTouchHelper(new DragControl)
-    helper attachToRecyclerView layout.channelList
-    layout.channelList addItemDecoration helper
+    touchHelper attachToRecyclerView layout.channelList
+    layout.channelList addItemDecoration touchHelper
 
     IntentExpander executeBy activity.getIntent
   }

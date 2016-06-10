@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -58,7 +59,8 @@ public class SettingChannelOrderRowItemProvider implements ViewHolderProvider<Se
             public SettingChannelOrderRowItem createViewHolder(View view){
                 return new SettingChannelOrderRowItem(
                     view,
-                    (TextView) view.findViewById(R.id.setting_channel_order_row__item__name)
+                    (TextView) view.findViewById(R.id.setting_channel_order_row__item__name),
+                    (ImageView) view.findViewById(R.id.setting_channel_order_row__item__start_dragging)
                 );
             }
         };
