@@ -1,7 +1,10 @@
 package x7c1.linen.modern.init.settings.order
 
 import android.app.Activity
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView.ViewHolder
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
+import android.support.v7.widget.helper.ItemTouchHelper.{Callback, DOWN, UP}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
@@ -31,6 +34,10 @@ class ChannelOrderDelegatee (
     layout.channelList setAdapter new ChannelOrderRowAdapter(
       AdapterDelegatee.create(providers, loader.sequence)
     )
+    val helper = new ItemTouchHelper(new DragControl)
+    helper attachToRecyclerView layout.channelList
+    layout.channelList addItemDecoration helper
+
     IntentExpander executeBy activity.getIntent
   }
   def onDestroy(): Unit = {
@@ -52,5 +59,22 @@ class ChannelOrderDelegatee (
       case SqlError(e) =>
         Log error format(e.getCause){"[failed]"}
     }
+  }
+}
+
+class DragControl extends Callback {
+  override def getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int = {
+    Callback.makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, UP | DOWN)
+  }
+  override def onSwiped(viewHolder: ViewHolder, i: Int): Unit = {
+    Log info "[init]"
+    // nop
+  }
+  override def onMove(recyclerView: RecyclerView, holder: ViewHolder, target: ViewHolder): Boolean = {
+    Log info "[init]"
+    val from = holder.getAdapterPosition
+    val to = target.getAdapterPosition
+    recyclerView.getAdapter.notifyItemMoved(from, to)
+    true
   }
 }
