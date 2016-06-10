@@ -7,7 +7,7 @@ import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
-import x7c1.wheat.modern.database.{Insertable, Updatable}
+import x7c1.wheat.modern.database.{HasTable, Insertable, Updatable}
 
 
 trait source_statuses extends TypedFields {
@@ -26,6 +26,9 @@ object source_statuses {
   }
   case class Key(accountId:Long, sourceId: Long)
 
+  implicit object hasTable extends HasTable[source_statuses]{
+    override def tableName = table
+  }
   implicit object providable extends DefaultProvidable[HasSourceStatusKey, source_statuses]
 
   implicit object reifiable extends RecordReifiable[source_statuses]{

@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasLoaderScheduleId, LoaderScheduleKindRecord, LoaderScheduleRecord}
 import x7c1.wheat.macros.database.TypedCursor
 import x7c1.wheat.modern.database.Query
-import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanTraverseRecord, CanTraverseRecordByQuery, Find, FindBy, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 
@@ -66,8 +65,4 @@ object LoaderScheduleWithKind {
       with FindBy[HasLoaderScheduleId, LoaderScheduleWithKind]
       with TraverseOn[HasAccountId, LoaderScheduleWithKind]
       with TraverseAll[LoaderScheduleWithKind]
-
-  object Selector {
-    implicit def reify: CanReify[Selector] = new Selector(_)
-  }
 }

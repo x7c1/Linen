@@ -53,6 +53,14 @@ object LinenBuild extends Build with LinenSettings {
     settings(libraryDependencies +=
       "org.scala-lang" % "scala-reflect" % scalaVersion.value )
 
+  lazy val `wheat-macros-sample` = project.
+    settings(linenSettings:_*).
+    settings(unmanagedJars in Compile := androidSdkClasspath).
+    settings(libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    )).
+    dependsOn(`wheat-macros`)
+
   lazy val `wheat-modern` = project.
     settings(linenSettings:_*).
     settings(unmanagedJars in Compile := androidSdkClasspath).

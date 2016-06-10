@@ -27,7 +27,7 @@ class PresetChannelsDelegatee(
     allFragments collect reloadable foreach (_ reload event.channelId)
   }
   def allFragments = {
-    (0 to layout.pager.getAdapter.getCount - 1).view map { n =>
+    (0 until layout.pager.getAdapter.getCount).view map { n =>
       layout.pager.getAdapter.instantiateItem(layout.pager, n).asInstanceOf[Fragment]
     }
   }

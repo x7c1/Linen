@@ -8,9 +8,10 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.Button
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.mixin.ChannelsToAttachRecord
 import x7c1.linen.glue.res.layout.{SettingSourceAttach, SettingSourceAttachRow, SettingSourceAttachRowItem}
 import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
-import x7c1.linen.repository.channel.my.{ChannelToAttach, ChannelsToAttachAccessor, MyChannelConnectionUpdater}
+import x7c1.linen.repository.channel.my.{ChannelToAttach, MyChannelConnectionUpdater}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -107,8 +108,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
   }
 
   private def createAccessor() = {
-    ChannelsToAttachAccessor.create(
-      db = helper.getReadableDatabase,
+    helper.selectorOf[ChannelToAttach] traverseOn ChannelsToAttachRecord.Key(
       accountId = args.clientAccountId,
       sourceId = args.originalSourceId
     )

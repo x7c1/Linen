@@ -8,7 +8,6 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -20,9 +19,10 @@ public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
     public final Button createDummySources;
     public final Button createDummies;
     public final Button createPreset;
-    public final Button deleteDatabase;
     public final Button createPresetJp;
     public final Button createPresetEn;
+    public final Button markAllAsUnread;
+    public final Button deleteDatabase;
 
     public DevCreateRecordsLayout(
         View itemView,
@@ -32,9 +32,10 @@ public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
         Button createDummySources,
         Button createDummies,
         Button createPreset,
-        Button deleteDatabase,
         Button createPresetJp,
-        Button createPresetEn
+        Button createPresetEn,
+        Button markAllAsUnread,
+        Button deleteDatabase
     ){
         super(itemView);
         this.toolbar = toolbar;
@@ -43,8 +44,9 @@ public class DevCreateRecordsLayout extends RecyclerView.ViewHolder {
         this.createDummySources = createDummySources;
         this.createDummies = createDummies;
         this.createPreset = createPreset;
-        this.deleteDatabase = deleteDatabase;
         this.createPresetJp = createPresetJp;
         this.createPresetEn = createPresetEn;
+        this.markAllAsUnread = markAllAsUnread;
+        this.deleteDatabase = deleteDatabase;
     }
 }

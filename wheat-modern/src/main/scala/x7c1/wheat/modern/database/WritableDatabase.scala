@@ -54,6 +54,17 @@ class WritableDatabase(db: SQLiteDatabase) {
       case e: SQLException => Left(e)
     }
   }
+  def truncate[A: HasTable: AllowTruncate]: Either[SQLException, Int] = {
+    try {
+      Right apply db.delete(
+        implicitly[HasTable[A]].tableName,
+        "",
+        Array()
+      )
+    } catch {
+      case e: SQLException => Left(e)
+    }
+  }
 }
 
 object WritableDatabase {

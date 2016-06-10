@@ -66,7 +66,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 
 //    plans foreach println
     assertEquals("USE TEMP B-TREE",
-      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
+      false, plans.exists(_.useTempBtree))
   }
 
   @Test
@@ -114,7 +114,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
 //    plans foreach println
 
     assertEquals("USE TEMP B-TREE",
-      false, plans.exists(_.detail contains "USE TEMP B-TREE"))
+      false, plans.exists(_.useTempBtree))
   }
 
   @Test

@@ -1,6 +1,7 @@
 package x7c1.wheat.modern.database.selector
 
 import android.database.sqlite.SQLiteDatabase
+import x7c1.wheat.macros.reify.{HasConstructor, New}
 import x7c1.wheat.modern.database.selector.SelectorProvidable.CanReify
 
 import scala.language.reflectiveCalls
@@ -13,9 +14,7 @@ trait CanProvideSelector[A]{
 
 class SelectorProvidable[A, S: CanReify] extends CanProvideSelector[A]{
   override type Selector = S
-  override def createFrom(db: SQLiteDatabase): S = {
-    implicitly[CanReify[S]] apply db
-  }
+  override def createFrom(db: SQLiteDatabase): S = New[S](db)
 }
 
 object SelectorProvidable {
@@ -26,5 +25,5 @@ object SelectorProvidable {
       }
     }
   }
-  type CanReify[A] = SQLiteDatabase => A
+  type CanReify[A] = HasConstructor[SQLiteDatabase => A]
 }
