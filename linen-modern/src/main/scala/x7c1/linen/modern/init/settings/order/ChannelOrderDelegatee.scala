@@ -1,22 +1,19 @@
 package x7c1.linen.modern.init.settings.order
 
 import android.app.Activity
-import android.support.v7.widget.RecyclerView.ViewHolder
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.support.v7.widget.helper.ItemTouchHelper.{Callback, DOWN, UP}
-import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.SettingChannelOrderLayout
+import x7c1.linen.glue.res.layout.{SettingChannelOrderLayout, SettingChannelOrderRowItem}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
-import x7c1.wheat.modern.decorator.Imports.{toRichToolbar, toRichView}
+import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class ChannelOrderDelegatee (
@@ -29,10 +26,8 @@ class ChannelOrderDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
-    val touchHelper = new ItemTouchHelper(new DragControl)
-    val manager = new LinearLayoutManager(activity)
-    layout.channelList setLayoutManager manager
-
+    val touchHelper = new ItemTouchHelper(loader.callback)
+    layout.channelList setLayoutManager new LinearLayoutManager(activity)
     layout.channelList setAdapter new ChannelOrderRowAdapter(
       delegatee = AdapterDelegatee.create(providers, loader.sequence),
       onDragStart = holder => touchHelper startDrag holder
@@ -46,12 +41,6 @@ class ChannelOrderDelegatee (
     Log info s"[init]"
     helper.close()
   }
-  private lazy val helper = {
-    new DatabaseHelper(activity)
-  }
-  private lazy val loader = {
-    ClosableSequenceLoader[HasAccountId, SubscribedChannel](helper.getReadableDatabase)
-  }
   def showChannels(accountId: Long): Unit = {
     Log info s"[init]"
     loader.startLoading(accountId) apply {
@@ -62,21 +51,24 @@ class ChannelOrderDelegatee (
         Log error format(e.getCause){"[failed]"}
     }
   }
-}
-
-class DragControl extends Callback {
-  override def getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int = {
-    Callback.makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, UP | DOWN)
+  private lazy val helper = {
+    new DatabaseHelper(activity)
   }
-  override def onSwiped(viewHolder: ViewHolder, i: Int): Unit = {
-    Log info "[init]"
-    // nop
-  }
-  override def onMove(recyclerView: RecyclerView, holder: ViewHolder, target: ViewHolder): Boolean = {
-    Log info "[init]"
-    val from = holder.getAdapterPosition
-    val to = target.getAdapterPosition
-    recyclerView.getAdapter.notifyItemMoved(from, to)
-    true
-  }
+  private lazy val loader =
+    new SequenceLoaderForDragging[HasAccountId, SubscribedChannel](
+      db = helper.getReadableDatabase,
+      onStart = {
+        case (row: SettingChannelOrderRowItem, sequence) =>
+          Log info s"start:${row.name.text}"
+          // todo: change color of row being dragged
+      },
+      onFinish = {
+        case (row: SettingChannelOrderRowItem, sequence) =>
+          Log info s"[finish]"
+          // todo: save updated order
+          sequence.toSeq foreach { channel =>
+            Log info s"${channel.name}"
+          }
+      }
+    )
 }
