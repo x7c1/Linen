@@ -70,7 +70,7 @@ class CreateRecordsDelegatee (
     }
     layout.markAllAsUnread onClick { _ =>
       implicit object truncate extends AllowTruncate[source_statuses]
-      helper.writable.truncate[source_statuses] match {
+      helper.writable.truncate[source_statuses]() match {
         case Left(e) =>
           Log error format(e){"[failed]"}
           show(s"[failed] ${e.getMessage}")
