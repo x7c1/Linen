@@ -13,6 +13,8 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoaderToDrag
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoaderToDrag.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
@@ -26,7 +28,7 @@ class ChannelOrderDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
-    val touchHelper = new ItemTouchHelper(loader.callback)
+    val touchHelper = new ItemTouchHelper(loader callbackBy new OnDragChannel)
     layout.channelList setLayoutManager new LinearLayoutManager(activity)
     layout.channelList setAdapter new ChannelOrderRowAdapter(
       delegatee = AdapterDelegatee.create(providers, loader.sequence),
@@ -54,21 +56,31 @@ class ChannelOrderDelegatee (
   private lazy val helper = {
     new DatabaseHelper(activity)
   }
-  private lazy val loader =
-    new SequenceLoaderForDragging[HasAccountId, SubscribedChannel](
-      db = helper.getReadableDatabase,
-      onStart = {
-        case (row: SettingChannelOrderRowItem, sequence) =>
-          Log info s"start:${row.name.text}"
-          // todo: change color of row being dragged
-      },
-      onFinish = {
-        case (row: SettingChannelOrderRowItem, sequence) =>
-          Log info s"[finish]"
-          // todo: save updated order
-          sequence.toSeq foreach { channel =>
-            Log info s"${channel.name}"
-          }
-      }
-    )
+  private lazy val loader = {
+    ClosableSequenceLoaderToDrag[HasAccountId, SubscribedChannel](helper.getReadableDatabase)
+  }
+}
+
+class OnDragChannel extends OnDragListener[SubscribedChannel]{
+  override def onStartDragging(event: DragStarted[SubscribedChannel]) = {
+    event.holder match {
+      case row: SettingChannelOrderRowItem =>
+        Log info s"start:${row.name.text}"
+        // todo: change color of row being dragged
+      case _ =>
+        Log error s"[failed] unknown type of ViewHolder: ${event.holder}"
+    }
+  }
+  override def onFinishDragging(event: DragFinished[SubscribedChannel]) = {
+    event.holder match {
+      case row: SettingChannelOrderRowItem =>
+        Log info s"[finish]"
+        // todo: save updated order
+        event.sequence.toSeq foreach { channel =>
+          Log info s"${channel.name}"
+        }
+      case _ =>
+        Log error s"[failed] unknown type of ViewHolder: ${event.holder}"
+    }
+  }
 }

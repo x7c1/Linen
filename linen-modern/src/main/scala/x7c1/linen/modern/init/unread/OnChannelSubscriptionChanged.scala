@@ -55,7 +55,7 @@ class OnChannelSubscriptionChanged (
         Log info s"[done] ${e.sequence.length}"
         layout.menuList runUi { _.getAdapter.notifyDataSetChanged() }
         f(e)
-      case error: SqlError[UnreadChannel] =>
+      case error: SqlError =>
         Log error format(error.cause.getCause){"[failed]"}
     }
   }

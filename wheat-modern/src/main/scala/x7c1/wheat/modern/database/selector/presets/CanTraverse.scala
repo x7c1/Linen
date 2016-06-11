@@ -1,12 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
-import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.TaskProvider.async
-import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
-import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanProvideSelector, CanSelect, CursorReadable, CursorReifiable}
+import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanSelect, CursorReadable, CursorReifiable}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, CanMapFrom, Sequence}
 
 import scala.language.{higherKinds, reflectiveCalls}
@@ -58,64 +53,5 @@ object ClosableSequence {
         override def findAt(position: Int) = filtered get position flatMap fa.findAt
         override def length = filtered.size
       }
-  }
-}
-
-class ClosableSequenceLoader[I[T] <: CanIdentify[T], A] private
-  (db: SQLiteDatabase)
-  (implicit
-    x1: CanTraverse[I, A],
-    x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
-  ){
-
-  private val holder = new SequenceHolder
-
-  val sequence: Sequence[A] = holder
-
-  def startLoading[X: I](x: X): CallbackTask[LoaderEvent[A]] = async {
-    db.selectorOf[A].traverseOn(x)
-  } map {
-    case Right(xs) =>
-      holder.updateSequence(xs)
-      Done(xs)
-    case Left(e) =>
-      SqlError(e)
-  }
-  def closeCursor(): Unit = {
-    holder.closeCursor()
-  }
-  private class SequenceHolder extends ClosableSequence[A]{
-    private var underlying: Option[ClosableSequence[A]] = None
-
-    def updateSequence(sequence: ClosableSequence[A]) = synchronized {
-      underlying foreach {_.closeCursor()}
-      underlying = Some(sequence)
-    }
-    override def length = {
-      underlying map (_.length) getOrElse 0
-    }
-    override def findAt(position: Int) = {
-      underlying flatMap (_ findAt position)
-    }
-    override def closeCursor() = synchronized {
-      underlying foreach (_.closeCursor())
-      underlying = None
-    }
-  }
-}
-
-object ClosableSequenceLoader {
-  sealed trait LoaderEvent[A]
-  case class Done[A](sequence: Sequence[A]) extends LoaderEvent[A]
-  case class SqlError[A](cause: SQLException) extends LoaderEvent[A]
-
-  def apply[I[T] <: CanIdentify[T], A]
-    (db: SQLiteDatabase)
-    (implicit
-      x1: CanTraverse[I, A],
-      x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
-    ): ClosableSequenceLoader[I, A] = {
-
-    new ClosableSequenceLoader(db)
   }
 }
