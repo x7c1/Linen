@@ -8,14 +8,14 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper.{ACTION_STATE_DRAG, Callback, DOWN, UP}
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceConnector.{DragFinished, DragStarted, OnDragListener}
+import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 
 import scala.collection.breakOut
 import scala.language.higherKinds
 
-class DraggableSequenceConnector[I[T] <: CanIdentify[T], A] private (
+class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
   underlying: ClosableSequenceLoader[I, A], listener: OnDragListener[A]){
 
   val loader: ClosableSequenceLoader[I, A] =
@@ -79,14 +79,14 @@ class DraggableSequenceConnector[I[T] <: CanIdentify[T], A] private (
   }
 }
 
-object DraggableSequenceConnector {
+object DraggableSequenceRoute {
   def apply[I[T] <: CanIdentify[T], A](db: SQLiteDatabase, listener: OnDragListener[A])
     (implicit
       x1: CanTraverse[I, A],
       x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
-    ): DraggableSequenceConnector[I, A] = {
+    ): DraggableSequenceRoute[I, A] = {
 
-    new DraggableSequenceConnector[I, A](new ClosableSequenceLoaderImpl(db), listener)
+    new DraggableSequenceRoute[I, A](new ClosableSequenceLoaderImpl(db), listener)
   }
   case class DragStarted[A](
     holder: ViewHolder

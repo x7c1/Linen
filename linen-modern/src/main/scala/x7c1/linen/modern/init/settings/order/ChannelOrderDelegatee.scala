@@ -13,8 +13,8 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceConnector
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceConnector.{DragFinished, DragStarted, OnDragListener}
+import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute
+import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
@@ -57,11 +57,11 @@ class ChannelOrderDelegatee (
     new DatabaseHelper(activity)
   }
   private lazy val (loader, callback) = {
-    val connector = DraggableSequenceConnector[HasAccountId, SubscribedChannel](
+    val route = DraggableSequenceRoute[HasAccountId, SubscribedChannel](
       db = helper.getReadableDatabase,
       listener = new OnDragChannel
     )
-    connector.loader -> connector.callback
+    route.loader -> route.callback
   }
 }
 
