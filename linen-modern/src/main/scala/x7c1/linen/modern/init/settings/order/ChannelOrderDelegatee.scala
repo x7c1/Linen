@@ -13,8 +13,8 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoaderToDrag
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoaderToDrag.{DragFinished, DragStarted, OnDragListener}
+import x7c1.wheat.modern.database.selector.presets.DraggableSequenceConnector
+import x7c1.wheat.modern.database.selector.presets.DraggableSequenceConnector.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
@@ -28,7 +28,7 @@ class ChannelOrderDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
-    val touchHelper = new ItemTouchHelper(loader callbackBy new OnDragChannel)
+    val touchHelper = new ItemTouchHelper(callback)
     layout.channelList setLayoutManager new LinearLayoutManager(activity)
     layout.channelList setAdapter new ChannelOrderRowAdapter(
       delegatee = AdapterDelegatee.create(providers, loader.sequence),
@@ -56,8 +56,12 @@ class ChannelOrderDelegatee (
   private lazy val helper = {
     new DatabaseHelper(activity)
   }
-  private lazy val loader = {
-    ClosableSequenceLoaderToDrag[HasAccountId, SubscribedChannel](helper.getReadableDatabase)
+  private lazy val (loader, callback) = {
+    val connector = DraggableSequenceConnector[HasAccountId, SubscribedChannel](
+      db = helper.getReadableDatabase,
+      listener = new OnDragChannel
+    )
+    connector.loader -> connector.callback
   }
 }
 
