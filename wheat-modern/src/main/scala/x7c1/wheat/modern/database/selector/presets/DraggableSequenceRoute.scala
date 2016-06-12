@@ -12,7 +12,7 @@ import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute.{DragF
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 
-import scala.collection.breakOut
+import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
 class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
@@ -69,8 +69,8 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
     }
 
   private def orderedSequence: Sequence[A] = {
-    val map = (0 until positions.size()).map(n => n -> positions.get(n))(breakOut): Map[Int, Int]
-    implicitly[CanFilterFrom[Sequence]].asFiltered(underlying.sequence)(map)
+    val ordered = Sequence from positions.asScala
+    implicitly[CanFilterFrom[Sequence]].asFiltered(underlying.sequence)(ordered)
   }
   private var positions = init()
 

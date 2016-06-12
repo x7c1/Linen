@@ -47,11 +47,11 @@ object ClosableSequence {
       }
   }
   implicit object canFilterFrom extends CanFilterFrom[ClosableSequence]{
-    override def asFiltered[A](fa: ClosableSequence[A])(filtered: Map[Int, Int]) =
+    override def asFiltered[A](fa: ClosableSequence[A])(positions: Sequence[Int]) =
       new ClosableSequence[A] {
         override def closeCursor() = fa.closeCursor()
-        override def findAt(position: Int) = filtered get position flatMap fa.findAt
-        override def length = filtered.size
+        override def findAt(position: Int) = positions findAt position flatMap fa.findAt
+        override def length = positions.length
       }
   }
 }
