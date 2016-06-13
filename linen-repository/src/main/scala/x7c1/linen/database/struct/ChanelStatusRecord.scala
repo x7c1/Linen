@@ -12,8 +12,10 @@ import x7c1.wheat.modern.database.{Insertable, Updatable}
 trait ChannelStatusRecord extends TypedFields {
   def channel_id: Long
   def account_id: Long
+  def channel_rank: Double
   def subscribed: Int
   def created_at: Int --> Date
+  def updated_at: Int --> Date
 }
 
 object ChannelStatusRecord {
@@ -49,6 +51,7 @@ trait HasChannelStatusKey[A] extends Identifiable[A, ChannelStatusKey]
 case class ChannelStatusRecordParts(
   channelId: Long,
   accountId: Long,
+  channelRank: Double,
   subscribed: Boolean
 )
 object ChannelStatusRecordParts {
@@ -60,6 +63,8 @@ object ChannelStatusRecordParts {
       TypedFields toContentValues (
         column.account_id -> target.accountId,
         column.channel_id -> target.channelId,
+        column.channel_rank -> target.channelRank,
+        column.updated_at -> Date.current(),
         column.subscribed -> (if (target.subscribed) 1 else 0)
       )
     }
@@ -74,7 +79,9 @@ object ChannelStatusRecordParts {
       TypedFields toContentValues (
         column.account_id -> target.accountId,
         column.channel_id -> target.channelId,
+        column.channel_rank -> target.channelRank,
         column.subscribed -> (if (target.subscribed) 1 else 0),
+        column.updated_at -> Date.current(),
         column.created_at -> Date.current()
       )
     }

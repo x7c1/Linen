@@ -36,6 +36,7 @@ class ChannelSubscriber[X: HasAccountId](account: X, helper: DatabaseHelper) {
         f(writable, ChannelStatusRecordParts(
           channelId = channelId,
           accountId = implicitly[HasAccountId[X]] toId account,
+          channelRank = 0,
           subscribed = subscribed
         ))
       }

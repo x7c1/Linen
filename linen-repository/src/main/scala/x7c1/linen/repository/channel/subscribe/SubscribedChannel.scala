@@ -8,6 +8,7 @@ import x7c1.wheat.modern.features.HasShortLength
 
 case class SubscribedChannel (
   channelId: Long,
+  channelRank: Double,
   subscriberAccountId: Long,
   name: String
 )
@@ -30,6 +31,7 @@ object SubscribedChannel {
     override def fromCursor = cursor =>
       SubscribedChannel(
         channelId = cursor.channel_id,
+        channelRank = cursor.channel_rank,
         subscriberAccountId = cursor.account_id,
         name = cursor.name
       )
