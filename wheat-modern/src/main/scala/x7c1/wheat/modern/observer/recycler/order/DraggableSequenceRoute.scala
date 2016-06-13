@@ -1,4 +1,4 @@
-package x7c1.wheat.modern.database.selector.presets
+package x7c1.wheat.modern.observer.recycler.order
 
 import java.util
 import java.util.Collections
@@ -8,8 +8,9 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper.{ACTION_STATE_DRAG, Callback, DOWN, UP}
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
+import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenceLoader, TraverseOn}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
+import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 
 import scala.collection.JavaConverters._
@@ -46,7 +47,7 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
         super.onSelectedChanged(viewHolder, actionState)
         actionState match {
           case ACTION_STATE_DRAG =>
-            listener onStartDragging DragStarted(viewHolder)
+            listener onStartDragging DragStarted(viewHolder, orderedSequence)
           case _ =>
             // nop
         }
@@ -86,10 +87,11 @@ object DraggableSequenceRoute {
       x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
     ): DraggableSequenceRoute[I, A] = {
 
-    new DraggableSequenceRoute[I, A](new ClosableSequenceLoaderImpl(db), listener)
+    new DraggableSequenceRoute[I, A](ClosableSequenceLoader(db), listener)
   }
   case class DragStarted[A](
-    holder: ViewHolder
+    holder: ViewHolder,
+    sequence: Sequence[A]
   )
   case class DragFinished[A](
     holder: ViewHolder,

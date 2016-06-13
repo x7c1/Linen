@@ -13,10 +13,10 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute
-import x7c1.wheat.modern.database.selector.presets.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute
+import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 
 class ChannelOrderDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
