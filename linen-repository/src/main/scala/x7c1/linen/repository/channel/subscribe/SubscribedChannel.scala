@@ -16,6 +16,9 @@ object SubscribedChannel {
   implicit object id extends HasChannelId[SubscribedChannel]{
     override def toId = _.channelId
   }
+  implicit object account extends HasAccountId[SubscribedChannel]{
+    override def toId = _.subscriberAccountId
+  }
   implicit object key extends HasChannelStatusKey[SubscribedChannel]{
     override def toId = cursor =>
       ChannelStatusKey(

@@ -12,11 +12,9 @@ import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
-import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar, toRichView}
-import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute
+import x7c1.wheat.modern.decorator.Imports.{toRichTextView, toRichToolbar}
 import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
+import x7c1.wheat.modern.observer.recycler.order.{DraggableSequenceRoute, OnDragListenerToReload, OnDragListenerToSave, OrderUpdater, PositionedItems, SequenceReloader}
 
 class ChannelOrderDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
@@ -28,10 +26,10 @@ class ChannelOrderDelegatee (
     layout.toolbar onClickNavigation { _ =>
       activity.finish()
     }
-    val touchHelper = new ItemTouchHelper(callback)
+    val touchHelper = new ItemTouchHelper(route createCallback onDragChannel)
     layout.channelList setLayoutManager new LinearLayoutManager(activity)
     layout.channelList setAdapter new ChannelOrderRowAdapter(
-      delegatee = AdapterDelegatee.create(providers, loader.sequence),
+      delegatee = AdapterDelegatee.create(providers, route.loader.sequence),
       onDragStart = holder => touchHelper startDrag holder
     )
     touchHelper attachToRecyclerView layout.channelList
@@ -44,32 +42,36 @@ class ChannelOrderDelegatee (
     helper.close()
   }
   def showChannels(accountId: Long): Unit = {
-    Log info s"[init]"
-    loader.startLoading(accountId) apply {
-      case Done(_) =>
-        Log info s"[start]"
-        layout.channelList runUi {_.getAdapter.notifyDataSetChanged()}
-      case SqlError(e) =>
-        Log error format(e.getCause){"[failed]"}
-    }
+    reloader.reload(accountId)
   }
   private lazy val helper = {
     new DatabaseHelper(activity)
   }
-  private lazy val (loader, callback) = {
-    val route = DraggableSequenceRoute[HasAccountId, SubscribedChannel](
-      db = helper.getReadableDatabase,
-      listener = new OnDragChannel
+  private lazy val reloader = {
+    new SequenceReloader(route.loader, layout.channelList)
+  }
+  private lazy val route = {
+    DraggableSequenceRoute[HasAccountId, SubscribedChannel](
+      db = helper.getReadableDatabase
     )
-    route.loader -> route.callback
+  }
+  private def onDragChannel = {
+    val updater = new OrderUpdater[SubscribedChannel] {
+      override def update(items: PositionedItems[SubscribedChannel]): Unit = {
+        Log info s"[init] $items"
+      }
+    }
+    new OnDragListenerToStyle append
+      OnDragListenerToSave(updater) append
+      OnDragListenerToReload(reloader)
   }
 }
 
-class OnDragChannel extends OnDragListener[SubscribedChannel]{
+class OnDragListenerToStyle extends OnDragListener[SubscribedChannel]{
   override def onStartDragging(event: DragStarted[SubscribedChannel]) = {
     event.holder match {
       case row: SettingChannelOrderRowItem =>
-        Log info s"start:${row.name.text}"
+        Log info s"start:${row.name.text} ${row.getAdapterPosition}"
         // todo: change color of row being dragged
       case _ =>
         Log error s"[failed] unknown type of ViewHolder: ${event.holder}"
@@ -78,8 +80,10 @@ class OnDragChannel extends OnDragListener[SubscribedChannel]{
   override def onFinishDragging(event: DragFinished[SubscribedChannel]) = {
     event.holder match {
       case row: SettingChannelOrderRowItem =>
-        Log info s"[finish]"
-        // todo: save updated order
+        Log info s"[finish] ${row.getAdapterPosition}"
+
+        // todo: revert color of dragged row
+
         event.sequence.toSeq foreach { channel =>
           Log info s"${channel.name}"
         }
