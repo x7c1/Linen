@@ -13,7 +13,7 @@ trait ChannelStatusRecord extends TypedFields {
   def channel_id: Long
   def account_id: Long
   def channel_rank: Double
-  def subscribed: Int
+  def subscribed: Int --> Boolean
   def created_at: Int --> Date
   def updated_at: Int --> Date
 }
@@ -65,7 +65,7 @@ object ChannelStatusRecordParts {
         column.channel_id -> target.channelId,
         column.channel_rank -> target.channelRank,
         column.updated_at -> Date.current(),
-        column.subscribed -> (if (target.subscribed) 1 else 0)
+        column.subscribed -> target.subscribed
       )
     }
     override def where(target: ChannelStatusRecordParts) = toArgs(
@@ -80,12 +80,10 @@ object ChannelStatusRecordParts {
         column.account_id -> target.accountId,
         column.channel_id -> target.channelId,
         column.channel_rank -> target.channelRank,
-        column.subscribed -> (if (target.subscribed) 1 else 0),
+        column.subscribed -> target.subscribed,
         column.updated_at -> Date.current(),
         column.created_at -> Date.current()
       )
     }
   }
 }
-
-

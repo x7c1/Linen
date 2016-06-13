@@ -50,6 +50,12 @@ trait FieldConvertible[A, B]{
   def wrap(value: A): B
   def unwrap(value: B): A
 }
+object FieldConvertible {
+  implicit object intToBoolean extends FieldConvertible[Int, Boolean]{
+    override def wrap(value: Int): Boolean = value == 1
+    override def unwrap(value: Boolean): Int = if (value) 1 else 0
+  }
+}
 
 private object TypedColumnImpl {
   def create[A: c.WeakTypeTag](c: blackbox.Context)(cursor: c.Tree): c.Tree = {

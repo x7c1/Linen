@@ -33,7 +33,7 @@ object MyChannel {
         name = cursor.name,
         description = cursor.description,
         createdAt = cursor.created_at.typed,
-        isSubscribed = cursor.subscribed == 1
+        isSubscribed = cursor.subscribed.typed
       )
   }
   implicit object traversable extends CanTraverseEntity[HasAccountId, MyChannelRecord, MyChannel]
