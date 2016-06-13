@@ -66,6 +66,7 @@ private object TypedColumnImpl {
       case x if x =:= typeOf[String] => q"$cursor.getString($indexKey)"
       case x if x =:= typeOf[Long] => q"$cursor.getLong($indexKey)"
       case x if x =:= typeOf[Int] => q"$cursor.getInt($indexKey)"
+      case x if x =:= typeOf[Double] => q"$cursor.getDouble($indexKey)"
       case x if x =:= typeOf[Option[Long]] =>
         /*
           cannot use cursor.getLong here
