@@ -17,7 +17,7 @@ import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
 class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
-  underlying: ClosableSequenceLoader[I, A], listener: OnDragListener[A]){
+  underlying: ClosableSequenceLoader[I, A]){
 
   val loader: ClosableSequenceLoader[I, A] =
     new ClosableSequenceLoader[I, A] {
@@ -35,7 +35,7 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
       }
     }
 
-  val callback: Callback =
+  def createCallback(listener: OnDragListener[A]): Callback =
     new Callback {
       override def getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder) = {
         Callback.makeFlag(ACTION_STATE_DRAG, UP | DOWN)
@@ -81,13 +81,13 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
 }
 
 object DraggableSequenceRoute {
-  def apply[I[T] <: CanIdentify[T], A](db: SQLiteDatabase, listener: OnDragListener[A])
+  def apply[I[T] <: CanIdentify[T], A](db: SQLiteDatabase)
     (implicit
       x1: CanTraverse[I, A],
       x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
     ): DraggableSequenceRoute[I, A] = {
 
-    new DraggableSequenceRoute[I, A](ClosableSequenceLoader(db), listener)
+    new DraggableSequenceRoute[I, A](ClosableSequenceLoader(db))
   }
   case class DragStarted[A](
     holder: ViewHolder,
@@ -97,8 +97,33 @@ object DraggableSequenceRoute {
     holder: ViewHolder,
     sequence: Sequence[A]
   )
-  trait OnDragListener[A]{
+  trait OnDragListener[A]{ self =>
+
     def onStartDragging(event: DragStarted[A]): Unit
+
     def onFinishDragging(event: DragFinished[A]): Unit
+
+    def append(listener: OnDragListener[A]): OnDragListener[A] =
+      new OnDragListener[A] {
+        override def onStartDragging(event: DragStarted[A]) = {
+          self onStartDragging event
+          listener onStartDragging event
+        }
+        override def onFinishDragging(event: DragFinished[A]) = {
+          self onFinishDragging event
+          listener onFinishDragging event
+        }
+      }
+  }
+  object OnDragListener {
+    def onFinish[A](f: DragFinished[A] => Unit): OnDragListener[A] =
+      new OnDragListener[A] {
+        override def onStartDragging(event: DragStarted[A]): Unit = {
+          //nop
+        }
+        override def onFinishDragging(event: DragFinished[A]): Unit = {
+          f(event)
+        }
+      }
   }
 }
