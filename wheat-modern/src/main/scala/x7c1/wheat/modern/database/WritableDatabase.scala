@@ -30,6 +30,15 @@ class WritableDatabase(db: SQLiteDatabase) {
       case e: SQLException => Left(e)
     }
   }
+  def updateAll[A: Updatable](targets: Seq[A]): Either[SQLException, Int] = {
+    targets.foldLeft(Right(0): Either[SQLException, Int]){
+      case (accum, target) =>
+        for {
+          sum <- accum.right
+          num <- update(target).right
+        } yield sum + num
+    }
+  }
   def replace[A: Insertable](target: A): Either[SQLException, Long] = {
     try {
       val i = implicitly[Insertable[A]]
