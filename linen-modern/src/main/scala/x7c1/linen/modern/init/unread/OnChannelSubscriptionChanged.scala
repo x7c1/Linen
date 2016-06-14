@@ -23,6 +23,7 @@ class OnChannelSubscriptionChanged (
   loader: UnreadChannelLoader){
 
   private lazy val listeners = Seq(
+    LocalBroadcastListener(update[ChannelOrdered]),
     LocalBroadcastListener(update[ChannelCreated]),
     LocalBroadcastListener(update[MyChannelDeleted]),
     LocalBroadcastListener(update[MyChannelSubscriptionChanged]),
