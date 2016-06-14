@@ -1,7 +1,8 @@
 package x7c1.linen.repository.channel.subscribe
 
 import x7c1.linen.database.mixin.SubscribedChannelRecord
-import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelId, HasChannelStatusKey}
+import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelId}
+import x7c1.linen.repository.channel.order.HasChannelRank
 import x7c1.wheat.modern.database.selector.CursorConvertible
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseEntity, DefaultProvidable}
 import x7c1.wheat.modern.features.HasShortLength
@@ -19,13 +20,6 @@ object SubscribedChannel {
   }
   implicit object account extends HasAccountId[SubscribedChannel]{
     override def toId = _.subscriberAccountId
-  }
-  implicit object key extends HasChannelStatusKey[SubscribedChannel]{
-    override def toId = cursor =>
-      ChannelStatusKey(
-        channelId = cursor.channelId,
-        accountId = cursor.subscriberAccountId
-      )
   }
   implicit object convertible extends CursorConvertible[SubscribedChannelRecord, SubscribedChannel]{
     override def convertFrom = cursor =>
@@ -46,4 +40,13 @@ object SubscribedChannel {
     SubscribedChannel ]
 
   implicit object short extends HasShortLength[SubscribedChannel]
+
+  implicit object rank extends HasChannelRank[SubscribedChannel]{
+    override def toId = channel =>
+      ChannelStatusKey(
+        channelId = channel.channelId,
+        accountId = channel.subscriberAccountId
+      )
+    override def rankOf(channel: SubscribedChannel) = channel.channelRank
+  }
 }

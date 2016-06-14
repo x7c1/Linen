@@ -87,3 +87,37 @@ object ChannelStatusRecordParts {
     }
   }
 }
+
+case class ChannelRankParts(
+  accountId: Long,
+  channelId: Long,
+  channelRank: Double
+)
+object ChannelRankParts {
+  import ChannelStatusRecord.column
+
+  implicit object updatable extends Updatable[ChannelRankParts]{
+    override def tableName = ChannelStatusRecord.table
+    override def toContentValues(target: ChannelRankParts) = {
+      TypedFields toContentValues (
+        column.account_id -> target.accountId,
+        column.channel_id -> target.channelId,
+        column.channel_rank -> target.channelRank,
+        column.updated_at -> Date.current()
+      )
+    }
+    override def where(target: ChannelRankParts) = toArgs(
+      column.channel_id -> target.channelId,
+      column.account_id -> target.accountId
+    )
+  }
+
+  def apply[A: HasChannelStatusKey](origin: A, channelRank: Double): ChannelRankParts = {
+    val key = implicitly[HasChannelStatusKey[A]] toId origin
+    new ChannelRankParts(
+      accountId = key.accountId,
+      channelId = key.channelId,
+      channelRank = channelRank
+    )
+  }
+}
