@@ -31,7 +31,7 @@ object SourceTitle {
   implicit object providable extends DefaultProvidable[HasSourceId, SourceTitle]
 
   implicit object convertible extends CursorConvertible[SourceRecord, SourceTitle]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       SourceTitle(
         sourceId = cursor._id,
         title = cursor.title

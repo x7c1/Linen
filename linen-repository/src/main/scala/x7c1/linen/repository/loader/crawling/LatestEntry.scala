@@ -18,7 +18,7 @@ object LatestEntry {
   implicit object providable extends DefaultProvidable[HasSourceId, LatestEntry]
 
   implicit object convertible extends CursorConvertible[LatestEntryRecord, LatestEntry]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       LatestEntry(
         entryId = cursor.latest_entry_id,
         entryUrl = cursor.url,

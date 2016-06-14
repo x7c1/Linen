@@ -34,7 +34,7 @@ class ChannelToAttach (
 
 object ChannelToAttach {
   implicit object convert extends CursorConvertible[ChannelsToAttachRecord, ChannelToAttach]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       new ChannelToAttach(
         channelId = cursor._id,
         channelName = cursor.name,

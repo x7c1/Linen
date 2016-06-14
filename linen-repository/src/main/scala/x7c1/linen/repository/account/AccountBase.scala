@@ -28,7 +28,7 @@ case class PresetAccount(accountId: Long) extends AccountBase
 
 object PresetAccount {
   implicit object convertible extends CursorConvertible[TaggedAccountRecord, PresetAccount]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       PresetAccount(cursor.account_id)
   }
   implicit object query extends CanFindEntityByQuery
@@ -49,7 +49,7 @@ case class ClientAccount(accountId: Long) extends AccountBase
 
 object ClientAccount {
   implicit object convertible extends CursorConvertible[TaggedAccountRecord, ClientAccount]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       ClientAccount(cursor.account_id)
   }
   implicit object query extends CanFindEntityByQuery

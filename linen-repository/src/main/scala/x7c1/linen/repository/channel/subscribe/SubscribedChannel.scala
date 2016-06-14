@@ -28,7 +28,7 @@ object SubscribedChannel {
       )
   }
   implicit object convertible extends CursorConvertible[SubscribedChannelRecord, SubscribedChannel]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       SubscribedChannel(
         channelId = cursor.channel_id,
         channelRank = cursor.channel_rank,

@@ -27,7 +27,7 @@ object MyChannel {
   implicit object deletable extends ChannelDeletable[MyChannel](_.channelId)
 
   implicit object convertible extends CursorConvertible[MyChannelRecord, MyChannel]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       MyChannel(
         channelId = cursor._id,
         name = cursor.name,
