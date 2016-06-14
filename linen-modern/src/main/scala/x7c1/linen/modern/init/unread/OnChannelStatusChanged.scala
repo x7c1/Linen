@@ -18,7 +18,7 @@ import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 
-class OnChannelSubscriptionChanged (
+class OnChannelStatusChanged (
   layout: UnreadItemsLayout,
   loader: UnreadChannelLoader){
 
