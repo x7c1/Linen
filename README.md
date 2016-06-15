@@ -14,7 +14,7 @@ Application layer.
  * linen-glue
    * defines interfaces and classes written in Java to be called from Scala projects like `linen-modern`.
  * linen-repository
-   * provides reader/writer for data sources mainly around SQLite.
+   * provides classes for data sources mainly around SQLite.
  * linen-modern
    * includes Scala entry files depending on linen-glue, linen-repository.
  * linen-pickle
