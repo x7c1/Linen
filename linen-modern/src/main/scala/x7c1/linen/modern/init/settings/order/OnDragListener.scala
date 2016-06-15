@@ -1,6 +1,7 @@
 package x7c1.linen.modern.init.settings.order
 
 import android.content.Context
+import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.res.layout.SettingChannelOrderRowItem
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.wheat.macros.intent.LocalBroadcaster
@@ -37,12 +38,12 @@ class OnDragListenerToStyle extends OnDragListener[SubscribedChannel]{
   }
 }
 
-class OnDragListenerToNotify(context: Context) extends OnDragListener[SubscribedChannel]{
-  override def onStartDragging(event: DragStarted[SubscribedChannel]): Unit = {
+class OnDragListenerToNotify[A: HasAccountId](context: Context) extends OnDragListener[A]{
+  override def onStartDragging(event: DragStarted[A]): Unit = {
     // nop
   }
-  override def onFinishDragging(event: DragFinished[SubscribedChannel]): Unit = {
-    event.sequence.findAt(0).map(_.subscriberAccountId) match {
+  override def onFinishDragging(event: DragFinished[A]): Unit = {
+    event.sequence findAt 0 map implicitly[HasAccountId[A]].toId match {
       case Some(accountId) =>
         val event = ChannelOrdered(accountId)
         LocalBroadcaster(event) dispatchFrom context
