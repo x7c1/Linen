@@ -2,7 +2,8 @@ package x7c1.linen.modern.init.settings.order
 
 import android.support.v4.view.MotionEventCompat
 import android.support.v7.widget.RecyclerView.ViewHolder
-import android.view.MotionEvent
+import android.view.{MotionEvent, View}
+import android.view.View.OnTouchListener
 import x7c1.linen.glue.res.layout.{SettingChannelOrderRow, SettingChannelOrderRowItem}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.wheat.lore.resource.AdapterDelegatee
@@ -18,15 +19,22 @@ class ChannelOrderRowAdapter(
     delegatee.bindViewHolder(holder, i){
       case (row: SettingChannelOrderRowItem, channel) =>
         row.name.text = channel.name
-        row.startDragging onTouch { (_, event) =>
-          if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN){
-            onDragStart(row)
-          }
-          false
-        }
+
+        val listener = createOnTouchListener(row)
+        row.startDraggingLeft setOnTouchListener listener
+        row.startDraggingRight setOnTouchListener listener
+
       case (x, y) =>
         Log info s"unknown row: $x $y"
     }
 
+  }
+  private def createOnTouchListener(row: SettingChannelOrderRow) = new OnTouchListener {
+    override def onTouch(v: View, event: MotionEvent): Boolean = {
+      if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN){
+        onDragStart(row)
+      }
+      false
+    }
   }
 }

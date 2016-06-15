@@ -28,17 +28,8 @@
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
             />
-        <TextView
-            android:id="@+id/setting_channel_order_row__item__name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/setting_channel_order_row__item__start_dragging_left"
-            android:textSize="15sp"
-            android:textColor="@color/text_secondary"
-            android:layout_centerInParent="true"
-            />
         <ImageView
-            android:id="@+id/setting_channel_order_row__item__start_dragging"
+            android:id="@+id/setting_channel_order_row__item__start_dragging_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingTop="8dp"
@@ -47,6 +38,18 @@
             android:paddingStart="12dp"
             android:src="@drawable/ic_drag_handle_24dp"
             android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            />
+        <TextView
+            android:id="@+id/setting_channel_order_row__item__name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/setting_channel_order_row__item__start_dragging_left"
+            android:layout_toStartOf="@id/setting_channel_order_row__item__start_dragging_right"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textSize="15sp"
+            android:textColor="@color/text_secondary"
             android:layout_centerInParent="true"
             />
     </RelativeLayout>
