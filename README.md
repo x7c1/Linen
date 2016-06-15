@@ -30,6 +30,8 @@ Library layer, which is independent from concrete application.
    * Java library dependent on Android SDK and Scala codes using it.
  * wheat-macros
    * Compile-time library to avoid reflections on runtime.
+ * wheat-calendar
+   * Substitutes for hairy java.util.Calendar
 
 ## Tips
 
