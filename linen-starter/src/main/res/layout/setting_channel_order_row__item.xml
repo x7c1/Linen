@@ -1,25 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:paddingTop="10dp"
-    android:layout_marginBottom="10dp"
-    android:paddingBottom="10dp"
+    android:layout_marginTop="1px"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="0dp"
+    android:layout_marginStart="4dp"
+    app:cardCornerRadius="4dp"
     >
-    <TextView
-        android:id="@+id/setting_channel_order_row__item__name"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
-        android:textColor="@color/text_primary"
-        />
-    <ImageView
-        android:id="@+id/setting_channel_order_row__item__start_dragging"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_drag_handle_black_24dp"
-        android:layout_alignParentEnd="true"
-        />
-</RelativeLayout>
+        android:paddingEnd="0dp"
+        android:paddingStart="0dp"
+        >
+        <ImageView
+            android:id="@+id/setting_channel_order_row__item__start_dragging_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="12dp"
+            android:src="@drawable/ic_drag_handle_24dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            />
+        <TextView
+            android:id="@+id/setting_channel_order_row__item__name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/setting_channel_order_row__item__start_dragging_left"
+            android:textSize="15sp"
+            android:textColor="@color/text_secondary"
+            android:layout_centerInParent="true"
+            />
+        <ImageView
+            android:id="@+id/setting_channel_order_row__item__start_dragging"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="12dp"
+            android:src="@drawable/ic_drag_handle_24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
