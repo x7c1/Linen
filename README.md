@@ -13,8 +13,10 @@ Application layer.
    * starts application, generates apk file, manages resources handled by Android SDK.
  * linen-glue
    * defines interfaces and classes written in Java to be called from Scala projects like `linen-modern`.
+ * linen-repository
+   * provides reader/writer for data sources mainly around SQLite.
  * linen-modern
-   * includes Scala files depending on linen-glue.
+   * includes Scala entry files depending on linen-glue, linen-repository.
  * linen-pickle
    * preserves jars which are not changed usually such as Scala standard library.
 
