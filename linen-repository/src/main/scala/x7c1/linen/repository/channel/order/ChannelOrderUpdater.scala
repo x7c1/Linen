@@ -25,6 +25,17 @@ class ChannelOrderUpdater[A: HasChannelRank] private (
       e => Log error format(e){"[failed]"}
     }
   }
+  def normalizeRanksOf[X: HasAccountId](account: X): Either[SQLException, Int] = {
+    for {
+      channels <- db.selectorOf[OrderedChannel].collectFrom(account).right
+      affected <- {
+        val ranks = channels.zipWithIndex map {
+          case (channel, rank) => ChannelRankParts(channel, rank)
+        }
+        transaction(db)(_ updateAll ranks).right
+      }
+    } yield affected
+  }
   def updateDefaultRanks[X: HasAccountId](account: X): Either[SQLException, Int] = {
     for {
       channels <- db.selectorOf[DefaultRankChannel].collectFrom(account).right

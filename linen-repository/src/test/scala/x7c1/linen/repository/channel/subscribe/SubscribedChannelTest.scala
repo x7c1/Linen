@@ -112,6 +112,22 @@ class SubscribedChannelTest extends JUnitSuiteLike with LogSetting with AllowTra
       val Right(after) = helper.selectorOf[SubscribedChannel] traverseOn account1
       assertEquals(Seq("foo2","foo3","foo1"), after.toSeq.map(_.name).toIndexedSeq)
     }
+    // normalize ranks finally
+    locally {
+      val Right(before) = helper.selectorOf[SubscribedChannel] traverseOn account1
+      assertEquals(
+        Seq(-1.5, -0.5, 0),
+        before.toSeq.map(_.channelRank).toIndexedSeq
+      )
+      updater.normalizeRanksOf(account1).left foreach {
+        e => fail(e)
+      }
+      val Right(after) = helper.selectorOf[SubscribedChannel] traverseOn account1
+      assertEquals(
+        Seq(0, 1, 2),
+        after.toSeq.map(_.channelRank).toIndexedSeq
+      )
+    }
   }
 
   @Test
