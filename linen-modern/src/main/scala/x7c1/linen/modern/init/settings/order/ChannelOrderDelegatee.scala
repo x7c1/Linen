@@ -10,6 +10,7 @@ import x7c1.linen.glue.res.layout.SettingChannelOrderLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.channel.order.ChannelOrderUpdater
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
+import x7c1.linen.scene.updater.ChannelNormalizerService
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
@@ -20,6 +21,8 @@ class ChannelOrderDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
   layout: SettingChannelOrderLayout,
   providers: ChannelOrderRowProviders ){
+
+  private var targetAccountId: Option[Long] = None
 
   def onCreate(): Unit = {
     Log info s"[init]"
@@ -44,11 +47,19 @@ class ChannelOrderDelegatee (
   }
   def onDestroy(): Unit = {
     Log info s"[init]"
+
+    targetAccountId match {
+      case Some(id) =>
+        ChannelNormalizerService(activity) normalizeRanks id
+      case None =>
+        Log info "channel not reordered"
+    }
     helper.close()
   }
   def showChannels(accountId: Long): Unit = {
     updater.updateDefaultRanks(accountId)
     reloader.reload(accountId)
+    targetAccountId = Some(accountId)
   }
   private lazy val helper = {
     new DatabaseHelper(activity)

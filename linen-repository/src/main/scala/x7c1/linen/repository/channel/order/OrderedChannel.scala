@@ -35,8 +35,9 @@ class OrderedChannelSelector(
 
 private[order] class CanCollectOrdered extends CanCollect[HasAccountId, OrderedChannel]{
   override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
-    val either = traverser.extract(db, id)
-    either.right map { _ map readable.convertFrom sortWith (_.channelRank < _.channelRank) }
+    traverser.extract(db, id).right map {
+      _ sortBy (_.channel_rank) map readable.convertFrom
+    }
   }
   private object traverser extends Where[HasAccountId, ChannelStatusRecord](ChannelStatusRecord.table){
     override def where[X](id: Long) = toArgs(

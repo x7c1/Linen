@@ -30,7 +30,7 @@ class OnDragListenerToStyle extends OnDragListener[SubscribedChannel]{
         // todo: revert color of dragged row
 
         event.sequence.toSeq foreach { channel =>
-          Log info s"${channel.channelRank}, ${channel.name}"
+          Log info s"ch${channel.channelId}, ac:${channel.subscriberAccountId}, ${channel.channelRank}, ${channel.name}"
         }
       case _ =>
         Log error s"[failed] unknown type of ViewHolder: ${event.holder}"

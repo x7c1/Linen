@@ -13,7 +13,7 @@ abstract class CanCollectRecord[
 
   override def fromCursor(cursor: Cursor) = {
     val converter = new CursorConverter[A, A](cursor)
-    val xs = 0 until cursor.getColumnCount flatMap { converter.convertAt }
+    val xs = 0 until cursor.getCount flatMap { converter.convertAt }
     Right(xs)
   }
 }
