@@ -10,9 +10,10 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.mixin.SubscribedChannelRecord
 import x7c1.linen.repository.channel.my.ChannelCreator
 import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
-import x7c1.linen.repository.channel.order.ChannelOrderUpdater
+import x7c1.linen.repository.channel.order.{ChannelOrderNormalizer, ChannelOrderUpdater}
 import x7c1.linen.repository.source.setting.SampleFactory
 import x7c1.linen.testing.{AllowTraversingAll, LogSetting}
+import x7c1.wheat.macros.reify.New
 import x7c1.wheat.modern.database.QueryExplainer
 import x7c1.wheat.modern.observer.recycler.order.PositionedItems
 
@@ -119,7 +120,8 @@ class SubscribedChannelTest extends JUnitSuiteLike with LogSetting with AllowTra
         Seq(-1.5, -0.5, 0),
         before.toSeq.map(_.channelRank).toIndexedSeq
       )
-      updater.normalizeRanksOf(account1).left foreach {
+      val normalizer = New[ChannelOrderNormalizer](helper.getWritableDatabase)
+      normalizer.normalizeRanksOf(account1).left foreach {
         e => fail(e)
       }
       val Right(after) = helper.selectorOf[SubscribedChannel] traverseOn account1

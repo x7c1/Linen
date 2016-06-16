@@ -4,7 +4,6 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{ChannelRankParts, HasAccountId, HasChannelStatusKey}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.macros.reify.New
 import x7c1.wheat.modern.database.WritableDatabase.transaction
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -25,9 +24,6 @@ class ChannelOrderUpdater[A: HasChannelRank] private (
     either.left foreach {
       e => Log error format(e){"[failed]"}
     }
-  }
-  def normalizeRanksOf[X: HasAccountId](account: X): Either[SQLException, Int] = {
-    New[ChannelOrderNormalizer](db) normalizeRanksOf account
   }
   def updateDefaultRanks[X: HasAccountId](account: X): Either[SQLException, Int] = {
     for {
