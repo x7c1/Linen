@@ -4,10 +4,11 @@ import android.app.Service
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
-import x7c1.linen.repository.channel.order.{ChannelOrderUpdater, OrderedChannel}
+import x7c1.linen.repository.channel.order.ChannelOrderNormalizer
 import x7c1.linen.repository.loader.crawling.Implicits._
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.macros.reify.New
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 import scala.concurrent.Future
@@ -36,7 +37,7 @@ private class ChannelNormalizerServiceImpl(
   helper: DatabaseHelper ) extends ChannelNormalizerService {
 
   override def normalizeRanks(accountId: Long): Unit = Future {
-    val updater = ChannelOrderUpdater[OrderedChannel](helper.getWritableDatabase)
+    val updater = New[ChannelOrderNormalizer](helper.getWritableDatabase)
     val either = updater normalizeRanksOf accountId
     either match {
       case Right(num) =>
