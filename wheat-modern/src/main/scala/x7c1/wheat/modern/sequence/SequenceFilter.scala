@@ -10,23 +10,23 @@ trait SequenceFilter[A, F[_] <: Sequence[_]]{
     val fa = underlying.asInstanceOf[Sequence[A]]
 
     @tailrec
-    def loop(n: Int, hit: Int, map: Map[Int, Int]): Map[Int, Int] = n match {
-      case _ if n == fa.length => map
-      case _ if fa findAt n exists f => loop(n + 1, hit + 1, map + (hit -> n))
-      case _ => loop(n + 1, hit, map)
+    def loop(n: Int, xs: Vector[Int]): Vector[Int] = n match {
+      case _ if n == fa.length => xs
+      case _ if fa findAt n exists f => loop(n + 1, xs :+ n)
+      case _ => loop(n + 1, xs)
     }
-    x.asFiltered(underlying)(loop(0, 0, Map()))
+    x.asFiltered(underlying)(Sequence from loop(0, Vector()))
   }
 }
 
 trait CanFilterFrom[F[_]]{
-  def asFiltered[A](fa: F[A])(filtered: Map[Int, Int]): F[A]
+  def asFiltered[A](fa: F[A])(positions: Sequence[Int]): F[A]
 }
 
 private[sequence] class DefaultCanFilterFrom extends CanFilterFrom[Sequence]{
-  override def asFiltered[A](fa: Sequence[A])(filtered: Map[Int, Int]) =
+  override def asFiltered[A](fa: Sequence[A])(positions: Sequence[Int]) =
     new Sequence[A] {
-      override def findAt(position: Int) = filtered get position flatMap fa.findAt
-      override def length = filtered.size
+      override def findAt(position: Int) = positions findAt position flatMap fa.findAt
+      override def length = positions.length
     }
 }

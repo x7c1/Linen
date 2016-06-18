@@ -11,7 +11,7 @@ case class PresetChannel(
 )
 object PresetChannel {
   implicit object convertible extends CursorConvertible[ChannelRecord, PresetChannel]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       PresetChannel(
         channelId = cursor._id,
         accountId = cursor.account_id,

@@ -7,7 +7,7 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.crawling.{RemoteSourceLoader, TraceableQueue}
 import x7c1.linen.scene.loader.crawling.{QueueingService, SchedulerService}
-import x7c1.linen.scene.updater.UpdaterMethods
+import x7c1.linen.scene.updater.{ChannelNormalizerService, UpdaterMethods}
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
@@ -29,7 +29,8 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl){
     val expanders = Seq(
       IntentExpander from new UpdaterMethods(service, helper, startId),
       IntentExpander from QueueingService.reify(service, helper, queue),
-      IntentExpander from SchedulerService.reify(service, helper)
+      IntentExpander from SchedulerService.reify(service, helper),
+      IntentExpander from ChannelNormalizerService.reify(service, helper)
     )
     expanders findRunnerOf intent match {
       case Left(e) => Log error e.message

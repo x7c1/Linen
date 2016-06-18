@@ -50,6 +50,12 @@ trait FieldConvertible[A, B]{
   def wrap(value: A): B
   def unwrap(value: B): A
 }
+object FieldConvertible {
+  implicit object intToBoolean extends FieldConvertible[Int, Boolean]{
+    override def wrap(value: Int): Boolean = value == 1
+    override def unwrap(value: Boolean): Int = if (value) 1 else 0
+  }
+}
 
 private object TypedColumnImpl {
   def create[A: c.WeakTypeTag](c: blackbox.Context)(cursor: c.Tree): c.Tree = {
@@ -66,6 +72,7 @@ private object TypedColumnImpl {
       case x if x =:= typeOf[String] => q"$cursor.getString($indexKey)"
       case x if x =:= typeOf[Long] => q"$cursor.getLong($indexKey)"
       case x if x =:= typeOf[Int] => q"$cursor.getInt($indexKey)"
+      case x if x =:= typeOf[Double] => q"$cursor.getDouble($indexKey)"
       case x if x =:= typeOf[Option[Long]] =>
         /*
           cannot use cursor.getLong here

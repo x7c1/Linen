@@ -57,7 +57,7 @@ trait DrawerMenuInitializer {
   protected lazy val channelLoader = UnreadChannelSelector.createLoader(helper)
 
   protected lazy val onChannelSubscriptionChanged =
-    new OnChannelSubscriptionChanged(layout, channelLoader)
+    new OnChannelStatusChanged(layout, channelLoader)
 
   private def createMenuItems(
     account: ClientAccount, accessor: Sequence[UnreadChannel]): MenuItems[MenuRow] = {

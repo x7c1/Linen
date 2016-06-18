@@ -18,7 +18,7 @@ object Channel {
   implicit object providable extends DefaultProvidable[HasChannelId, Channel]
 
   implicit object convertible extends CursorConvertible[ChannelRecord, Channel]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       Channel(
         channelId = cursor._id,
         description = cursor.description,

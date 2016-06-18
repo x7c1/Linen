@@ -27,13 +27,13 @@ object MyChannel {
   implicit object deletable extends ChannelDeletable[MyChannel](_.channelId)
 
   implicit object convertible extends CursorConvertible[MyChannelRecord, MyChannel]{
-    override def fromCursor = cursor =>
+    override def convertFrom = cursor =>
       MyChannel(
         channelId = cursor._id,
         name = cursor.name,
         description = cursor.description,
         createdAt = cursor.created_at.typed,
-        isSubscribed = cursor.subscribed == 1
+        isSubscribed = cursor.subscribed.typed
       )
   }
   implicit object traversable extends CanTraverseEntity[HasAccountId, MyChannelRecord, MyChannel]
