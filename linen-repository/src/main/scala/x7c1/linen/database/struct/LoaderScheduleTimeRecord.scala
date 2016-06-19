@@ -5,10 +5,10 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
-import x7c1.wheat.modern.database.{HasTable, Insertable, Query}
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
 

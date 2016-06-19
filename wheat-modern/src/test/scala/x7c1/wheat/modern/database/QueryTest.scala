@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.database
 
 import org.scalatest.{FlatSpecLike, Matchers}
-import x7c1.wheat.modern.database.Query.SqlBuilder
+import x7c1.wheat.macros.database.Query.SqlBuilder
 
 
 class QueryTest extends FlatSpecLike with Matchers {

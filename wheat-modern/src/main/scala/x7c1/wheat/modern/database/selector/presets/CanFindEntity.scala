@@ -1,10 +1,10 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.Cursor
-import x7c1.wheat.modern.database.selector.{CursorReifiable, CursorReadable, CursorConverter, CanIdentify}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
+import x7c1.wheat.modern.database.selector.{CanIdentify, CursorConverter, CursorReadable, CursorReifiable}
 
-import scala.language.{reflectiveCalls, higherKinds}
+import scala.language.{higherKinds, reflectiveCalls}
 
 abstract class CanFindEntity[
   I[T] <: CanIdentify[T],

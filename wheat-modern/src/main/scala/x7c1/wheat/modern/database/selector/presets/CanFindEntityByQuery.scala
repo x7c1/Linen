@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.{CanSelect, CursorConverter, CursorReadable, CursorReifiable, UnitIdentifiable}
 
 import scala.language.reflectiveCalls

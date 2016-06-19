@@ -1,8 +1,9 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.Cursor
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.{CanIdentify, CursorConverter, CursorReadable, CursorReifiable}
-import x7c1.wheat.modern.database.{HasTable, Query}
+import x7c1.wheat.modern.database.HasTable
 
 import scala.language.{higherKinds, reflectiveCalls}
 

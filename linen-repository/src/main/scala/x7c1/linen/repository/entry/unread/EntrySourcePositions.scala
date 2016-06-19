@@ -2,7 +2,7 @@ package x7c1.linen.repository.entry.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.source.unread.UnreadSource
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.sequence.{Sequence, SequenceHeadlines}
 
 object EntrySourcePositions {

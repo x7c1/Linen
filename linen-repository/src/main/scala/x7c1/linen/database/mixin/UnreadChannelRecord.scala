@@ -4,7 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.HasChannelStatusKey
 import x7c1.linen.repository.source.unread.UnreadSourceAccessorQueries
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.SelectorProvidable
 import x7c1.wheat.modern.database.selector.presets.{CanDetectBySelect, DetectFrom}
 

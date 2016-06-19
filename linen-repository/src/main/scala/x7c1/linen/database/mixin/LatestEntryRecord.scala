@@ -2,9 +2,8 @@ package x7c1.linen.database.mixin
 
 import android.database.Cursor
 import x7c1.linen.database.struct.{EntryRecord, HasSourceId, retrieved_source_marks}
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
-import x7c1.wheat.modern.database.Query.SqlBuilder
+import x7c1.wheat.macros.database.Query.SqlBuilder
+import x7c1.wheat.macros.database.{Query, TypedCursor}
 import x7c1.wheat.modern.database.selector.RecordReifiable
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord
 

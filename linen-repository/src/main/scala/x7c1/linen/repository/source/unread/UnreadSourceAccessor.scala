@@ -3,8 +3,7 @@ package x7c1.linen.repository.source.unread
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor}
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.util.Try

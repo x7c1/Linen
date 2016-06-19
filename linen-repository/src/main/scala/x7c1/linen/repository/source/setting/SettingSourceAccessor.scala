@@ -5,8 +5,8 @@ import android.database.{Cursor, SQLException}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{ChannelSourceMapParts, HasAccountId, HasChannelId, HasSourceId, SourceParts, SourceRatingParts}
 import x7c1.linen.repository.date.Date
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Query, WritableDatabase}
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.WritableDatabase
 
 trait SettingSourceAccessor {
   def findAt(position: Int): Option[SettingSource]

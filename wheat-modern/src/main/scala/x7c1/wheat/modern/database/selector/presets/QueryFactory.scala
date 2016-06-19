@@ -1,6 +1,6 @@
 package x7c1.wheat.modern.database.selector.presets
 
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.CanIdentify
 
 import scala.language.higherKinds

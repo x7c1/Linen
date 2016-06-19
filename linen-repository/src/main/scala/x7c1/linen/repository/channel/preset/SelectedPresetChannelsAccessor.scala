@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 
 object SelectedPresetChannelsAccessor
   extends PresetChannelAccessorFactory(SelectedPresetChannelsQuery)

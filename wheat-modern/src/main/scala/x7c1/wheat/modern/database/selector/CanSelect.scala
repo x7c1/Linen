@@ -2,8 +2,7 @@ package x7c1.wheat.modern.database.selector
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor}
 
 import scala.language.{higherKinds, reflectiveCalls}
 
