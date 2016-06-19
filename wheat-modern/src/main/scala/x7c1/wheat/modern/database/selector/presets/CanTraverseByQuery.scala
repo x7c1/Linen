@@ -24,20 +24,20 @@ trait CanTraverseByQuery[A] extends CanSelect[UnitIdentifiable, ClosableSequence
 abstract class CanTraverseEntityByQuery[
   FROM: CursorReifiable,
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
-](query0: Query) extends CanTraverseByQuery[TO]{
+](query: Query) extends CanTraverseByQuery[TO]{
 
   override def reify(cursor: Cursor) = {
     ClosableSequence[FROM, TO](cursor)
   }
-  override def query[X: UnitIdentifiable](target: X) = query0
+  override def queryAbout[X: UnitIdentifiable](target: X) = query
 }
 
 abstract class CanTraverseRecordByQuery[
   A: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
-](query0: Query) extends CanTraverseByQuery[A]{
+](query: Query) extends CanTraverseByQuery[A]{
 
   override def reify(cursor: Cursor) = {
     ClosableSequence[A, A](cursor)
   }
-  override def query[X: UnitIdentifiable](target: X) = query0
+  override def queryAbout[X: UnitIdentifiable](target: X) = query
 }

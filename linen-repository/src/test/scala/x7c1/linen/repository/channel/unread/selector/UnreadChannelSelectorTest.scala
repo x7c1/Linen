@@ -152,7 +152,7 @@ class UnreadChannelSelectorTest extends JUnitSuiteLike with AllowTraversingAll w
       assertEquals(1, channels.filter(_.name == "foo1").length)
       assertEquals(1, channels.filter(_.name == "foo2").length)
     }
-    val query = UnreadChannelRecord.toDetect query ChannelStatusKey(
+    val query = UnreadChannelRecord.toDetect queryAbout ChannelStatusKey(
       channelId = channelId1,
       accountId = account.accountId
     )

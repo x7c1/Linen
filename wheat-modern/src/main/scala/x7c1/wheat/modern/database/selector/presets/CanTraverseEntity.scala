@@ -12,8 +12,8 @@ abstract class CanTraverseEntity[
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
 ] extends CanTraverseBySelect[I, TO]{
 
-  override def query[X: I](target: X): Query = {
-    implicitly[CanTraverseBySelect[I, FROM]] query target
+  override def queryAbout[X: I](target: X): Query = {
+    implicitly[CanTraverseBySelect[I, FROM]] queryAbout target
   }
   override def fromCursor(cursor: Cursor): Either[SQLException, ClosableSequence[TO]] = {
     val sequence = ClosableSequence[FROM, TO](cursor)

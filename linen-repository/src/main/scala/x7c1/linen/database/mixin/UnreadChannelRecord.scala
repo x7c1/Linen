@@ -16,7 +16,7 @@ object UnreadChannelRecord {
     UnreadChannelRecordSelector
   ]
   implicit object toDetect extends CanDetectBySelect[HasChannelStatusKey, UnreadChannelRecord] {
-    override def query[X: HasChannelStatusKey](target: X): Query = {
+    override def queryAbout[X: HasChannelStatusKey](target: X): Query = {
       val key = implicitly[HasChannelStatusKey[X]] toId target
       Query(
         sql = UnreadSourceAccessorQueries.sql3 + " LIMIT 1",

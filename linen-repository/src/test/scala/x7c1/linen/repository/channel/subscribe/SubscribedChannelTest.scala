@@ -139,7 +139,7 @@ class SubscribedChannelTest extends JUnitSuiteLike with LogSetting with AllowTra
     val factory = new SampleFactory(helper)
 
     val account1 = factory.createAccount()
-    val query = SubscribedChannelRecord.traversable query account1
+    val query = SubscribedChannelRecord.traversable queryAbout account1
     val plans = QueryExplainer(helper.getReadableDatabase) explain query
 
     assertEquals(

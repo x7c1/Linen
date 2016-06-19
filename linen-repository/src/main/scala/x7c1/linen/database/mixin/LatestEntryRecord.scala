@@ -14,7 +14,7 @@ object LatestEntryRecord {
     override def reify(cursor: Cursor) = TypedCursor[LatestEntryRecord](cursor)
   }
   implicit object findable extends CanFindRecord[HasSourceId, LatestEntryRecord]{
-    override def query[X: HasSourceId](target: X): Query = {
+    override def queryAbout[X: HasSourceId](target: X): Query = {
       val sourceId = implicitly[HasSourceId[X]] toId target
       val sql =
         s"""SELECT

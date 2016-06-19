@@ -23,7 +23,7 @@ object LoaderScheduleWithKind {
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleWithKind](cursor)
   }
   implicit object findable extends CanFindRecord[HasLoaderScheduleId, LoaderScheduleWithKind]{
-    override def query[X: HasLoaderScheduleId](target: X): Query = {
+    override def queryAbout[X: HasLoaderScheduleId](target: X): Query = {
       val scheduleId = implicitly[HasLoaderScheduleId[X]] toId target
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
@@ -36,7 +36,7 @@ object LoaderScheduleWithKind {
     }
   }
   implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleWithKind]{
-    override def query[X: HasAccountId](target: X): Query = {
+    override def queryAbout[X: HasAccountId](target: X): Query = {
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
         | INNER JOIN loader_schedule_kinds as t2

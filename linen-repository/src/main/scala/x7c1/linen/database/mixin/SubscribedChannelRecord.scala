@@ -18,7 +18,7 @@ object SubscribedChannelRecord {
     override def reify(cursor: Cursor) = TypedCursor[SubscribedChannelRecord](cursor)
   }
   implicit object traversable extends CanTraverseRecord[HasAccountId, SubscribedChannelRecord]{
-    override def query[X: HasAccountId](target: X): Query = {
+    override def queryAbout[X: HasAccountId](target: X): Query = {
       val sql =
         """SELECT
           | channel_id,

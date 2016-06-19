@@ -25,9 +25,9 @@ trait CanFindByQuery [A] extends CanSelect[UnitIdentifiable, Option[A]]{
 abstract class CanFindEntityByQuery[
   FROM: CursorReifiable,
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
-] (query0: Query) extends CanFindByQuery[TO]{
+] (query: Query) extends CanFindByQuery[TO]{
 
-  override def query[X: UnitIdentifiable](target: X): Query = query0
+  override def queryAbout[X: UnitIdentifiable](target: X): Query = query
 
   def reify(cursor: Cursor): Option[TO] = {
     new CursorConverter[FROM, TO](cursor) convertAt 0

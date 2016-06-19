@@ -15,7 +15,7 @@ abstract class CanFindEntity[
   override def reify(cursor: Cursor): Option[TO] = {
     new CursorConverter[FROM, TO](cursor) convertAt 0
   }
-  override def query[X: I](target: X): Query = {
-    implicitly[CanFindBySelect[I, FROM]] query target
+  override def queryAbout[X: I](target: X): Query = {
+    implicitly[CanFindBySelect[I, FROM]] queryAbout target
   }
 }

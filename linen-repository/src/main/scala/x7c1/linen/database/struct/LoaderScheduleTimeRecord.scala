@@ -35,7 +35,7 @@ object LoaderScheduleTimeRecord {
     Query("SELECT * FROM loader_schedule_times")
   )
   implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleTimeRecord]{
-    override def query[X: HasAccountId](target: X) = {
+    override def queryAbout[X: HasAccountId](target: X) = {
       val sql =
         """SELECT *
           | FROM loader_schedule_times AS t1

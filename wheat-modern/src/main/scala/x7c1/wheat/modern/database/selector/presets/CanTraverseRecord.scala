@@ -24,7 +24,7 @@ object CanTraverseRecord {
     A: HasTable: CursorReifiable: ({ type L[T] = CursorReadable[A, T] })#L
   ] extends CanTraverseRecord[I, A]{
 
-    override def query[X: I](target: X): Query = {
+    override def queryAbout[X: I](target: X): Query = {
       val table = implicitly[HasTable[A]].tableName
       QueryFactory[I](table).create(target)(where)
     }

@@ -25,7 +25,7 @@ object ChannelsToAttachRecord {
     override def reify(cursor: Cursor) = TypedCursor[ChannelsToAttachRecord](cursor)
   }
   implicit object traverse extends CanTraverseRecord[HasKey, ChannelsToAttachRecord]{
-    override def query[X: HasKey](target: X): Query = {
+    override def queryAbout[X: HasKey](target: X): Query = {
       val key = implicitly[HasKey[X]] toId target
       val sql =
         """SELECT
