@@ -21,10 +21,10 @@ class QueryTest extends FlatSpecLike with Matchers {
   }
   it can "build Query with 2 args" in {
     val id1 = 1
-    val id2 = 2
-    val query = sql"SELECT * FROM foo WHERE id1 = $id1 AND id2 = $id2"
+    val key2 = "key2"
+    val query = sql"SELECT * FROM foo WHERE id1 = $id1 AND key2 = $key2"
 
-    query.sql shouldBe "SELECT * FROM foo WHERE id1 = ? AND id2 = ?"
-    query.selectionArgs shouldBe Seq("1", "2")
+    query.sql shouldBe "SELECT * FROM foo WHERE id1 = ? AND key2 = ?"
+    query.selectionArgs shouldBe Seq("1", "key2")
   }
 }
