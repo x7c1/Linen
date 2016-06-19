@@ -31,7 +31,7 @@ object ChannelStatusRecord {
   implicit object reifiable extends RecordReifiable[ChannelStatusRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelStatusRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[HasChannelStatusKey, ChannelStatusRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasChannelStatusKey, ChannelStatusRecord]{
     override def where[X](key: ChannelStatusKey) = toArgs(
       column.account_id -> key.accountId,
       column.channel_id -> key.channelId

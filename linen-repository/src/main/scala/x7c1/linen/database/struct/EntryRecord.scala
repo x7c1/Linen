@@ -33,7 +33,7 @@ object EntryRecord {
   }
   implicit object providable extends SelectorProvidable[EntryRecord, Selector]
 
-  implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord]{
     override def where[X](id: Long) = toArgs(column.entry_id -> id)
   }
   implicit object collectable extends CanCollectRecord.Where[HasSourceId, EntryRecord]{

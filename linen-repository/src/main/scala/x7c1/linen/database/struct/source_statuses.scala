@@ -34,7 +34,7 @@ object source_statuses {
   implicit object reifiable extends RecordReifiable[source_statuses]{
     override def reify(cursor: Cursor) = TypedCursor[source_statuses](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[HasSourceStatusKey, source_statuses](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceStatusKey, source_statuses]{
     override def where[X](key: Key) = toArgs(
       column.source_id -> key.sourceId,
       column.account_id -> key.accountId

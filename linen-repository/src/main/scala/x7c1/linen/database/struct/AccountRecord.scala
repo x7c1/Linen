@@ -4,9 +4,10 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Insertable
-import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
+import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
+import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 
 
 trait AccountRecord extends TypedFields {
@@ -17,14 +18,17 @@ trait AccountRecord extends TypedFields {
 }
 object AccountRecord {
   def table: String = "accounts"
+
   def column = TypedFields.expose[AccountRecord]
+
+  implicit object hasTable extends HasTable.Where[AccountRecord](table)
 
   implicit object providable extends DefaultProvidable[HasAccountId, AccountRecord]
 
   implicit object reifiable extends RecordReifiable[AccountRecord]{
     override def reify(cursor: Cursor) = TypedCursor[AccountRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[HasAccountId, AccountRecord](table){
+  implicit object findable extends Where[HasAccountId, AccountRecord]{
     override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }
