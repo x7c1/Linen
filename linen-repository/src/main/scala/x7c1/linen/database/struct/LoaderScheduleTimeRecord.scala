@@ -8,7 +8,7 @@ import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
-import x7c1.wheat.modern.database.{Insertable, Query}
+import x7c1.wheat.modern.database.{HasTable, Insertable, Query}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
 
@@ -25,6 +25,8 @@ object LoaderScheduleTimeRecord {
   def table = "loader_schedule_times"
 
   def column = TypedFields.expose[LoaderScheduleTimeRecord]
+
+  implicit object hasTable extends HasTable.Where[LoaderScheduleTimeRecord](table)
 
   implicit object reifiable extends RecordReifiable[LoaderScheduleTimeRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleTimeRecord](cursor)
@@ -49,7 +51,7 @@ object LoaderScheduleTimeRecord {
   implicit object providable extends SelectorProvidable[LoaderScheduleTimeRecord, Selector]
 
   implicit object collect
-    extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord](table){
+    extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord]{
 
     override def where[X](id: Long) = toArgs(
       column.schedule_id -> id
