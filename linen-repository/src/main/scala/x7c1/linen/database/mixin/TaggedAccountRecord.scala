@@ -12,7 +12,7 @@ trait TaggedAccountRecord extends TypedFields {
 }
 
 object TaggedAccountRecord {
-  def select(label: AccountTagLabel): Query = new Query(
+  def select(label: AccountTagLabel): Query = Query(
     sql =
       s"""SELECT
          |  t2.tag_label as tag_label,

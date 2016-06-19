@@ -28,7 +28,7 @@ object LatestEntryRecord {
            |WHERE t1.source_id = ?
            |""".stripMargin
 
-      new Query(sql, Array(sourceId.toString, sourceId.toString))
+      Query(sql, Array(sourceId.toString, sourceId.toString))
     }
   }
 }

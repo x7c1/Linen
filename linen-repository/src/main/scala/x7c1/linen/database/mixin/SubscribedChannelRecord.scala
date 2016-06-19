@@ -34,7 +34,7 @@ object SubscribedChannelRecord {
         """.stripMargin
 
       val id = implicitly[HasAccountId[X]] toId target
-      new Query(sql, Array(id.toString))
+      Query(sql, Array(id.toString))
     }
   }
 }

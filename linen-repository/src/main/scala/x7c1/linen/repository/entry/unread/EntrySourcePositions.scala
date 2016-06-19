@@ -29,7 +29,7 @@ object EntrySourcePositions {
       map(_ => s"SELECT * FROM ($sql) AS tmp").
       mkString(" UNION ALL ")
 
-    new Query(union, QueryParts.toArgs(sources))
+    Query(union, QueryParts.toArgs(sources))
   }
 }
 

@@ -3,7 +3,7 @@ package x7c1.wheat.modern.database
 import android.database.sqlite.SQLiteDatabase
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 
-class Query(
+class Query private (
   val sql: String,
   val selectionArgs: Array[String] = Array()) {
 

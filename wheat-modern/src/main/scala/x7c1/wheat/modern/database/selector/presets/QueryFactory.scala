@@ -11,6 +11,6 @@ private case class QueryFactory[I[T] <: CanIdentify[T]](table: String){
     val clause = where(id) map { case (key, _) => s"$key = ?" } mkString " AND "
     val sql = s"SELECT * FROM $table WHERE $clause"
     val args = where(id) map { case (_, value) => value }
-    new Query(sql, args.toArray)
+    Query(sql, args.toArray)
   }
 }

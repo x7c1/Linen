@@ -86,7 +86,7 @@ class SettingSourceAccessorFactory(
         |ORDER BY t2.source_id DESC
       """.stripMargin
 
-    new Query(sql2, Array(accountId.toString, channelId.toString))
+    Query(sql2, Array(accountId.toString, channelId.toString))
   }
 }
 

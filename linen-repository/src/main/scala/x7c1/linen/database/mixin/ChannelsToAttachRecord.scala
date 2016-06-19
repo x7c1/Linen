@@ -40,7 +40,7 @@ object ChannelsToAttachRecord {
           | c1.account_id = ?
           |""".stripMargin
 
-      new Query(sql, Array(
+      Query(sql, Array(
         key.sourceId.toString,
         key.accountId.toString
       ))

@@ -90,7 +90,7 @@ object UnreadSourceAccessor {
     val accountId = implicitly[HasAccountId[A]] toId account
     val channelId = implicitly[HasChannelId[B]] toId channel
     val sql = UnreadSourceAccessorQueries.sql5
-    new Query(sql,
+    Query(sql,
       Array(
         accountId.toString, accountId.toString,
         channelId.toString, accountId.toString))

@@ -33,7 +33,7 @@ object MyChannelRecord {
           |ORDER BY c1._id DESC""".stripMargin
 
       val id = implicitly[HasAccountId[X]] toId target
-      new Query(sql, Array(id.toString, id.toString))
+      Query(sql, Array(id.toString, id.toString))
     }
   }
 }

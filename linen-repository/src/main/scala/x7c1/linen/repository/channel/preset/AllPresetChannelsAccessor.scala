@@ -20,7 +20,7 @@ object AllPresetChannelsQuery extends PresetChannelQueryFactory {
          |ORDER BY c1._id DESC
        """.stripMargin
 
-    new Query(sql, Array(
+    Query(sql, Array(
       clientAccountId.toString,
       presetAccountId.toString)
     )
