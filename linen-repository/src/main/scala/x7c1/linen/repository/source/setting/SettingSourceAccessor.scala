@@ -78,7 +78,6 @@ class SettingSourceAccessorFactory(
     val sql1 =
       """SELECT
         | s1.source_id AS source_id,
-        | s2.account_id AS account_id,
         | s2.rating AS rating
         |FROM channel_source_map AS s1
         | LEFT JOIN source_ratings AS s2
@@ -91,7 +90,7 @@ class SettingSourceAccessorFactory(
         | t1._id AS source_id,
         | t1.title AS title,
         | t1.description AS description,
-        | t2.account_id AS account_id,
+        | $accountId AS account_id,
         | t2.rating AS rating
         |FROM sources AS t1
         |INNER JOIN ($sql1) AS t2 ON t1._id = t2.source_id
