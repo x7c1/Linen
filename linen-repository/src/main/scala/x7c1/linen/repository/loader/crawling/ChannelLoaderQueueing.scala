@@ -3,10 +3,11 @@ package x7c1.linen.repository.loader.crawling
 import java.util.concurrent.atomic.AtomicInteger
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelId}
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
-import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
+import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 import scala.concurrent.ExecutionContext
 
@@ -18,9 +19,18 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
 
     val inspectedSources = {
       val inspector = SourceInspector(helper)
-      val accessor = SettingSourceAccessorFactory(helper, account).create(channel)
-      val settingSources = 0 until accessor.length flatMap accessor.findAt
-      settingSources map inspector.inspectSource[SettingSource]
+
+      helper.selectorOf[SettingSource] traverseOn ChannelStatusKey(
+        channelId = implicitly[HasChannelId[B]] toId channel,
+        accountId = implicitly[HasAccountId[A]] toId account
+      ) match {
+        case Left(e) =>
+          Log error format(e){"[failed]"}
+          Seq()
+        case Right(accessor) =>
+          val settingSources = 0 until accessor.length flatMap accessor.findAt
+          settingSources map inspector.inspectSource[SettingSource]
+      }
     }
     val targetSources = inspectedSources collect {
       case Right(sources) => sources

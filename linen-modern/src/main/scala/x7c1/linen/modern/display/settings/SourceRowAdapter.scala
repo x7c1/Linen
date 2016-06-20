@@ -8,14 +8,15 @@ import android.widget.{RelativeLayout, SeekBar}
 import x7c1.linen.database.struct.HasSourceStatusKey
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.linen.repository.source.setting.SettingSourceAccessor
+import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.linen.scene.source.rating.SourceRatingChanged
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.resource.MetricsConverter
+import x7c1.wheat.modern.sequence.Sequence
 
 class SourceRowAdapter (
-  accessor: SettingSourceAccessor,
+  sources: Sequence[SettingSource],
   account: ClientAccount,
   channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
@@ -23,13 +24,13 @@ class SourceRowAdapter (
   onRatingChanged: SourceRatingChanged => Unit,
   metricsConverter: MetricsConverter ) extends Adapter[SettingChannelSourcesRow]{
 
-  override def getItemCount: Int = accessor.length
+  override def getItemCount: Int = sources.length
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int) = {
     viewHolderProvider inflateOn parent
   }
   override def onBindViewHolder(holder: SettingChannelSourcesRow, position: Int): Unit = {
-    accessor findAt position foreach { source =>
+    sources findAt position foreach { source =>
       holder.title.text = source.title
       holder.description toggleVisibility source.description
       holder.menu onClick { view =>

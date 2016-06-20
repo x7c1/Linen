@@ -4,13 +4,14 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
+import x7c1.linen.database.struct.ChannelStatusKey
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.res.layout.{SettingChannelSourcesLayout, SettingChannelSourcesRow, SettingSourceAttach, SettingSourceAttachRowItem}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelSourcesSelected, SourceRowAdapter}
 import x7c1.linen.modern.init.settings.source.OnSourceMenuSelected
 import x7c1.linen.repository.account.ClientAccount
-import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
+import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.linen.scene.source.rating.SourceRatingUpdater
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
@@ -46,9 +47,12 @@ class PresetChannelSourcesDelegatee (
     helper.close()
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
-    val accessorFactory = new SettingSourceAccessorFactory(database, event.accountId)
+    val Right(sequence) = helper.selectorOf[SettingSource] traverseOn ChannelStatusKey(
+      channelId = event.channelId,
+      accountId = event.accountId
+    )
     layout.sourceList setAdapter new SourceRowAdapter(
-      accessor = accessorFactory create event.channelId,
+      sources = sequence,
       account = ClientAccount(event.accountId),
       channelId = event.channelId,
       viewHolderProvider = sourceRowProvider,

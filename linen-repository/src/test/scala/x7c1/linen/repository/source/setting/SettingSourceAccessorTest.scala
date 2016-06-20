@@ -8,7 +8,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.{RobolectricTestRunner, RuntimeEnvironment}
 import org.scalatest.junit.JUnitSuiteLike
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelParts, AccountParts}
+import x7c1.linen.database.struct.{AccountParts, ChannelParts, ChannelStatusKey}
 import x7c1.linen.repository.account.dev.DevAccount
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.modern.database.QueryExplainer
@@ -46,18 +46,17 @@ class SettingSourceAccessorTest extends JUnitSuiteLike {
     val subscriber1 = new SourceSubscriber(db, account2.accountId, sourceId1)
     subscriber1 updateRating 55
 
-    val accessorFactory = new SettingSourceAccessorFactory(db, account1.accountId)
-    val cursor = accessorFactory.
-      createCursor(channel1.channelId)
-
+    val query = SettingSource.traverse queryAbout ChannelStatusKey(
+      channelId = channel1.channelId,
+      accountId = account1.accountId
+    )
+    val cursor = db.rawQuery(query.sql, query.selectionArgs)
     val maps = toMaps(cursor)
 //    maps foreach println
     assertEquals(Seq("hoge2", "hoge1"), maps map {_("title")})
     assertEquals(Seq("88", "99"), maps map {_("rating")})
 
-    val plans = QueryExplainer(db).
-      explain(accessorFactory createQuery channel1.channelId)
-
+    val plans = QueryExplainer(db).explain(query)
     assertEquals("USE TEMP B-TREE",
       false, plans.exists(_.useTempBtree))
   }
