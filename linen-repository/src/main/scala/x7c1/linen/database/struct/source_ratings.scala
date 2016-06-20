@@ -12,6 +12,11 @@ trait source_ratings extends TypedFields {
   def created_at: Int --> Date
 }
 
+object source_ratings {
+  def table = "source_ratings"
+  def column = TypedFields.expose[source_ratings]
+}
+
 case class SourceRatingParts(
   sourceId: Long,
   accountId: Long,
@@ -20,10 +25,10 @@ case class SourceRatingParts(
 )
 
 object SourceRatingParts {
+  import source_ratings.column
   implicit object insertable extends Insertable[SourceRatingParts] {
-    override def tableName: String = "source_ratings"
+    override def tableName: String = source_ratings.table
     override def toContentValues(target: SourceRatingParts): ContentValues = {
-      val column = TypedFields.expose[source_ratings]
       TypedFields toContentValues (
         column.source_id -> target.sourceId,
         column.account_id -> target.accountId,

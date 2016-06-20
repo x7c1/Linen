@@ -5,9 +5,11 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.{View, ViewGroup}
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.{RelativeLayout, SeekBar}
+import x7c1.linen.database.struct.HasSourceStatusKey
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.source.setting.SettingSourceAccessor
+import x7c1.linen.scene.source.rating.SourceRatingChanged
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.resource.MetricsConverter
@@ -18,6 +20,7 @@ class SourceRowAdapter (
   channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
   onMenuSelected: SourceMenuSelected => Unit,
+  onRatingChanged: SourceRatingChanged => Unit,
   metricsConverter: MetricsConverter ) extends Adapter[SettingChannelSourcesRow]{
 
   override def getItemCount: Int = accessor.length
@@ -29,7 +32,6 @@ class SourceRowAdapter (
     accessor findAt position foreach { source =>
       holder.title.text = source.title
       holder.description toggleVisibility source.description
-
       holder.menu onClick { view =>
         onMenuSelected apply SourceMenuSelected(
           targetView = view,
@@ -43,7 +45,9 @@ class SourceRowAdapter (
       holder.ratingBar setProgress source.rating
       holder.ratingBar setOnSeekBarChangeListener new OnRatingChanged(
         holder,
-        ratingRadiusPixel = metricsConverter.dipToPixel(16)
+        sourceStatus = source,
+        ratingRadiusPixel = metricsConverter.dipToPixel(16),
+        onRatingChanged = onRatingChanged
       )
       holder.ratingValue.text = s"${source.rating}"
       holder.ratingValue setVisibility View.GONE
@@ -51,9 +55,11 @@ class SourceRowAdapter (
   }
 }
 
-private class OnRatingChanged(
+private class OnRatingChanged[A: HasSourceStatusKey](
   holder: SettingChannelSourcesRow,
-  ratingRadiusPixel: => Int ) extends OnSeekBarChangeListener {
+  sourceStatus: A,
+  ratingRadiusPixel: => Int,
+  onRatingChanged: SourceRatingChanged => Unit ) extends OnSeekBarChangeListener {
 
   lazy val initial = getDefault
   var started = false
@@ -61,8 +67,8 @@ private class OnRatingChanged(
 
   override def onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean): Unit = {
     if (started){
-      val stepped = Math.round(progress/ minStep) * minStep
-      holder.ratingValue.text = s"$stepped"
+      val rating = toStepped(progress)
+      holder.ratingValue.text = s"$rating"
       holder.ratingValue setX {
         val current = seekBar.getThumb.getBounds.left
         initial + current - (holder.ratingValue.getWidth / 2)
@@ -75,7 +81,15 @@ private class OnRatingChanged(
         holder.ratingValue setVisibility View.GONE
       }
     })
+    val rating = toStepped(seekBar.getProgress)
+    holder.ratingLabel.text = s"RATING:$rating"
+
+    onRatingChanged apply SourceRatingChanged(
+      sourceStatusKey = implicitly[HasSourceStatusKey[A]] toId sourceStatus,
+      rating = rating
+    )
   }
+
   override def onStartTrackingTouch(seekBar: SeekBar): Unit = {
     started = true
 
@@ -87,6 +101,9 @@ private class OnRatingChanged(
         holder.ratingValue setVisibility View.VISIBLE
       }
     })
+  }
+  private def toStepped(progress: Int) = {
+    Math.round(progress/ minStep) * minStep
   }
   private def getLeft(view: View) = {
     val x = new Array[Int](2)

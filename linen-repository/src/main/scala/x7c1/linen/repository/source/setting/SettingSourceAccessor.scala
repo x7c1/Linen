@@ -3,7 +3,7 @@ package x7c1.linen.repository.source.setting
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelSourceMapParts, HasAccountId, HasChannelId, HasSourceId, SourceParts, SourceRatingParts}
+import x7c1.linen.database.struct.{ChannelSourceMapParts, HasAccountId, HasChannelId, HasSourceId, HasSourceStatusKey, SourceParts, SourceRatingParts, source_statuses}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.WritableDatabase
@@ -23,6 +23,7 @@ private class SettingSourceAccessorImpl(rawCursor: Cursor) extends SettingSource
     cursor.moveToFind(position){
       SettingSource(
         sourceId = cursor.source_id,
+        accountId = cursor.account_id,
         title = cursor.title,
         description = cursor.description,
         rating = cursor.rating
@@ -33,6 +34,7 @@ private class SettingSourceAccessorImpl(rawCursor: Cursor) extends SettingSource
 
 case class SettingSource(
   sourceId: Long,
+  accountId: Long,
   title: String,
   description: String,
   rating: Int
@@ -41,10 +43,18 @@ object SettingSource {
   implicit object id extends HasSourceId[SettingSource]{
     override def toId = _.sourceId
   }
+  implicit object key extends HasSourceStatusKey[SettingSource]{
+    override def toId = source =>
+      source_statuses.Key(
+        accountId = source.accountId,
+        sourceId = source.sourceId
+      )
+  }
 }
 
 trait SettingSourceRecord extends TypedFields {
   def source_id: Long
+  def account_id: Long
   def title: String
   def description: String
   def rating: Int
@@ -68,6 +78,7 @@ class SettingSourceAccessorFactory(
     val sql1 =
       """SELECT
         | s1.source_id AS source_id,
+        | s2.account_id AS account_id,
         | s2.rating AS rating
         |FROM channel_source_map AS s1
         | LEFT JOIN source_ratings AS s2
@@ -80,6 +91,7 @@ class SettingSourceAccessorFactory(
         | t1._id AS source_id,
         | t1.title AS title,
         | t1.description AS description,
+        | t2.account_id AS account_id,
         | t2.rating AS rating
         |FROM sources AS t1
         |INNER JOIN ($sql1) AS t2 ON t1._id = t2.source_id

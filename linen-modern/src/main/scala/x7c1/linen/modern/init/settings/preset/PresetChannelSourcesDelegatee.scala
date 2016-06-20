@@ -11,6 +11,7 @@ import x7c1.linen.modern.display.settings.{ChannelSourcesSelected, SourceRowAdap
 import x7c1.linen.modern.init.settings.source.OnSourceMenuSelected
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.source.setting.SettingSourceAccessorFactory
+import x7c1.linen.scene.source.rating.SourceRatingUpdater
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.{ViewHolderProvider, ViewHolderProviderFactory}
 import x7c1.wheat.macros.intent.IntentExpander
@@ -26,8 +27,9 @@ class PresetChannelSourcesDelegatee (
   attachRowFactory: ViewHolderProviderFactory[SettingSourceAttachRowItem],
   sourceRowProvider: ViewHolderProvider[SettingChannelSourcesRow] ){
 
-  private lazy val database =
-    new DatabaseHelper(activity).getReadableDatabase
+  private lazy val helper = new DatabaseHelper(activity)
+
+  private lazy val database = helper.getReadableDatabase
 
   def setup(): Unit = {
     layout.toolbar onClickNavigation { _ =>
@@ -41,6 +43,7 @@ class PresetChannelSourcesDelegatee (
   def close(): Unit = {
     Log info "[init]"
     database.close()
+    helper.close()
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
     val accessorFactory = new SettingSourceAccessorFactory(database, event.accountId)
@@ -49,10 +52,14 @@ class PresetChannelSourcesDelegatee (
       account = ClientAccount(event.accountId),
       channelId = event.channelId,
       viewHolderProvider = sourceRowProvider,
-      onMenuSelected = new OnSourceMenuSelected(
-        activity,
-        dialogFactory, attachLayoutFactory, attachRowFactory ).showMenu,
-
+      onMenuSelected = {
+        val listener = new OnSourceMenuSelected(
+          activity,
+          dialogFactory, attachLayoutFactory, attachRowFactory
+        )
+        listener.showMenu
+      },
+      onRatingChanged = new SourceRatingUpdater(helper).onSourceRatingChanged,
       metricsConverter = MetricsConverter(activity)
     )
     layout.toolbar setTitle event.channelName

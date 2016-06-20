@@ -42,7 +42,7 @@ class OnChannelStatusChanged (
   def notifyAdapter(event: LoaderEvent[UnreadChannel]) = CallbackTask[Done[UnreadChannel]]{ f =>
     event match {
       case e: Done[UnreadChannel] =>
-        Log info s"[done] ${e.sequence.length}"
+        Log info s"[done] rows:${e.sequence.length}"
         layout.menuList runUi { _.getAdapter.notifyDataSetChanged() }
         f(e)
       case error: SqlError =>
