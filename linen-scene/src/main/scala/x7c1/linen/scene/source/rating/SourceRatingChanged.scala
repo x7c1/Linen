@@ -1,13 +1,20 @@
 package x7c1.linen.scene.source.rating
 
+import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{SourceRatingParts, source_ratings, source_statuses}
+import x7c1.linen.database.struct.{HasChannelStatusKey, SourceRatingParts, source_ratings, source_statuses}
 import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.wheat.macros.database.TypedFields
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.callback.either.EitherTask
+import x7c1.wheat.modern.callback.either.EitherTask.|
 import x7c1.wheat.modern.database.Updatable
+import x7c1.wheat.modern.database.selector.presets.RecyclerViewReloader
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+
+import scala.language.higherKinds
 
 
 case class SourceRatingChanged(
@@ -31,8 +38,26 @@ object SourceRatingChanged {
   }
 }
 
+class OnSourceRatingChanged[A: HasChannelStatusKey](
+  helper: DatabaseHelper,
+  reloader: RecyclerViewReloader[HasChannelStatusKey, SettingSource],
+  key: A ) extends (SourceRatingChanged => Unit) {
+
+  override def apply(event: SourceRatingChanged): Unit = {
+    val task = for {
+      _ <- new SourceRatingUpdater(helper).updateRating(event)
+      _ <- reloader taskToRedraw key
+    } yield {}
+
+    task run {
+      case Right(_) => // nop
+      case Left(e) => Log error format(e){"[failed]"}
+    }
+  }
+}
+
 class SourceRatingUpdater(helper: DatabaseHelper){
-  def onSourceRatingChanged(event: SourceRatingChanged): Unit = {
+  def updateRating(event: SourceRatingChanged): SQLException | Unit = {
     val found = helper.selectorOf[source_ratings] findBy event.sourceStatusKey
     val either = found.toEither.right flatMap {
       case Some(_) =>
@@ -45,8 +70,6 @@ class SourceRatingUpdater(helper: DatabaseHelper){
           createdAt = Date.current()
         )
     }
-    either.left foreach {
-      case error => Log error format(error){"[failed]"}
-    }
+    EitherTask fromEither either.right.map(_ => {})
   }
 }

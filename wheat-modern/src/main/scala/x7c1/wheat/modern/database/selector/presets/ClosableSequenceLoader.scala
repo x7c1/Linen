@@ -2,11 +2,17 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
+import android.support.v7.widget.RecyclerView
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.TaskProvider.async
+import x7c1.wheat.modern.callback.either.EitherTask
+import x7c1.wheat.modern.callback.either.EitherTask.|
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
+import x7c1.wheat.modern.decorator.Imports.toRichView
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.language.higherKinds
@@ -80,4 +86,30 @@ private class ClosableSequenceLoaderImpl[I[T] <: CanIdentify[T], A]
       underlying = None
     }
   }
+}
+
+class RecyclerViewReloader[I[T] <: CanIdentify[T], A](
+  underlying: ClosableSequenceLoader[I, A],
+  recyclerView: RecyclerView ) extends ClosableSequenceLoader[I, A]{
+
+  def redrawBy[X: I](key: X): Unit = {
+    taskToRedraw(key) run {
+      case Right(_) => // nop
+      case Left(e) => Log error format(e){"[failed]"}
+    }
+  }
+  def taskToRedraw[X: I](key: X): SQLException | Unit = EitherTask {
+    underlying startLoading key map {
+      case Done(xs) =>
+        recyclerView runUi {
+          _.getAdapter.notifyDataSetChanged()
+        }
+        Right({})
+      case SqlError(e) =>
+        Left(e)
+    }
+  }
+  override def startLoading[X: I](x: X) = underlying startLoading x
+  override def closeCursor(): Unit = underlying.closeCursor()
+  override def sequence = underlying.sequence
 }
