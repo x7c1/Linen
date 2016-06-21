@@ -25,7 +25,6 @@ import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.sequence.Sequence
 
 class MyChannelsDelegatee (
   activity: FragmentActivity with ActivityControl with ServiceControl,
@@ -59,7 +58,7 @@ class MyChannelsDelegatee (
     IntentExpander executeBy activity.getIntent
   }
   def showMyChannels(accountId: Long) = {
-    setAdapter(accountId)(loader.sequence)
+    setAdapter(accountId)
     reloadChannels(accountId)
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
@@ -78,11 +77,10 @@ class MyChannelsDelegatee (
         Log error format(e.getCause){"[failed]"}
     }
   }
-  private def setAdapter[A: HasAccountId](account: A)(accessor: Sequence[MyChannelRow]) = {
-    Log info s"[init]"
+  private def setAdapter[A: HasAccountId](account: A) = {
     layout.channelList setAdapter new ChannelRowAdapter(
       account = account,
-      delegatee = AdapterDelegatee.create(channelRowProviders, accessor),
+      delegatee = AdapterDelegatee.create(channelRowProviders, loader.sequence),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,
       onMenuSelected = OnChannelMenuSelected.forMyChannel(
         activity = activity,
