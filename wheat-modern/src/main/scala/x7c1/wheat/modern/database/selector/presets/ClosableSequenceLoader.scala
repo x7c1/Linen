@@ -9,17 +9,20 @@ import x7c1.wheat.modern.callback.TaskProvider.async
 import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.callback.either.EitherTask.|
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError, UnexpectedError}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.decorator.Imports.toRichView
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.sequence.Sequence
 
+import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 
 trait ClosableSequenceLoader[I[T] <: CanIdentify[T], A]{
 
   def startLoading[X: I](x: X): CallbackTask[LoaderEvent[A]]
+
+  def startLoading2[X: I](x: X)(implicit i: ExecutionContext): UnexpectedError | Done[A]
 
   def sequence: Sequence[A]
 
@@ -33,6 +36,8 @@ object ClosableSequenceLoader {
   case class Done[A](sequence: Sequence[A]) extends LoaderEvent[A]
 
   case class SqlError(cause: SQLException) extends LoaderEvent[Nothing]
+
+  case class UnexpectedError(cause: Throwable)
 
   def apply[I[T] <: CanIdentify[T], A]
     (db: SQLiteDatabase)
@@ -65,6 +70,16 @@ private class ClosableSequenceLoaderImpl[I[T] <: CanIdentify[T], A]
     case Left(e) =>
       SqlError(e)
   }
+  override def startLoading2[X: I](x: X)(implicit i: ExecutionContext) = EitherTask future {
+    db.selectorOf[A] traverseOn x match {
+      case Left(e) =>
+        Left(UnexpectedError(e))
+      case Right(xs) =>
+        holder updateSequence xs
+        Right(Done(xs))
+    }
+  }
+
   override def closeCursor(): Unit = {
     holder.closeCursor()
   }
@@ -110,6 +125,7 @@ class RecyclerViewReloader[I[T] <: CanIdentify[T], A](
     }
   }
   override def startLoading[X: I](x: X) = underlying startLoading x
+  override def startLoading2[X: I](x: X)(implicit i: ExecutionContext) = underlying startLoading2 x
   override def closeCursor(): Unit = underlying.closeCursor()
   override def sequence = underlying.sequence
 }

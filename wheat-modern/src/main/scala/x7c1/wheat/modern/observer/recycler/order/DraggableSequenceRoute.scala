@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper.{ACTION_STATE_DRAG, Callback, DOWN, UP}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask.task
+import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenceLoader, TraverseOn}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -16,6 +17,7 @@ import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFin
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 
 class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
@@ -31,6 +33,14 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
         for {
           event <- underlying startLoading x
           _ <- task { positions = init() }
+        } yield {
+          event
+        }
+      }
+      override def startLoading2[X: I](x: X)(implicit i: ExecutionContext) = {
+        for {
+          event <- underlying startLoading2 x
+          _ <- EitherTask unit { positions = init() }
         } yield {
           event
         }
