@@ -7,7 +7,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.{RelativeLayout, SeekBar}
 import x7c1.linen.database.struct.HasSourceStatusKey
 import x7c1.linen.glue.res.layout.SettingChannelSourcesRow
-import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.linen.scene.source.rating.SourceRatingChanged
 import x7c1.wheat.ancient.resource.ViewHolderProvider
@@ -17,7 +16,6 @@ import x7c1.wheat.modern.sequence.Sequence
 
 class SourceRowAdapter (
   sources: Sequence[SettingSource],
-  account: ClientAccount,
   channelId: Long,
   viewHolderProvider: ViewHolderProvider[SettingChannelSourcesRow],
   onMenuSelected: SourceMenuSelected => Unit,
@@ -36,7 +34,7 @@ class SourceRowAdapter (
       holder.menu onClick { view =>
         onMenuSelected apply SourceMenuSelected(
           targetView = view,
-          clientAccount = account,
+          clientAccountId = source.accountId,
           channelId = channelId,
           source = source
         )
