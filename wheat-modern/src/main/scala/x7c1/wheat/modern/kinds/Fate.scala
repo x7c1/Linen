@@ -2,27 +2,34 @@ package x7c1.wheat.modern.kinds
 
 import scala.language.reflectiveCalls
 
-trait Fate[L, R, X]{
-  def map[R2](f: R => R2): Fate[L, R2, X]
-  def flatMap[R2](f: R => Fate[L, R2, X]): Fate[L, R2, X]
-  def run(x: X)(f: Either[L, R] => Unit): Unit
+trait Fate[X, +L, +R]{
+  def map[R2](f: R => R2): Fate[X, L, R2]
+  def flatMap[L2 >: L, R2](f: R => Fate[X, L2, R2]): Fate[X, L2, R2]
+  def run[L2 >: L, R2 >: R]: X => (Either[L2, R2] => Unit) => Unit
 }
 
-private class FateImpl[L, R, X](
-  underlying: X => (Either[L, R] => Unit) => Unit) extends Fate[L, R, X]{
+object Fate {
+  def apply[X, L, R](underlying: X => (Either[L, R] => Unit) => Unit): Fate[X, L, R] = {
+    new FateImpl(underlying)
+  }
+}
 
-  override def map[R2](f: R => R2): Fate[L, R2, X] = new FateImpl[L, R2, X](
-    context => g => underlying(context){ a =>
-      g(a.right map f)
-    }
-  )
-  override def flatMap[R2](f: R => Fate[L, R2, X]): Fate[L, R2, X] = new FateImpl[L, R2, X](
+private class FateImpl[X, L, R](
+  underlying: X => (Either[L, R] => Unit) => Unit) extends Fate[X, L, R]{
+
+  override def map[R2](f: R => R2): Fate[X, L, R2] = new FateImpl[X, L, R2](
     context => g => underlying(context){
-      case Left(e) => g(Left(e))
-      case Right(a) => f(a).run(context)(g)
+      case Right(right) => g(Right(f(right)))
+      case Left(left) => g(Left(left))
     }
   )
-  override def run(context: X)(f: Either[L, R] => Unit): Unit = {
-    underlying(context)(f)
+  override def flatMap[L2 >: L, R2](f: R => Fate[X, L2, R2]): Fate[X, L2, R2] = new FateImpl[X, L2, R2](
+    context => g => underlying(context){
+      case Right(right) => f(right).run(context)(g)
+      case Left(left) => g(Left(left))
+    }
+  )
+  override def run[L2 >: L, R2 >: R] = {
+    underlying
   }
 }

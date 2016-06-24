@@ -13,10 +13,6 @@ object HasConstructor {
   type HasDefaultConstructor[A] = HasConstructor[() => A]
 }
 
-trait HasInstance[A]{
-  def instanceOf: A
-}
-
 object ReificationImpl {
   def infer[A: c.WeakTypeTag](c: blackbox.Context): c.Tree = {
     val factory = new ReificationFactory {
