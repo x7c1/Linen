@@ -1,8 +1,9 @@
 package x7c1.wheat.modern.kinds
 
+import java.util.Timer
+
 import x7c1.wheat.macros.reify.HasConstructor
-import x7c1.wheat.modern.chrono.HasTimer
-import x7c1.wheat.modern.features.HasValue
+import x7c1.wheat.modern.features.{HasSharedInstance, HasValue}
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
@@ -35,12 +36,12 @@ object FutureFate {
     def right[A](f: => A): Fate[X, L, A] = {
       create(Right(f))
     }
-    def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
+    def await(duration: FiniteDuration)(implicit i: HasSharedInstance[X, Timer]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {
           g(Right({}))
         }
-        i.timer.schedule(task, duration.toMillis)
+        i.instance.schedule(task, duration.toMillis)
       }
   }
 
