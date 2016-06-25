@@ -1,7 +1,10 @@
 package x7c1.wheat.modern.kinds
 
 import x7c1.wheat.macros.reify.HasConstructor
+import x7c1.wheat.modern.chrono.HasTimer
+import x7c1.wheat.modern.patch.TimerTask
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 object FutureFate {
@@ -15,6 +18,14 @@ object FutureFate {
         Future(f) recover {
           case e => Left(implicitly[ErrorLike[L]] newInstance e)
         } map g
+      }
+
+    def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
+      Fate { x => g =>
+        val task = TimerTask {
+          g(Right({}))
+        }
+        i.timer.schedule(task, duration.toMillis)
       }
   }
   def hold[X: HasContext, L: ErrorLike]: AppliedHolder[X, L] = new AppliedHolder
