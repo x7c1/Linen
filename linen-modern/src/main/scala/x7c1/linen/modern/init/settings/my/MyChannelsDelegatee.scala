@@ -57,7 +57,7 @@ class MyChannelsDelegatee (
     IntentExpander executeBy activity.getIntent
   }
   def showMyChannels(accountId: Long) = {
-    setAdapter(accountId)
+    layout.channelList setAdapter createAdapter(accountId)
     reloadChannels(accountId)
     layout.buttonToCreate onClick { _ => showInputDialog(accountId) }
   }
@@ -76,8 +76,8 @@ class MyChannelsDelegatee (
         Log error e.detail
     }
   }
-  private def setAdapter[A: HasAccountId](account: A) = {
-    layout.channelList setAdapter new ChannelRowAdapter(
+  private def createAdapter[A: HasAccountId](account: A) = {
+    new ChannelRowAdapter(
       account = account,
       delegatee = AdapterDelegatee.create(channelRowProviders, loader.sequence),
       onSourcesSelected = new OnChannelSourcesSelected(activity).onSourcesSelected,

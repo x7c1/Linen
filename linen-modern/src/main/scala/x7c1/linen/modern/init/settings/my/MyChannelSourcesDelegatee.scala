@@ -48,20 +48,20 @@ class MyChannelSourcesDelegatee (
     helper.close()
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
-    setAdapter(event)
+    layout.sourceList setAdapter createAdapter(event)
     reloader.redrawBy(event).run(CrawlerContext){
       case Right(_) => //nop
       case Left(e) => Log error e.detail
     }
     layout.toolbar setTitle event.channelName
   }
-  private def setAdapter[A: HasChannelStatusKey](event: A) = {
+  private def createAdapter[A: HasChannelStatusKey](event: A) = {
     val onRatingChanged = new OnSourceRatingChanged(
       helper = helper,
       reloader = reloader,
       key = event
     )
-    layout.sourceList setAdapter new SourceRowAdapter(
+    new SourceRowAdapter(
       sources = reloader.sequence,
       channelId = implicitly[HasChannelStatusKey[A]].toId(event).channelId,
       viewHolderProvider = sourceRowProvider,
