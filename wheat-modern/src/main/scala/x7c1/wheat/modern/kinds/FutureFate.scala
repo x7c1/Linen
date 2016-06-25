@@ -20,6 +20,9 @@ object FutureFate {
         } map g
       }
 
+    def right[A](f: => A): Fate[X, L, A] = {
+      apply(Right(f))
+    }
     def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {

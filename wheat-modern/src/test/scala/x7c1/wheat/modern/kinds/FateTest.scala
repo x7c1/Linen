@@ -46,12 +46,12 @@ class FateTest extends FlatSpecLike with Matchers {
   }
   it can "await given msec" in {
     val fate = for {
-      start <- holder(Right(System.currentTimeMillis()))
-      n1 <- holder(Right(1))
+      start <- holder right System.currentTimeMillis()
+      n1 <- holder right 1
       _  <- holder await 111.millis
-      n2 <- holder(Right(2))
+      n2 <- holder right 2
       _  <- holder await 222.millis
-      n3 <- holder(Right(3))
+      n3 <- holder right 3
     } yield {
       val elapsed = System.currentTimeMillis() - start
       elapsed.toInt -> (n1 + n2 + n3)
