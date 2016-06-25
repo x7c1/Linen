@@ -8,14 +8,14 @@ import scala.concurrent.duration.DurationInt
 
 class FateTest extends FlatSpecLike with Matchers {
 
-  val holder = FutureFate.hold[CustomContext, CustomError]
+  val provide = FutureFate.hold[CustomContext, CustomError]
   val context = CustomContext(ExecutionContext.global)
 
   it can "compose by for-yield" in {
     val fate = for {
-      n1 <- holder(Right(1))
-      n2 <- holder(Right(2))
-      n3 <- holder(Right(3))
+      n1 <- provide right 1
+      n2 <- provide right 2
+      n3 <- provide right 3
     } yield {
       n1 + n2 + n3
     }
@@ -31,9 +31,9 @@ class FateTest extends FlatSpecLike with Matchers {
   }
   it should "stop when exception thrown" in {
     val fate = for {
-      n1 <- holder(Right(1))
-      n2 <- holder{ throw new Exception("boo") }
-      n3 <- holder(Right(3))
+      n1 <- provide right 1
+      n2 <- provide right { throw new Exception("boo") }
+      n3 <- provide right 3
     } yield {
       n1 + n2 + n3
     }
@@ -46,12 +46,12 @@ class FateTest extends FlatSpecLike with Matchers {
   }
   it can "await given msec" in {
     val fate = for {
-      start <- holder right System.currentTimeMillis()
-      n1 <- holder right 1
-      _  <- holder await 111.millis
-      n2 <- holder right 2
-      _  <- holder await 222.millis
-      n3 <- holder right 3
+      start <- provide right System.currentTimeMillis()
+      n1 <- provide right 1
+      _  <- provide await 111.millis
+      n2 <- provide right 2
+      _  <- provide await 222.millis
+      n3 <- provide right 3
     } yield {
       val elapsed = System.currentTimeMillis() - start
       elapsed.toInt -> (n1 + n2 + n3)
