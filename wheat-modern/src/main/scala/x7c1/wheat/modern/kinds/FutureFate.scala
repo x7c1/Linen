@@ -2,6 +2,7 @@ package x7c1.wheat.modern.kinds
 
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.chrono.HasTimer
+import x7c1.wheat.modern.features.HasValue
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
@@ -9,16 +10,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object FutureFate {
   type ErrorLike[X] = HasConstructor[Throwable => X]
-  type HasContext[X] = X => ExecutionContext
+  type HasContext[X] = HasValue[X => ExecutionContext]
+
+  def apply[X: HasContext, L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] =
+    Fate { x => g =>
+      implicit val context = implicitly[HasContext[X]].value(x)
+      Future(f) recover {
+        case e => Left(implicitly[ErrorLike[L]] newInstance e)
+      } map g
+    }
 
   class AppliedHolder[X: HasContext, L: ErrorLike]{
-    def apply[R](f: => Either[L, R]): Fate[X, L, R] =
-      Fate { x => g =>
-        implicit val context = implicitly[HasContext[X]] apply x
-        Future(f) recover {
-          case e => Left(implicitly[ErrorLike[L]] newInstance e)
-        } map g
-      }
+
+    def apply[R](f: => Either[L, R]): Fate[X, L, R] = FutureFate(f)
 
     def right[A](f: => A): Fate[X, L, A] = {
       apply(Right(f))

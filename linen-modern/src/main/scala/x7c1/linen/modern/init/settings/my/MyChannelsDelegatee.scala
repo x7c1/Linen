@@ -14,6 +14,7 @@ import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelRowAdapter, ChannelSourcesSelected, MyChannelSubscriptionChanged}
 import x7c1.linen.repository.channel.my.MyChannelRow
 import x7c1.linen.repository.channel.subscribe.ChannelSubscriber
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.linen.scene.channel.menu.OnChannelMenuSelected
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -22,9 +23,7 @@ import x7c1.wheat.macros.fragment.FragmentFactory
 import x7c1.wheat.macros.intent.{IntentExpander, IntentFactory, LocalBroadcastListener, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, SqlError}
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class MyChannelsDelegatee (
   activity: FragmentActivity with ActivityControl with ServiceControl,
@@ -37,7 +36,7 @@ class MyChannelsDelegatee (
 
   private lazy val database = helper.getReadableDatabase
 
-  private lazy val loader = ClosableSequenceLoader[HasAccountId, MyChannelRow](helper.getReadableDatabase)
+  private lazy val loader = ClosableSequenceLoader[CrawlerContext, HasAccountId, MyChannelRow](helper.getReadableDatabase)
 
   private lazy val onChannelCreated =
     LocalBroadcastListener{ reloadChannels[ChannelCreated] }
@@ -70,11 +69,11 @@ class MyChannelsDelegatee (
     Log info "[done]"
   }
   private def reloadChannels[A: HasAccountId](event: A): Unit = {
-    loader startLoading event apply {
-      case Done(_) =>
+    loader.startLoading(event).run(CrawlerContext){
+      case Right(_) =>
         layout.channelList runUi { _.getAdapter.notifyDataSetChanged() }
-      case SqlError(e) =>
-        Log error format(e.getCause){"[failed]"}
+      case Left(e) =>
+        Log error e.detail
     }
   }
   private def setAdapter[A: HasAccountId](account: A) = {

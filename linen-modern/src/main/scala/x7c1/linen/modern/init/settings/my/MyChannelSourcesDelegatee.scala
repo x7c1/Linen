@@ -10,6 +10,7 @@ import x7c1.linen.glue.res.layout.{SettingChannelSourcesLayout, SettingChannelSo
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.display.settings.{ChannelSourcesSelected, SourceRowAdapter}
 import x7c1.linen.modern.init.settings.source.OnSourceMenuSelected
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.linen.scene.source.rating.OnSourceRatingChanged
 import x7c1.wheat.ancient.context.ContextualFactory
@@ -48,7 +49,10 @@ class MyChannelSourcesDelegatee (
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
     setAdapter(event)
-    reloader redrawBy event
+    reloader.redrawBy(event).run(CrawlerContext){
+      case Right(_) => //nop
+      case Left(e) => Log error e.detail
+    }
     layout.toolbar setTitle event.channelName
   }
   private def setAdapter[A: HasChannelStatusKey](event: A) = {
@@ -75,7 +79,7 @@ class MyChannelSourcesDelegatee (
     )
   }
   private lazy val reloader = {
-    val loader = ClosableSequenceLoader[HasChannelStatusKey, SettingSource](database)
+    val loader = ClosableSequenceLoader[CrawlerContext, HasChannelStatusKey, SettingSource](database)
     new RecyclerViewReloader(loader, layout.sourceList)
   }
 }

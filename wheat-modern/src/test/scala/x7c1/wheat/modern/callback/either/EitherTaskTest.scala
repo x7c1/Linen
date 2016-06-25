@@ -74,26 +74,4 @@ class EitherTaskTest extends FlatSpecLike with Matchers {
       case Left(error) => fail("unexpected error")
     }
   }
-  it can "call future" in {
-    import scala.concurrent.ExecutionContext.Implicits.global
-
-    val task1 = EitherTask.future[SampleError, Int] {
-      Right(123)
-    }
-    def await[L, R](x: EitherTask[L, R]) = {
-      import concurrent.duration._
-      Await.result(x.toFuture, atMost = 5.seconds)
-    }
-    await(task1) match {
-      case Left(error) => fail(error.message)
-      case Right(n) => n shouldBe 123
-    }
-    val task2 = EitherTask.future[SampleError, Int] {
-      throw new Exception("unexpected!!")
-    }
-    await(task2) match {
-      case Left(error) => error.message shouldBe "unexpected!!"
-      case Right(n) => fail(s"not failed: $n")
-    }
-  }
 }

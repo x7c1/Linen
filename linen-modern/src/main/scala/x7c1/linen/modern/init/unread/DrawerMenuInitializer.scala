@@ -17,6 +17,7 @@ import x7c1.linen.modern.init.settings.schedule.LoaderSchedulesDelegatee
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.selector.UnreadChannelSelector
 import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel}
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.intent.IntentFactory
 import x7c1.wheat.macros.logger.Log
@@ -44,8 +45,10 @@ trait DrawerMenuInitializer {
         channelLoader.startLoading(account).
           flatMap(onChannelSubscriptionChanged.notifyAdapter).
           map(reader.onMenuLoaded).
-          execute()
-
+          run(CrawlerContext){
+            case Right(_) => //nop
+            case Left(e) => Log error e.detail
+          }
       case _ =>
         Log error s"client not found"
     }

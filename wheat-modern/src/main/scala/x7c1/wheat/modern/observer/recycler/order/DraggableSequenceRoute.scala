@@ -8,39 +8,30 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper.{ACTION_STATE_DRAG, Callback, DOWN, UP}
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenceLoader, TraverseOn}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.kinds.Fate
+import x7c1.wheat.modern.kinds.FutureFate.HasContext
 import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 
-class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
-  underlying: ClosableSequenceLoader[I, A]){
+class DraggableSequenceRoute[C: HasContext, I[T] <: CanIdentify[T], A] private (
+  underlying: ClosableSequenceLoader[C, I, A]){
 
-  val loader: ClosableSequenceLoader[I, A] =
-    new ClosableSequenceLoader[I, A] {
+  val loader: ClosableSequenceLoader[C, I, A] =
+    new ClosableSequenceLoader[C, I, A] {
       override def sequence = underlying.sequence
 
       override def closeCursor() = underlying.closeCursor()
 
       override def startLoading[X: I](x: X) = {
         for {
-          event <- underlying startLoading x
-          _ <- task { positions = init() }
-        } yield {
-          event
-        }
-      }
-      override def startLoading2[X: I](x: X)(implicit i: ExecutionContext) = {
-        for {
-          event <- underlying startLoading2 x
-          _ <- EitherTask unit { positions = init() }
+          event <- underlying.startLoading(x)
+          _ <- Fate { positions = init() }
         } yield {
           event
         }
@@ -101,13 +92,13 @@ class DraggableSequenceRoute[I[T] <: CanIdentify[T], A] private (
 }
 
 object DraggableSequenceRoute {
-  def apply[I[T] <: CanIdentify[T], A](db: SQLiteDatabase)
+  def apply[C: HasContext, I[T] <: CanIdentify[T], A](db: SQLiteDatabase)
     (implicit
       x1: CanTraverse[I, A],
       x2: CanProvideSelector[A]{ type Selector <: TraverseOn[I, A] }
-    ): DraggableSequenceRoute[I, A] = {
+    ): DraggableSequenceRoute[C, I, A] = {
 
-    new DraggableSequenceRoute[I, A](ClosableSequenceLoader(db))
+    new DraggableSequenceRoute[C, I, A](ClosableSequenceLoader(db))
   }
   case class DragStarted[A](
     holder: ViewHolder,

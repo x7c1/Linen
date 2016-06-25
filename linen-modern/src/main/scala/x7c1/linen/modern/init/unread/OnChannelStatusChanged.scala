@@ -9,13 +9,13 @@ import x7c1.linen.modern.init.settings.order.ChannelOrdered
 import x7c1.linen.modern.init.settings.preset.PresetChannelSubscriptionChanged
 import x7c1.linen.repository.channel.unread.UnreadChannel
 import x7c1.linen.repository.channel.unread.selector.UnreadChannelSelector.UnreadChannelLoader
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.linen.scene.channel.menu.MyChannelDeleted
 import x7c1.wheat.macros.intent.LocalBroadcastListener
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{Done, LoaderEvent, SqlError}
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{LoadingDone, LoadingError}
 import x7c1.wheat.modern.decorator.Imports._
-import x7c1.wheat.modern.formatter.ThrowableFormatter.format
+import x7c1.wheat.modern.kinds.Fate
 
 
 class OnChannelStatusChanged (
@@ -36,17 +36,15 @@ class OnChannelStatusChanged (
     listeners foreach { _ unregisterFrom context }
   }
   private def update[A: HasAccountId](account: A) = {
-    val task = loader.startLoading(account) flatMap notifyAdapter
-    task.execute()
-  }
-  def notifyAdapter(event: LoaderEvent[UnreadChannel]) = CallbackTask[Done[UnreadChannel]]{ f =>
-    event match {
-      case e: Done[UnreadChannel] =>
-        Log info s"[done] rows:${e.sequence.length}"
-        layout.menuList runUi { _.getAdapter.notifyDataSetChanged() }
-        f(e)
-      case error: SqlError =>
-        Log error format(error.cause.getCause){"[failed]"}
+    val task = loader startLoading account flatMap notifyAdapter
+    task.run(CrawlerContext){
+      case Right(done) => //nop
+      case Left(e) => Log error e.detail
     }
   }
+  def notifyAdapter(done: LoadingDone[UnreadChannel]): Fate[CrawlerContext, LoadingError, LoadingDone[UnreadChannel]] =
+    Fate { x => g =>
+      layout.menuList runUi {_.getAdapter.notifyDataSetChanged()}
+      g(Right(done))
+    }
 }
