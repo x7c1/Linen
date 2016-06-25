@@ -64,7 +64,7 @@ private class ClosableSequenceLoaderImpl[C: HasContext, I[T] <: CanIdentify[T], 
 
   override val sequence: Sequence[A] = holder
 
-  override def startLoading[X: I](x: X) = FutureFate[C, LoadingError, LoadingDone[A]] {
+  override def startLoading[X: I](x: X) = FutureFate.on[C] create {
     db.selectorOf[A] traverseOn x match {
       case Right(xs) =>
         holder updateSequence xs

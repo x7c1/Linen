@@ -20,12 +20,20 @@ object FutureFate {
       } map g
     }
 
-  class AppliedHolder[X: HasContext, L: ErrorLike]{
+  def on[X: HasContext]: Applied1[X] = new Applied1
 
-    def apply[R](f: => Either[L, R]): Fate[X, L, R] = FutureFate(f)
+  def hold[X: HasContext, L: ErrorLike]: Applied2[X, L] = new Applied2
+
+  class Applied1[X: HasContext]{
+    def create[L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] = {
+      FutureFate[X, L, R](f)
+    }
+  }
+  class Applied2[X: HasContext, L: ErrorLike]{
+    def create[R](f: => Either[L, R]): Fate[X, L, R] = FutureFate(f)
 
     def right[A](f: => A): Fate[X, L, A] = {
-      apply(Right(f))
+      create(Right(f))
     }
     def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
@@ -35,5 +43,5 @@ object FutureFate {
         i.timer.schedule(task, duration.toMillis)
       }
   }
-  def hold[X: HasContext, L: ErrorLike]: AppliedHolder[X, L] = new AppliedHolder
+
 }
