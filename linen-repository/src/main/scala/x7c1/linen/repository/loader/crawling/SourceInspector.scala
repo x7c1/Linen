@@ -4,6 +4,7 @@ import java.net.URL
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{HasSourceId, SourceRecord}
+import x7c1.linen.repository.loader.crawling.SourceInspectorError.{SourceNotFound, SqlError}
 
 object SourceInspector {
   def apply(helper: DatabaseHelper ): SourceInspector = new SourceInspector(helper)

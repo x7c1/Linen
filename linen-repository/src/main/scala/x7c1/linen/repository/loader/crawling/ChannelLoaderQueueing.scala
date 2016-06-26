@@ -9,13 +9,11 @@ import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-import scala.concurrent.ExecutionContext
-
 class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQueue){
 
   def start[A: HasAccountId, B: HasChannelId]
     (account: A, channel: B)
-    (callback: QueueingEvent => Unit)(implicit x: ExecutionContext) = {
+    (callback: QueueingEvent => Unit) = {
 
     val inspectedSources = {
       val inspector = SourceInspector(helper)
@@ -43,7 +41,7 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
 
   private def enqueueSources
     (sources: Seq[InspectedSource])
-    (callback: QueueingEvent => Unit)(implicit x: ExecutionContext) = {
+    (callback: QueueingEvent => Unit) = {
 
     val progress = new AtomicInteger(0)
     val max = sources.length
@@ -61,7 +59,7 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
     if (max == 0){
       callback apply OnDone(max)
     } else sources foreach { source =>
-      queue.enqueueSource(source) onComplete { _ => onProgress() }
+      queue.enqueueSource(source).run(CrawlerContext){ _ => onProgress() }
     }
   }
 

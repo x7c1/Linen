@@ -10,17 +10,13 @@ import x7c1.linen.repository.notification.{NotificationIdStore, ProgressNotifier
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-import scala.concurrent.ExecutionContext
-
 class ChannelLoaderRunner private (
   context: Context,
   helper: DatabaseHelper,
   queue: TraceableQueue,
   listener: OnChannelLoaderListener ){
 
-  def startLoading[A: HasAccountId, B: HasChannelId]
-    (account: A, channel: B)(implicit x: ExecutionContext) = {
-
+  def startLoading[A: HasAccountId, B: HasChannelId](account: A, channel: B) = {
     val either = for {
       record <- findChannelRecord(channel).right
       notifier <- findNotifier(account, channel).right

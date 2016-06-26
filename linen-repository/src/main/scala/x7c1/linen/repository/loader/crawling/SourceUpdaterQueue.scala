@@ -8,11 +8,10 @@ import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.patch.TaskAsync.after
+import x7c1.wheat.modern.kinds.{Fate, FutureFate}
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
-import scala.util.Try
+import scala.concurrent.duration.DurationInt
 
 object SourceUpdaterQueue {
   def apply(
@@ -25,7 +24,7 @@ object SourceUpdaterQueue {
 }
 
 trait SourceUpdaterQueue {
-  def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit
+  def enqueue(source: InspectedSource): Fate[CrawlerContext, SourceQueueError, Unit]
 }
 
 private class SourceUpdaterQueueImpl(
@@ -35,23 +34,22 @@ private class SourceUpdaterQueueImpl(
 
   private lazy val queueMap = new SourceQueueMap
 
-  override def enqueue(source: InspectedSource)(implicit x: ExecutionContext): Unit = synchronized {
-    Log info s"[init] source:$source"
-    val host = source.feedUrl.getHost
-    if (queueMap has host){
+  override def enqueue(source: InspectedSource) = {
+    val provide = FutureFate.hold[CrawlerContext, SourceQueueError]
+    provide right synchronized {
+      val hostExists = queueMap has source.feedUrl.getHost
       queueMap enqueue source
-    } else {
-      queueMap enqueue source
-      update(source)
+      hostExists
+    } flatMap {
+      case true => provide.empty
+      case false => update(source)
     }
   }
-  private def update(source: InspectedSource)(implicit x: ExecutionContext): Unit = {
-    Log info s"[init] source:$source"
-
+  private def update(source: InspectedSource): Fate[CrawlerContext, SourceQueueError, Unit] = {
     val start = currentTimeMillis()
     def elapsed() = currentTimeMillis() - start
 
-    val future = sourceLoader loadSource source map { loadedSource =>
+    val fate = sourceLoader.loadSource(source) map { loadedSource =>
       Log info s"[loaded] msec:${elapsed()}, source:$source, entries(${loadedSource.validEntries.length})"
 
       if (loadedSource isModifiedFrom source){
@@ -65,25 +63,28 @@ private class SourceUpdaterQueueImpl(
       }
       val insertedEntries = insertEntries(entries map toEntryParts(source.sourceId))
       UpdatedSource(loadedSource, insertedEntries)
-    }
-    future onFailure {
-      case e => Log error format(e)(s"[error] ${source.feedUrl}")
-    }
-    future onComplete { result =>
+    } transform { result =>
       val host = source.feedUrl.getHost
       val nextSource = this synchronized {
         queueMap dequeue host
-
         Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
         queueMap headOption host
       }
-      try onSourceDequeue(SourceDequeueEvent(source, result))
-      catch {
+      try {
+        val either = result.left map SourceQueueError.LoadingError
+        onSourceDequeue(SourceDequeueEvent(source, either))
+      } catch {
         case e: Exception => Log error format(e){"[failed]"}
       }
-      nextSource match {
-        case Some(next) => after(msec = 750){ update(next) }
-        case None => Log info s"[done] host:$host"
+      Right(nextSource)
+    }
+    val provide = FutureFate.hold[CrawlerContext, SourceQueueError]
+    fate flatMap {
+      case Some(next) => provide await 750.millis flatMap { _ =>
+        update(next)
+      }
+      case None => provide right {
+        Log info s"[done] host:${source.feedUrl.getHost}"
       }
     }
   }
@@ -144,6 +145,7 @@ private class SourceUpdaterQueueImpl(
     marks
 //    notifier.notifyDone()
   }
+
 }
 
 private class SourceQueueMap {
@@ -181,7 +183,7 @@ private class SourceQueueMap {
 
 case class SourceDequeueEvent(
   inspected: InspectedSource,
-  updated: Try[UpdatedSource]
+  updated: Either[SourceQueueError, UpdatedSource]
 )
 
 case class UpdatedSource(

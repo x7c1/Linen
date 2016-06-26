@@ -2,13 +2,14 @@ package x7c1.linen.repository.dummy
 
 import java.util.concurrent.Executor
 
-import x7c1.linen.repository.loader.crawling.{LoadedEntry, LoadedSource, InspectedSource, SourceLoader}
+import x7c1.linen.repository.loader.crawling.{InspectedSource, LoadedEntry, LoadedSource, SourceLoader}
+import x7c1.wheat.modern.kinds.Fate
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class DummySourceLoader private (entries: Seq[LoadedEntry]) extends SourceLoader {
 
-  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext) = Future {
+  override def loadSource(source: InspectedSource) = Fate {
     new LoadedSource(
       sourceId = source.sourceId,
       title = source.title,

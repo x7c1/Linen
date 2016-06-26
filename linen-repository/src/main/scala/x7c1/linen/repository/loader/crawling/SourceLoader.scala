@@ -7,19 +7,17 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{Sy
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.TaskProvider.using
-
-import scala.concurrent.{ExecutionContext, Future}
+import x7c1.wheat.modern.kinds.{Fate, FutureFate}
 
 trait SourceLoader {
-  def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource]
+  def loadSource(source: InspectedSource): Fate[CrawlerContext, SourceLoaderError, LoadedSource]
 }
 
 object RemoteSourceLoader extends SourceLoader {
-  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext): Future[LoadedSource] = {
+  override def loadSource(source: InspectedSource) = {
     val loader = source.feedUrl.getHost match {
       case host if host endsWith "example.com" => ExampleLoader
       case _ => RealLoader
@@ -29,9 +27,8 @@ object RemoteSourceLoader extends SourceLoader {
 }
 
 private object ExampleLoader extends SourceLoader {
-  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext) = {
-    Log info s"[init] $source"
-    Future {
+  override def loadSource(source: InspectedSource) = {
+    Fate {
       new LoadedSource(
         sourceId = source.sourceId,
         title = source.title,
@@ -48,8 +45,10 @@ private object ExampleLoader extends SourceLoader {
 private object RealLoader extends SourceLoader {
   import collection.JavaConverters._
 
-  override def loadSource(source: InspectedSource)(implicit x: ExecutionContext) = {
-    Future(source.feedUrl).map(loadRawFeed).flatMap(_.toFuture) map { feed =>
+  override def loadSource(source: InspectedSource) = {
+    val provide = FutureFate.hold[CrawlerContext, SourceLoaderError]
+    val fate = provide fromCallback loadRawFeed(source.feedUrl)
+    fate map { feed =>
       val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
       new LoadedSource(
         sourceId = source.sourceId,
