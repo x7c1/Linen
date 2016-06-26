@@ -13,14 +13,13 @@ import x7c1.linen.modern.init.unread.entry.{DetailListProviders, OutlineListProv
 import x7c1.linen.modern.init.unread.source.SourceListProviders
 import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.account.setup.ClientAccountSetup
+import x7c1.linen.repository.loader.crawling.CrawlerFate
 import x7c1.linen.repository.source.unread.RawSourceAccessor
 import x7c1.linen.repository.unread._
 import x7c1.linen.scene.loader.crawling.SchedulerService
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.resource.MetricsConverter
-
-import scala.concurrent.Future
 
 class UnreadItemsDelegatee(
   val activity: Activity with ActivityControl with ServiceControl,
@@ -46,8 +45,9 @@ class UnreadItemsDelegatee(
   def onPause(): Unit = {
     Log info s"[init]"
 
-    import x7c1.linen.repository.loader.crawling.Implicits._
-    Future { entryMarker.markAsRead() }
+    CrawlerFate run entryMarker.markAsRead() atLeft { e =>
+      Log error e.detail
+    }
   }
   def close(): Unit = {
     Log info s"[start]"
