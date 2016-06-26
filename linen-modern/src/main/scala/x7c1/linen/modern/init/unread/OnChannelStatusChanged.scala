@@ -37,9 +37,8 @@ class OnChannelStatusChanged (
   }
   private def update[A: HasAccountId](account: A) = {
     val task = loader startLoading account flatMap notifyAdapter
-    task.run(CrawlerContext){
-      case Right(done) => //nop
-      case Left(e) => Log error e.detail
+    task run CrawlerContext atLeft {
+      Log error _.detail
     }
   }
   def notifyAdapter(done: LoadingDone[UnreadChannel]): Fate[CrawlerContext, LoadingError, LoadingDone[UnreadChannel]] =

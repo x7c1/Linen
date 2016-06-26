@@ -60,9 +60,8 @@ class OnDragListenerToReload[C: HasContext, I[T] <: CanIdentify[T], A: I] privat
   override def onFinishDragging(event: DragFinished[A]): Unit = {
     event.sequence findAt 0 match {
       case Some(item) =>
-        reloader.reload(item).run(context){
-          case Left(e) => Log error e.detail
-          case _ => // nop
+        reloader.reload(item) run context atLeft {
+          Log error _.detail
         }
       case None => Log error s"[failed] empty sequence"
     }

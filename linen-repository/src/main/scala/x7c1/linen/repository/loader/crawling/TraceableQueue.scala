@@ -24,9 +24,8 @@ class TraceableQueue(
         case None =>
           val promise = Promise[UpdatedSource]()
           map(source) = promise
-          enqueue(source).run(CrawlerContext){
-            case Left(e) => Log error e.detail
-            case Right(_) => //nop
+          enqueue(source) run CrawlerContext atLeft {
+            Log error _.detail
           }
           promise
         case Some(existent) =>

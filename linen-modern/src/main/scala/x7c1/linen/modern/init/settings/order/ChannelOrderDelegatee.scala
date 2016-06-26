@@ -59,9 +59,8 @@ class ChannelOrderDelegatee (
   }
   def showChannels(accountId: Long): Unit = {
     updater.updateDefaultRanks(accountId)
-    reloader.reload(accountId).run(CrawlerContext){
-      case Right(_) => // nop
-      case Left(e) => Log error e.detail
+    reloader.reload(accountId) run CrawlerContext atLeft {
+      Log error _.detail
     }
     targetAccountId = Some(accountId)
   }

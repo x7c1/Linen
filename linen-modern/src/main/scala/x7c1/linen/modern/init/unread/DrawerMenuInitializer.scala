@@ -45,9 +45,8 @@ trait DrawerMenuInitializer {
         channelLoader.startLoading(account).
           flatMap(onChannelSubscriptionChanged.notifyAdapter).
           map(reader.onMenuLoaded).
-          run(CrawlerContext){
-            case Right(_) => //nop
-            case Left(e) => Log error e.detail
+          run(CrawlerContext) atLeft {
+            Log error _.detail
           }
       case _ =>
         Log error s"client not found"

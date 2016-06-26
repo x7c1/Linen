@@ -49,9 +49,8 @@ private class QueueingServiceImpl(
       inspector inspectSource sourceId
     } map {
       source =>
-        queue.enqueue(source).run(CrawlerContext){
-          case Right(_) => //nop
-          case Left(e) => Log error e.detail
+        queue enqueue source run CrawlerContext atLeft {
+          Log error _.detail
         }
     }
     fate run CrawlerContext atLeft {

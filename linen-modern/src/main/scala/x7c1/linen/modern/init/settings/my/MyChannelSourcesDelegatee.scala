@@ -49,9 +49,8 @@ class MyChannelSourcesDelegatee (
   }
   def showSources(event: ChannelSourcesSelected): Unit = {
     layout.sourceList setAdapter createAdapter(event)
-    reloader.redrawBy(event).run(CrawlerContext){
-      case Right(_) => //nop
-      case Left(e) => Log error e.detail
+    reloader redrawBy event run CrawlerContext atLeft { e =>
+      Log error e.detail
     }
     layout.toolbar setTitle event.channelName
   }
