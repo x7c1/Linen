@@ -15,7 +15,7 @@ class TraceableQueue(
 
   private lazy val queue = SourceUpdaterQueue(helper, sourceLoader, onSourceDequeue)
 
-  override def enqueue(source: InspectedSource): Fate[CrawlerContext, SourceQueueError, Unit] = {
+  override def enqueue(source: InspectedSource) = {
     queue.enqueue(source)
   }
   def enqueueSource(source: InspectedSource): Fate[CrawlerContext, SourceQueueError, UpdatedSource] = {

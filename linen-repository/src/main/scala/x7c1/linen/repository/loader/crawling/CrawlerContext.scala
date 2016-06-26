@@ -8,12 +8,13 @@ import x7c1.wheat.modern.features.HasSharedInstance
 import x7c1.wheat.modern.kinds.FutureFate.HasContext
 import x7c1.wheat.modern.kinds.{FateRunner, FutureFate}
 
+import scala.concurrent.ExecutionContext
+
 trait CrawlerContext
 
 object CrawlerContext extends CrawlerContext {
-  import scala.concurrent.ExecutionContext
 
-  private val executor = {
+  private val executor: ExecutionContext = {
     val pool = Executors.newCachedThreadPool()
     ExecutionContext fromExecutor pool
   }
