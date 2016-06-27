@@ -1,7 +1,6 @@
 package x7c1.linen.modern.display.settings
 
 import android.view.View
-import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.source.setting.SettingSource
 
 class SourceMenuSelected private (
@@ -14,13 +13,13 @@ class SourceMenuSelected private (
 object SourceMenuSelected {
   def apply(
     targetView: View,
-    clientAccount: ClientAccount,
+    clientAccountId: Long,
     channelId: Long,
     source: SettingSource): SourceMenuSelected = {
 
     new SourceMenuSelected(
       targetView,
-      clientAccount.accountId,
+      clientAccountId,
       channelId,
       source.sourceId)
   }

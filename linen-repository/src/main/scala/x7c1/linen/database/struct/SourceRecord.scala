@@ -5,7 +5,7 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 
@@ -17,13 +17,15 @@ object SourceRecord {
 
   def column = TypedFields.expose[SourceRecord]
 
+  implicit object hasTable extends HasTable.Where[SourceRecord](table)
+
   implicit object reifiable extends RecordReifiable[SourceRecord]{
     override def reify(cursor: Cursor) = TypedCursor[SourceRecord](cursor)
   }
   implicit object providable
     extends DefaultProvidable[HasSourceId, SourceRecord]
 
-  implicit object findable extends CanFindRecord.Where[HasSourceId, SourceRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceId, SourceRecord]{
     override def where[X](id: Long) = toArgs(column._id -> id)
   }
 }

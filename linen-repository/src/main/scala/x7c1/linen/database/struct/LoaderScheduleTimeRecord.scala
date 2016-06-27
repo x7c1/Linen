@@ -5,10 +5,10 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanTraverseRecord, CanTraverseRecordByQuery, CollectFrom, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
-import x7c1.wheat.modern.database.{Insertable, Query}
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.Sequence
 
@@ -26,6 +26,8 @@ object LoaderScheduleTimeRecord {
 
   def column = TypedFields.expose[LoaderScheduleTimeRecord]
 
+  implicit object hasTable extends HasTable.Where[LoaderScheduleTimeRecord](table)
+
   implicit object reifiable extends RecordReifiable[LoaderScheduleTimeRecord]{
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleTimeRecord](cursor)
   }
@@ -33,7 +35,7 @@ object LoaderScheduleTimeRecord {
     Query("SELECT * FROM loader_schedule_times")
   )
   implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleTimeRecord]{
-    override def query[X: HasAccountId](target: X) = {
+    override def queryAbout[X: HasAccountId](target: X) = {
       val sql =
         """SELECT *
           | FROM loader_schedule_times AS t1
@@ -49,7 +51,7 @@ object LoaderScheduleTimeRecord {
   implicit object providable extends SelectorProvidable[LoaderScheduleTimeRecord, Selector]
 
   implicit object collect
-    extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord](table){
+    extends CanCollectRecord.Where[HasLoaderScheduleId, LoaderScheduleTimeRecord]{
 
     override def where[X](id: Long) = toArgs(
       column.schedule_id -> id

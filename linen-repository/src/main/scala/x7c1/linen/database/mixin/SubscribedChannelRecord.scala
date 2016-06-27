@@ -2,8 +2,7 @@ package x7c1.linen.database.mixin
 
 import android.database.Cursor
 import x7c1.linen.database.struct.{ChannelRecord, ChannelStatusRecord, HasAccountId}
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.RecordReifiable
 import x7c1.wheat.modern.database.selector.presets.CanTraverseRecord
 
@@ -18,7 +17,7 @@ object SubscribedChannelRecord {
     override def reify(cursor: Cursor) = TypedCursor[SubscribedChannelRecord](cursor)
   }
   implicit object traversable extends CanTraverseRecord[HasAccountId, SubscribedChannelRecord]{
-    override def query[X: HasAccountId](target: X): Query = {
+    override def queryAbout[X: HasAccountId](target: X): Query = {
       val sql =
         """SELECT
           | channel_id,
@@ -34,7 +33,7 @@ object SubscribedChannelRecord {
         """.stripMargin
 
       val id = implicitly[HasAccountId[X]] toId target
-      new Query(sql, Array(id.toString))
+      Query(sql, Array(id.toString))
     }
   }
 }

@@ -7,7 +7,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 import x7c1.wheat.modern.database.selector.presets.{CanCollectRecord, CanFindRecord, CollectFrom, FindBy}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable, SelectorProvidable}
 
@@ -23,17 +23,20 @@ trait EntryRecord extends TypedFields {
 
 object EntryRecord {
   def table: String = "entries"
+
   def column = TypedFields.expose[EntryRecord]
+
+  implicit object hasTable extends HasTable.Where[EntryRecord](table)
 
   implicit object reifiable extends RecordReifiable[EntryRecord]{
     override def reify(cursor: Cursor) = TypedCursor[EntryRecord](cursor)
   }
   implicit object providable extends SelectorProvidable[EntryRecord, Selector]
 
-  implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasEntryId, EntryRecord]{
     override def where[X](id: Long) = toArgs(column.entry_id -> id)
   }
-  implicit object collectable extends CanCollectRecord.Where[HasSourceId, EntryRecord](table){
+  implicit object collectable extends CanCollectRecord.Where[HasSourceId, EntryRecord]{
     override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
   class Selector(val db: SQLiteDatabase)

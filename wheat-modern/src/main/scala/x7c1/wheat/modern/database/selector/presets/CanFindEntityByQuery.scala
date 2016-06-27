@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.{CanSelect, CursorConverter, CursorReadable, CursorReifiable, UnitIdentifiable}
 
 import scala.language.reflectiveCalls
@@ -25,9 +25,9 @@ trait CanFindByQuery [A] extends CanSelect[UnitIdentifiable, Option[A]]{
 abstract class CanFindEntityByQuery[
   FROM: CursorReifiable,
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
-] (query0: Query) extends CanFindByQuery[TO]{
+] (query: Query) extends CanFindByQuery[TO]{
 
-  override def query[X: UnitIdentifiable](target: X): Query = query0
+  override def queryAbout[X: UnitIdentifiable](target: X): Query = query
 
   def reify(cursor: Cursor): Option[TO] = {
     new CursorConverter[FROM, TO](cursor) convertAt 0

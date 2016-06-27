@@ -1,7 +1,7 @@
 package x7c1.linen.repository.channel.order
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.ChannelStatusRecord.{column, table}
+import x7c1.linen.database.struct.ChannelStatusRecord.column
 import x7c1.linen.database.struct.{ChannelStatusRecord, HasAccountId}
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.modern.database.selector.CursorConvertible
@@ -12,7 +12,7 @@ class DefaultRankChannelSelector(
   protected val db: SQLiteDatabase) extends CollectFrom[HasAccountId, DefaultRankChannel]
 
 private[order] class CanCollectImpl extends CanCollect[HasAccountId, DefaultRankChannel]{
-  private object collector extends Where[HasAccountId, ChannelStatusRecord](table){
+  private object collector extends Where[HasAccountId, ChannelStatusRecord]{
     override def where[X](id: Long) = toArgs(
       column.account_id -> id,
       column.channel_rank -> 0D

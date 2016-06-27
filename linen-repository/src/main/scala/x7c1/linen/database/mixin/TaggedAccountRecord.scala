@@ -2,8 +2,7 @@ package x7c1.linen.database.mixin
 
 import android.database.Cursor
 import x7c1.linen.database.struct.AccountTagLabel
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.RecordReifiable
 
 trait TaggedAccountRecord extends TypedFields {
@@ -12,7 +11,7 @@ trait TaggedAccountRecord extends TypedFields {
 }
 
 object TaggedAccountRecord {
-  def select(label: AccountTagLabel): Query = new Query(
+  def select(label: AccountTagLabel): Query = Query(
     sql =
       s"""SELECT
          |  t2.tag_label as tag_label,

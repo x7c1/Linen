@@ -1,26 +1,8 @@
 package x7c1.wheat.modern.database
 
 import android.database.sqlite.SQLiteDatabase
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
 
-class Query(
-  val sql: String,
-  val selectionArgs: Array[String] = Array()) {
-
-  def toExplain: Query = new Query(
-    "EXPLAIN QUERY PLAN " + sql,
-    selectionArgs
-  )
-  override def toString = {
-    s"""sql: $sql, args: ${selectionArgs.mkString(",")}"""
-  }
-}
-
-object Query {
-  def apply(sql: String, selectionArgs: Array[String] = Array()): Query = {
-    new Query(sql, selectionArgs)
-  }
-}
 
 trait QueryPlanColumn extends TypedFields {
   def detail: String

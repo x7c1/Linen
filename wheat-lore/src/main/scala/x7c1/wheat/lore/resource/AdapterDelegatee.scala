@@ -1,13 +1,15 @@
 package x7c1.wheat.lore.resource
 
+import android.database.StaleDataException
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.ViewGroup
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.resource.ViewHolderProviders
 import x7c1.wheat.modern.sequence.Sequence
 
-import scala.language.{reflectiveCalls, higherKinds}
+import scala.language.{higherKinds, reflectiveCalls}
 
 trait AdapterDelegatee[VH <: ViewHolder, A]{
 
@@ -67,7 +69,20 @@ private class AdapterDelegateeImpl[
     (holder: VH, position: Int)
     (block: PartialFunction[(VH, A), Unit]) = {
 
-    sequence.findAt(position) -> holder match {
+    def attempt() = try sequence findAt position catch {
+      case e: StaleDataException =>
+        Log warn format(e){"[failed] recoverable"}
+        retry()
+      case e: Exception =>
+        Log error format(e){"[failed] unexpected"}
+        None
+    }
+    def retry() = try sequence findAt position catch {
+      case e: Exception =>
+        Log error format(e){"[failed] after retried"}
+        None
+    }
+    attempt() -> holder match {
       case (Some(item), _) if block isDefinedAt holder -> item =>
         block(holder -> item)
       case (item, _) =>

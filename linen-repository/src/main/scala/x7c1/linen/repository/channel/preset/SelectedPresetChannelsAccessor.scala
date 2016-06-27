@@ -1,6 +1,6 @@
 package x7c1.linen.repository.channel.preset
 
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 
 object SelectedPresetChannelsAccessor
   extends PresetChannelAccessorFactory(SelectedPresetChannelsQuery)
@@ -20,7 +20,7 @@ object SelectedPresetChannelsQuery extends PresetChannelQueryFactory {
          |ORDER BY c1._id DESC
        """.stripMargin
 
-    new Query(sql, Array(
+    Query(sql, Array(
       clientAccountId.toString,
       presetAccountId.toString)
     )

@@ -7,7 +7,7 @@ import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.CanFindRecord.Where
 import x7c1.wheat.modern.database.selector.presets.DefaultProvidable
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
-import x7c1.wheat.modern.database.{Deletable, Insertable}
+import x7c1.wheat.modern.database.{Deletable, HasTable, Insertable}
 
 trait ChannelRecord extends TypedFields {
   def _id: Long
@@ -19,17 +19,20 @@ trait ChannelRecord extends TypedFields {
 
 object ChannelRecord {
   def table: String = "channels"
+
   def column: ChannelRecord = TypedFields.expose[ChannelRecord]
+
+  implicit object hasTable extends HasTable.Where[ChannelRecord](table)
 
   implicit object reifiable extends RecordReifiable[ChannelRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelRecord](cursor)
   }
-  implicit object findable extends Where[HasChannelId, ChannelRecord](table){
+  implicit object findable extends Where[HasChannelId, ChannelRecord]{
     override def where[X](id: Long) = toArgs(
       column._id -> id
     )
   }
-  implicit object fromName extends Where[HasNamedChannelKey, ChannelRecord](table){
+  implicit object fromName extends Where[HasNamedChannelKey, ChannelRecord]{
     override def where[X](key: NamedChannelKey) = toArgs(
       column.account_id -> key.accountId,
       column.name -> key.channelName

@@ -4,7 +4,7 @@ import x7c1.linen.repository.account.ClientAccount
 import x7c1.linen.repository.channel.unread.{ChannelSelectable, UnreadChannel}
 import x7c1.linen.repository.unread.AccessorLoader
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.Done
+import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.LoadingDone
 
 
 class UnreadChannelsReader(
@@ -12,7 +12,7 @@ class UnreadChannelsReader(
   loader: => AccessorLoader,
   onLoaded: OnAccessorsLoadedListener ) {
 
-  def onMenuLoaded(e: Done[UnreadChannel]): Unit = {
+  def onMenuLoaded(e: LoadingDone[UnreadChannel]): Unit = {
     e.sequence.findAt(0) match {
       case Some(channel) =>
         loadChannel(channel)

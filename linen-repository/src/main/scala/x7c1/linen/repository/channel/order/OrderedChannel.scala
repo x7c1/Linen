@@ -35,11 +35,11 @@ class OrderedChannelSelector(
 
 private[order] class CanCollectOrdered extends CanCollect[HasAccountId, OrderedChannel]{
   override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
-    traverser.extract(db, id).right map {
+    canCollect.extract(db, id).right map {
       _ sortBy (_.channel_rank) map readable.convertFrom
     }
   }
-  private object traverser extends Where[HasAccountId, ChannelStatusRecord](ChannelStatusRecord.table){
+  private object canCollect extends Where[HasAccountId, ChannelStatusRecord]{
     override def where[X](id: Long) = toArgs(
       column.account_id -> id
     )

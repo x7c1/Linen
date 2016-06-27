@@ -4,7 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.HasChannelStatusKey
 import x7c1.linen.repository.source.unread.UnreadSourceAccessorQueries
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.SelectorProvidable
 import x7c1.wheat.modern.database.selector.presets.{CanDetectBySelect, DetectFrom}
 
@@ -16,7 +16,7 @@ object UnreadChannelRecord {
     UnreadChannelRecordSelector
   ]
   implicit object toDetect extends CanDetectBySelect[HasChannelStatusKey, UnreadChannelRecord] {
-    override def query[X: HasChannelStatusKey](target: X): Query = {
+    override def queryAbout[X: HasChannelStatusKey](target: X): Query = {
       val key = implicitly[HasChannelStatusKey[X]] toId target
       Query(
         sql = UnreadSourceAccessorQueries.sql3 + " LIMIT 1",

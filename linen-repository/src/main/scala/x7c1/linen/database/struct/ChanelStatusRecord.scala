@@ -6,7 +6,7 @@ import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
-import x7c1.wheat.modern.database.{Insertable, Updatable}
+import x7c1.wheat.modern.database.{HasTable, Insertable, Updatable}
 
 
 trait ChannelStatusRecord extends TypedFields {
@@ -20,7 +20,10 @@ trait ChannelStatusRecord extends TypedFields {
 
 object ChannelStatusRecord {
   def table: String = "channel_statuses"
+
   def column = TypedFields.expose[ChannelStatusRecord]
+
+  implicit object hasTable extends HasTable.Where[ChannelStatusRecord](table)
 
   implicit object providable
     extends DefaultProvidable[HasChannelStatusKey, ChannelStatusRecord]
@@ -28,7 +31,7 @@ object ChannelStatusRecord {
   implicit object reifiable extends RecordReifiable[ChannelStatusRecord]{
     override def reify(cursor: Cursor) = TypedCursor[ChannelStatusRecord](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[HasChannelStatusKey, ChannelStatusRecord](table){
+  implicit object findable extends CanFindRecord.Where[HasChannelStatusKey, ChannelStatusRecord]{
     override def where[X](key: ChannelStatusKey) = toArgs(
       column.account_id -> key.accountId,
       column.channel_id -> key.channelId

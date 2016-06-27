@@ -2,8 +2,7 @@ package x7c1.wheat.modern.database.selector
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor}
 
 import scala.language.{higherKinds, reflectiveCalls}
 
@@ -13,7 +12,8 @@ trait CanExtract[I[T] <: CanIdentify[T], A]{
 }
 
 trait CanSelect[I[T] <: CanIdentify[T], A] extends CanExtract[I, A]{
-  def query[X: I](target: X): Query
+
+  def queryAbout[X: I](target: X): Query
 
   def fromCursor(cursor: Cursor): Result[A]
 
@@ -23,7 +23,7 @@ trait CanSelect[I[T] <: CanIdentify[T], A] extends CanExtract[I, A]{
 
   override def extract[X: I](db: SQLiteDatabase, id: X): Result[A] =
     try {
-      val query = this.query(id)
+      val query = queryAbout(id)
       val cursor = db.rawQuery(query.sql, query.selectionArgs)
       try fromCursor(cursor)
       finally atFinal(cursor)

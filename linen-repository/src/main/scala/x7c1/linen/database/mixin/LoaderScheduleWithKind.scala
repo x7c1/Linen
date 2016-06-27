@@ -3,8 +3,7 @@ package x7c1.linen.database.mixin
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.struct.{HasAccountId, HasLoaderScheduleId, LoaderScheduleKindRecord, LoaderScheduleRecord}
-import x7c1.wheat.macros.database.TypedCursor
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.{Query, TypedCursor}
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, CanTraverseRecord, CanTraverseRecordByQuery, Find, FindBy, TraverseAll, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 
@@ -23,7 +22,7 @@ object LoaderScheduleWithKind {
     override def reify(cursor: Cursor) = TypedCursor[LoaderScheduleWithKind](cursor)
   }
   implicit object findable extends CanFindRecord[HasLoaderScheduleId, LoaderScheduleWithKind]{
-    override def query[X: HasLoaderScheduleId](target: X): Query = {
+    override def queryAbout[X: HasLoaderScheduleId](target: X): Query = {
       val scheduleId = implicitly[HasLoaderScheduleId[X]] toId target
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
@@ -36,7 +35,7 @@ object LoaderScheduleWithKind {
     }
   }
   implicit object traverseOn extends CanTraverseRecord[HasAccountId, LoaderScheduleWithKind]{
-    override def query[X: HasAccountId](target: X): Query = {
+    override def queryAbout[X: HasAccountId](target: X): Query = {
       val sql = s"""
         |SELECT * FROM loader_schedules as t1
         | INNER JOIN loader_schedule_kinds as t2

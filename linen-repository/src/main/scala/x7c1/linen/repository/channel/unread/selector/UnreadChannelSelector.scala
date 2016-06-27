@@ -6,6 +6,7 @@ import x7c1.linen.database.mixin.UnreadChannelRecord
 import x7c1.linen.database.struct.{HasAccountId, HasChannelStatusKey}
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
 import x7c1.linen.repository.channel.unread.UnreadChannel
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenceLoader, TraverseOn}
@@ -27,10 +28,10 @@ class UnreadChannelSelector(protected val db: SQLiteDatabase)
 
 object UnreadChannelSelector {
 
-  type UnreadChannelLoader = ClosableSequenceLoader[HasAccountId, UnreadChannel]
+  type UnreadChannelLoader = ClosableSequenceLoader[CrawlerContext, HasAccountId, UnreadChannel]
 
   def createLoader(helper: DatabaseHelper): UnreadChannelLoader = {
-    ClosableSequenceLoader[HasAccountId, UnreadChannel](helper.getReadableDatabase)
+    ClosableSequenceLoader[CrawlerContext, HasAccountId, UnreadChannel](helper.getReadableDatabase)
   }
 }
 

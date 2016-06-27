@@ -10,6 +10,7 @@ import x7c1.linen.glue.res.layout.SettingChannelOrderLayout
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.channel.order.ChannelOrderUpdater
 import x7c1.linen.repository.channel.subscribe.SubscribedChannel
+import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.linen.scene.updater.ChannelNormalizerService
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
@@ -31,7 +32,7 @@ class ChannelOrderDelegatee (
     }
     val listener = new OnDragListenerToStyle append
       OnDragListenerToSave(updater) append
-      OnDragListenerToReload(reloader) append
+      OnDragListenerToReload(CrawlerContext, reloader) append
       new OnDragListenerToNotify(activity)
 
     val touchHelper = new ItemTouchHelper(route createCallback listener)
@@ -58,17 +59,19 @@ class ChannelOrderDelegatee (
   }
   def showChannels(accountId: Long): Unit = {
     updater.updateDefaultRanks(accountId)
-    reloader.reload(accountId)
+    reloader.reload(accountId) run CrawlerContext atLeft {
+      Log error _.detail
+    }
     targetAccountId = Some(accountId)
   }
   private lazy val helper = {
     new DatabaseHelper(activity)
   }
   private lazy val reloader = {
-    new SequenceReloader(route.loader, layout.channelList)
+    SequenceReloader.on[CrawlerContext].create(route.loader, layout.channelList)
   }
   private lazy val route = {
-    DraggableSequenceRoute[HasAccountId, SubscribedChannel](
+    DraggableSequenceRoute[CrawlerContext, HasAccountId, SubscribedChannel](
       db = helper.getReadableDatabase
     )
   }

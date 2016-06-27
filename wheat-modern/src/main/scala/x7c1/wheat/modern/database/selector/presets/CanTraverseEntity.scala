@@ -1,7 +1,7 @@
 package x7c1.wheat.modern.database.selector.presets
 
 import android.database.{Cursor, SQLException}
-import x7c1.wheat.modern.database.Query
+import x7c1.wheat.macros.database.Query
 import x7c1.wheat.modern.database.selector.{CanIdentify, CursorReadable, CursorReifiable}
 
 import scala.language.{higherKinds, reflectiveCalls}
@@ -12,8 +12,8 @@ abstract class CanTraverseEntity[
   TO: ({ type L[T] = CursorReadable[FROM, T] })#L
 ] extends CanTraverseBySelect[I, TO]{
 
-  override def query[X: I](target: X): Query = {
-    implicitly[CanTraverseBySelect[I, FROM]] query target
+  override def queryAbout[X: I](target: X): Query = {
+    implicitly[CanTraverseBySelect[I, FROM]] queryAbout target
   }
   override def fromCursor(cursor: Cursor): Either[SQLException, ClosableSequence[TO]] = {
     val sequence = ClosableSequence[FROM, TO](cursor)

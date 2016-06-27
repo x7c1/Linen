@@ -6,13 +6,12 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
 import x7c1.linen.repository.loader.crawling.ChannelLoaderRunner.{AllSourcesLoaded, ChannelLoaderError, ChannelSourceLoaded}
 import x7c1.linen.repository.loader.crawling.PresetLoaderRunner.{AllChannelsLoaded, ChannelLoaded, PresetLoaderError}
-import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, OnChannelLoaderListener, OnPresetLoaderListener, PresetLoaderRunner, SourceInspector, TraceableQueue}
+import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, CrawlerContext, CrawlerFate, OnChannelLoaderListener, OnPresetLoaderListener, PresetLoaderRunner, SourceInspector, TraceableQueue}
 import x7c1.linen.repository.notification.ProgressContent
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-
-import scala.concurrent.Future
+import x7c1.wheat.modern.kinds.FutureFate
 
 trait QueueingService {
   def loadSource(sourceId: Long): Unit
@@ -41,21 +40,25 @@ private class QueueingServiceImpl(
   helper: DatabaseHelper,
   queue: TraceableQueue ) extends QueueingService {
 
-  import x7c1.linen.repository.loader.crawling.Implicits._
-
   override def loadSource(sourceId: Long) = {
     Log info s"[init] source-id: $sourceId"
 
     val inspector = SourceInspector(helper)
-    val future = Future { inspector inspectSource sourceId } map {
-      case Right(source) => queue enqueue source
-      case Left(error) => Log error error.message
+
+    val fate = FutureFate.on[CrawlerContext] create {
+      inspector inspectSource sourceId
+    } map {
+      source =>
+        queue enqueue source run CrawlerContext atLeft {
+          Log error _.detail
+        }
     }
-    future onFailure {
-      case e => Log error format(e)(s"[error] source(id:$sourceId)")
+    fate run CrawlerContext atLeft {
+      case e =>
+        Log error s"source(id:$sourceId): ${e.message}"
     }
   }
-  override def loadChannelSources(channelId: Long, accountId: Long) = Future {
+  override def loadChannelSources(channelId: Long, accountId: Long) = CrawlerFate run {
     Log info s"[init] channel:$channelId"
 
     val runner = ChannelLoaderRunner(
@@ -70,10 +73,10 @@ private class QueueingServiceImpl(
       account = accountId,
       channel = channelId
     )
-  } onFailure {
-    case e => Log error format(e){"[abort]"}
+  } atLeft {
+    case e => Log error format(e.cause){"[abort]"}
   }
-  override def loadSubscribedChannels(accountId: Long) = Future {
+  override def loadSubscribedChannels(accountId: Long) = CrawlerFate run {
     Log info s"[init] account:$accountId"
 
     val intent = new Intent(service, service getClassOf ServiceLabel.Updater)
@@ -85,8 +88,8 @@ private class QueueingServiceImpl(
       channelLoaderListener = new OnPresetChannelLoader(intent)
     )
     runner.startLoading(accountId)
-  } onFailure {
-    case e => Log error format(e){"[abort]"}
+  } atLeft {
+    case e => Log error format(e.cause){"[abort]"}
   }
 }
 

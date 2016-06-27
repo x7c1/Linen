@@ -1,6 +1,6 @@
 package x7c1.linen.modern.display.settings
 
-import x7c1.linen.database.struct.HasAccountId
+import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelStatusKey}
 import x7c1.linen.glue.res.layout.{SettingMyChannelRow, SettingMyChannelRowFooter, SettingMyChannelRowItem}
 import x7c1.linen.repository.channel.my.{MyChannel, MyChannelFooter, MyChannelRow}
 import x7c1.linen.scene.channel.menu.{MenuSelected, OnMenuSelectedListener}
@@ -54,6 +54,15 @@ case class ChannelSourcesSelected(
   channelId: Long,
   channelName: String
 )
+object ChannelSourcesSelected {
+  implicit object key extends HasChannelStatusKey[ChannelSourcesSelected]{
+    override def toId = event =>
+      ChannelStatusKey(
+        channelId = event.channelId,
+        accountId = event.accountId
+      )
+  }
+}
 
 case class MyChannelSubscriptionChanged(
   accountId: Long,

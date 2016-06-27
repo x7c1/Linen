@@ -3,24 +3,32 @@ package x7c1.linen.repository.loader.crawling
 import java.util.concurrent.atomic.AtomicInteger
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelId}
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
-import x7c1.linen.repository.source.setting.{SettingSource, SettingSourceAccessorFactory}
+import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.wheat.macros.logger.Log
-
-import scala.concurrent.ExecutionContext
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQueue){
 
   def start[A: HasAccountId, B: HasChannelId]
     (account: A, channel: B)
-    (callback: QueueingEvent => Unit)(implicit x: ExecutionContext) = {
+    (callback: QueueingEvent => Unit) = {
 
     val inspectedSources = {
       val inspector = SourceInspector(helper)
-      val accessor = SettingSourceAccessorFactory(helper, account).create(channel)
-      val settingSources = 0 until accessor.length flatMap accessor.findAt
-      settingSources map inspector.inspectSource[SettingSource]
+
+      helper.selectorOf[SettingSource] traverseOn ChannelStatusKey(
+        channelId = implicitly[HasChannelId[B]] toId channel,
+        accountId = implicitly[HasAccountId[A]] toId account
+      ) match {
+        case Left(e) =>
+          Log error format(e){"[failed]"}
+          Seq()
+        case Right(accessor) =>
+          val settingSources = 0 until accessor.length flatMap accessor.findAt
+          settingSources map inspector.inspectSource[SettingSource]
+      }
     }
     val targetSources = inspectedSources collect {
       case Right(sources) => sources
@@ -33,7 +41,7 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
 
   private def enqueueSources
     (sources: Seq[InspectedSource])
-    (callback: QueueingEvent => Unit)(implicit x: ExecutionContext) = {
+    (callback: QueueingEvent => Unit) = {
 
     val progress = new AtomicInteger(0)
     val max = sources.length
@@ -51,7 +59,7 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
     if (max == 0){
       callback apply OnDone(max)
     } else sources foreach { source =>
-      queue.enqueueSource(source) onComplete { _ => onProgress() }
+      queue.enqueueSource(source).run(CrawlerContext){ _ => onProgress() }
     }
   }
 

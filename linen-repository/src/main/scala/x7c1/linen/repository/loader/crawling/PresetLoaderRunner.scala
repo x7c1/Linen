@@ -13,8 +13,6 @@ import x7c1.linen.repository.notification.{NotificationIdStore, ProgressNotifier
 import x7c1.wheat.calendar.CalendarDate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
-import scala.concurrent.ExecutionContext
-
 class PresetLoaderRunner(
   context: Context,
   helper: DatabaseHelper,
@@ -22,7 +20,7 @@ class PresetLoaderRunner(
   presetLoaderListener: OnPresetLoaderListener,
   channelLoaderListener: OnChannelLoaderListener ){
 
-  def startLoading[A: HasAccountId](account: A)(implicit x: ExecutionContext) = {
+  def startLoading[A: HasAccountId](account: A) = {
     val either = for {
       notifier <- findNotifier(account).right
       sequence <- findSequence(account).right

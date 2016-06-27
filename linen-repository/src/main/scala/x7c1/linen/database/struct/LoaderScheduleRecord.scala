@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
-import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.{Insertable, Query, Updatable}
+import x7c1.wheat.macros.database.{Query, TypedCursor, TypedFields}
+import x7c1.wheat.modern.database.{Insertable, Updatable}
 import x7c1.wheat.modern.database.selector.presets.{CanTraverseRecordByQuery, DefaultProvidable}
 import x7c1.wheat.modern.database.selector.{IdEndo, Identifiable, RecordReifiable}
 

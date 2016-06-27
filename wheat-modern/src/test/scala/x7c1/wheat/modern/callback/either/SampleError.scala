@@ -1,12 +1,16 @@
 package x7c1.wheat.modern.callback.either
 
+import x7c1.wheat.macros.reify.HasConstructor
+
 
 trait SampleError {
   def message: String
 }
 object SampleError {
-  implicit class Unexpected(e: Throwable) extends SampleError {
-    override def message = e.getMessage
+  implicit object constructor extends HasConstructor[Throwable => SampleError]{
+    override def newInstance = e => new SampleError {
+      override def message = e.getMessage
+    }
   }
 }
 

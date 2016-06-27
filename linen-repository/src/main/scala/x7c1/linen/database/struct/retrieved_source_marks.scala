@@ -4,13 +4,16 @@ import android.database.Cursor
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.database.TypedFields.toArgs
 import x7c1.wheat.macros.database.{TypedCursor, TypedFields}
-import x7c1.wheat.modern.database.Insertable
+import x7c1.wheat.modern.database.{HasTable, Insertable}
 import x7c1.wheat.modern.database.selector.RecordReifiable
 import x7c1.wheat.modern.database.selector.presets.{CanFindRecord, DefaultProvidable}
 
 object retrieved_source_marks {
   val table = "retrieved_source_marks"
+
   val column = TypedFields.expose[retrieved_source_marks]
+
+  implicit object hasTable extends HasTable.Where[retrieved_source_marks](table)
 
   implicit object providable
     extends DefaultProvidable[HasSourceId, retrieved_source_marks]
@@ -18,7 +21,7 @@ object retrieved_source_marks {
   implicit object reifiable extends RecordReifiable[retrieved_source_marks]{
     override def reify(cursor: Cursor) = TypedCursor[retrieved_source_marks](cursor)
   }
-  implicit object findable extends CanFindRecord.Where[HasSourceId, retrieved_source_marks](table){
+  implicit object findable extends CanFindRecord.Where[HasSourceId, retrieved_source_marks]{
     override def where[X](id: Long) = toArgs(column.source_id -> id)
   }
   implicit object entryId extends HasEntryId[retrieved_source_marks]{

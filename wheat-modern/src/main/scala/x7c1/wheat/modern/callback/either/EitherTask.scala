@@ -4,12 +4,12 @@ import x7c1.wheat.modern.callback.either.EitherTask.|
 import x7c1.wheat.modern.patch.TaskAsync
 import x7c1.wheat.modern.tasks.UiThread
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.language.reflectiveCalls
 
-class EitherTask [L, R] private (f: (Either[L, R] => Unit) => Unit){
+class EitherTask [+L, +R] private (f: (Either[L, R] => Unit) => Unit){
 
-  def flatMap[A](g: R => L | A): L | A =
+  def flatMap[A, L2 >: L](g: R => L2 | A): L2 | A =
     EitherTask(h => f {
       case Left(x) => h(Left(x))
       case Right(x) => g(x) run h
@@ -38,6 +38,8 @@ class EitherTask [L, R] private (f: (Either[L, R] => Unit) => Unit){
 object EitherTask {
   type | [A, B] = EitherTask[A, B]
 
+  def unit[L](f: => Unit): L | Unit = apply(Right(f))
+
   def apply[L, R](f: => Either[L, R]): L | R = apply { _(f) }
 
   def apply[L, R](f: (Either[L, R] => Unit) => Unit): L | R = new EitherTask(f)
@@ -56,15 +58,6 @@ object EitherTask {
   }
   def ui[L, R](f: => R): L | R = EitherTask { g =>
     UiThread run g(Right(f))
-  }
-  def future[L: ({type F[X] = Throwable => X})#F, R]
-    (f: => Either[L, R])(implicit x: ExecutionContext): L | R = {
-
-    EitherTask { g =>
-      Future(f) recover {
-        case e => Left(implicitly[Throwable => L] apply e)
-      } map g
-    }
   }
 }
 
