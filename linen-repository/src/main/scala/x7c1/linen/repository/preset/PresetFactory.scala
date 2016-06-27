@@ -93,6 +93,30 @@ object Tech extends PresetChannelSet {
         url = "http://wired.jp/feed/"
       ),
       PresetSourcePiece(
+        title = "andronavi",
+        url = "http://andronavi.com/feed"
+      ),
+      PresetSourcePiece(
+        title = "ITmedia Mobile",
+        url = "http://rss.rssad.jp/rss/itmmobile/1.0/mobile.xml"
+      ),
+      PresetSourcePiece(
+        title = "ITmedia PC USER",
+        url = "http://rss.rssad.jp/rss/itmpcuser/1.0/pcupdate.xml"
+      ),
+      PresetSourcePiece(
+        title = "ITmedia LifeStyle",
+        url = "http://rss.rssad.jp/rss/itmlifestyle/1.0/lifestyle.xml"
+      ),
+      PresetSourcePiece(
+        title = "CNET Japan 最新情報　デジタル製品チャネル",
+        url = "http://feeds.japan.cnet.com/rss/cnet/digital.rdf"
+      ),
+      PresetSourcePiece(
+        title = "S-MAX（エスマックス）",
+        url = "http://s-max.jp/atom.xml"
+      ),
+      PresetSourcePiece(
         title = "INTERNET Watch",
         url = "http://rss.rssad.jp/rss/internetwatch/internet.rdf"
       ),
@@ -107,6 +131,18 @@ object Tech extends PresetChannelSet {
       PresetSourcePiece(
         title = "PC Watch",
         url = "http://rss.rssad.jp/rss/impresswatch/pcwatch.rdf"
+      ),
+      PresetSourcePiece(
+        title = "窓の杜",
+        url = "http://rss.rssad.jp/rss/forest/rss.xml"
+      ),
+      PresetSourcePiece(
+        title = "家電 Watch",
+        url = "http://rss.rssad.jp/rss/kadenwatch/kaden.rdf"
+      ),
+      PresetSourcePiece(
+        title = "AKIBA PC Hotline!",
+        url = "http://rss.rssad.jp/rss/akibapc/akiba-pc.rdf"
       ),
       PresetSourcePiece(
         title = "ASCII.jp － トップ",
