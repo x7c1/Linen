@@ -9,19 +9,19 @@ import x7c1.wheat.modern.kinds.{FateRunner, FutureFate}
 import scala.concurrent.ExecutionContext
 
 trait CrawlerContext {
-  private val executionContext: ExecutionContext = {
+  private val executionContext = {
     val pool = Executors.newCachedThreadPool()
     ExecutionContext fromExecutor pool
   }
-  private val timer: Timer = new Timer
+  private val timer = new Timer
 }
 
 object CrawlerContext extends CrawlerContext {
   implicit object hasContext extends HasContext[CrawlerContext]{
-    override def value = _.executionContext
+    override def instance = _.executionContext
   }
   implicit object hasTimer extends HasTimer[CrawlerContext]{
-    override def value = _.timer
+    override def instance = _.timer
   }
 }
 

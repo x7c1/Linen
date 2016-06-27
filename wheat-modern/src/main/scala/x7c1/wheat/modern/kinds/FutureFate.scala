@@ -5,7 +5,7 @@ import java.util.Timer
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.features.HasValue
+import x7c1.wheat.modern.features.HasInstance
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
@@ -14,13 +14,13 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 object FutureFate {
   type ErrorLike[X] = HasConstructor[Throwable => X]
 
-  type HasContext[X] = HasValue[X => ExecutionContext]
+  type HasContext[X] = HasInstance[X => ExecutionContext]
 
-  type HasTimer[X] = HasValue[X => Timer]
+  type HasTimer[X] = HasInstance[X => Timer]
 
   def fromEither[X: HasContext, L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] =
     Fate { x => g =>
-      implicit val context = implicitly[HasContext[X]].value(x)
+      implicit val context = implicitly[HasContext[X]].instance(x)
       Future(f) recover {
         case e => Left(implicitly[ErrorLike[L]] newInstance e)
       } map g
@@ -28,7 +28,7 @@ object FutureFate {
 
   def fromCallback[X: HasContext, L: ErrorLike, R](callback: CallbackTask[R]): Fate[X, L, R] = {
     Fate { x => g =>
-      implicit val context = implicitly[HasContext[X]].value(x)
+      implicit val context = implicitly[HasContext[X]].instance(x)
       Future[CallbackTask[Either[L, R]]] {
         callback map Right.apply
       } recover {
@@ -40,7 +40,7 @@ object FutureFate {
   }
   def fromPromise[X: HasContext, L: ErrorLike, R](promise: Promise[R]): Fate[X, L, R] = {
     Fate { x => g =>
-      implicit val context = implicitly[HasContext[X]].value(x)
+      implicit val context = implicitly[HasContext[X]].instance(x)
       promise.future map Right.apply recover {
         case e => Left(implicitly[ErrorLike[L]] newInstance e)
       } map g
@@ -59,7 +59,7 @@ object FutureFate {
         val task = TimerTask {
           g(Right({}))
         }
-        i.value(x).schedule(task, duration.toMillis)
+        i.instance(x).schedule(task, duration.toMillis)
       }
   }
   class Applied2[X: HasContext, L: ErrorLike]{
@@ -82,7 +82,7 @@ object FutureFate {
         val task = TimerTask {
           g(Right({}))
         }
-        i.value(x).schedule(task, duration.toMillis)
+        i.instance(x).schedule(task, duration.toMillis)
       }
   }
 }
