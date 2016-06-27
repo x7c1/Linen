@@ -3,13 +3,12 @@ package x7c1.wheat.modern.kinds
 import org.scalatest.{FlatSpecLike, Matchers}
 import x7c1.wheat.modern.kinds.RichFate.ToRichFate
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
 class FateTest extends FlatSpecLike with Matchers {
 
   val provide = FutureFate.hold[CustomContext, CustomError]
-  val context = CustomContext(ExecutionContext.global)
+  val context = CustomContext
 
   it can "compose by for-yield" in {
     val fate = for {

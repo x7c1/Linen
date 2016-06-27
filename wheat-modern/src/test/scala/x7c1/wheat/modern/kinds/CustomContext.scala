@@ -1,21 +1,24 @@
 package x7c1.wheat.modern.kinds
 
+import java.util
 import java.util.Timer
 
-import x7c1.wheat.modern.features.HasSharedInstance
-import x7c1.wheat.modern.kinds.FutureFate.HasContext
+import x7c1.wheat.modern.kinds.FutureFate.{HasContext, HasTimer}
 
 import scala.concurrent.ExecutionContext
 
-object CustomContext {
-  implicit object extract extends HasContext[CustomContext]{
+object CustomContext extends CustomContext {
+  implicit object hasContext extends HasContext[CustomContext]{
     override def value = _.context
   }
-  implicit object timer extends HasSharedInstance[CustomContext, Timer]{
-    override val instance = new Timer()
+  implicit object hasTimer extends HasTimer[CustomContext]{
+    override def value = _.timer
   }
 }
 
-case class CustomContext(context: ExecutionContext)
+trait CustomContext {
+  val context: ExecutionContext = ExecutionContext.global
+  val timer: Timer = new util.Timer()
+}
 
 case class CustomContextBoo(context: ExecutionContext)

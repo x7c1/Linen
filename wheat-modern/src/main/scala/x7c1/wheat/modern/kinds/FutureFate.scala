@@ -5,7 +5,7 @@ import java.util.Timer
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.features.{HasSharedInstance, HasValue}
+import x7c1.wheat.modern.features.HasValue
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
@@ -15,6 +15,8 @@ object FutureFate {
   type ErrorLike[X] = HasConstructor[Throwable => X]
 
   type HasContext[X] = HasValue[X => ExecutionContext]
+
+  type HasTimer[X] = HasValue[X => Timer]
 
   def fromEither[X: HasContext, L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] =
     Fate { x => g =>
@@ -52,12 +54,12 @@ object FutureFate {
     def create[L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] = {
       FutureFate.fromEither[X, L, R](f)
     }
-    def await[L: ErrorLike](duration: FiniteDuration)(implicit i: HasSharedInstance[X, Timer]): Fate[X, L, Unit] =
+    def await[L: ErrorLike](duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {
           g(Right({}))
         }
-        i.instance.schedule(task, duration.toMillis)
+        i.value(x).schedule(task, duration.toMillis)
       }
   }
   class Applied2[X: HasContext, L: ErrorLike]{
@@ -75,12 +77,12 @@ object FutureFate {
     def empty: Fate[X, L, Unit] = {
       right({})
     }
-    def await(duration: FiniteDuration)(implicit i: HasSharedInstance[X, Timer]): Fate[X, L, Unit] =
+    def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {
           g(Right({}))
         }
-        i.instance.schedule(task, duration.toMillis)
+        i.value(x).schedule(task, duration.toMillis)
       }
   }
 }
