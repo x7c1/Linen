@@ -39,6 +39,7 @@ object LinenBuild extends Build with LinenSettings {
         "https://android-rome-feed-reader.googlecode.com/svn/maven2/releases"
     ).
     settings(libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.2.1",
       "com.google.code.android-rome-feed-reader" % "android-rome-feed-reader" % "1.0.0-r2"
     )).
     settings(
@@ -174,6 +175,7 @@ trait LinenSettings {
     val ignore = (path: String) =>
       (path startsWith "org/jdom") || (path startsWith "JDOMAbout") ||
       (path startsWith "com/google/code/rome") || (path startsWith "META-INF") ||
+      (path startsWith "com/typesafe/config") ||
       (path startsWith "x7c1/linen/glue") ||
       (path startsWith "x7c1/wheat/ancient")
 

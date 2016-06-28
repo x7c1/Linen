@@ -1,11 +1,14 @@
 package x7c1.linen.repository.preset
 
+import com.typesafe.config.ConfigFactory
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.account.setup.PresetAccountSetup
-import x7c1.linen.repository.channel.preset.{PresetChannelSetup, PresetChannelPiece}
+import x7c1.linen.repository.channel.preset.{PresetChannelPiece, PresetChannelSetup}
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
 import x7c1.wheat.macros.logger.Log
+
+import scala.collection.JavaConverters._
 
 class PresetFactory (helper: DatabaseHelper){
 
@@ -68,6 +71,24 @@ case class PresetSourcePiece(
 case class PresetSourcePieces(
   list: Seq[PresetSourcePiece]
 )
+object PresetSourcePieces {
+  private def sourceList(file: String) = {
+    val config = ConfigFactory.parseResources(
+      getClass.getClassLoader,
+      file
+    )
+    config.getObjectList("sources").asScala map (_.toConfig)
+  }
+  def from(file: String) = PresetSourcePieces(
+    list = sourceList(file) map { conf =>
+      PresetSourcePiece(
+        title = conf getString "title",
+        url = conf getString "url"
+      )
+    }
+  )
+
+}
 trait PresetChannelSet {
   def channel: PresetChannelPiece
   def sources: PresetSourcePieces
@@ -78,94 +99,9 @@ object Tech extends PresetChannelSet {
     name = "Tech",
     description = "IT / インターネット / 科学技術 / ガジェット"
   )
-  override def sources = PresetSourcePieces(
-    list = Seq(
-      PresetSourcePiece(
-        title = "ギズモード・ジャパン",
-        url = "http://www.gizmodo.jp/atom.xml"
-      ),
-      PresetSourcePiece(
-        title = "GIGAZINE",
-        url = "http://feed.rssad.jp/rss/gigazine/rss_2.0"
-      ),
-      PresetSourcePiece(
-        title = "WIRED.jp",
-        url = "http://wired.jp/feed/"
-      ),
-      PresetSourcePiece(
-        title = "andronavi",
-        url = "http://andronavi.com/feed"
-      ),
-      PresetSourcePiece(
-        title = "ITmedia Mobile",
-        url = "http://rss.rssad.jp/rss/itmmobile/1.0/mobile.xml"
-      ),
-      PresetSourcePiece(
-        title = "ITmedia PC USER",
-        url = "http://rss.rssad.jp/rss/itmpcuser/1.0/pcupdate.xml"
-      ),
-      PresetSourcePiece(
-        title = "ITmedia LifeStyle",
-        url = "http://rss.rssad.jp/rss/itmlifestyle/1.0/lifestyle.xml"
-      ),
-      PresetSourcePiece(
-        title = "CNET Japan 最新情報　デジタル製品チャネル",
-        url = "http://feeds.japan.cnet.com/rss/cnet/digital.rdf"
-      ),
-      PresetSourcePiece(
-        title = "S-MAX（エスマックス）",
-        url = "http://s-max.jp/atom.xml"
-      ),
-      PresetSourcePiece(
-        title = "INTERNET Watch",
-        url = "http://rss.rssad.jp/rss/internetwatch/internet.rdf"
-      ),
-      PresetSourcePiece(
-        title = "ケータイ Watch",
-        url = "http://rss.rssad.jp/rss/k-taiwatch/k-tai.rdf"
-      ),
-      PresetSourcePiece(
-        title = "AV Watch",
-        url = "http://rss.rssad.jp/rss/avwatch/av.rdf"
-      ),
-      PresetSourcePiece(
-        title = "PC Watch",
-        url = "http://rss.rssad.jp/rss/impresswatch/pcwatch.rdf"
-      ),
-      PresetSourcePiece(
-        title = "窓の杜",
-        url = "http://rss.rssad.jp/rss/forest/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "家電 Watch",
-        url = "http://rss.rssad.jp/rss/kadenwatch/kaden.rdf"
-      ),
-      PresetSourcePiece(
-        title = "AKIBA PC Hotline!",
-        url = "http://rss.rssad.jp/rss/akibapc/akiba-pc.rdf"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － トップ",
-        url = "http://rss.rssad.jp/rss/ascii/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － TECH",
-        url = "http://rss.rssad.jp/rss/ascii/it/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － 自作PC",
-        url = "http://rss.rssad.jp/rss/ascii/pc/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － アスキークラウド",
-        url = "http://ascii.jp/cloud/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － デジタル",
-        url = "http://rss.rssad.jp/rss/ascii/digital/rss.xml"
-      )
-    )
-  )
+  override def sources = {
+    PresetSourcePieces from "preset-tech-jp.json"
+  }
 }
 object Game extends PresetChannelSet {
   override def channel = PresetChannelPiece(

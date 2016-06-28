@@ -1,0 +1,84 @@
+{
+  "sources":[
+    {
+      "title": "ギズモード・ジャパン",
+      "url": "http://www.gizmodo.jp/atom.xml"
+    },
+    {
+      "title": "GIGAZINE",
+      "url": "http://feed.rssad.jp/rss/gigazine/rss_2.0"
+    },
+    {
+      "title": "WIRED.jp",
+      "url": "http://wired.jp/feed/"
+    },
+    {
+      "title": "ITmedia Mobile",
+      "url": "http://rss.rssad.jp/rss/itmmobile/1.0/mobile.xml"
+    },
+    {
+      "title": "andronavi",
+      "url": "http://andronavi.com/feed"
+    },
+    {
+      "title": "ITmedia PC USER",
+      "url": "http://rss.rssad.jp/rss/itmpcuser/1.0/pcupdate.xml"
+    },
+    {
+      "title": "ITmedia LifeStyle",
+      "url": "http://rss.rssad.jp/rss/itmlifestyle/1.0/lifestyle.xml"
+    },
+    {
+      "title": "CNET Japan 最新情報　デジタル製品チャネル",
+      "url": "http://feeds.japan.cnet.com/rss/cnet/digital.rdf"
+    },
+    {
+      "title": "S-MAX（エスマックス）",
+      "url": "http://s-max.jp/atom.xml"
+    },
+    {
+      "title": "窓の杜",
+      "url": "http://rss.rssad.jp/rss/forest/rss.xml"
+    },
+    {
+      "title": "INTERNET Watch",
+      "url": "http://rss.rssad.jp/rss/internetwatch/internet.rdf"
+    },
+    {
+      "title": "ケータイ Watch",
+      "url": "http://rss.rssad.jp/rss/k-taiwatch/k-tai.rdf"
+    },
+    {
+      "title": "AV Watch",
+      "url": "http://rss.rssad.jp/rss/avwatch/av.rdf"
+    },
+    {
+      "title": "PC Watch",
+      "url": "http://rss.rssad.jp/rss/impresswatch/pcwatch.rdf"
+    },
+    {
+      "title": "家電 Watch",
+      "url": "http://rss.rssad.jp/rss/kadenwatch/kaden.rdf"
+    },
+    {
+      "title": "AKIBA PC Hotline!",
+      "url": "http://rss.rssad.jp/rss/akibapc/akiba-pc.rdf"
+    },
+    {
+      "title": "ASCII.jp － トップ",
+      "url": "http://rss.rssad.jp/rss/ascii/rss.xml"
+    },
+    {
+      "title": "ASCII.jp － TECH",
+      "url": "http://rss.rssad.jp/rss/ascii/it/rss.xml"
+    },
+    {
+      "title": "ASCII.jp － 自作PC",
+      "url": "http://rss.rssad.jp/rss/ascii/pc/rss.xml"
+    },
+    {
+      "title": "ASCII.jp － デジタル",
+      "url": "http://rss.rssad.jp/rss/ascii/digital/rss.xml"
+    }
+  ]
+}
