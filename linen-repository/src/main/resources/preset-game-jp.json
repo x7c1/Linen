@@ -1,0 +1,14 @@
+{
+  "name": "Game",
+  "description": "ゲーム / ホビー",
+  "sources":[
+    {
+      "title": "GAME Watch",
+      "url": "http://rss.rssad.jp/rss/gamewatch/index.rdf"
+    }
+    ,{
+      "title": "ASCII.jp － ゲーム・ホビー",
+      "url": "http://rss.rssad.jp/rss/ascii/hobby/rss.xml"
+    }
+  ]
+}
