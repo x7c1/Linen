@@ -13,7 +13,7 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
 
   def start[A: HasAccountId, B: HasChannelId]
     (account: A, channel: B)
-    (callback: QueueingEvent => Unit) = {
+    (callback: QueueingEvent => Unit): Unit = {
 
     val inspectedSources = {
       val inspector = SourceInspector(helper)

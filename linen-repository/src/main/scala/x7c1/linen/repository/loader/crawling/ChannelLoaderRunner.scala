@@ -16,7 +16,7 @@ class ChannelLoaderRunner private (
   queue: TraceableQueue,
   listener: OnChannelLoaderListener ){
 
-  def startLoading[A: HasAccountId, B: HasChannelId](account: A, channel: B) = {
+  def startLoading[A: HasAccountId, B: HasChannelId](account: A, channel: B): Unit = {
     val either = for {
       record <- findChannelRecord(channel).right
       notifier <- findNotifier(account, channel).right
