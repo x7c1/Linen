@@ -9,10 +9,6 @@ class SourceRowSelector(db: SQLiteDatabase){
   }
 }
 
-object SourceRowSelector{
-  implicit class reify(db: SQLiteDatabase) extends SourceRowSelector(db)
-}
-
 trait SourceRowHolder extends ClosableSourceAccessor {
   def addLength(size: Int): Unit
   def updateSequence(sequence: ClosableSourceAccessor): Unit
