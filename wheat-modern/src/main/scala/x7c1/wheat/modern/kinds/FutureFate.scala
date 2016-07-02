@@ -4,12 +4,12 @@ import java.util.Timer
 
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.features.HasInstance
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
 
 object FutureFate {
   type ErrorLike[X] = HasConstructor[Throwable => X]
@@ -29,13 +29,10 @@ object FutureFate {
   def fromCallback[X: HasContext, L: ErrorLike, R](callback: CallbackTask[R]): Fate[X, L, R] = {
     Fate { x => g =>
       implicit val context = implicitly[HasContext[X]].instance(x)
-      Future[CallbackTask[Either[L, R]]] {
-        callback map Right.apply
-      } recover {
-        case e => task {
-          Left(implicitly[ErrorLike[L]] newInstance e)
-        }
-      } map (_(g))
+      callback.toFuture onComplete {
+        case Success(r) => g(Right(r))
+        case Failure(e) => g(Left(implicitly[ErrorLike[L]] newInstance e))
+      }
     }
   }
   def fromPromise[X: HasContext, L: ErrorLike, R](promise: Promise[R]): Fate[X, L, R] = {
