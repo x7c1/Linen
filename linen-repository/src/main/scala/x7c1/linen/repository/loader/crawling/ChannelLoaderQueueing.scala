@@ -59,7 +59,13 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
     if (max == 0){
       callback apply OnDone(max)
     } else sources foreach { source =>
-      queue.enqueueSource(source).run(CrawlerContext){ _ => onProgress() }
+      queue.enqueueSource(source).run(CrawlerContext){
+        case Left(e) =>
+          Log error s"$source\n${e.detail}"
+          onProgress()
+        case Right(updated) =>
+          onProgress()
+      }
     }
   }
 

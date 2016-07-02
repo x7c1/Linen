@@ -47,7 +47,7 @@ class TraceableQueue(
           Log warn {
             val id = event.inspected.sourceId
             val title = event.inspected.title
-            s"source already dequeued: id:$id, $title"
+            s"source not enqueued or already dequeued: id:$id, $title"
           }
       }
     }

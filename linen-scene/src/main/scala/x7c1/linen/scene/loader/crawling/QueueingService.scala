@@ -49,7 +49,7 @@ private class QueueingServiceImpl(
       inspector inspectSource sourceId
     } map {
       source =>
-        queue enqueue source run CrawlerContext atLeft {
+        queue enqueueSource source run CrawlerContext atLeft {
           Log error _.detail
         }
     }
