@@ -26,8 +26,6 @@ import x7c1.wheat.modern.database.QueryExplainer
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
 class UnreadChannelSelectorTest extends JUnitSuiteLike with AllowTraversingAll with LogSetting {
-  import x7c1.linen.repository.dummy.DummySourceLoader.Implicits._
-
   import concurrent.duration._
 
   @Test
@@ -72,8 +70,7 @@ class UnreadChannelSelectorTest extends JUnitSuiteLike with AllowTraversingAll w
     def createOutlineSequence(channelId: Long) = {
       val sourceSequence = AccessorLoader.inspectSourceAccessor(
         db = helper.getReadableDatabase,
-        accountId = account.accountId,
-        channelId = channelId ).right.get
+        key = account -> channelId ).right.get
 
       val outlineSequence = {
         val db = helper.getReadableDatabase

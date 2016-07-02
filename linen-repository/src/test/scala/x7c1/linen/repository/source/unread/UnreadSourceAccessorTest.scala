@@ -29,8 +29,7 @@ class UnreadSourceAccessorTest extends JUnitSuiteLike {
 
     val Success(accessor) = UnreadSourceAccessor.create(
       db,
-      fixture.account2.accountId,
-      fixture.channel1.channelId
+      fixture.account2 -> fixture.channel1
     )
     val sources = 0 until accessor.length flatMap accessor.findAt collect {
       case x: UnreadSource => x

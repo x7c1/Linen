@@ -24,7 +24,7 @@ class UnreadChannelsReader(
     client match {
       case Some(account) =>
         Log info s"[start]"
-        loader.reload(account, channel)(onLoaded.afterLoad[A])
+        loader.reload(account -> channel)(onLoaded.afterLoad[(ClientAccount, A)])
       case None =>
         Log error s"account not found"
     }
@@ -33,7 +33,7 @@ class UnreadChannelsReader(
     client match {
       case Some(account) =>
         Log info s"[start]"
-        loader.reload(account, channel)(onLoaded.afterReload[A])
+        loader.reload(account -> channel)(onLoaded.afterReload[(ClientAccount, A)])
       case None =>
         Log error s"account not found"
     }

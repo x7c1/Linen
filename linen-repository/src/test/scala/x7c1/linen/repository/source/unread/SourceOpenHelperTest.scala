@@ -33,8 +33,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
     val db = helper.getWritableDatabase
     val Success(accessor) = UnreadSourceAccessor.create(
       db,
-      fixture.channel1.channelId,
-      fixture.account1.accountId
+      fixture.account1 -> fixture.channel1
     )
     val sources = 0 until accessor.length flatMap accessor.findAt collect {
       case x: UnreadSource => x
@@ -143,7 +142,7 @@ class SourceOpenHelperTest extends JUnitSuiteLike {
       channel <- MyChannelAccessor.createForDebug(helper, accountId).findAt(0).collect {
         case x: MyChannel => x
       }
-      either = AccessorLoader.inspectSourceAccessor(db, accountId, channel.channelId)
+      either = AccessorLoader.inspectSourceAccessor(db, accountId -> channel)
       accessor <- either.right.toOption
     } yield accountId -> accessor
   }

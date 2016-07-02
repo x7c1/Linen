@@ -3,7 +3,7 @@ package x7c1.linen.repository.unread
 import android.app.{Activity, LoaderManager}
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.HasChannelStatusKey
 import x7c1.linen.repository.channel.unread.ChannelSelectable
 import x7c1.linen.repository.entry.unread.{EntryAccessor, EntryRowContent, EntrySourcePositionsFactory, UnreadDetail, UnreadOutline}
 import x7c1.linen.repository.source.unread.SourceNotLoaded.{Abort, ErrorEmpty}
@@ -44,8 +44,8 @@ class AccessorLoader private (
   }
   def details: EntryAccessor[UnreadDetail] = detailUnderlying
 
-  def reload[A: HasAccountId, B: ChannelSelectable]
-    (account: A, channel: B)(onLoad: LoadCompleteEvent[B] => Unit): Unit = {
+  def reload[A: HasChannelStatusKey: ChannelSelectable]
+    (key: A)(onLoad: LoadCompleteEvent[A] => Unit): Unit = {
 
 //    val first = for {
 //      sourceIds <- startLoadingSources(account.accountId)
@@ -56,11 +56,12 @@ class AccessorLoader private (
 //    }
 //    first onComplete loadNext
 
-    val accountId = implicitly[HasAccountId[A]] toId account
+
+    val accountId = implicitly[HasChannelStatusKey[A]].toId(key).accountId
     Log info s"[init] account:$accountId"
 
     val load = for {
-      accessor <- startLoadingSources(account, channel)
+      accessor <- startLoadingSources(key)
       event <- loadSourceEntries(
         remainingSources = accessor map (_.sources) getOrElse Seq()
       )
@@ -69,7 +70,7 @@ class AccessorLoader private (
         accessor foreach sourceUnderlying.updateSequence
         updateAccessors(event)
       }
-      _ <- Future { onLoad(LoadCompleteEvent(channel)) }
+      _ <- Future { onLoad(LoadCompleteEvent(key)) }
     } yield {
       event.remainingSources
     }
@@ -90,10 +91,10 @@ class AccessorLoader private (
       sourceUnderlying.close()
     }
   }
-  private def startLoadingSources[A: HasAccountId, B: HasChannelId]
-    (account: A, channel: B): Future[Option[ClosableSourceAccessor]] = loaderFactory asFuture {
+  private def startLoadingSources[A: HasChannelStatusKey]
+    (key: A): Future[Option[ClosableSourceAccessor]] = loaderFactory asFuture {
 
-    AccessorLoader.inspectSourceAccessor(database, account, channel) match {
+    AccessorLoader.inspectSourceAccessor(database, key) match {
       case Left(error: ErrorEmpty) =>
         Log error error.message
         None
@@ -170,16 +171,16 @@ object AccessorLoader {
       activity.getLoaderManager
     )
   }
-  def inspectSourceAccessor[A: HasAccountId, B: HasChannelId](
-    db: SQLiteDatabase, accountId: A,
-    channelId: B): SourceNotLoaded Either ClosableSourceAccessor =
+  def inspectSourceAccessor[A: HasChannelStatusKey](
+    db: SQLiteDatabase, key: A): Either[SourceNotLoaded, ClosableSourceAccessor] = {
 
-    try UnreadSourceAccessor.create(db, accountId, channelId) match {
+    try UnreadSourceAccessor.create(db, key) match {
       case Failure(exception) => Left(Abort(exception))
       case Success(accessor) => Right(accessor)
     } catch {
       case e: Exception => Left(Abort(e))
     }
+  }
 }
 
 case class AccessorsLoadedEvent(
