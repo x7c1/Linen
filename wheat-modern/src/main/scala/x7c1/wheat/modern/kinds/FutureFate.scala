@@ -38,9 +38,10 @@ object FutureFate {
   def fromPromise[X: HasContext, L: ErrorLike, R](promise: Promise[R]): Fate[X, L, R] = {
     Fate { x => g =>
       implicit val context = implicitly[HasContext[X]].instance(x)
-      promise.future map Right.apply recover {
-        case e => Left(implicitly[ErrorLike[L]] newInstance e)
-      } map g
+      promise.future onComplete {
+        case Success(r) => g(Right(r))
+        case Failure(e) => g(Left(implicitly[ErrorLike[L]] newInstance e))
+      }
     }
   }
   def on[X: HasContext]: Applied1[X] = new Applied1

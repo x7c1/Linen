@@ -23,13 +23,10 @@ object NotificationKey {
     }
     override def contentKind = SourceLoaderKind
   }
-  case class ChannelLoaderKey[A: HasAccountId, C: HasChannelId]
-    (account: A, channel: C) extends NotificationKey {
-
+  case class ChannelLoaderKey[A: HasChannelStatusKey](key: A) extends NotificationKey {
     override val contentKey = {
-      val accountId = implicitly[HasAccountId[A]] toId account
-      val channelId = implicitly[HasChannelId[C]] toId channel
-      s"account:$accountId,channel:$channelId"
+      val x = implicitly[HasChannelStatusKey[A]] toId key
+      s"account:${x.accountId},channel:${x.channelId}"
     }
     override def contentKind = ChannelLoaderKind
   }

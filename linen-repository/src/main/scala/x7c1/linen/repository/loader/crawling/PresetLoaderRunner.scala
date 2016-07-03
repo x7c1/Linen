@@ -40,7 +40,7 @@ class PresetLoaderRunner(
     }
     either match {
       case Right((sequence, runner)) =>
-        sequence.toSeq foreach { runner.startLoading(account, _) }
+        sequence.toSeq foreach { runner startLoading account -> _ }
         sequence.closeCursor()
       case Left(error) =>
         presetLoaderListener onError error

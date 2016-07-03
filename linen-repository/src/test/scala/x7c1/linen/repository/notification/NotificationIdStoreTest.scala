@@ -28,7 +28,7 @@ class NotificationIdStoreTest extends JUnitSuiteLike with LogSetting with AllowT
     val account2 = factory.createAccount()
     val channel1 = factory createChannel account1
 
-    val target = ChannelLoaderKey(account1, channel1)
+    val target = ChannelLoaderKey(account1 -> channel1)
     def findTarget() = helper.selectorOf[NotificationIdRecord] findBy target
 
     val OptionRight(before) = findTarget()
@@ -46,8 +46,7 @@ class NotificationIdStoreTest extends JUnitSuiteLike with LogSetting with AllowT
 
     val OptionRight(other) =
       helper.selectorOf[NotificationIdRecord] findBy ChannelLoaderKey(
-        account2,
-        channel1
+        account2 -> channel1
       )
     assertEquals(None, other)
   }
