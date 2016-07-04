@@ -10,5 +10,9 @@
       "title": "ASCII.jp － ゲーム・ホビー",
       "url": "http://rss.rssad.jp/rss/ascii/hobby/rss.xml"
     }
+    ,{
+      "title": "4Gamer.net − 最新記事",
+      "url": "http://www.4gamer.net/rss/index.xml"
+    }
   ]
 }
