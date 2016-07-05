@@ -14,5 +14,9 @@
       "title": "4Gamer.net − 最新記事",
       "url": "http://www.4gamer.net/rss/index.xml"
     }
+    ,{
+      "title": "4Gamer.net − 総合トップ/インタビュー",
+      "url": "http://www.4gamer.net/rss/all_interview.xml"
+    }
   ]
 }
