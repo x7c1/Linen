@@ -22,5 +22,9 @@
       "title": "4Gamer.net − 総合トップ/レビュー",
       "url": "http://www.4gamer.net/rss/all_review.xml"
     }
+    ,{
+      "title": "4Gamer.net − 総合トップ/連載",
+      "url": "http://www.4gamer.net/rss/all_series.xml"
+    }
   ]
 }
