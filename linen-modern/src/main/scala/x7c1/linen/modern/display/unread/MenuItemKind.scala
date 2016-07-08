@@ -18,6 +18,7 @@ object MenuItemKind {
   case class PresetChannels(body: String) extends MenuItemKind
   case class ChannelOrder(body: String) extends MenuItemKind
   case class LoaderSchedule(body: String) extends MenuItemKind
+  case class SourceInspector(body: String) extends MenuItemKind
 
   case class DevCreateDummies(body: String) extends MenuItemKind
 

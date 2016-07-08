@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.glue.activity.ActivityControl
 import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannelOrder, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, UnreadChannelMenu}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, SourceInspector, UnreadChannelMenu}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.order.ChannelOrderDelegatee
@@ -80,7 +80,8 @@ trait DrawerMenuInitializer {
         label of MyChannels("My Channels"),
         label of PresetChannels("Preset Channels"),
         label of ChannelOrder("Channel Order"),
-        label of LoaderSchedule("Loader Schedules")
+        label of LoaderSchedule("Loader Schedules"),
+        label of SourceInspector("Inspector Reports")
       ),
       -----,
       MenuItems(
@@ -165,6 +166,9 @@ class OnMenuItemClick(
         create(activity, activity getClassOf SettingLoaderSchedule){
           _ setupFor accountId
         }
+
+    case _: SourceInspector =>
+      Log info s"$kind"
 
     case _: DevCreateDummies =>
       activity startActivity new Intent(
