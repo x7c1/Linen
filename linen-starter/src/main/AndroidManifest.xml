@@ -54,6 +54,11 @@
             />
 
         <activity
+            android:name=".tools.InspectorReportsActivity"
+            android:parentActivityName=".unread.UnreadItemsActivity"
+            />
+
+        <activity
             android:name=".dev.CreateRecordsActivity"
             android:label="create dummies"
             android:parentActivityName=".unread.UnreadItemsActivity"
