@@ -31,6 +31,11 @@ object Sequence {
     override protected val underlying: F[A]) extends SequenceFilter[A, F]
 
   implicit object canFilterFrom extends DefaultCanFilterFrom
+
+  implicit class slice[A, F[_] <: Sequence[_]](
+    override protected val underlying: F[A] ) extends SequenceSlice[A, F]
+
+  implicit object canSliceFrom extends DefaultCanSliceFrom
 }
 
 trait SequenceMerger[A] {
