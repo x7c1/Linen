@@ -10,12 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
 
-public class InspectorLayout extends RecyclerView.ViewHolder {
+public class SourceSearchLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final android.support.v7.widget.RecyclerView reports;
 
-    public InspectorLayout(
+    public SourceSearchLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
         android.support.v7.widget.RecyclerView reports

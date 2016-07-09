@@ -9,11 +9,11 @@ package x7c1.linen.glue.res.layout;
 import android.view.View;
 import android.widget.TextView;
 
-public class InspectorRowSourceItem extends InspectorRow {
+public class SourceSearchRowSourceItem extends SourceSearchRow {
 
     public final TextView body;
 
-    public InspectorRowSourceItem(
+    public SourceSearchRowSourceItem(
         View itemView,
         TextView body
     ){

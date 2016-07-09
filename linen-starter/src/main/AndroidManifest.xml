@@ -54,7 +54,7 @@
             />
 
         <activity
-            android:name=".tools.InspectorReportsActivity"
+            android:name=".tools.SourceSearchActivity"
             android:parentActivityName=".unread.UnreadItemsActivity"
             />
 

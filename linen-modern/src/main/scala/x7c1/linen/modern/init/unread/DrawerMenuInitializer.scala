@@ -5,12 +5,12 @@ import java.lang.Math.min
 import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
-import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, InspectorReports, SettingChannelOrder, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
+import x7c1.linen.glue.activity.ActivityLabel.{CreateRecords, SettingChannelOrder, SettingLoaderSchedule, SettingMyChannels, SettingPresetChannels}
+import x7c1.linen.glue.activity.{ActivityControl, ActivityLabel}
 import x7c1.linen.glue.res.layout.{MenuRow, MenuRowLabel}
-import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, SourceInspector, UnreadChannelMenu}
+import x7c1.linen.modern.display.unread.MenuItemKind.{ChannelOrder, DevCreateDummies, LoaderSchedule, MyChannels, NoChannel, PresetChannels, SourceSearch, UnreadChannelMenu}
 import x7c1.linen.modern.display.unread.{DrawerMenuLabelFactory, DrawerMenuRowAdapter, DrawerMenuTitleFactory, MenuItemKind, OnMenuItemClickListener}
-import x7c1.linen.modern.init.inspector.InspectorReportsDelegatee
+import x7c1.linen.modern.init.inspector.SourceSearchDelegatee
 import x7c1.linen.modern.init.settings.my.MyChannelsDelegatee
 import x7c1.linen.modern.init.settings.order.ChannelOrderDelegatee
 import x7c1.linen.modern.init.settings.preset.PresetChannelsDelegatee
@@ -82,7 +82,7 @@ trait DrawerMenuInitializer {
         label of PresetChannels("Preset Channels"),
         label of ChannelOrder("Channel Order"),
         label of LoaderSchedule("Loader Schedules"),
-        label of SourceInspector("Inspector Reports")
+        label of SourceSearch("Source Search")
       ),
       -----,
       MenuItems(
@@ -165,10 +165,10 @@ class OnMenuItemClick(
           _ setupFor accountId
         }
 
-    case _: SourceInspector =>
+    case _: SourceSearch =>
       Log info s"$kind"
-      activity startActivity IntentFactory.using[InspectorReportsDelegatee].
-        create(activity, activity getClassOf InspectorReports){
+      activity startActivity IntentFactory.using[SourceSearchDelegatee].
+        create(activity, activity getClassOf ActivityLabel.SourceSearch){
           _ showInspectorReports accountId
         }
 

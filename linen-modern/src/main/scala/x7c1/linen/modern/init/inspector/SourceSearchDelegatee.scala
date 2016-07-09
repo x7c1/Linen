@@ -5,19 +5,19 @@ import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.HasAccountId
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.InspectorLayout
+import x7c1.linen.glue.res.layout.SourceSearchLayout
 import x7c1.linen.glue.service.ServiceControl
-import x7c1.linen.repository.inspector.InspectorReportRow
+import x7c1.linen.repository.inspector.SourceSearchReportRow
 import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
 
-class InspectorReportsDelegatee (
+class SourceSearchDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
-  layout: InspectorLayout,
-  rowProviders: InspectorRowProviders
+  layout: SourceSearchLayout,
+  rowProviders: SearchReportRowProviders
 ){
   def onCreate(): Unit = {
 
@@ -33,7 +33,7 @@ class InspectorReportsDelegatee (
     }
   }
   def createAdapter[A: HasAccountId](account: A) = {
-    new InspectorRowAdapter(
+    new SourceSearchRowAdapter(
       delegatee = AdapterDelegatee.create(rowProviders, loader.sequence)
     )
   }
@@ -46,6 +46,6 @@ class InspectorReportsDelegatee (
     ClosableSequenceLoader[
       CrawlerContext,
       HasAccountId,
-      InspectorReportRow ](helper.getReadableDatabase)
+      SourceSearchReportRow ](helper.getReadableDatabase)
   }
 }

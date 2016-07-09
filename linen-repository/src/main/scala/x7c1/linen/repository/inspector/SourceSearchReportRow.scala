@@ -6,15 +6,15 @@ import x7c1.wheat.modern.database.selector.SelectorProvidable
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequence, TraverseOn}
 import x7c1.wheat.modern.sequence.Sequence
 
-sealed trait InspectorReportRow
+sealed trait SourceSearchReportRow
 
-object InspectorReportRow {
-  implicit object traverse extends CanTraverse[HasAccountId, InspectorReportRow]{
+object SourceSearchReportRow {
+  implicit object traverse extends CanTraverse[HasAccountId, SourceSearchReportRow]{
     override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
       val ys = Sequence from (0 until 10).map{ n =>
         DiscoveredSource(s"source-$n")
       }
-      val xs = new ClosableSequence[InspectorReportRow] {
+      val xs = new ClosableSequence[SourceSearchReportRow] {
         override def closeCursor(): Unit = {}
         override def findAt(position: Int) = ys findAt position
         override def length = ys.length
@@ -22,14 +22,14 @@ object InspectorReportRow {
       Right(xs)
     }
   }
-  implicit object providable extends SelectorProvidable[InspectorReportRow, Selector]
+  implicit object providable extends SelectorProvidable[SourceSearchReportRow, Selector]
 
   class Selector(
-    protected val db: SQLiteDatabase) extends TraverseOn[HasAccountId, InspectorReportRow]
+    protected val db: SQLiteDatabase) extends TraverseOn[HasAccountId, SourceSearchReportRow]
 }
 
 case class DiscoveredSourceLabel(
-  body: String ) extends InspectorReportRow
+  body: String ) extends SourceSearchReportRow
 
 case class DiscoveredSource(
-  label: String ) extends InspectorReportRow
+  label: String ) extends SourceSearchReportRow

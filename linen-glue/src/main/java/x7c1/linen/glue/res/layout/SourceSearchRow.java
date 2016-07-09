@@ -9,8 +9,8 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class InspectorRow extends RecyclerView.ViewHolder {
-    public InspectorRow(View itemView) {
+public class SourceSearchRow extends RecyclerView.ViewHolder {
+    public SourceSearchRow(View itemView) {
         super(itemView);
     }
 }

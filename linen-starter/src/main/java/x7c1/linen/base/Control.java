@@ -10,7 +10,7 @@ import x7c1.linen.settings.PresetChannelsActivity;
 import x7c1.linen.settings.MyChannelSourcesActivity;
 import x7c1.linen.settings.MyChannelsActivity;
 import x7c1.linen.settings.LoaderSchedulesActivity;
-import x7c1.linen.tools.InspectorReportsActivity;
+import x7c1.linen.tools.SourceSearchActivity;
 
 import static java.lang.String.format;
 
@@ -37,8 +37,8 @@ public class Control {
 			case SettingLoaderSchedule:
 				klass = LoaderSchedulesActivity.class;
 				break;
-			case InspectorReports:
-				klass = InspectorReportsActivity.class;
+			case SourceSearch:
+				klass = SourceSearchActivity.class;
 				break;
 			case CreateRecords:
 				klass = CreateRecordsActivity.class;

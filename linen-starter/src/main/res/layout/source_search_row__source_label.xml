@@ -11,7 +11,7 @@
     android:gravity="center_vertical"
     >
     <TextView
-        android:id="@+id/inspector_row__source_label__body"
+        android:id="@+id/source_search_row__source_label__body"
         android:textSize="12sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
