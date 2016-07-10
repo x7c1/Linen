@@ -11,9 +11,21 @@ sealed trait SourceSearchReportRow
 object SourceSearchReportRow {
   implicit object traverse extends CanTraverse[HasAccountId, SourceSearchReportRow]{
     override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
-      val ys = Sequence from (0 until 10).map{ n =>
-        DiscoveredSource(s"source-$n")
-      }
+      val ys = Sequence from Seq(
+        DiscoveredLabelRow(
+          formattedDate = "Mon Jul 11",
+          message = "2 sources found",
+          via = "http://example.com/page/id/123"
+        ),
+        DiscoveredSourceRow(
+          title = "Sample Feed Foo Bar",
+          url = "http://example.com/feed/rss.xml"
+        ),
+        DiscoveredSourceRow(
+          title = "Sample Feed Foo Bar",
+          url = "http://example.com/feed/atom.xml"
+        )
+      )
       val xs = new ClosableSequence[SourceSearchReportRow] {
         override def closeCursor(): Unit = {}
         override def findAt(position: Int) = ys findAt position
@@ -28,8 +40,17 @@ object SourceSearchReportRow {
     protected val db: SQLiteDatabase) extends TraverseOn[HasAccountId, SourceSearchReportRow]
 }
 
-case class DiscoveredSourceLabel(
-  body: String ) extends SourceSearchReportRow
+case class DiscoveredLabelRow(
+  formattedDate: String,
+  message: String,
+  via: String ) extends SourceSearchReportRow
 
-case class DiscoveredSource(
-  label: String ) extends SourceSearchReportRow
+case class DiscoveredSourceRow(
+  title: String,
+  url: String ) extends SourceSearchReportRow
+
+case class DateLabelRow() extends SourceSearchReportRow
+
+case class NoSourceRow() extends SourceSearchReportRow
+
+case class LoadingErrorRow() extends SourceSearchReportRow

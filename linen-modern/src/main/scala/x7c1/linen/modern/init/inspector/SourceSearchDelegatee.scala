@@ -13,6 +13,7 @@ import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.macros.intent.IntentExpander
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader
+import x7c1.wheat.modern.decorator.Imports._
 
 class SourceSearchDelegatee (
   activity: Activity with ActivityControl with ServiceControl,
@@ -20,7 +21,9 @@ class SourceSearchDelegatee (
   rowProviders: SearchReportRowProviders
 ){
   def onCreate(): Unit = {
-
+    layout.toolbar onClickNavigation { _ =>
+      activity.finish()
+    }
     layout.reports setLayoutManager new LinearLayoutManager(activity)
 
     IntentExpander executeBy activity.getIntent

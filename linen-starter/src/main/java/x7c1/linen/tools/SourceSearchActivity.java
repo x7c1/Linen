@@ -11,6 +11,7 @@ import x7c1.linen.modern.init.inspector.SearchReportRowProviders;
 import x7c1.linen.modern.init.inspector.SourceSearchDelegatee;
 import x7c1.linen.res.layout.SourceSearchLayoutProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
+import x7c1.linen.res.layout.SourceSearchRowSourceLabelProvider;
 
 public class SourceSearchActivity extends BaseActivity {
 	private SourceSearchDelegatee delegatee = null;
@@ -29,6 +30,7 @@ public class SourceSearchActivity extends BaseActivity {
 				this,
 				layout,
 				new SearchReportRowProviders(
+						new SourceSearchRowSourceLabelProvider(this),
 						new SourceSearchRowSourceItemProvider(this)
 				)
 		);
