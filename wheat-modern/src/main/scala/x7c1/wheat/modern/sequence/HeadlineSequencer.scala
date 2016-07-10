@@ -4,7 +4,16 @@ import x7c1.wheat.modern.features.HasShortLength
 
 import scala.annotation.tailrec
 
-class HeadlineSequencer[X: HasShortLength, A](
+object HeadlineSequencer {
+  def apply[X: HasShortLength, A](
+    equals: (X, X) => Boolean,
+    toHeadline: Sequence[X] => A): HeadlineSequencer[X, A] = {
+
+    new HeadlineSequencer(equals, toHeadline)
+  }
+}
+
+class HeadlineSequencer[X, A] private(
   equals: (X, X) => Boolean,
   toHeadline: Sequence[X] => A) {
 
