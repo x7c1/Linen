@@ -13,17 +13,20 @@ object SourceSearchReportRow {
     override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
       val ys = Sequence from Seq(
         DiscoveredLabelRow(
-          formattedDate = "Mon Jul 11",
-          message = "2 sources found",
-          via = "http://example.com/page/id/123"
+          formattedDate = "2016-07-11 22:59:00",
+          reportMessage = "2 Sources found",
+          pageTitle = "Sample Page",
+          pageUrl = "http://example.com/page/id/123"
         ),
         DiscoveredSourceRow(
-          title = "Sample Feed Foo Bar",
-          url = "http://example.com/feed/rss.xml"
+          sourceTitle = "Sample Feed Foo Bar",
+          sourceDescription = "Sample description.",
+          sourceUrl = "http://example.com/feed/rss.xml"
         ),
         DiscoveredSourceRow(
-          title = "Sample Feed Foo Bar",
-          url = "http://example.com/feed/atom.xml"
+          sourceTitle = "Sample Feed Foo Bar",
+          sourceDescription = "Sample description.",
+          sourceUrl = "http://example.com/feed/atom.xml"
         )
       )
       val xs = new ClosableSequence[SourceSearchReportRow] {
@@ -42,12 +45,14 @@ object SourceSearchReportRow {
 
 case class DiscoveredLabelRow(
   formattedDate: String,
-  message: String,
-  via: String ) extends SourceSearchReportRow
+  reportMessage: String,
+  pageTitle: String,
+  pageUrl: String ) extends SourceSearchReportRow
 
 case class DiscoveredSourceRow(
-  title: String,
-  url: String ) extends SourceSearchReportRow
+  sourceTitle: String,
+  sourceDescription: String,
+  sourceUrl: String ) extends SourceSearchReportRow
 
 case class DateLabelRow() extends SourceSearchReportRow
 

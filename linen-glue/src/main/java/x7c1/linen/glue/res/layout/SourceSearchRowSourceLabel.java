@@ -11,13 +11,16 @@ import android.widget.TextView;
 
 public class SourceSearchRowSourceLabel extends SourceSearchRow {
 
-    public final TextView body;
+    public final TextView date;
+    public final TextView message;
 
     public SourceSearchRowSourceLabel(
         View itemView,
-        TextView body
+        TextView date,
+        TextView message
     ){
         super(itemView);
-        this.body = body;
+        this.date = date;
+        this.message = message;
     }
 }

@@ -11,13 +11,22 @@ import android.widget.TextView;
 
 public class SourceSearchRowSourceItem extends SourceSearchRow {
 
-    public final TextView body;
+    public final TextView title;
+    public final TextView description;
+    public final TextView subscribe;
+    public final TextView entries;
 
     public SourceSearchRowSourceItem(
         View itemView,
-        TextView body
+        TextView title,
+        TextView description,
+        TextView subscribe,
+        TextView entries
     ){
         super(itemView);
-        this.body = body;
+        this.title = title;
+        this.description = description;
+        this.subscribe = subscribe;
+        this.entries = entries;
     }
 }

@@ -58,7 +58,8 @@ public class SourceSearchRowSourceLabelProvider implements ViewHolderProvider<So
             public SourceSearchRowSourceLabel createViewHolder(View view){
                 return new SourceSearchRowSourceLabel(
                     view,
-                    (TextView) view.findViewById(R.id.source_search_row__source_label__body)
+                    (TextView) view.findViewById(R.id.source_search_row__source_label__date),
+                    (TextView) view.findViewById(R.id.source_search_row__source_label__message)
                 );
             }
         };

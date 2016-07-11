@@ -14,10 +14,12 @@ class SourceSearchRowAdapter(
   override def onBindViewHolder(holder: SourceSearchRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
       case (row: SourceSearchRowSourceLabel, source: DiscoveredLabelRow) =>
-        row.body.text = source.formattedDate
+        row.date.text = source.formattedDate
+        row.message.text = source.reportMessage
 
       case (row: SourceSearchRowSourceItem, source: DiscoveredSourceRow) =>
-        row.body.text = source.title
+        row.title.text = source.sourceTitle
+        row.description.text = source.sourceDescription
 
       case (row, item) =>
         Log info s"unknown row: $row, $item"

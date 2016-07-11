@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:paddingTop="0dp"
     android:paddingEnd="0dp"
     android:paddingBottom="0dp"
     android:paddingStart="0dp"
     android:gravity="center_vertical"
     >
+
     <TextView
-        android:id="@+id/source_search_row__source_label__body"
-        android:textSize="12sp"
-        android:layout_width="match_parent"
+        android:id="@+id/source_search_row__source_label__message"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
-        android:paddingStart="10dp"
-        android:drawablePadding="6dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="8dp"
+        android:drawablePadding="5dp"
+        android:drawableStart="@drawable/ic_public_24dp"
         android:textColor="@color/lapis_lazuli"
+        android:textSize="14sp"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif-condensed"
+        />
+
+    <TextView
+        android:id="@+id/source_search_row__source_label__date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="4dp"
+        android:textColor="@color/lapis_lazuli"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-condensed"
         android:maxLines="1"
         />
-</LinearLayout>
+
+</RelativeLayout>

@@ -58,7 +58,10 @@ public class SourceSearchRowSourceItemProvider implements ViewHolderProvider<Sou
             public SourceSearchRowSourceItem createViewHolder(View view){
                 return new SourceSearchRowSourceItem(
                     view,
-                    (TextView) view.findViewById(R.id.source_search_row__source_item__body)
+                    (TextView) view.findViewById(R.id.source_search_row__source_item__title),
+                    (TextView) view.findViewById(R.id.source_search_row__source_item__description),
+                    (TextView) view.findViewById(R.id.source_search_row__source_item__subscribe),
+                    (TextView) view.findViewById(R.id.source_search_row__source_item__entries)
                 );
             }
         };
