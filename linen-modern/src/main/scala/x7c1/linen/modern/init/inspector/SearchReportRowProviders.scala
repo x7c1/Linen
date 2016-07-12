@@ -1,7 +1,7 @@
 package x7c1.linen.modern.init.inspector
 
 import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowSourceItem, SourceSearchRowSourceLabel}
-import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSourceRow, SourceSearchReportRow}
+import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, SourceSearchReportRow}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.lore.resource.ProviderSelectable
 import x7c1.wheat.modern.resource.ViewHolderProviders
@@ -13,7 +13,7 @@ object SearchReportRowProviders {
       override def selectProvider(position: Int, sequence: A, providers: SearchReportRowProviders) = {
         sequence findAt position match {
           case Some(x: DiscoveredLabelRow) => providers.forSourceLabel
-          case Some(x: DiscoveredSourceRow) => providers.forSourceItem
+          case Some(x: DiscoveredSource) => providers.forSourceItem
           case _ => ???
         }
       }

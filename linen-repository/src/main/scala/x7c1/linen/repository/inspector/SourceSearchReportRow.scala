@@ -49,7 +49,7 @@ case class DiscoveredLabelRow(
   pageTitle: String,
   pageUrl: String ) extends SourceSearchReportRow
 
-case class DiscoveredSourceRow(
+case class DiscoveredSource(
   sourceTitle: String,
   sourceDescription: String,
   sourceUrl: String ) extends SourceSearchReportRow

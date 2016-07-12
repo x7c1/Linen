@@ -12,20 +12,20 @@ import android.widget.TextView;
 public class SourceSearchRowSourceItem extends SourceSearchRow {
 
     public final TextView title;
-    public final TextView description;
+    public final TextView url;
     public final TextView subscribe;
     public final TextView entries;
 
     public SourceSearchRowSourceItem(
         View itemView,
         TextView title,
-        TextView description,
+        TextView url,
         TextView subscribe,
         TextView entries
     ){
         super(itemView);
         this.title = title;
-        this.description = description;
+        this.url = url;
         this.subscribe = subscribe;
         this.entries = entries;
     }
