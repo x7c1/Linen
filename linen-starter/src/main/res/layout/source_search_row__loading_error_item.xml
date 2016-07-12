@@ -7,61 +7,48 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="8dp"
+    android:paddingTop="12dp"
     >
     <TextView
-        android:id="@+id/source_search_row__source_item__title"
+        android:id="@+id/source_search_row__loading_error_item__message"
         android:paddingTop="4dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:textSize="14sp"
+        android:layout_marginBottom="12dp"
+        android:textSize="17sp"
         android:textColor="@color/text_primary"
         android:lineSpacingExtra="4dp"
         android:lineSpacingMultiplier="1.1"
-        android:drawablePadding="8dp"
-        android:drawableStart="@drawable/ic_cast_connected"
         />
 
     <TextView
-        android:id="@+id/source_search_row__source_item__url"
+        android:id="@+id/source_search_row__loading_error_item__url"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:paddingEnd="@dimen/setting_channels_row_padding"
-        android:layout_below="@id/source_search_row__source_item__title"
+        android:layout_below="@id/source_search_row__loading_error_item__message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="24dp"
-        android:textSize="14sp"
-        android:textColor="@color/text_tertiary"
-        android:fontFamily="sans-serif-condensed"
+        android:layout_marginBottom="12dp"
+        android:textSize="15sp"
+        android:textColor="@color/text_secondary"
         android:lineSpacingExtra="4dp"
         android:lineSpacingMultiplier="1.2"
-        android:gravity="center_vertical"
         />
 
     <View
         android:id="@+id/border"
-        android:layout_below="@id/source_search_row__source_item__url"
+        android:layout_below="@id/source_search_row__loading_error_item__url"
         style="@style/SourceSearch.ItemBorder"
         />
 
     <TextView
-        android:id="@+id/source_search_row__source_item__subscribe"
-        android:text="SUBSCRIBE"
+        android:id="@+id/source_search_row__loading_error_item__open"
+        android:text="OPEN"
         android:layout_below="@id/border"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="24dp"
-        style="@style/SourceSearch.ItemBottomText"
-        />
-
-    <TextView
-        android:id="@+id/source_search_row__source_item__entries"
-        android:text="ENTRIES"
-        android:layout_below="@id/border"
-        android:layout_toStartOf="@id/source_search_row__source_item__subscribe"
         style="@style/SourceSearch.ItemBottomText"
         />
 

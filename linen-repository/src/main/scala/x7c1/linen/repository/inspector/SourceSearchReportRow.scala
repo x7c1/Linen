@@ -14,19 +14,29 @@ object SourceSearchReportRow {
       val ys = Sequence from Seq(
         DiscoveredLabelRow(
           formattedDate = "2016-07-11 22:59:00",
-          reportMessage = "2 Sources found",
+          reportMessage = "2 Sources found.",
           pageTitle = "Sample Page",
           pageUrl = "http://example.com/page/id/123"
         ),
-        DiscoveredSourceRow(
+        DiscoveredSource(
           sourceTitle = "Sample Feed Foo Bar",
           sourceDescription = "Sample description.",
           sourceUrl = "http://example.com/feed/rss.xml"
         ),
-        DiscoveredSourceRow(
+        DiscoveredSource(
           sourceTitle = "Sample Feed Foo Bar",
           sourceDescription = "Sample description.",
           sourceUrl = "http://example.com/feed/atom.xml"
+        )
+        ,
+        UrlLoadingErrorLabel(
+          formattedDate = "2016-07-10 22:19:00",
+          reportMessage = "Loading failed.",
+          pageUrl = "http://example.com/page/id/123?foo=bar"
+        ),
+        UrlLoadingError(
+          errorText = "HTML Parse Error",
+          pageUrl = "http://example.com/page/id/123?foo=bar"
         )
       )
       val xs = new ClosableSequence[SourceSearchReportRow] {
@@ -54,8 +64,26 @@ case class DiscoveredSource(
   sourceDescription: String,
   sourceUrl: String ) extends SourceSearchReportRow
 
-case class DateLabelRow() extends SourceSearchReportRow
+case class UrlLoadingErrorLabel(
+  formattedDate: String,
+  reportMessage: String,
+  pageUrl: String ) extends SourceSearchReportRow
 
-case class NoSourceRow() extends SourceSearchReportRow
+case class UrlLoadingError(
+  errorText: String,
+  pageUrl: String ) extends SourceSearchReportRow
 
-case class LoadingErrorRow() extends SourceSearchReportRow
+case class SourceLoadingError(
+  errorText: String,
+  pageUrl: String ) extends SourceSearchReportRow
+
+case class NoSourceFoundLabel(
+  formattedDate: String,
+  reportMessage: String,
+  pageTitle: String,
+  pageUrl: String ) extends SourceSearchReportRow
+
+case class NoSourceFound(
+  pageTitle: String,
+  pageUrl: String,
+  reportMessage: String ) extends SourceSearchReportRow

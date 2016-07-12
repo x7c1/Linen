@@ -48,7 +48,10 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="SourceSearch.Item">
+    <style name="SourceSearch.ItemRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardUseCompatPadding">true</item>
     </style>
 
     <style name="SourceSearch.ItemBorder">
@@ -61,13 +64,13 @@
 
     <style name="SourceSearch.ItemBottomText">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">45dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
 
         <item name="android:gravity">center_vertical</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">12sp</item>
     </style>
 </resources>
