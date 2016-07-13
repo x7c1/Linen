@@ -42,11 +42,15 @@
     <color name="awafujiiro">#bbc8e6</color><!-- 淡藤色 -->
     <color name="benimidori">#8491c3</color><!-- 紅碧 -->
     <color name="benikabairo">#bb5548</color><!-- 紅樺色 -->
+    <color name="daidaiiro">#ee7800</color><!-- 橙色 -->
+    <color name="edocha">#cd8c5c</color><!-- 江戸茶 -->
     <color name="ikkonzome">#f5b199</color><!-- 一斤染 -->
     <color name="jinzamomi">#ee827c</color><!-- 甚三紅 -->
+    <color name="kabairo">#cd5e3c</color><!-- 樺色 -->
     <color name="kakiiro">#ed6d3d</color><!-- 柿色 -->
     <color name="kanzouiro">#f8b862</color><!-- 萱草色 -->
     <color name="koiai">#0f2350</color><!-- 濃藍 -->
+    <color name="kohakuiro">#bf783a</color><!-- 琥珀色 -->
     <color name="konnezu">#44617b</color><!-- 紺鼠 -->
     <color name="konruri">#164a84</color><!-- 紺瑠璃 -->
     <color name="masuhanairo">#5b7e91</color><!-- 舛花色 -->
@@ -58,7 +62,9 @@
     <color name="sabinezu">#47585c</color><!-- 錆鼠 -->
     <color name="seiran">#274a78</color><!-- 青藍 -->
     <color name="shikkoku">#0d0015</color><!-- 漆黒 -->
+    <color name="shishiiro">#efab93</color><!-- 宍色 -->
     <color name="soho">#ab6953</color><!-- 赭 -->
+    <color name="taisha">#bb5520</color><!-- 代赭 -->
     <color name="terigaki">#eb6238</color><!-- 照柿 -->
     <color name="tokigaracha">#e09e87</color><!-- ときがら茶 -->
     <color name="tomekon">#1c305c</color><!-- 留紺 -->
