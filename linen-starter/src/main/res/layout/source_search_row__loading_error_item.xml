@@ -13,7 +13,7 @@
         android:id="@+id/source_search_row__loading_error_item__message"
         android:paddingTop="4dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
-        android:paddingStart="@dimen/setting_channels_row_padding"
+        android:paddingStart="14dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
@@ -22,7 +22,7 @@
         android:lineSpacingExtra="4dp"
         android:lineSpacingMultiplier="1.1"
         android:drawablePadding="10dp"
-        android:drawableStart="@drawable/ic_report_problem"
+        android:drawableStart="@drawable/ic_error_outline"
         />
 
     <TextView
