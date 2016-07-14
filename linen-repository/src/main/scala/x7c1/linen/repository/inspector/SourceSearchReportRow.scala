@@ -31,7 +31,7 @@ object SourceSearchReportRow {
         ,
         UrlLoadingErrorLabel(
           formattedDate = "2016-07-10 22:19:00",
-          reportMessage = "Loading failed.",
+          reportMessage = "Discovery failed.",
           pageUrl = "http://example.com/page/id/123?foo=bar"
         ),
         UrlLoadingError(
