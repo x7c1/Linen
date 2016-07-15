@@ -29,6 +29,7 @@ Library layer, which is independent from concrete application.
    * provides some useful sbt tasks like generating Java sources from layout XML.
  * wheat-modern
    * Scala library which provides, for instance, some decorators to hide redundant Java API.
+ * wheat-lore
  * wheat-ancient
    * Java library dependent on Android SDK and Scala codes using it.
  * wheat-macros
