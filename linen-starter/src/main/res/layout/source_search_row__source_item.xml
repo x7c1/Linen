@@ -11,20 +11,11 @@
     >
     <TextView
         android:id="@+id/source_search_row__source_item__title"
-        android:paddingTop="4dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="@dimen/setting_channels_row_padding"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:textSize="16sp"
-        android:textColor="@color/text_primary"
-        android:lineSpacingExtra="4dp"
-        android:lineSpacingMultiplier="1.1"
-        android:drawablePadding="10dp"
         android:drawableStart="@drawable/ic_feed"
+        style="@style/SourceSearch.ItemTitle"
         />
-
     <TextView
         android:id="@+id/source_search_row__source_item__url"
         android:layout_below="@id/source_search_row__source_item__title"
