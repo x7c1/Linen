@@ -14,6 +14,7 @@ import x7c1.linen.res.layout.SourceSearchRowLoadingErrorItemProvider;
 import x7c1.linen.res.layout.SourceSearchRowLoadingErrorLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceLabelProvider;
+import x7c1.linen.res.layout.SourceSearchRowSourceNotFoundProvider;
 
 public class SourceSearchActivity extends BaseActivity {
 	private SourceSearchDelegatee delegatee = null;
@@ -35,7 +36,8 @@ public class SourceSearchActivity extends BaseActivity {
 						new SourceSearchRowSourceLabelProvider(this),
 						new SourceSearchRowSourceItemProvider(this),
 						new SourceSearchRowLoadingErrorLabelProvider(this),
-						new SourceSearchRowLoadingErrorItemProvider(this)
+						new SourceSearchRowLoadingErrorItemProvider(this),
+						new SourceSearchRowSourceNotFoundProvider(this)
 				)
 		);
 		this.delegatee.onCreate();

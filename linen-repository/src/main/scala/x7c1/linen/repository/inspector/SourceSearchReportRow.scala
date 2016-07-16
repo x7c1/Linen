@@ -27,8 +27,7 @@ object SourceSearchReportRow {
           sourceTitle = "Sample Feed Foo Bar",
           sourceDescription = "Sample description.",
           sourceUrl = "http://example.com/feed/atom.xml"
-        )
-        ,
+        ),
         UrlLoadingErrorLabel(
           formattedDate = "2016-07-10 22:19:00",
           reportMessage = "Discovery failed.",
@@ -37,6 +36,16 @@ object SourceSearchReportRow {
         UrlLoadingError(
           errorText = "HTML Parse Error",
           pageUrl = "http://example.com/page/id/123?foo=bar"
+        ),
+        NoSourceFoundLabel(
+          formattedDate = "2016-07-09 21:15:00",
+          reportMessage = "Discovery failed",
+          pageUrl = "http://example.com/page/id/123"
+        ),
+        NoSourceFound(
+          pageTitle = "Example Page",
+          pageUrl = "http://example.com/page/id/123",
+          reportMessage = "Source Not Found"
         )
       )
       val xs = new ClosableSequence[SourceSearchReportRow] {
@@ -80,7 +89,6 @@ case class SourceLoadingError(
 case class NoSourceFoundLabel(
   formattedDate: String,
   reportMessage: String,
-  pageTitle: String,
   pageUrl: String ) extends SourceSearchReportRow
 
 case class NoSourceFound(

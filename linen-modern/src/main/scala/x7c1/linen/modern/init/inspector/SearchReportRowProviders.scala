@@ -1,7 +1,7 @@
 package x7c1.linen.modern.init.inspector
 
-import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowLoadingErrorItem, SourceSearchRowLoadingErrorLabel, SourceSearchRowSourceItem, SourceSearchRowSourceLabel}
-import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
+import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowLoadingErrorItem, SourceSearchRowLoadingErrorLabel, SourceSearchRowSourceItem, SourceSearchRowSourceLabel, SourceSearchRowSourceNotFound}
+import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, NoSourceFound, NoSourceFoundLabel, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.lore.resource.ProviderSelectable
 import x7c1.wheat.modern.resource.ViewHolderProviders
@@ -16,6 +16,8 @@ object SearchReportRowProviders {
           case Some(x: DiscoveredSource) => providers.forSourceItem
           case Some(x: UrlLoadingErrorLabel) => providers.forErrorLabel
           case Some(x: UrlLoadingError) => providers.forErrorItem
+          case Some(x: NoSourceFoundLabel) => providers.forErrorLabel
+          case Some(x: NoSourceFound) => providers.forNoSource
           case _ => ???
         }
       }
@@ -26,13 +28,15 @@ class SearchReportRowProviders (
   val forSourceLabel: ViewHolderProvider[SourceSearchRowSourceLabel],
   var forSourceItem: ViewHolderProvider[SourceSearchRowSourceItem],
   var forErrorLabel: ViewHolderProvider[SourceSearchRowLoadingErrorLabel],
-  var forErrorItem: ViewHolderProvider[SourceSearchRowLoadingErrorItem]
+  var forErrorItem: ViewHolderProvider[SourceSearchRowLoadingErrorItem],
+  var forNoSource: ViewHolderProvider[SourceSearchRowSourceNotFound]
 ) extends ViewHolderProviders[SourceSearchRow]{
 
   override protected def all = Seq(
     forSourceLabel,
     forSourceItem,
     forErrorLabel,
-    forErrorItem
+    forErrorItem,
+    forNoSource
   )
 }
