@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SourceSearch.ItemRow"
+    >
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="8dp"
+    >
+    <TextView
+        android:id="@+id/source_search_row__source_error__message"
+        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingStart="14dp"
+        android:drawableStart="@drawable/ic_report_problem"
+        style="@style/SourceSearch.ItemTitle"
+        />
+    <TextView
+        android:id="@+id/source_search_row__source_error__url"
+        android:layout_below="@id/source_search_row__source_error__message"
+        android:layout_marginStart="28dp"
+        style="@style/SourceSearch.ItemUrl"
+        />
+
+    <View
+        android:id="@+id/border"
+        android:layout_below="@id/source_search_row__source_error__url"
+        style="@style/SourceSearch.ItemBorder"
+        />
+
+    <TextView
+        android:id="@+id/source_search_row__source_error__open"
+        android:text="OPEN"
+        android:layout_below="@id/border"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="24dp"
+        style="@style/SourceSearch.ItemBottomText"
+        />
+
+    <TextView
+        android:id="@+id/source_search_row__source_error__retry"
+        android:text="RETRY"
+        android:layout_below="@id/border"
+        android:layout_toStartOf="@id/source_search_row__source_error__open"
+        style="@style/SourceSearch.ItemBottomText"
+        />
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>

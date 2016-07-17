@@ -46,6 +46,16 @@ object SourceSearchReportRow {
           pageTitle = "Example Page",
           pageUrl = "http://example.com/page/id/123",
           reportMessage = "Source Not Found"
+        ),
+        DiscoveredLabelRow(
+          formattedDate = "2016-07-09 21:15:00",
+          reportMessage = "1 Source found.",
+          pageTitle = "Sample Page",
+          pageUrl = "http://example.com/page/id/123"
+        ),
+        SourceLoadingError(
+          errorText = "Connection Timeout",
+          pageUrl = "http://example.com/feed/atom.xml"
         )
       )
       val xs = new ClosableSequence[SourceSearchReportRow] {
