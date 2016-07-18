@@ -58,9 +58,8 @@ public class SourceSearchRowLoadingErrorItemProvider implements ViewHolderProvid
             public SourceSearchRowLoadingErrorItem createViewHolder(View view){
                 return new SourceSearchRowLoadingErrorItem(
                     view,
-                    (TextView) view.findViewById(R.id.source_search_row__loading_error_item__url),
                     (TextView) view.findViewById(R.id.source_search_row__loading_error_item__message),
-                    (TextView) view.findViewById(R.id.source_search_row__loading_error_item__open)
+                    (TextView) view.findViewById(R.id.source_search_row__loading_error_item__url)
                 );
             }
         };

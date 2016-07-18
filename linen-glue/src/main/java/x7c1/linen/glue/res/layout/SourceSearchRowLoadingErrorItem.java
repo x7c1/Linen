@@ -11,19 +11,16 @@ import android.widget.TextView;
 
 public class SourceSearchRowLoadingErrorItem extends SourceSearchRow {
 
-    public final TextView url;
     public final TextView message;
-    public final TextView open;
+    public final TextView url;
 
     public SourceSearchRowLoadingErrorItem(
         View itemView,
-        TextView url,
         TextView message,
-        TextView open
+        TextView url
     ){
         super(itemView);
-        this.url = url;
         this.message = message;
-        this.open = open;
+        this.url = url;
     }
 }

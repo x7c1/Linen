@@ -59,8 +59,7 @@ public class SourceSearchRowSourceNotFoundProvider implements ViewHolderProvider
                 return new SourceSearchRowSourceNotFound(
                     view,
                     (TextView) view.findViewById(R.id.source_search_row__source_not_found__title),
-                    (TextView) view.findViewById(R.id.source_search_row__source_not_found__url),
-                    (TextView) view.findViewById(R.id.source_search_row__source_not_found__open)
+                    (TextView) view.findViewById(R.id.source_search_row__source_not_found__url)
                 );
             }
         };

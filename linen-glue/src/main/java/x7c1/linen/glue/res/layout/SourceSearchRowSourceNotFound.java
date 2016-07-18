@@ -13,17 +13,14 @@ public class SourceSearchRowSourceNotFound extends SourceSearchRow {
 
     public final TextView title;
     public final TextView url;
-    public final TextView open;
 
     public SourceSearchRowSourceNotFound(
         View itemView,
         TextView title,
-        TextView url,
-        TextView open
+        TextView url
     ){
         super(itemView);
         this.title = title;
         this.url = url;
-        this.open = open;
     }
 }

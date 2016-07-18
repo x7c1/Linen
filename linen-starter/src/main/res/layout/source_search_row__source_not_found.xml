@@ -11,31 +11,31 @@
     >
     <TextView
         android:id="@+id/source_search_row__source_not_found__title"
+        android:layout_marginBottom="10dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="@dimen/setting_channels_row_padding"
         android:drawableStart="@drawable/ic_blank_file"
         android:drawablePadding="11dp"
         style="@style/SourceSearch.ItemTitle"
         />
-    <TextView
-        android:id="@+id/source_search_row__source_not_found__url"
-        android:layout_below="@id/source_search_row__source_not_found__title"
-        android:layout_marginStart="27dp"
-        style="@style/SourceSearch.ItemUrl"
-        />
 
     <View
         android:id="@+id/border"
-        android:layout_below="@id/source_search_row__source_not_found__url"
+        android:layout_below="@id/source_search_row__source_not_found__title"
         style="@style/SourceSearch.ItemBorder"
         />
 
     <TextView
-        android:id="@+id/source_search_row__source_not_found__open"
-        android:text="OPEN"
-        android:layout_below="@id/border"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="24dp"
+        android:id="@+id/source_search_row__source_not_found__url"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_below="@id/source_search_row__source_not_found__title"
+        android:layout_marginStart="44dp"
+        android:textAlignment="textEnd"
+        android:drawableEnd="@drawable/ic_open_in_new_18dp"
+        android:drawablePadding="4dp"
+        android:textColor="@color/text_tertiary"
+        android:textSize="14sp"
         style="@style/SourceSearch.ItemBottomText"
         />
 

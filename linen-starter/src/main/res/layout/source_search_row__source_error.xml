@@ -16,6 +16,7 @@
         android:drawableStart="@drawable/ic_report_problem"
         style="@style/SourceSearch.ItemTitle"
         />
+
     <TextView
         android:id="@+id/source_search_row__source_error__url"
         android:layout_below="@id/source_search_row__source_error__message"
