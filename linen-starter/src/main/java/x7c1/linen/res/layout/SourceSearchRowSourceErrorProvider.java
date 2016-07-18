@@ -60,7 +60,7 @@ public class SourceSearchRowSourceErrorProvider implements ViewHolderProvider<So
                     view,
                     (TextView) view.findViewById(R.id.source_search_row__source_error__message),
                     (TextView) view.findViewById(R.id.source_search_row__source_error__url),
-                    (TextView) view.findViewById(R.id.source_search_row__source_error__open)
+                    (TextView) view.findViewById(R.id.source_search_row__source_error__retry)
                 );
             }
         };

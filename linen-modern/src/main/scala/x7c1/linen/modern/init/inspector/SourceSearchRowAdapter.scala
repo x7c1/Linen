@@ -15,7 +15,6 @@ class SourceSearchRowAdapter(
     delegatee.bindViewHolder(holder, position){
       case (row: SourceSearchRowSourceLabel, source: DiscoveredLabelRow) =>
         row.date.text = source.formattedDate
-        row.message.text = source.reportMessage
 
       case (row: SourceSearchRowSourceItem, source: DiscoveredSource) =>
         row.title.text = source.sourceTitle
@@ -23,7 +22,6 @@ class SourceSearchRowAdapter(
 
       case (row: SourceSearchRowLoadingErrorLabel, label: UrlLoadingErrorLabel) =>
         row.date.text = label.formattedDate
-        row.message.text = label.reportMessage
 
       case (row: SourceSearchRowLoadingErrorItem, item: UrlLoadingError) =>
         row.message.text = item.errorText
@@ -31,7 +29,6 @@ class SourceSearchRowAdapter(
 
       case (row: SourceSearchRowLoadingErrorLabel, label: NoSourceFoundLabel) =>
         row.date.text = label.formattedDate
-        row.message.text = label.reportMessage
 
       case (row: SourceSearchRowSourceNotFound, item: NoSourceFound) =>
         row.title.text = item.reportMessage

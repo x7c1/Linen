@@ -13,17 +13,17 @@ public class SourceSearchRowSourceError extends SourceSearchRow {
 
     public final TextView message;
     public final TextView url;
-    public final TextView open;
+    public final TextView retry;
 
     public SourceSearchRowSourceError(
         View itemView,
         TextView message,
         TextView url,
-        TextView open
+        TextView retry
     ){
         super(itemView);
         this.message = message;
         this.url = url;
-        this.open = open;
+        this.retry = retry;
     }
 }

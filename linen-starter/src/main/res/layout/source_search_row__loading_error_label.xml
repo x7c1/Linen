@@ -5,7 +5,6 @@
     >
     <TextView
         android:id="@+id/source_search_row__loading_error_label__message"
-        android:drawableStart="@drawable/ic_public_24dp"
         android:textColor="@color/lapis_lazuli"
         style="@style/SourceSearch.LabelMessage"
         />
