@@ -10,11 +10,10 @@ import x7c1.linen.glue.res.layout.SourceSearchLayout;
 import x7c1.linen.modern.init.inspector.SearchReportRowProviders;
 import x7c1.linen.modern.init.inspector.SourceSearchDelegatee;
 import x7c1.linen.res.layout.SourceSearchLayoutProvider;
+import x7c1.linen.res.layout.SourceSearchRowLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowLoadingErrorItemProvider;
-import x7c1.linen.res.layout.SourceSearchRowLoadingErrorLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceErrorProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
-import x7c1.linen.res.layout.SourceSearchRowSourceLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceNotFoundProvider;
 
 public class SourceSearchActivity extends BaseActivity {
@@ -34,9 +33,8 @@ public class SourceSearchActivity extends BaseActivity {
 				this,
 				layout,
 				new SearchReportRowProviders(
-						new SourceSearchRowSourceLabelProvider(this),
+						new SourceSearchRowLabelProvider(this),
 						new SourceSearchRowSourceItemProvider(this),
-						new SourceSearchRowLoadingErrorLabelProvider(this),
 						new SourceSearchRowLoadingErrorItemProvider(this),
 						new SourceSearchRowSourceNotFoundProvider(this),
 						new SourceSearchRowSourceErrorProvider(this)

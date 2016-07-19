@@ -4,13 +4,13 @@
     style="@style/SourceSearch.LabelRow"
     >
     <TextView
-        android:id="@+id/source_search_row__loading_error_label__message"
+        android:id="@+id/source_search_row__label__message"
         android:textColor="@color/lapis_lazuli"
         style="@style/SourceSearch.LabelMessage"
         />
 
     <TextView
-        android:id="@+id/source_search_row__loading_error_label__date"
+        android:id="@+id/source_search_row__label__date"
         android:textColor="@color/lapis_lazuli"
         style="@style/SourceSearch.LabelDate"
         />

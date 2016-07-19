@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.inspector
 
-import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowLoadingErrorItem, SourceSearchRowLoadingErrorLabel, SourceSearchRowSourceError, SourceSearchRowSourceItem, SourceSearchRowSourceLabel, SourceSearchRowSourceNotFound}
+import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowLabel, SourceSearchRowLoadingErrorItem, SourceSearchRowSourceError, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
 import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, NoSourceFound, NoSourceFoundLabel, SourceLoadingError, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
@@ -13,21 +13,21 @@ class SourceSearchRowAdapter(
 
   override def onBindViewHolder(holder: SourceSearchRow, position: Int): Unit = {
     delegatee.bindViewHolder(holder, position){
-      case (row: SourceSearchRowSourceLabel, source: DiscoveredLabelRow) =>
+      case (row: SourceSearchRowLabel, source: DiscoveredLabelRow) =>
         row.date.text = source.formattedDate
 
       case (row: SourceSearchRowSourceItem, source: DiscoveredSource) =>
         row.title.text = source.sourceTitle
         row.url.text = source.sourceUrl
 
-      case (row: SourceSearchRowLoadingErrorLabel, label: UrlLoadingErrorLabel) =>
+      case (row: SourceSearchRowLabel, label: UrlLoadingErrorLabel) =>
         row.date.text = label.formattedDate
 
       case (row: SourceSearchRowLoadingErrorItem, item: UrlLoadingError) =>
         row.message.text = item.errorText
         row.url.text = item.pageUrl
 
-      case (row: SourceSearchRowLoadingErrorLabel, label: NoSourceFoundLabel) =>
+      case (row: SourceSearchRowLabel, label: NoSourceFoundLabel) =>
         row.date.text = label.formattedDate
 
       case (row: SourceSearchRowSourceNotFound, item: NoSourceFound) =>
