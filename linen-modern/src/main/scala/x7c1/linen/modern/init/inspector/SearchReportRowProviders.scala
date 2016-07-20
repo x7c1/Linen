@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.inspector
 
-import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowLabel, SourceSearchRowLoadingErrorItem, SourceSearchRowSourceError, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
+import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowClientError, SourceSearchRowLabel, SourceSearchRowLoadingErrorItem, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
 import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, NoSourceFound, NoSourceFoundLabel, SourceLoadingError, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.lore.resource.ProviderSelectable
@@ -18,7 +18,7 @@ object SearchReportRowProviders {
           case Some(x: UrlLoadingError) => providers.forErrorItem
           case Some(x: NoSourceFoundLabel) => providers.forLabel
           case Some(x: NoSourceFound) => providers.forNoSource
-          case Some(x: SourceLoadingError) => providers.forSourceError
+          case Some(x: SourceLoadingError) => providers.forClientError
           case _ => ???
         }
       }
@@ -30,7 +30,7 @@ class SearchReportRowProviders (
   val forSourceItem: ViewHolderProvider[SourceSearchRowSourceItem],
   val forErrorItem: ViewHolderProvider[SourceSearchRowLoadingErrorItem],
   val forNoSource: ViewHolderProvider[SourceSearchRowSourceNotFound],
-  val forSourceError: ViewHolderProvider[SourceSearchRowSourceError]
+  val forClientError: ViewHolderProvider[SourceSearchRowClientError]
 ) extends ViewHolderProviders[SourceSearchRow]{
 
   override protected def all = Seq(
@@ -38,6 +38,6 @@ class SearchReportRowProviders (
     forSourceItem,
     forErrorItem,
     forNoSource,
-    forSourceError
+    forClientError
   )
 }
