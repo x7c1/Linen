@@ -10,7 +10,7 @@
     android:paddingTop="8dp"
     >
     <TextView
-        android:id="@+id/source_search_row__loading_error_item__message"
+        android:id="@+id/source_search_row__origin_error__message"
         android:layout_marginBottom="10dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="14dp"
@@ -20,12 +20,12 @@
 
     <View
         android:id="@+id/border"
-        android:layout_below="@id/source_search_row__loading_error_item__message"
+        android:layout_below="@id/source_search_row__origin_error__message"
         style="@style/SourceSearch.ItemBorder"
         />
 
     <TextView
-        android:id="@+id/source_search_row__loading_error_item__url"
+        android:id="@+id/source_search_row__origin_error__url"
         style="@style/SourceSearch.ItemBottomText.OriginUrl"
         />
 

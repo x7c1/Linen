@@ -1,6 +1,6 @@
 package x7c1.linen.modern.init.inspector
 
-import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowClientError, SourceSearchRowLabel, SourceSearchRowLoadingErrorItem, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
+import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowClientError, SourceSearchRowLabel, SourceSearchRowOriginError, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
 import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, NoSourceFound, NoSourceFoundLabel, SourceLoadingError, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
@@ -23,7 +23,7 @@ class SourceSearchRowAdapter(
       case (row: SourceSearchRowLabel, label: UrlLoadingErrorLabel) =>
         row.date.text = label.formattedDate
 
-      case (row: SourceSearchRowLoadingErrorItem, item: UrlLoadingError) =>
+      case (row: SourceSearchRowOriginError, item: UrlLoadingError) =>
         row.message.text = item.errorText
         row.url.text = item.pageUrl
 

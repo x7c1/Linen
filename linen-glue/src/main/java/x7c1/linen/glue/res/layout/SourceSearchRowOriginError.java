@@ -9,12 +9,12 @@ package x7c1.linen.glue.res.layout;
 import android.view.View;
 import android.widget.TextView;
 
-public class SourceSearchRowLoadingErrorItem extends SourceSearchRow {
+public class SourceSearchRowOriginError extends SourceSearchRow {
 
     public final TextView message;
     public final TextView url;
 
-    public SourceSearchRowLoadingErrorItem(
+    public SourceSearchRowOriginError(
         View itemView,
         TextView message,
         TextView url
