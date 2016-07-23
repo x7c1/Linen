@@ -26,7 +26,7 @@
 
     <TextView
         android:id="@+id/source_search_row__origin_error__url"
-        style="@style/SourceSearch.ItemBottomText.OriginUrl"
+        style="@style/SourceSearch.ItemBottomText.OriginUrl.ToOpen"
         />
 
 </RelativeLayout>

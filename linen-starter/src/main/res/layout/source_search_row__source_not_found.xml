@@ -27,7 +27,7 @@
 
     <TextView
         android:id="@+id/source_search_row__source_not_found__url"
-        style="@style/SourceSearch.ItemBottomText.OriginUrl"
+        style="@style/SourceSearch.ItemBottomText.OriginUrl.ToOpen"
         />
 
 </RelativeLayout>

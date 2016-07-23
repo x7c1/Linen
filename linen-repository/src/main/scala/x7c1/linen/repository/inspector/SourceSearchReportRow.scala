@@ -35,7 +35,7 @@ object SourceSearchReportRow {
         ),
         UrlLoadingError(
           errorText = "HTML Parse Error",
-          pageUrl = "http://example.com/page/id/123?foo=bar"
+          pageUrl = "http://example.com/page/id/123?foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&"
         ),
         NoSourceFoundLabel(
           formattedDate = "2016-07-09 21:15:00",
