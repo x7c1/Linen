@@ -35,7 +35,7 @@ object SourceSearchReportRow {
         ),
         UrlLoadingError(
           errorText = "HTML Parse Error",
-          pageUrl = "http://example.com/page/id/123?foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&foo=bar&"
+          pageUrl = "http://example.com/page/id/123?foo=bar&foo=bar1&foo=bar2&foo=bar3&foo=bar4&foo=bar5&foo=bar6&foo=bar7&foo=bar8&foo=bar9&foo=bar10&foo=bar11&end"
         ),
         NoSourceFoundLabel(
           formattedDate = "2016-07-09 21:15:00",
@@ -56,7 +56,8 @@ object SourceSearchReportRow {
         SourceLoadingError(
           errorText = "Connection Timeout",
           pageUrl = "http://example.com/feed/atom.xml"
-        )
+        ),
+        Footer()
       )
       val xs = new ClosableSequence[SourceSearchReportRow] {
         override def closeCursor(): Unit = {}
@@ -105,3 +106,5 @@ case class NoSourceFound(
   pageTitle: String,
   pageUrl: String,
   reportMessage: String ) extends SourceSearchReportRow
+
+case class Footer() extends SourceSearchReportRow

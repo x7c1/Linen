@@ -11,6 +11,7 @@ import x7c1.linen.modern.init.inspector.SearchReportRowProviders;
 import x7c1.linen.modern.init.inspector.SourceSearchDelegatee;
 import x7c1.linen.res.layout.SourceSearchLayoutProvider;
 import x7c1.linen.res.layout.SourceSearchRowClientErrorProvider;
+import x7c1.linen.res.layout.SourceSearchRowFooterProvider;
 import x7c1.linen.res.layout.SourceSearchRowLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowOriginErrorProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
@@ -37,7 +38,8 @@ public class SourceSearchActivity extends BaseActivity {
 						new SourceSearchRowSourceItemProvider(this),
 						new SourceSearchRowOriginErrorProvider(this),
 						new SourceSearchRowSourceNotFoundProvider(this),
-						new SourceSearchRowClientErrorProvider(this)
+						new SourceSearchRowClientErrorProvider(this),
+						new SourceSearchRowFooterProvider(this)
 				)
 		);
 		this.delegatee.onCreate();

@@ -1,7 +1,7 @@
 package x7c1.linen.modern.init.inspector
 
-import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowClientError, SourceSearchRowLabel, SourceSearchRowOriginError, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
-import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, NoSourceFound, NoSourceFoundLabel, SourceLoadingError, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
+import x7c1.linen.glue.res.layout.{SourceSearchRow, SourceSearchRowClientError, SourceSearchRowFooter, SourceSearchRowLabel, SourceSearchRowOriginError, SourceSearchRowSourceItem, SourceSearchRowSourceNotFound}
+import x7c1.linen.repository.inspector.{DiscoveredLabelRow, DiscoveredSource, Footer, NoSourceFound, NoSourceFoundLabel, SourceLoadingError, SourceSearchReportRow, UrlLoadingError, UrlLoadingErrorLabel}
 import x7c1.wheat.ancient.resource.ViewHolderProvider
 import x7c1.wheat.lore.resource.ProviderSelectable
 import x7c1.wheat.modern.resource.ViewHolderProviders
@@ -19,6 +19,7 @@ object SearchReportRowProviders {
           case Some(x: NoSourceFoundLabel) => providers.forLabel
           case Some(x: NoSourceFound) => providers.forNoSource
           case Some(x: SourceLoadingError) => providers.forClientError
+          case Some(x: Footer) => providers.forFooter
           case _ => ???
         }
       }
@@ -30,7 +31,8 @@ class SearchReportRowProviders (
   val forSourceItem: ViewHolderProvider[SourceSearchRowSourceItem],
   val forErrorItem: ViewHolderProvider[SourceSearchRowOriginError],
   val forNoSource: ViewHolderProvider[SourceSearchRowSourceNotFound],
-  val forClientError: ViewHolderProvider[SourceSearchRowClientError]
+  val forClientError: ViewHolderProvider[SourceSearchRowClientError],
+  val forFooter: ViewHolderProvider[SourceSearchRowFooter]
 ) extends ViewHolderProviders[SourceSearchRow]{
 
   override protected def all = Seq(
@@ -38,6 +40,7 @@ class SearchReportRowProviders (
     forSourceItem,
     forErrorItem,
     forNoSource,
-    forClientError
+    forClientError,
+    forFooter
   )
 }

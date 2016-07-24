@@ -11,6 +11,7 @@
     >
     <TextView
         android:id="@+id/source_search_row__client_error__message"
+        android:layout_marginBottom="10dp"
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="14dp"
         android:drawableStart="@drawable/ic_report_problem"
