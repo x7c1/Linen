@@ -31,6 +31,7 @@
     <color name="spanish_blue">#0070BB</color>
     <color name="spanish_orange">#E86100</color>
     <color name="usafa_blue">#004F98</color>
+    <color name="white">#FFFFFF</color>
 
     <!-- customized -->
     <color name="dark_imperial_blue__lighter">#094D79</color>
