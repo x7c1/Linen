@@ -23,8 +23,6 @@ import x7c1.wheat.modern.either.OptionRight
 @Config(manifest=Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
 class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
-  import x7c1.linen.repository.dummy.DummySourceLoader.Implicits._
-
   import concurrent.duration._
 
   @Test
@@ -42,8 +40,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
     }
     val sourceAccessor = AccessorLoader.inspectSourceAccessor(
       db = helper.getReadableDatabase,
-      accountId = account.accountId,
-      channelId = channel.channelId ).right.get
+      key = account -> channel ).right.get
 
     assertEquals(5, sourceAccessor.length)
 
@@ -98,8 +95,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
     {
       val updatedSourceAccessor = AccessorLoader.inspectSourceAccessor(
         db = helper.getReadableDatabase,
-        accountId = account.accountId,
-        channelId = channel.channelId ).right.get
+        key = account -> channel ).right.get
 
       assertEquals(2, updatedSourceAccessor.length)
 
@@ -139,8 +135,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
     {
       val updatedSourceAccessor = AccessorLoader.inspectSourceAccessor(
         db = helper.getReadableDatabase,
-        accountId = account.accountId,
-        channelId = channel.channelId ).right.get
+        key = account -> channel ).right.get
 
       assertEquals(3, updatedSourceAccessor.length)
 
@@ -162,8 +157,7 @@ class BrowsedEntriesMarkerTest extends JUnitSuiteLike with LogSetting {
     {
       val updatedSourceAccessor = AccessorLoader.inspectSourceAccessor(
         db = helper.getReadableDatabase,
-        accountId = account.accountId,
-        channelId = channel.channelId ).right.get
+        key = account -> channel ).right.get
 
       val outlineAccessor = {
         val db = helper.getReadableDatabase

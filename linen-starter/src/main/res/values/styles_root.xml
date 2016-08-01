@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="footer_height_for_floating_action_button">90dp</dimen>
+
+</resources>

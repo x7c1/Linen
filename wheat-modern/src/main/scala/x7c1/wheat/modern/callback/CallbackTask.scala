@@ -15,9 +15,10 @@ class CallbackTask[EVENT](
 
   def toFuture: Future[EVENT] = {
     val promise = Promise[EVENT]()
-    callback { event =>
-      try promise trySuccess event
-      catch { case e: Throwable => promise tryFailure e }
+    try callback { event =>
+      promise trySuccess event
+    } catch { case e: Throwable =>
+      promise tryFailure e
     }
     promise.future
   }

@@ -47,6 +47,16 @@ object ChannelStatusKey {
   implicit object id
     extends HasChannelStatusKey[ChannelStatusKey]
       with IdEndo[ChannelStatusKey]
+
+  implicit def key[A: HasAccountId, B: HasChannelId]: HasChannelStatusKey[(A, B)] =
+    new HasChannelStatusKey[(A, B)]{
+      override def toId = {
+        case (account, channel) => ChannelStatusKey(
+          channelId = implicitly[HasChannelId[B]] toId channel,
+          accountId = implicitly[HasAccountId[A]] toId account
+        )
+      }
+    }
 }
 
 trait HasChannelStatusKey[A] extends Identifiable[A, ChannelStatusKey]

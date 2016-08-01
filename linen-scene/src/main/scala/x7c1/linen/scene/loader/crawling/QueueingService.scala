@@ -41,15 +41,12 @@ private class QueueingServiceImpl(
   queue: TraceableQueue ) extends QueueingService {
 
   override def loadSource(sourceId: Long) = {
-    Log info s"[init] source-id: $sourceId"
-
     val inspector = SourceInspector(helper)
-
     val fate = FutureFate.on[CrawlerContext] create {
       inspector inspectSource sourceId
     } map {
       source =>
-        queue enqueue source run CrawlerContext atLeft {
+        queue enqueueSource source run CrawlerContext atLeft {
           Log error _.detail
         }
     }
@@ -69,10 +66,7 @@ private class QueueingServiceImpl(
         intent = new Intent(service, service getClassOf ServiceLabel.Updater)
       )
     )
-    runner.startLoading(
-      account = accountId,
-      channel = channelId
-    )
+    runner startLoading accountId -> channelId
   } atLeft {
     case e => Log error format(e.cause){"[abort]"}
   }

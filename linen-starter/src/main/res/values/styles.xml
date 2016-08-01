@@ -119,7 +119,7 @@
 
     <color name="text_primary">@color/rouiro</color>
     <color name="text_secondary">#4b4b4b</color>
-    <color name="text_tertiary">#909090</color>
+    <color name="text_tertiary">#999999</color>
 
     <color name="toolbar_background">@color/dark_imperial_blue</color>
     <color name="list_background">@color/opaque_blue</color>

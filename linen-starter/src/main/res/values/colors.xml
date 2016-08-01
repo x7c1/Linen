@@ -31,6 +31,7 @@
     <color name="spanish_blue">#0070BB</color>
     <color name="spanish_orange">#E86100</color>
     <color name="usafa_blue">#004F98</color>
+    <color name="white">#FFFFFF</color>
 
     <!-- customized -->
     <color name="dark_imperial_blue__lighter">#094D79</color>
@@ -41,19 +42,32 @@
     <color name="ainezu">#6c848d</color><!-- 藍鼠 -->
     <color name="awafujiiro">#bbc8e6</color><!-- 淡藤色 -->
     <color name="benimidori">#8491c3</color><!-- 紅碧 -->
+    <color name="benikabairo">#bb5548</color><!-- 紅樺色 -->
+    <color name="daidaiiro">#ee7800</color><!-- 橙色 -->
+    <color name="edocha">#cd8c5c</color><!-- 江戸茶 -->
+    <color name="ikkonzome">#f5b199</color><!-- 一斤染 -->
+    <color name="jinzamomi">#ee827c</color><!-- 甚三紅 -->
+    <color name="kabairo">#cd5e3c</color><!-- 樺色 -->
     <color name="kakiiro">#ed6d3d</color><!-- 柿色 -->
+    <color name="kanzouiro">#f8b862</color><!-- 萱草色 -->
     <color name="koiai">#0f2350</color><!-- 濃藍 -->
+    <color name="kohakuiro">#bf783a</color><!-- 琥珀色 -->
     <color name="konnezu">#44617b</color><!-- 紺鼠 -->
     <color name="konruri">#164a84</color><!-- 紺瑠璃 -->
     <color name="masuhanairo">#5b7e91</color><!-- 舛花色 -->
     <color name="niiro">#e45e32</color><!-- 丹色 -->
+    <color name="nikkeiiro">#dd7a56</color><!-- 肉桂色 -->
     <color name="noshimehanairo">#426579</color><!-- 熨斗目花色 -->
     <color name="rouiro">#2b2b2b</color><!-- 蝋色 -->
     <color name="ruriiro">#1e50a2</color><!-- 瑠璃色 -->
     <color name="sabinezu">#47585c</color><!-- 錆鼠 -->
     <color name="seiran">#274a78</color><!-- 青藍 -->
     <color name="shikkoku">#0d0015</color><!-- 漆黒 -->
+    <color name="shishiiro">#efab93</color><!-- 宍色 -->
+    <color name="soho">#ab6953</color><!-- 赭 -->
+    <color name="taisha">#bb5520</color><!-- 代赭 -->
     <color name="terigaki">#eb6238</color><!-- 照柿 -->
+    <color name="tokigaracha">#e09e87</color><!-- ときがら茶 -->
     <color name="tomekon">#1c305c</color><!-- 留紺 -->
     <color name="usugunjou">#5383c3</color><!-- 薄群青 -->
     <color name="usuhanada">#507ea4</color><!-- 薄縹 -->

@@ -1,20 +1,24 @@
 package x7c1.linen.repository.preset
 
+import com.typesafe.config.{Config, ConfigFactory}
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.repository.account.PresetAccount
 import x7c1.linen.repository.account.setup.PresetAccountSetup
-import x7c1.linen.repository.channel.preset.{PresetChannelSetup, PresetChannelPiece}
+import x7c1.linen.repository.channel.preset.{PresetChannelPiece, PresetChannelSetup}
 import x7c1.linen.repository.source.setting.{ChannelOwner, ChannelSourceParts}
 import x7c1.wheat.macros.logger.Log
+
+import scala.collection.JavaConverters._
 
 class PresetFactory (helper: DatabaseHelper){
 
   def setupJapanesePresets() = {
     val sets = Seq(
-      Tech,
-      Game,
-      Column
-    )
+       "preset-tech-jp.json"
+      ,"preset-game-jp.json"
+      ,"preset-column-jp.json"
+    ) map PresetChannelSet.fromFile
+
     sets.reverse map SetupStarter(helper) foreach {_.start()}
   }
 
@@ -68,98 +72,34 @@ case class PresetSourcePiece(
 case class PresetSourcePieces(
   list: Seq[PresetSourcePiece]
 )
+
 trait PresetChannelSet {
   def channel: PresetChannelPiece
   def sources: PresetSourcePieces
 }
 
-object Tech extends PresetChannelSet {
-  override def channel = PresetChannelPiece(
-    name = "Tech",
-    description = "IT / インターネット / 科学技術 / ガジェット"
-  )
-  override def sources = PresetSourcePieces(
-    list = Seq(
-      PresetSourcePiece(
-        title = "ギズモード・ジャパン",
-        url = "http://www.gizmodo.jp/atom.xml"
-      ),
-      PresetSourcePiece(
-        title = "GIGAZINE",
-        url = "http://feed.rssad.jp/rss/gigazine/rss_2.0"
-      ),
-      PresetSourcePiece(
-        title = "WIRED.jp",
-        url = "http://wired.jp/feed/"
-      ),
-      PresetSourcePiece(
-        title = "INTERNET Watch",
-        url = "http://rss.rssad.jp/rss/internetwatch/internet.rdf"
-      ),
-      PresetSourcePiece(
-        title = "ケータイ Watch",
-        url = "http://rss.rssad.jp/rss/k-taiwatch/k-tai.rdf"
-      ),
-      PresetSourcePiece(
-        title = "AV Watch",
-        url = "http://rss.rssad.jp/rss/avwatch/av.rdf"
-      ),
-      PresetSourcePiece(
-        title = "PC Watch",
-        url = "http://rss.rssad.jp/rss/impresswatch/pcwatch.rdf"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － トップ",
-        url = "http://rss.rssad.jp/rss/ascii/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － TECH",
-        url = "http://rss.rssad.jp/rss/ascii/it/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － 自作PC",
-        url = "http://rss.rssad.jp/rss/ascii/pc/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － アスキークラウド",
-        url = "http://ascii.jp/cloud/rss.xml"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － デジタル",
-        url = "http://rss.rssad.jp/rss/ascii/digital/rss.xml"
-      )
+object PresetChannelSet {
+  def fromFile(fileName: String): PresetChannelSet = {
+    val config = ConfigFactory.parseResources(
+      getClass.getClassLoader,
+      fileName
     )
-  )
-}
-object Game extends PresetChannelSet {
-  override def channel = PresetChannelPiece(
-    name = "Game",
-    description = "ゲーム / ホビー"
-  )
-  override def sources = PresetSourcePieces(
-    list = Seq(
-      PresetSourcePiece(
-        title = "GAME Watch",
-        url = "http://rss.rssad.jp/rss/gamewatch/index.rdf"
-      ),
-      PresetSourcePiece(
-        title = "ASCII.jp － ゲーム・ホビー",
-        url = "http://rss.rssad.jp/rss/ascii/hobby/rss.xml"
-      )
+    new PresetChannelSetImpl(config)
+  }
+  private class PresetChannelSetImpl(config: Config) extends PresetChannelSet {
+    val list = config.getObjectList("sources").asScala map (_.toConfig)
+
+    override def channel: PresetChannelPiece = PresetChannelPiece(
+      name = config getString "name",
+      description = config getString "description"
     )
-  )
-}
-object Column extends PresetChannelSet {
-  override def channel: PresetChannelPiece = PresetChannelPiece(
-    name = "Column",
-    description = "コラム / ブログ / 日記 / 寄稿 / 読み物"
-  )
-  override def sources: PresetSourcePieces = PresetSourcePieces(
-    list = Seq(
-      PresetSourcePiece(
-        title = "Newsweek コラム＆ブログ",
-        url = "http://www.newsweekjapan.jp/column/rss.xml"
-      )
+    override def sources: PresetSourcePieces = PresetSourcePieces(
+      list = list map { conf =>
+        PresetSourcePiece(
+          title = conf getString "title",
+          url = conf getString "url"
+        )
+      }
     )
-  )
+  }
 }

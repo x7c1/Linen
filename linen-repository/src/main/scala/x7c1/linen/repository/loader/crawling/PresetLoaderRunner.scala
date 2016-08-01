@@ -20,7 +20,7 @@ class PresetLoaderRunner(
   presetLoaderListener: OnPresetLoaderListener,
   channelLoaderListener: OnChannelLoaderListener ){
 
-  def startLoading[A: HasAccountId](account: A) = {
+  def startLoading[A: HasAccountId](account: A): Unit = {
     val either = for {
       notifier <- findNotifier(account).right
       sequence <- findSequence(account).right
@@ -40,7 +40,7 @@ class PresetLoaderRunner(
     }
     either match {
       case Right((sequence, runner)) =>
-        sequence.toSeq foreach { runner.startLoading(account, _) }
+        sequence.toSeq foreach { runner startLoading account -> _ }
         sequence.closeCursor()
       case Left(error) =>
         presetLoaderListener onError error

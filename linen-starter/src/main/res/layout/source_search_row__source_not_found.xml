@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SourceSearch.ItemRow"
+    >
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="8dp"
+    >
+    <TextView
+        android:id="@+id/source_search_row__source_not_found__title"
+        android:layout_marginBottom="10dp"
+        android:paddingEnd="@dimen/setting_channels_row_padding"
+        android:paddingStart="@dimen/setting_channels_row_padding"
+        android:drawableStart="@drawable/ic_blank_file"
+        android:drawablePadding="11dp"
+        style="@style/SourceSearch.ItemTitle"
+        />
+
+    <View
+        android:id="@+id/border"
+        android:layout_below="@id/source_search_row__source_not_found__title"
+        style="@style/SourceSearch.ItemBorder"
+        />
+
+    <TextView
+        android:id="@+id/source_search_row__source_not_found__url"
+        style="@style/SourceSearch.ItemBottomText.OriginUrl.ToOpen"
+        />
+
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>

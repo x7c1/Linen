@@ -3,7 +3,7 @@ package x7c1.linen.repository.loader.crawling
 import java.util.concurrent.atomic.AtomicInteger
 
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{ChannelStatusKey, HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.HasChannelStatusKey
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
 import x7c1.linen.repository.source.setting.SettingSource
 import x7c1.wheat.macros.logger.Log
@@ -11,17 +11,10 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQueue){
 
-  def start[A: HasAccountId, B: HasChannelId]
-    (account: A, channel: B)
-    (callback: QueueingEvent => Unit) = {
-
+  def start[A: HasChannelStatusKey](key: A)(callback: QueueingEvent => Unit): Unit = {
     val inspectedSources = {
       val inspector = SourceInspector(helper)
-
-      helper.selectorOf[SettingSource] traverseOn ChannelStatusKey(
-        channelId = implicitly[HasChannelId[B]] toId channel,
-        accountId = implicitly[HasAccountId[A]] toId account
-      ) match {
+      helper.selectorOf[SettingSource] traverseOn key match {
         case Left(e) =>
           Log error format(e){"[failed]"}
           Seq()
@@ -59,7 +52,13 @@ class ChannelLoaderQueueing private (helper: DatabaseHelper, queue: TraceableQue
     if (max == 0){
       callback apply OnDone(max)
     } else sources foreach { source =>
-      queue.enqueueSource(source).run(CrawlerContext){ _ => onProgress() }
+      queue.enqueueSource(source).run(CrawlerContext){
+        case Left(e) =>
+          Log error s"$source\n${e.detail}"
+          onProgress()
+        case Right(updated) =>
+          onProgress()
+      }
     }
   }
 

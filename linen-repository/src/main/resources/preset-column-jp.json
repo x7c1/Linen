@@ -1,0 +1,10 @@
+{
+  "name": "Column",
+  "description": "コラム / ブログ / 日記 / 寄稿 / 読み物",
+  "sources":[
+    {
+      "title": "Newsweek コラム＆ブログ",
+      "url": "http://www.newsweekjapan.jp/column/rss.xml"
+    }
+  ]
+}

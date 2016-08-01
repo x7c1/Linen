@@ -2,7 +2,7 @@ package x7c1.linen.repository.source.unread
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import x7c1.linen.database.struct.{HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.{HasAccountId, HasChannelId, HasChannelStatusKey}
 import x7c1.wheat.macros.database.{Query, TypedCursor}
 import x7c1.wheat.modern.sequence.Sequence
 
@@ -57,7 +57,11 @@ private class UnreadSourceAccessorImpl(
 }
 
 object UnreadSourceAccessor {
-  def create[A: HasAccountId, B: HasChannelId](
+  def create[A: HasChannelStatusKey](db: SQLiteDatabase, key: A): Try[ClosableSourceAccessor] = {
+    val id = implicitly[HasChannelStatusKey[A]] toId key
+    create(db, accountId = id.accountId, channelId = id.channelId)
+  }
+  private def create[A: HasAccountId, B: HasChannelId](
     db: SQLiteDatabase,
     accountId: A, channelId: B): Try[ClosableSourceAccessor] = {
 

@@ -42,8 +42,10 @@ targets = [
   "linen-scene",
   "linen-modern",
   "linen-pickle",
+  "linen-links.rb",
   "project",
   "local.properties",
+  "README.md",
 ]
 
 begin

@@ -3,7 +3,7 @@ package x7c1.linen.repository.loader.crawling
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.NotificationKey.ChannelLoaderKey
-import x7c1.linen.database.struct.{ChannelRecord, HasAccountId, HasChannelId}
+import x7c1.linen.database.struct.{ChannelRecord, HasChannelId, HasChannelStatusKey}
 import x7c1.linen.repository.loader.crawling.ChannelLoaderRunner.{AllSourcesLoaded, ChannelLoaderError, ChannelNotFound, ChannelSourceLoaded, UnexpectedError}
 import x7c1.linen.repository.loader.crawling.QueueingEvent.{OnDone, OnProgress}
 import x7c1.linen.repository.notification.{NotificationIdStore, ProgressNotifier}
@@ -16,10 +16,11 @@ class ChannelLoaderRunner private (
   queue: TraceableQueue,
   listener: OnChannelLoaderListener ){
 
-  def startLoading[A: HasAccountId, B: HasChannelId](account: A, channel: B) = {
+  def startLoading[A: HasChannelStatusKey](key: A): Unit = {
+    val channel = implicitly[HasChannelStatusKey[A]].toId(key).channelId
     val either = for {
       record <- findChannelRecord(channel).right
-      notifier <- findNotifier(account, channel).right
+      notifier <- findNotifier(key).right
     } yield (_: QueueingEvent) match {
       case event: OnProgress =>
         listener onProgress ChannelSourceLoaded(
@@ -38,13 +39,13 @@ class ChannelLoaderRunner private (
     either match {
       case Right(callback) =>
         val queueing = ChannelLoaderQueueing(helper, queue)
-        queueing.start(account, channel){ callback }
+        queueing.start(key){ callback }
       case Left(error) =>
         listener onError error
     }
   }
-  private def findNotifier[A: HasAccountId, B: HasChannelId](account: A, channel: B) = {
-    val key = ChannelLoaderKey(account, channel)
+  private def findNotifier[A: HasChannelStatusKey](x: A) = {
+    val key = ChannelLoaderKey(x)
     NotificationIdStore(helper).getOrCreate(key) match {
       case Right(id) =>
         Right apply ProgressNotifier(

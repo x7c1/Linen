@@ -1,0 +1,30 @@
+{
+  "name": "Game",
+  "description": "ゲーム / ホビー",
+  "sources":[
+    {
+      "title": "GAME Watch",
+      "url": "http://rss.rssad.jp/rss/gamewatch/index.rdf"
+    }
+    ,{
+      "title": "ASCII.jp － ゲーム・ホビー",
+      "url": "http://rss.rssad.jp/rss/ascii/hobby/rss.xml"
+    }
+    ,{
+      "title": "4Gamer.net − 最新記事",
+      "url": "http://www.4gamer.net/rss/index.xml"
+    }
+    ,{
+      "title": "4Gamer.net − 総合トップ/インタビュー",
+      "url": "http://www.4gamer.net/rss/all_interview.xml"
+    }
+    ,{
+      "title": "4Gamer.net − 総合トップ/レビュー",
+      "url": "http://www.4gamer.net/rss/all_review.xml"
+    }
+    ,{
+      "title": "4Gamer.net − 総合トップ/連載",
+      "url": "http://www.4gamer.net/rss/all_series.xml"
+    }
+  ]
+}

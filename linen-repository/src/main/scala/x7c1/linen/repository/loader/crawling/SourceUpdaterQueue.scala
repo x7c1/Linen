@@ -67,7 +67,10 @@ private class SourceUpdaterQueueImpl(
       val host = source.feedUrl.getHost
       val nextSource = this synchronized {
         queueMap dequeue host
-        Log info s"[inserted] msec:${elapsed()}, left:${queueMap length host}, feed:${source.feedUrl}"
+        Log info {
+          val remains = queueMap length host
+          s"[dequeued] msec:${elapsed()}, remains:$remains, feed:${source.feedUrl}"
+        }
         queueMap headOption host
       }
       try {
