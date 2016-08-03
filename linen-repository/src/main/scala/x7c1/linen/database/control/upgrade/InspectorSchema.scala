@@ -5,7 +5,7 @@ object InspectorSchema {
     s"""
       |CREATE TABLE IF NOT EXISTS inspector_actions (
       |   action_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      |   loading_result INTEGER NOT NULL,
+      |   action_loading_status INTEGER NOT NULL,
       |   origin_title TEXT NOT NULL,
       |   origin_url TEXT NOT NULL,
       |   created_at INTEGER NOT NULL,
@@ -16,7 +16,7 @@ object InspectorSchema {
     s"""
        |CREATE TABLE IF NOT EXISTS inspector_sources (
        |   action_id INTEGER NOT NULL,
-       |   loading_result INTEGER NOT NULL,
+       |   source_loading_status INTEGER NOT NULL,
        |   latent_source_url TEXT NOT NULL,
        |   discovered_source_id INTEGER,
        |   created_at INTEGER NOT NULL,
