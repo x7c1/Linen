@@ -12,7 +12,7 @@ object SourceSearchReportRow {
   implicit object traverse extends CanTraverse[HasAccountId, SourceSearchReportRow]{
     override def extract[X: HasAccountId](db: SQLiteDatabase, id: X) = {
       val ys = Sequence from Seq(
-        DiscoveredLabelRow(
+        DiscoveredSourceLabel(
           formattedDate = "2016-07-11 22:59:00",
           reportMessage = "2 Sources found.",
           pageTitle = "Sample Page",
@@ -47,7 +47,7 @@ object SourceSearchReportRow {
           pageUrl = "http://example.com/page/id/123",
           reportMessage = "Source Not Found"
         ),
-        DiscoveredLabelRow(
+        DiscoveredSourceLabel(
           formattedDate = "2016-07-09 21:15:00",
           reportMessage = "1 Source found.",
           pageTitle = "Sample Page",
@@ -73,7 +73,7 @@ object SourceSearchReportRow {
     protected val db: SQLiteDatabase) extends TraverseOn[HasAccountId, SourceSearchReportRow]
 }
 
-case class DiscoveredLabelRow(
+case class DiscoveredSourceLabel(
   formattedDate: String,
   reportMessage: String,
   pageTitle: String,
