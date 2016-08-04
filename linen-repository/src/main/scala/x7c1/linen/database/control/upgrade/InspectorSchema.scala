@@ -6,10 +6,12 @@ object InspectorSchema {
       |CREATE TABLE IF NOT EXISTS inspector_actions (
       |   action_id INTEGER PRIMARY KEY AUTOINCREMENT,
       |   action_loading_status INTEGER NOT NULL,
+      |   account_id INTEGER NOT NULL,
       |   origin_title TEXT NOT NULL,
       |   origin_url TEXT NOT NULL,
       |   created_at INTEGER NOT NULL,
-      |   updated_at INTEGER NOT NULL
+      |   updated_at INTEGER NOT NULL,
+      |   FOREIGN KEY(account_id) REFERENCES accounts(_id) ON DELETE CASCADE
       |)
      """.stripMargin,
 
