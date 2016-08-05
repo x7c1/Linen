@@ -9,7 +9,7 @@ import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 
 trait InspectorActionRecord extends TypedFields {
   def action_id: Long
-  def action_loading_status: Int
+  def action_loading_status: Int --> InspectorLoadingStatus
   def account_id: Long
   def origin_title: String
   def origin_url: String
@@ -35,3 +35,7 @@ object InspectorActionRecord {
   class Selector(protected val db: SQLiteDatabase)
     extends TraverseOn[HasAccountId, InspectorActionRecord]
 }
+
+
+
+case class InspectorActionParts()
