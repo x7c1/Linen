@@ -12,7 +12,7 @@ import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.source.setting.SampleFactory
 import x7c1.linen.testing.{AllowTraversingAll, LogSetting}
 
-@Config(manifest=Config.NONE)
+@Config(manifest = Config.NONE)
 @RunWith(classOf[RobolectricTestRunner])
 class InspectorActionRecordTest extends JUnitSuiteLike with LogSetting with AllowTraversingAll {
   @Test
@@ -26,7 +26,7 @@ class InspectorActionRecordTest extends JUnitSuiteLike with LogSetting with Allo
       loadingStatus = Loading,
       accountId = account.accountId,
       originTitle = "sample article1",
-      originUrl = "http://example.com/feed1.xml",
+      originUrl = "http://example.com/article1.php",
       createdAt = Date.current(),
       updatedAt = Date.current()
     )
@@ -34,7 +34,7 @@ class InspectorActionRecordTest extends JUnitSuiteLike with LogSetting with Allo
       loadingStatus = Loading,
       accountId = account.accountId,
       originTitle = "sample article2",
-      originUrl = "http://example.com/feed2.xml",
+      originUrl = "http://example.com/article2.php",
       createdAt = Date.current(),
       updatedAt = Date.current()
     )
@@ -44,14 +44,14 @@ class InspectorActionRecordTest extends JUnitSuiteLike with LogSetting with Allo
     {
       val Some(record) = sequence.toSeq.find(_.action_id == id1)
       assertEquals("sample article1", record.origin_title)
-      assertEquals("http://example.com/feed1.xml", record.origin_url)
+      assertEquals("http://example.com/article1.php", record.origin_url)
       assertEquals(Loading, record.action_loading_status.typed)
     }
 
     {
       val Some(record) = sequence.toSeq.find(_.action_id == id2)
       assertEquals("sample article2", record.origin_title)
-      assertEquals("http://example.com/feed2.xml", record.origin_url)
+      assertEquals("http://example.com/article2.php", record.origin_url)
       assertEquals(Loading, record.action_loading_status.typed)
     }
 
