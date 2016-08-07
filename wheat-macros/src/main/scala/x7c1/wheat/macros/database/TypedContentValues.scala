@@ -38,6 +38,12 @@ private object TypedContentValues {
     }
     def forPrimitive(values: Tree)(left: Tree, right: Tree) = {
       val value = parser.getJavaType(left.tpe) match {
+        case Some(tpe) if right.tpe <:< typeOf[Option[_]] =>
+          val x = TermName(c freshName "x")
+          q"""$right match {
+            case Some($x) => $x : $tpe
+            case None => null : $tpe
+          }"""
         case Some(tpe) => q"$right: $tpe"
         case None => q"$right"
       }
