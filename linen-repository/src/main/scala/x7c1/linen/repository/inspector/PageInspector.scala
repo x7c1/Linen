@@ -4,12 +4,12 @@ import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.wheat.modern.kinds.Fate
 
 trait PageInspector {
-  def inspect(pageUrl: String): Fate[CrawlerContext, InspectorError, DiscoveredResource]
+  def inspect(pageUrl: String): Fate[CrawlerContext, PageInspectorError, LatentSource]
 }
 
-trait InspectorError
+trait PageInspectorError
 
-trait DiscoveredResource {
-  def latentSourceUrl: String
+trait LatentSource {
+  def url: String
 }
 
