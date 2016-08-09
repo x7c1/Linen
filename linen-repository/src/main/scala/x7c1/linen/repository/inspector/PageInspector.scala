@@ -13,3 +13,9 @@ trait LatentSource {
   def url: String
 }
 
+trait LatentSourceQueueError
+
+trait LatentSourceQueue {
+  def enqueue(latentSource: LatentSource): Fate[CrawlerContext, LatentSourceQueueError, Unit]
+}
+
