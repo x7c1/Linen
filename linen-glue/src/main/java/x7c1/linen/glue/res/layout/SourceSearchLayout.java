@@ -9,19 +9,23 @@ package x7c1.linen.glue.res.layout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
+import android.support.design.widget.FloatingActionButton;
 
 public class SourceSearchLayout extends RecyclerView.ViewHolder {
 
     public final android.support.v7.widget.Toolbar toolbar;
     public final android.support.v7.widget.RecyclerView reports;
+    public final android.support.design.widget.FloatingActionButton buttonToCreate;
 
     public SourceSearchLayout(
         View itemView,
         android.support.v7.widget.Toolbar toolbar,
-        android.support.v7.widget.RecyclerView reports
+        android.support.v7.widget.RecyclerView reports,
+        android.support.design.widget.FloatingActionButton buttonToCreate
     ){
         super(itemView);
         this.toolbar = toolbar;
         this.reports = reports;
+        this.buttonToCreate = buttonToCreate;
     }
 }
