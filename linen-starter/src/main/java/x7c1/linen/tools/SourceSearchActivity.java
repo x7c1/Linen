@@ -3,7 +3,7 @@ package x7c1.linen.tools;
 import android.os.Bundle;
 
 import x7c1.linen.R;
-import x7c1.linen.base.BaseActivity;
+import x7c1.linen.base.BaseFragmentActivity;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SourceSearchLayout;
@@ -16,8 +16,10 @@ import x7c1.linen.res.layout.SourceSearchRowLabelProvider;
 import x7c1.linen.res.layout.SourceSearchRowOriginErrorProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceNotFoundProvider;
+import x7c1.linen.res.layout.SourceSearchStartProvider;
+import x7c1.linen.settings.DialogFactory;
 
-public class SourceSearchActivity extends BaseActivity {
+public class SourceSearchActivity extends BaseFragmentActivity {
 	private SourceSearchDelegatee delegatee = null;
 
 	@Override
@@ -33,6 +35,8 @@ public class SourceSearchActivity extends BaseActivity {
 		this.delegatee = new SourceSearchDelegatee(
 				this,
 				layout,
+				new DialogFactory(),
+				SourceSearchStartProvider.factory(),
 				new SearchReportRowProviders(
 						new SourceSearchRowLabelProvider(this),
 						new SourceSearchRowSourceItemProvider(this),
