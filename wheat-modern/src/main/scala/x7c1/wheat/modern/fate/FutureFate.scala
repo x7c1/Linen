@@ -4,6 +4,7 @@ import java.util.Timer
 
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
+import x7c1.wheat.modern.fate.FateProvider.{ErrorLike, HasContext}
 import x7c1.wheat.modern.features.HasInstance
 import x7c1.wheat.modern.kinds.Fate
 import x7c1.wheat.modern.patch.TimerTask
@@ -13,9 +14,6 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 
 object FutureFate {
-  type ErrorLike[X] = HasConstructor[Throwable => X]
-
-  type HasContext[X] = HasInstance[X => ExecutionContext]
 
   type HasTimer[X] = HasInstance[X => Timer]
 
@@ -36,6 +34,7 @@ object FutureFate {
       }
     }
   }
+
   def fromPromise[X: HasContext, L: ErrorLike, R](promise: Promise[R]): Fate[X, L, R] = {
     Fate { x => g =>
       implicit val context = implicitly[HasContext[X]].instance(x)
@@ -45,14 +44,16 @@ object FutureFate {
       }
     }
   }
+
   def on[X: HasContext]: Applied1[X] = new Applied1
 
   def hold[X: HasContext, L: ErrorLike]: Applied2[X, L] = new Applied2
 
-  class Applied1[X: HasContext]{
+  class Applied1[X: HasContext] {
     def create[L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] = {
       FutureFate.fromEither[X, L, R](f)
     }
+
     def await[L: ErrorLike](duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {
@@ -61,21 +62,26 @@ object FutureFate {
         i.instance(x).schedule(task, duration.toMillis)
       }
   }
-  class Applied2[X: HasContext, L: ErrorLike]{
+
+  class Applied2[X: HasContext, L: ErrorLike] {
     def create[R](f: => Either[L, R]): Fate[X, L, R] = FutureFate fromEither f
 
     def fromCallback[R](callback: CallbackTask[R]): Fate[X, L, R] = {
       FutureFate.fromCallback(callback)
     }
+
     def fromPromise[R](promise: Promise[R]): Fate[X, L, R] = {
       FutureFate.fromPromise[X, L, R](promise)
     }
+
     def right[A](f: => A): Fate[X, L, A] = {
       create(Right(f))
     }
+
     def empty: Fate[X, L, Unit] = {
       right({})
     }
+
     def await(duration: FiniteDuration)(implicit i: HasTimer[X]): Fate[X, L, Unit] =
       Fate { x => g =>
         val task = TimerTask {
@@ -84,4 +90,5 @@ object FutureFate {
         i.instance(x).schedule(task, duration.toMillis)
       }
   }
+
 }
