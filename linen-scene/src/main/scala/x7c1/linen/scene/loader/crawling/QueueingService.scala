@@ -15,7 +15,9 @@ import x7c1.wheat.modern.kinds.FutureFate
 
 trait QueueingService {
   def loadSource(sourceId: Long): Unit
+
   def loadChannelSources(channelId: Long, accountId: Long): Unit
+
   def loadSubscribedChannels(accountId: Long): Unit
 }
 
@@ -29,7 +31,7 @@ object QueueingService {
   def reify(
     service: Service with ServiceControl,
     helper: DatabaseHelper,
-    queue: TraceableQueue ): QueueingService = {
+    queue: TraceableQueue): QueueingService = {
 
     new QueueingServiceImpl(service, helper, queue)
   }
@@ -38,7 +40,7 @@ object QueueingService {
 private class QueueingServiceImpl(
   service: Service with ServiceControl,
   helper: DatabaseHelper,
-  queue: TraceableQueue ) extends QueueingService {
+  queue: TraceableQueue) extends QueueingService {
 
   override def loadSource(sourceId: Long) = {
     val inspector = SourceInspector(helper)
@@ -51,10 +53,11 @@ private class QueueingServiceImpl(
         }
     }
     fate run CrawlerContext atLeft {
-      case e =>
+      e =>
         Log error s"source(id:$sourceId): ${e.message}"
     }
   }
+
   override def loadChannelSources(channelId: Long, accountId: Long) = CrawlerFate run {
     Log info s"[init] channel:$channelId"
 
@@ -68,8 +71,11 @@ private class QueueingServiceImpl(
     )
     runner startLoading accountId -> channelId
   } atLeft {
-    case e => Log error format(e.cause){"[abort]"}
+    e => Log error format(e.cause) {
+      "[abort]"
+    }
   }
+
   override def loadSubscribedChannels(accountId: Long) = CrawlerFate run {
     Log info s"[init] account:$accountId"
 
@@ -83,7 +89,9 @@ private class QueueingServiceImpl(
     )
     runner.startLoading(accountId)
   } atLeft {
-    case e => Log error format(e.cause){"[abort]"}
+    e => Log error format(e.cause) {
+      "[abort]"
+    }
   }
 }
 
@@ -97,6 +105,7 @@ private class OnChannelLoader(intent: Intent) extends OnChannelLoaderListener {
       intent = intent
     )
   }
+
   override def onComplete(event: AllSourcesLoaded) = {
     event.notifier show ProgressContent(
       title = s"Channel : ${event.channelName}",
@@ -107,6 +116,7 @@ private class OnChannelLoader(intent: Intent) extends OnChannelLoaderListener {
     )
     Log info s"[done] ${event.channelName}"
   }
+
   override def onError(error: ChannelLoaderError) = {
     Log error error.detail
   }
@@ -122,9 +132,11 @@ private class OnPresetLoader(intent: Intent) extends OnPresetLoaderListener {
       intent = intent
     )
   }
+
   override def onError(error: PresetLoaderError) = {
     Log error error.detail
   }
+
   override def onComplete(event: AllChannelsLoaded) = {
     event.notifier show ProgressContent(
       title = "Loading completed",
@@ -143,9 +155,11 @@ private class OnPresetChannelLoader(intent: Intent) extends OnChannelLoaderListe
   override def onProgress(event: ChannelSourceLoaded): Unit = {
     base.onProgress(event)
   }
+
   override def onError(error: ChannelLoaderError): Unit = {
     base.onError(error)
   }
+
   override def onComplete(event: AllSourcesLoaded): Unit = {
     base.onComplete(event)
     event.notifier.hide()
