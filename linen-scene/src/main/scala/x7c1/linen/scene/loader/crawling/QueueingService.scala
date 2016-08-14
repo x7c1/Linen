@@ -10,8 +10,8 @@ import x7c1.linen.repository.loader.crawling.{ChannelLoaderRunner, CrawlerContex
 import x7c1.linen.repository.notification.ProgressContent
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.kinds.FutureFate
 
 trait QueueingService {
   def loadSource(sourceId: Long): Unit

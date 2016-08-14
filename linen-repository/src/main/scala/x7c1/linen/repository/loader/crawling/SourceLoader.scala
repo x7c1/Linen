@@ -10,7 +10,8 @@ import x7c1.linen.repository.entry.EntryUrl
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.callback.CallbackTask.task
 import x7c1.wheat.modern.callback.TaskProvider.using
-import x7c1.wheat.modern.kinds.{Fate, FutureFate}
+import x7c1.wheat.modern.fate.FutureFate
+import x7c1.wheat.modern.kinds.Fate
 
 trait SourceLoader {
   def loadSource(source: InspectedSource): Fate[CrawlerContext, SourceLoaderError, LoadedSource]

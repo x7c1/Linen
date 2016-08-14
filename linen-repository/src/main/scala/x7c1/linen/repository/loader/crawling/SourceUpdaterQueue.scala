@@ -7,8 +7,9 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.kinds.{Fate, FutureFate}
+import x7c1.wheat.modern.kinds.Fate
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt

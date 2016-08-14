@@ -1,10 +1,11 @@
-package x7c1.wheat.modern.kinds
+package x7c1.wheat.modern.fate
 
 import java.util.Timer
 
 import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.features.HasInstance
+import x7c1.wheat.modern.kinds.Fate
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration

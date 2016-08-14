@@ -12,7 +12,7 @@ import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequenc
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 import x7c1.wheat.modern.kinds.Fate
-import x7c1.wheat.modern.kinds.FutureFate.HasContext
+import x7c1.wheat.modern.fate.FutureFate.HasContext
 import x7c1.wheat.modern.observer.recycler.order.DraggableSequenceRoute.{DragFinished, DragStarted, OnDragListener}
 import x7c1.wheat.modern.sequence.{CanFilterFrom, Sequence}
 

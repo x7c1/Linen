@@ -2,7 +2,8 @@ package x7c1.linen.repository.loader.crawling
 
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.kinds.{Fate, FutureFate}
+import x7c1.wheat.modern.fate.FutureFate
+import x7c1.wheat.modern.kinds.Fate
 
 import scala.collection.mutable
 import scala.concurrent.Promise

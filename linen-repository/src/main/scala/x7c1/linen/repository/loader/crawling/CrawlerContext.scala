@@ -3,8 +3,9 @@ package x7c1.linen.repository.loader.crawling
 import java.util.Timer
 import java.util.concurrent.Executors
 
-import x7c1.wheat.modern.kinds.FutureFate.{HasContext, HasTimer}
-import x7c1.wheat.modern.kinds.{FateRunner, FutureFate}
+import x7c1.wheat.modern.fate.FutureFate
+import x7c1.wheat.modern.fate.FutureFate.{HasContext, HasTimer}
+import x7c1.wheat.modern.kinds.FateRunner
 
 import scala.concurrent.ExecutionContext
 

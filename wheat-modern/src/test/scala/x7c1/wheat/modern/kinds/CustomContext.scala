@@ -2,7 +2,7 @@ package x7c1.wheat.modern.kinds
 
 import java.util
 
-import x7c1.wheat.modern.kinds.FutureFate.{HasContext, HasTimer}
+import x7c1.wheat.modern.fate.FutureFate.{HasContext, HasTimer}
 
 import scala.concurrent.ExecutionContext
 
