@@ -2,7 +2,6 @@ package x7c1.wheat.modern.fate
 
 import java.util.Timer
 
-import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.fate.FateProvider.{ErrorLike, HasContext}
 import x7c1.wheat.modern.features.HasInstance
@@ -10,7 +9,7 @@ import x7c1.wheat.modern.kinds.Fate
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
 object FutureFate {
