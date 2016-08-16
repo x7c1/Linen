@@ -37,7 +37,7 @@ class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
     KeyboardControl[StartSearchError](this, layout.originUrl)
   }
 
-  def showIn(activity: FragmentActivity) = {
+  def showIn(activity: FragmentActivity): Unit = {
     show(activity.getSupportFragmentManager, "start-search-dialog")
   }
 
@@ -76,7 +76,7 @@ class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
       }
     }
     val builder = args.dialogFactory.newInstance(getActivity).
-      setTitle("Search Sources").
+      setTitle("Search sources").
       setPositiveButton("Start", nop).
       setNegativeButton("Cancel", nop)
 
