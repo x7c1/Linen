@@ -7,7 +7,13 @@ import x7c1.wheat.modern.fate.FateProvider.{ErrorLike, HasContext, using}
 import x7c1.wheat.modern.kinds.Fate
 
 
-class HttpRequestFate[X: HasContext, L: ErrorLike] {
+object HttpRequestFate {
+  def apply[X: HasContext, L: ErrorLike](): HttpRequestFate[X, L] = {
+    new HttpRequestFate()
+  }
+}
+
+class HttpRequestFate[X: HasContext, L: ErrorLike] private {
 
   private val future = FutureFate.hold[X, L]
 
