@@ -114,8 +114,6 @@ private class SourceUpdaterQueueImpl(
     }
   }
   private def insertEntries(entries: Seq[EntryParts]): Seq[(Long, EntryParts)] = {
-
-//    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     val marks = entries.zipWithIndex flatMap {
       case (entry, index) =>
         helper.writable insert entry match {
@@ -129,8 +127,6 @@ private class SourceUpdaterQueueImpl(
             Log debug s"$index,${entry.url.host},${entry.title} (by ${entry.author})"
             Some(entryId -> entry)
         }
-
-//        notifier.notifyProgress(index)
     }
     marks.headOption foreach {
       case (entryId, entry) =>
@@ -147,7 +143,6 @@ private class SourceUpdaterQueueImpl(
         }
     }
     marks
-//    notifier.notifyDone()
   }
 
 }
