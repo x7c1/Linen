@@ -1,19 +1,20 @@
 package x7c1.linen.modern.init.inspector
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
+import android.content.{Context, DialogInterface}
 import android.os.Bundle
 import android.support.v4.app.{DialogFragment, FragmentActivity}
 import android.support.v7.app.AlertDialog
 import android.widget.Button
 import x7c1.linen.glue.res.layout.SourceSearchStart
+import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.init.inspector.StartSearchDialog.Arguments
+import x7c1.linen.scene.inspector.InspectorService
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.logger.Log
-import x7c1.wheat.modern.callback.either.EitherTask
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.dialog.tasks.KeyboardControl
 
@@ -30,8 +31,6 @@ object StartSearchDialog {
 
 class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
   private lazy val args = getTypedArguments
-
-  private val provide = EitherTask.hold[StartSearchError]
 
   private lazy val keyboard = {
     KeyboardControl[StartSearchError](this, layout.originUrl)
@@ -57,7 +56,11 @@ class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
   }
 
   private def onClickPositive(button: Button) = {
-
+    val context = getActivity.asInstanceOf[Context with ServiceControl]
+    InspectorService(context).inspect(
+      accountId = args.clientAccountId,
+      pageUrl = layout.originUrl.text.toString
+    )
   }
 
   private def onClickNegative(button: Button) = {
