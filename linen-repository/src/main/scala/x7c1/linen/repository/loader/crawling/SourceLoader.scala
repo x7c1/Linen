@@ -1,16 +1,5 @@
 package x7c1.linen.repository.loader.crawling
 
-import java.io.{BufferedInputStream, InputStreamReader}
-import java.net.{HttpURLConnection, URL}
-
-import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.{SyndEntry, SyndFeed}
-import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
-import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.entry.EntryUrl
-import x7c1.wheat.modern.callback.CallbackTask
-import x7c1.wheat.modern.callback.CallbackTask.task
-import x7c1.wheat.modern.callback.TaskProvider.using
-import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.kinds.Fate
 
 trait SourceLoader {
@@ -38,52 +27,25 @@ private object ExampleLoader extends SourceLoader {
       )
     }
   }
+
   private def createEntries(): Seq[Either[InvalidEntry, LoadedEntry]] = {
     Seq()
   }
 }
 
 private object RealLoader extends SourceLoader {
-  import collection.JavaConverters._
 
   override def loadSource(source: InspectedSource) = {
-    val provide = FutureFate.hold[CrawlerContext, SourceLoaderError]
-    val fate = provide fromCallback loadRawFeed(source.feedUrl)
-    fate map { feed =>
-      val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
-      new LoadedSource(
-        sourceId = source.sourceId,
-        title = Option(feed.getTitle) getOrElse "",
-        description = Option(feed.getDescription) getOrElse "",
-        entries = entries map convertEntry
-      )
-    }
-  }
-  private def loadRawFeed(feedUrl: URL): CallbackTask[SyndFeed] = {
-    for {
-      connection <- task {
-        val connection = feedUrl.openConnection().asInstanceOf[HttpURLConnection]
-        connection setRequestMethod "GET"
-        connection
-      }
-      stream <- using(new BufferedInputStream(connection.getInputStream))
-      reader <- using(new InputStreamReader(stream))
-    } yield {
-      new SyndFeedInput().build(reader)
-    }
-  }
-  private def convertEntry(entry: SyndEntry): Either[InvalidEntry, LoadedEntry] = {
-    try for {
-      url <- (Option(entry.getLink) toRight EmptyUrl()).right
-      published <- (Option(entry.getPublishedDate) toRight EmptyPublishedDate()).right
-    } yield LoadedEntry(
-        title = Option(entry.getTitle) getOrElse "",
-        content = Option(entry.getDescription.getValue) getOrElse "",
-        author = Option(entry.getAuthor) getOrElse "",
-        url = EntryUrl(url),
-        createdAt = Date(published)
-      ) catch {
-      case e: Exception => Left(Abort(e))
+    SourceContentLoader().loadContent(source.feedUrl).transform {
+      case Right(content) =>
+        Right(new LoadedSource(
+          sourceId = source.sourceId,
+          title = content.title,
+          description = content.description,
+          entries = content.entries
+        ))
+      case Left(error) =>
+        Left(SourceLoaderError.Wrapped(error.cause, error.detail))
     }
   }
 }
