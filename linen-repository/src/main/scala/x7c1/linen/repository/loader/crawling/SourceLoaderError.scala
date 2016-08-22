@@ -4,7 +4,7 @@ import x7c1.wheat.macros.reify.HasConstructor
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 trait SourceLoaderError extends Exception {
-  def cause: Throwable
+  def cause: Option[Throwable]
 
   def detail: String
 }
@@ -15,14 +15,16 @@ object SourceLoaderError {
     override def newInstance = UnknownError
   }
 
-  case class Wrapped(
-    override val cause: Throwable,
-    override val detail: String ) extends SourceLoaderError
+  case class Affected(
+    override val cause: Option[Throwable],
+    override val detail: String) extends SourceLoaderError
 
-  case class UnknownError(cause: Throwable) extends SourceLoaderError {
-    override def detail = format(cause) {
+  case class UnknownError(origin: Throwable) extends SourceLoaderError {
+    override def detail = format(origin) {
       "[failed] unknown error"
     }
+
+    override def cause = Some(origin)
   }
 
 }

@@ -5,18 +5,33 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 trait SourceQueueError {
   def detail: String
-  def cause: Throwable
+
+  def cause: Option[Throwable]
+
+  def toThrowable: Throwable = cause match {
+    case Some(e) => e
+    case None => new Exception(detail)
+  }
 }
 
 object SourceQueueError {
-  implicit object unknown extends HasConstructor[Throwable => SourceQueueError]{
-    override def newInstance = UnknownError(_)
+
+  implicit object unknown extends HasConstructor[Throwable => SourceQueueError] {
+    override def newInstance = UnknownError
   }
+
   case class LoadingError(original: SourceLoaderError) extends SourceQueueError {
     def cause = original.cause
-    def detail = format(cause){"[failed] loading error"}
+
+    def detail = original.detail
   }
-  case class UnknownError(cause: Throwable) extends SourceQueueError {
-    override def detail = format(cause){"[failed] unknown error"}
+
+  case class UnknownError(origin: Throwable) extends SourceQueueError {
+    override def detail = format(origin) {
+      "[failed] unknown error"
+    }
+
+    override def cause = Some(origin)
   }
+
 }

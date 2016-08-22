@@ -41,7 +41,7 @@ class TraceableQueue(
       map remove event.inspected match {
         case Some(promise) =>
           event.updated match {
-            case Left(e) => promise failure e.cause
+            case Left(e) => promise failure e.toThrowable
             case Right(source) => promise success source
           }
         case None =>

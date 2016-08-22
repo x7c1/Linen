@@ -15,11 +15,11 @@ object HttpRequester {
 
 class HttpRequester[X: HasContext, L: ErrorLike] private {
 
-  private val future = FutureFate.hold[X, L]
+  private val provide = FutureFate.hold[X, L]
 
   def readerOf(url: URL): Fate[X, L, Reader] = {
     for {
-      connection <- future right {
+      connection <- provide right {
         val connection = url.openConnection().asInstanceOf[HttpURLConnection]
         connection setRequestMethod "GET"
         connection

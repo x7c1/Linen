@@ -45,7 +45,7 @@ private object RealLoader extends SourceLoader {
           entries = content.entries
         ))
       case Left(error) =>
-        Left(SourceLoaderError.Wrapped(error.cause, error.detail))
+        Left(SourceLoaderError.Affected(error.cause, error.detail))
     }
   }
 }

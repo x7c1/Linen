@@ -5,7 +5,7 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 trait SourceContentLoaderError {
   def detail: String
-  def cause: Throwable
+  def cause: Option[Throwable]
 }
 
 object SourceContentLoaderError {
@@ -14,11 +14,12 @@ object SourceContentLoaderError {
     override def newInstance = UnexpectedError
   }
 
-  case class UnexpectedError(e: Throwable) extends SourceContentLoaderError {
-    override def detail = format(cause) {
+  case class UnexpectedError(origin: Throwable) extends SourceContentLoaderError {
+    override def detail = format(origin) {
       "[unexpected]"
     }
-    override def cause: Throwable = e
+
+    override def cause: Option[Throwable] = Some(origin)
   }
 
 }
