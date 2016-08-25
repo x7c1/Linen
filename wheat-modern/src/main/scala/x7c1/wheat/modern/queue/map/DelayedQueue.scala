@@ -14,6 +14,16 @@ private trait DelayedQueue[C, L, V] {
   def enqueue(value: V): Fate[C, L, Unit]
 }
 
+private object DelayedQueue {
+  def apply[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
+    getKey: V => K,
+    callee: V => Either[L, R],
+    onDequeue: Either[L, R] => Unit ): DelayedQueue[C, L, V] = {
+
+    new DelayedQueueImpl(getKey, callee, onDequeue)
+  }
+}
+
 private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
   getKey: V => K,
   callee: V => Either[L, R],
