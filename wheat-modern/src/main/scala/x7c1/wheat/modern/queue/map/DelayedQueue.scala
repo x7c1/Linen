@@ -18,7 +18,7 @@ private object DelayedQueue {
   def apply[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
     getKey: V => K,
     callee: V => Either[L, R],
-    onDequeue: Either[L, R] => Unit ): DelayedQueue[C, L, V] = {
+    onDequeue: (V, Either[L, R]) => Unit ): DelayedQueue[C, L, V] = {
 
     new DelayedQueueImpl(getKey, callee, onDequeue)
   }
@@ -27,7 +27,7 @@ private object DelayedQueue {
 private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
   getKey: V => K,
   callee: V => Either[L, R],
-  onDequeue: Either[L, R] => Unit) extends DelayedQueue[C, L, V] {
+  onDequeue: (V, Either[L, R]) => Unit) extends DelayedQueue[C, L, V] {
 
   private val provide = FutureFate.hold[C, L]
 
@@ -52,7 +52,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
         queueMap headOption key
       }
       try {
-        onDequeue(result)
+        onDequeue(value, result)
       } catch {
         case e: Exception => Log error format(e) {
           "[uncaught]"
