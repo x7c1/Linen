@@ -29,14 +29,14 @@ private class DistributedQueueImpl[
   L: ThrowableLike : ErrorLike,
   X: CanDump, Y, K
 ](
-  getKey: X => K,
+  getGroupKey: X => K,
   callee: X => Either[L, Y]
 ) extends DistributedQueue[C, L, X, Y] {
 
   private val map = mutable.Map[X, Promise[Y]]()
 
   private val queue: DelayedQueue[C, L, X] = {
-    DelayedQueue(getKey, callee, onDequeue)
+    DelayedQueue(getGroupKey, callee, onDequeue)
   }
 
   private val provide = FutureFate.hold[C, L]

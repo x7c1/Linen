@@ -16,26 +16,26 @@ private trait DelayedQueue[C, L, V] {
 
 private object DelayedQueue {
   def apply[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
-    getKey: V => K,
+    getGroupKey: V => K,
     callee: V => Either[L, R],
     onDequeue: (V, Either[L, R]) => Unit ): DelayedQueue[C, L, V] = {
 
-    new DelayedQueueImpl(getKey, callee, onDequeue)
+    new DelayedQueueImpl(getGroupKey, callee, onDequeue)
   }
 }
 
 private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
-  getKey: V => K,
+  getGroupKey: V => K,
   callee: V => Either[L, R],
   onDequeue: (V, Either[L, R]) => Unit) extends DelayedQueue[C, L, V] {
 
   private val provide = FutureFate.hold[C, L]
 
-  private val queueMap = QueueMap[K, V](getKey)
+  private val queueMap = QueueMap[K, V](getGroupKey)
 
   override def enqueue(value: V): Fate[C, L, Unit] = {
     provide right synchronized {
-      val exists = queueMap has getKey(value)
+      val exists = queueMap has getGroupKey(value)
       queueMap enqueue value
       exists
     } flatMap {
@@ -46,7 +46,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V, K](
 
   private def update(value: V): Fate[C, L, Unit] = {
     val fate = provide.create(callee(value)) transform { result =>
-      val key = getKey(value)
+      val key = getGroupKey(value)
       val nextValue = this synchronized {
         queueMap dequeue key
         queueMap headOption key
