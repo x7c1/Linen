@@ -25,6 +25,16 @@ object TrackableQueue {
     def dump(x: X): String
   }
 
+  def apply[
+    C: HasContext : HasTimer,
+    E: CanThrow : ErrorLike,
+    X: CanDump, Y
+  ](
+    valueQueue: ValueQueue[X],
+    callee: X => Either[E, Y] ): TrackableQueue[C, E, X, Y] = {
+
+    new TrackableQueueImpl(valueQueue, callee)
+  }
 }
 
 private class TrackableQueueImpl[

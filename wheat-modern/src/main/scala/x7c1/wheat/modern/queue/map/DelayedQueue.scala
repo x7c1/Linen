@@ -32,7 +32,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
   private val provide = FutureFate.hold[C, E]
 
   override def enqueue(value: X): Fate[C, E, Unit] = {
-    provide right synchronized {
+    provide right {
       queue enqueue value
     } flatMap {
       case true => provide.empty
