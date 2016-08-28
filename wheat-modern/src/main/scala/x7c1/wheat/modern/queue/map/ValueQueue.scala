@@ -15,7 +15,7 @@ trait ValueQueue[V] {
 
 object ValueQueue {
 
-  def toGroup[K, V](getGroupKey: V => K): ValueQueue[V] = {
+  def toDistribute[K, V](getGroupKey: V => K): ValueQueue[V] = {
     new GroupingQueue[K, V](getGroupKey)
   }
 }

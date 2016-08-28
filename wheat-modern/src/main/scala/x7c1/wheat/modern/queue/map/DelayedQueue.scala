@@ -9,29 +9,29 @@ import x7c1.wheat.modern.kinds.Fate
 
 import scala.concurrent.duration.DurationInt
 
-private trait DelayedQueue[C, L, V] {
+private trait DelayedQueue[CONTEXT, ERROR, X] {
 
-  def enqueue(value: V): Fate[C, L, Unit]
+  def enqueue(value: X): Fate[CONTEXT, ERROR, Unit]
 }
 
 private object DelayedQueue {
-  def apply[C: HasContext : HasTimer, L: ErrorLike, R, V](
-    queue: ValueQueue[V],
-    callee: V => Either[L, R],
-    onDequeue: (V, Either[L, R]) => Unit ): DelayedQueue[C, L, V] = {
+  def apply[C: HasContext : HasTimer, E: ErrorLike, X, Y](
+    queue: ValueQueue[X],
+    callee: X => Either[E, Y],
+    onDequeue: (X, Either[E, Y]) => Unit ): DelayedQueue[C, E, X] = {
 
     new DelayedQueueImpl(queue, callee, onDequeue)
   }
 }
 
-private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V](
-  queue: ValueQueue[V],
-  callee: V => Either[L, R],
-  onDequeue: (V, Either[L, R]) => Unit) extends DelayedQueue[C, L, V] {
+private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
+  queue: ValueQueue[X],
+  callee: X => Either[E, Y],
+  onDequeue: (X, Either[E, Y]) => Unit) extends DelayedQueue[C, E, X] {
 
-  private val provide = FutureFate.hold[C, L]
+  private val provide = FutureFate.hold[C, E]
 
-  override def enqueue(value: V): Fate[C, L, Unit] = {
+  override def enqueue(value: X): Fate[C, E, Unit] = {
     provide right synchronized {
       queue enqueue value
     } flatMap {
@@ -40,7 +40,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, L: ErrorLike, R, V](
     }
   }
 
-  private def update(value: V): Fate[C, L, Unit] = {
+  private def update(value: X): Fate[C, E, Unit] = {
     val fate = provide.create(callee(value)) transform { result =>
       val nextValue = queue dequeue value
       try {
