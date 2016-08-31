@@ -3,7 +3,7 @@ package x7c1.linen.repository.loader.queueing
 import x7c1.wheat.modern.fate.FateProvider.ErrorLike
 import x7c1.wheat.modern.queue.map.TrackableQueue.CanThrow
 
-sealed trait LoaderQueueError {
+sealed trait UrlTraverserError {
   def message: String
 }
 
@@ -13,14 +13,14 @@ class LoaderQueueException(message: String, cause: Throwable) extends Exception(
   }
 }
 
-object LoaderQueueError {
+object UrlTraverserError {
 
-  case class Unexpected(cause: Throwable) extends LoaderQueueError {
+  case class Unexpected(cause: Throwable) extends UrlTraverserError {
     override def message = cause.getMessage
   }
 
-  implicit object canThrow extends CanThrow[LoaderQueueError] {
-    override def asThrowable(error: LoaderQueueError) = {
+  implicit object canThrow extends CanThrow[UrlTraverserError] {
+    override def asThrowable(error: UrlTraverserError) = {
       error match {
         case Unexpected(cause) => new LoaderQueueException(error.message, cause)
         case e => new LoaderQueueException(e.message)
@@ -28,7 +28,7 @@ object LoaderQueueError {
     }
   }
 
-  implicit object errorLike extends ErrorLike[LoaderQueueError] {
+  implicit object errorLike extends ErrorLike[UrlTraverserError] {
     override def newInstance = Unexpected
   }
 
