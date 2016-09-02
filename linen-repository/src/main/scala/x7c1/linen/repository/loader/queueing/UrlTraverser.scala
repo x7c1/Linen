@@ -9,8 +9,7 @@ trait UrlTraverser[A <: UrlEnclosure, B <: UrlTraverserOutput] {
 }
 
 private class UrlTraverserImpl[A <: UrlEnclosure, B <: UrlTraverserOutput](
-  callee: A => Either[UrlTraverserError, B]
-) extends UrlTraverser[A, B] {
+  callee: A => B ) extends UrlTraverser[A, B] {
 
   private val queue = TrackableQueue[CrawlerContext, UrlTraverserError, A, B](
     valueQueue = UrlEnclosureQueue(),

@@ -17,7 +17,7 @@ private trait DelayedQueue[CONTEXT, ERROR, X] {
 private object DelayedQueue {
   def apply[C: HasContext : HasTimer, E: ErrorLike, X, Y](
     queue: ValueQueue[X],
-    callee: X => Either[E, Y],
+    callee: X => Y,
     onDequeue: (X, Either[E, Y]) => Unit ): DelayedQueue[C, E, X] = {
 
     new DelayedQueueImpl(queue, callee, onDequeue)
@@ -26,7 +26,7 @@ private object DelayedQueue {
 
 private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
   queue: ValueQueue[X],
-  callee: X => Either[E, Y],
+  callee: X => Y,
   onDequeue: (X, Either[E, Y]) => Unit) extends DelayedQueue[C, E, X] {
 
   private val provide = FutureFate.hold[C, E]
@@ -41,7 +41,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
   }
 
   private def update(value: X): Fate[C, E, Unit] = {
-    val fate = provide.create(callee(value)) transform { result =>
+    val fate = provide right callee(value) transform { result =>
       val nextValue = queue dequeue value
       try {
         onDequeue(value, result)

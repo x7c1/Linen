@@ -31,7 +31,7 @@ object TrackableQueue {
     X: CanDump, Y
   ](
     valueQueue: ValueQueue[X],
-    callee: X => Either[E, Y] ): TrackableQueue[C, E, X, Y] = {
+    callee: X => Y ): TrackableQueue[C, E, X, Y] = {
 
     new TrackableQueueImpl(valueQueue, callee)
   }
@@ -43,8 +43,7 @@ private class TrackableQueueImpl[
   X: CanDump, Y
 ](
   valueQueue: ValueQueue[X],
-  callee: X => Either[E, Y]
-) extends TrackableQueue[C, E, X, Y] {
+  callee: X => Y ) extends TrackableQueue[C, E, X, Y] {
 
   private val map = mutable.Map[X, Promise[Y]]()
 
