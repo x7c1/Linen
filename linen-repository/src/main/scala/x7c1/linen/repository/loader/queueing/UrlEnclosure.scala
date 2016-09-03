@@ -10,8 +10,8 @@ trait UrlEnclosure {
 
 object UrlEnclosure {
 
-  implicit object canDump extends CanDump[UrlEnclosure] {
-    override def dump(x: UrlEnclosure): String = x.raw.toString
+  implicit def canDump[A <: UrlEnclosure]: CanDump[A] = new CanDump[A] {
+    override def dump(x: A): String = x.raw.toString
   }
 
 }
