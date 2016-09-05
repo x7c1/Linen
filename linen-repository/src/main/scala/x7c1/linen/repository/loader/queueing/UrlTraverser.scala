@@ -4,12 +4,18 @@ import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.wheat.modern.kinds.Fate
 import x7c1.wheat.modern.queue.map.{TrackableQueue, ValueQueue}
 
-trait UrlTraverser[A <: UrlEnclosure, B <: UrlTraverserOutput] {
+trait UrlTraverser[A <: UrlEnclosure, B] {
   def startLoading(url: A): Fate[CrawlerContext, UrlTraverserError, B]
 }
 
-private class UrlTraverserImpl[A <: UrlEnclosure, B <: UrlTraverserOutput](
-  callee: A => B ) extends UrlTraverser[A, B] {
+object UrlTraverser {
+  def apply[A <: UrlEnclosure, B](callee: A => B): UrlTraverser[A, B] = {
+    new UrlTraverserImpl(callee)
+  }
+}
+
+private class UrlTraverserImpl[A <: UrlEnclosure, B](
+  callee: A => B) extends UrlTraverser[A, B] {
 
   private val queue = TrackableQueue[CrawlerContext, UrlTraverserError, A, B](
     valueQueue = UrlEnclosureQueue(),
@@ -26,5 +32,3 @@ object UrlEnclosureQueue {
     ValueQueue.toDistribute(getGroupKey = _.raw.getHost)
   }
 }
-
-trait UrlTraverserOutput
