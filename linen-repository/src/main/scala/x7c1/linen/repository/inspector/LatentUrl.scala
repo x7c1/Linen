@@ -25,7 +25,7 @@ trait LatentUrl {
   def full: String
 }
 
-case class LatentUrlImpl(
+private case class LatentUrlImpl(
   override val raw: String,
   override val full: String) extends LatentUrl
 

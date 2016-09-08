@@ -2,12 +2,17 @@ package x7c1.linen.scene.inspector
 
 import java.net.URL
 
+import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.{InspectorActionParts, InspectorLoadingStatus, InspectorSourceParts}
+import x7c1.linen.database.struct.{HasSourceUrl, InspectorActionParts, InspectorLoadingStatus, InspectorSourceParts, SourceRecord}
 import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.inspector.{ActionPieceLoader, LatentUrl}
+import x7c1.linen.repository.inspector.{ActionPieceLoader, InspectorSourceStatus, LatentUrl}
+import x7c1.linen.repository.loader.crawling.SourceContentLoader
 import x7c1.linen.repository.loader.queueing.{UrlEnclosure, UrlReceiver, UrlTraverser}
+import x7c1.linen.repository.source.inspector.InspectorSource
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.formatter.ThrowableFormatter
+import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 
 object ActionRunner {
   def apply(
@@ -42,8 +47,30 @@ class ActionRunner private(
   }
 
   val startSourceAction: UrlReceiver = UrlReceiver {
-    case n: SourceActionUrl =>
-      ???
+    case url: SourceActionUrl =>
+
+      helper.selectorOf[InspectorSource] findBy url matches {
+        case Right(None) =>
+          // not loaded yet
+          // SourceContentLoader loadContent url.raw
+
+          SourceContentLoader() loadContent url.raw transform {
+            case Right(content) => ???
+            case Left(error) => ???
+          }
+
+        case Right(Some(source)) =>
+          helper.writable update InspectorSourceStatus(
+            actionId = url.actionId,
+            loadingStatus = InspectorLoadingStatus.LoadingCompleted,
+            latentUrl = url.raw,
+            discoveredSourceId = Some(source.original._id),
+            updatedAt = Date.current()
+          )
+        case Left(e: SQLException) =>
+          Log error format(e.getCause)("[failed]")
+      }
+
   }
 
   private def insertParts(parts: InspectorSourceParts) = {
@@ -74,8 +101,4 @@ class ActionRunner private(
 
 case class ActionPageUrl(
   accountId: Long,
-  override val raw: URL) extends UrlEnclosure
-
-case class SourceActionUrl(
-  actionId: Long,
   override val raw: URL) extends UrlEnclosure
