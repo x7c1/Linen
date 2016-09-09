@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.loader.crawling.LoadedEntry.toEntryParts
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
@@ -92,15 +93,6 @@ private class SourceUpdaterQueueImpl(
       }
     }
   }
-  private def toEntryParts(sourceId: Long): LoadedEntry => EntryParts =
-    entry => EntryParts(
-      sourceId = sourceId,
-      title = entry.title,
-      content = entry.content,
-      author = entry.author,
-      url = entry.url,
-      createdAt = entry.createdAt
-    )
 
   private def newerThan(latest: LatestEntry) = (parts: LoadedEntry) => {
     (parts.createdAt.timestamp >= latest.createdAt.timestamp) &&
