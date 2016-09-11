@@ -19,6 +19,10 @@ object SourceRecord {
 
   def column = TypedFields.expose[SourceRecord]
 
+  implicit object id extends HasSourceId[SourceRecord] {
+    override def toId = _._id
+  }
+
   implicit object hasTable extends HasTable.Where[SourceRecord](table)
 
   implicit object reifiable extends RecordReifiable[SourceRecord] {

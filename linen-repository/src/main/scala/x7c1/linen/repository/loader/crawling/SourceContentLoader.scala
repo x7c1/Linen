@@ -30,17 +30,23 @@ private class SourceContentLoaderImpl extends SourceContentLoader {
         title = Option(feed.getTitle) getOrElse "",
         entries = {
           val entries = feed.getEntries.asScala map { case x: SyndEntry => x }
-          entries map convertEntry
+          entries map convertEntry(url)
         },
         description = Option(feed.getDescription) getOrElse ""
       )
     }
   }
 
-  private def convertEntry(entry: SyndEntry): Either[InvalidEntry, LoadedEntry] = {
+  private def convertEntry(url: URL)(entry: SyndEntry): Either[InvalidEntry, LoadedEntry] = {
     try for {
-      url <- (Option(entry.getLink) toRight EmptyUrl()).right
-      published <- (Option(entry.getPublishedDate) toRight EmptyPublishedDate()).right
+      url <- {
+        val either = Option(entry.getLink) toRight EmptyUrl(url)
+        either.right
+      }
+      published <- {
+        val either = Option(entry.getPublishedDate) toRight EmptyPublishedDate(new URL(url))
+        either.right
+      }
     } yield LoadedEntry(
       title = Option(entry.getTitle) getOrElse "",
       content = Option(entry.getDescription.getValue) getOrElse "",
