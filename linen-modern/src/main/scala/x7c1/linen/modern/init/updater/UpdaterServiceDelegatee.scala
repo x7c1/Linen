@@ -48,14 +48,12 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl) {
     helper.close()
   }
 
-  private lazy val runner = {
-    ActionRunner(helper, () => traverser)
-  }
-  private lazy val callee: UrlEnclosure => Unit = {
-    runner.startPageAction orElse runner.startSourceAction
-  }
   private lazy val traverser: UrlTraverser[UrlEnclosure, Unit] = {
-    UrlTraverser(callee)
+    val runner = ActionRunner(helper, () => traverser)
+    UrlTraverser(
+      runner.startPageAction orElse
+        runner.startSourceAction
+    )
   }
 
 }
