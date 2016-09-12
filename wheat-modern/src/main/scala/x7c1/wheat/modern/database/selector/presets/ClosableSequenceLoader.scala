@@ -34,7 +34,7 @@ object ClosableSequenceLoader {
   }
   object LoadingError {
     implicit object hasConstructor extends HasConstructor[Throwable => LoadingError]{
-      override def newInstance = new UnexpectedError(_)
+      override def newInstance = UnexpectedError
     }
   }
   case class SqlError(cause:  SQLException) extends LoadingError {

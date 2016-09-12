@@ -9,7 +9,7 @@ import x7c1.wheat.modern.kinds.Fate
 
 import scala.concurrent.duration.DurationInt
 
-private trait DelayedQueue[CONTEXT, ERROR, X] {
+trait DelayedQueue[CONTEXT, ERROR, X] {
 
   def enqueue(value: X): Fate[CONTEXT, ERROR, Unit]
 }
@@ -55,7 +55,7 @@ private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
         _ => update(next)
       }
       case None => provide right {
-        // done: dispatch something?
+        // done
       }
     }
   }

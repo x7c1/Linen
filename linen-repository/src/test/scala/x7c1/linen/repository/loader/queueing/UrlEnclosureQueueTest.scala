@@ -7,9 +7,9 @@ import org.scalatest.{FlatSpecLike, Matchers}
 class UrlEnclosureQueueTest extends FlatSpecLike with Matchers {
 
   it can "enqueue same domain URL" in {
-    val url1 = new SampleUrl(new URL("http://example.com/1"))
-    val url2 = new SampleUrl(new URL("http://example.com/2"))
-    val url3 = new SampleUrl(new URL("http://example.com/3"))
+    val url1 = SampleUrl(new URL("http://example.com/1"))
+    val url2 = SampleUrl(new URL("http://example.com/2"))
+    val url3 = SampleUrl(new URL("http://example.com/3"))
 
     val queue = UrlEnclosureQueue[SampleUrl]()
 
@@ -28,11 +28,11 @@ class UrlEnclosureQueueTest extends FlatSpecLike with Matchers {
   }
 
   it can "enqueue different domain URL" in {
-    val url1 = new SampleUrl(new URL("http://sub1.example.com/1"))
-    val url2 = new SampleUrl(new URL("http://sub2.example.com/2"))
+    val url1 = SampleUrl(new URL("http://sub1.example.com/1"))
+    val url2 = SampleUrl(new URL("http://sub2.example.com/2"))
 
-    val url3_1 = new SampleUrl(new URL("http://sub3.example.com/3"))
-    val url3_2 = new SampleUrl(new URL("http://sub3.example.com/4"))
+    val url3_1 = SampleUrl(new URL("http://sub3.example.com/3"))
+    val url3_2 = SampleUrl(new URL("http://sub3.example.com/4"))
 
     val queue = UrlEnclosureQueue[SampleUrl]()
 
