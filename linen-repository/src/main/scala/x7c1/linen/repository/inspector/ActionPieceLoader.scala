@@ -8,24 +8,21 @@ object ActionPieceLoader {
   import collection.JavaConverters._
 
   def loadFrom(pageUrl: String): ActionPiece = {
-    Log info s"[init] $pageUrl"
+    val document = Jsoup.connect(pageUrl).
+      userAgent("").
+      get()
 
-    val document = Jsoup.connect(pageUrl).get()
-    val eithers = document.select("""link[type^='']""").asScala.
-      collect {
-        case element if isSupportedType(element attr "type") =>
-          LatentUrl.create(
-            originUrl = pageUrl,
-            path = element attr "href"
-          )
-      }
-
+    val links = document.select("""link[type^='']""")
+    val eithers = links.asScala collect {
+      case element if isSupportedType(element attr "type") =>
+        LatentUrl.create(
+          originUrl = pageUrl,
+          path = element attr "href"
+        )
+    }
     val urls = eithers.collect {
       case Right(url) => url
     }
-
-    urls foreach { Log info _.full }
-
     eithers.collect {
       case Left(e) => Log error e.message
     }
