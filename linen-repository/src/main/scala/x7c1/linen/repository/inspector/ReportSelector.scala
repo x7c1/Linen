@@ -3,6 +3,7 @@ package x7c1.linen.repository.inspector
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.InspectorStatusRecord
 import x7c1.linen.database.struct.HasAccountId
+import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequence, TraverseOn}
 import x7c1.wheat.modern.features.HasShortLength
@@ -34,6 +35,8 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
     } yield {
       val tmp = sequencer.derive(records) map {
         case Right(record) =>
+          Log error s"${record.source_title}, ${record.discovered_source_id}"
+
           DiscoveredSource(
             sourceTitle = s"${record.source_title}",
             sourceDescription = s"description of ${record.latent_source_url}",

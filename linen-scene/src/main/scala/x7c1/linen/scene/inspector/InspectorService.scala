@@ -37,7 +37,7 @@ private class InspectorServiceImpl(
   helper: DatabaseHelper) extends InspectorService {
 
   override def inspect(accountId: Long, pageUrl: String): Unit = {
-    Log info s"[init]"
+    Log info s"[init] account:$accountId, url:$pageUrl"
 
     val url = ActionPageUrl(accountId, new URL(pageUrl))
     traverser startLoading url run CrawlerContext atLeft {

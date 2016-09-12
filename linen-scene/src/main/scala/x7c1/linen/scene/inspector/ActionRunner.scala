@@ -30,6 +30,8 @@ class ActionRunner private(
   val startPageAction: UrlReceiver = UrlReceiver {
     case url: ActionPageUrl =>
       val piece = ActionPieceLoader loadFrom url.raw.toString
+      Log info s"[piece] $piece"
+
       val actionParts = InspectorActionParts(
         loadingStatus = InspectorLoadingStatus.Loading,
         accountId = url.accountId,
@@ -40,7 +42,7 @@ class ActionRunner private(
       )
       helper.writable insert actionParts match {
         case Left(e) =>
-          Log error e.getMessage
+          Log error format(e.getCause)("[failed]")
         case Right(actionId) =>
           piece.latentUrls map toSourceParts(actionId) foreach insertInspectorSourceParts
       }
@@ -50,15 +52,17 @@ class ActionRunner private(
     case url: SourceActionUrl =>
       helper.selectorOf[InspectorSource] findBy url matches {
         case Right(None) =>
-          startLoading(url.raw)
+          startLoading(url)
         case Right(Some(source)) =>
-          updateStatus(url, source.original)
+          updateStatus(url, source)
         case Left(e: SQLException) =>
           Log error format(e.getCause)("[failed]")
       }
   }
 
   private def updateStatus[A: HasSourceId](url: SourceActionUrl, source: A): Unit = {
+    Log info s"[init] $url"
+
     helper.writable update InspectorSourceStatus(
       actionId = url.actionId,
       loadingStatus = InspectorLoadingStatus.LoadingCompleted,
@@ -71,16 +75,22 @@ class ActionRunner private(
     }
   }
 
-  private def startLoading(url: URL): Unit = {
-    SourceContentLoader() loadContent url run CrawlerContext apply {
+  private def startLoading(url: SourceActionUrl): Unit = {
+    Log info s"[init] $url"
+
+    SourceContentLoader() loadContent url.raw run CrawlerContext apply {
       case Right(content) =>
+        Log info s"content: $content"
+
         helper.writable insert SourceParts(
           title = content.title,
-          url = url.toExternalForm,
+          url = url.raw.toExternalForm,
           description = content.description,
           createdAt = Date.current()
         ) match {
           case Right(sourceId) =>
+            Log info s"content-entries: ${content.entries.length}"
+
             content.entries foreach insertEntry(sourceId)
           case Left(e) =>
             Log error format(e.getCause)("[failed]")
@@ -91,6 +101,8 @@ class ActionRunner private(
   }
 
   private def insertEntry(sourceId: Long)(either: Either[InvalidEntry, LoadedEntry]): Unit = {
+    Log info s"[init] $either"
+
     either match {
       case Right(entry) => helper.writable insert toEntryParts(sourceId)(entry) match {
         case Right(id) => //nop
@@ -101,6 +113,8 @@ class ActionRunner private(
   }
 
   private def insertInspectorSourceParts(parts: InspectorSourceParts) = {
+    Log info s"[init] ${parts.latentUrl}"
+
     helper.writable insert parts match {
       case Right(_) =>
         getTraverser() startLoading SourceActionUrl(
@@ -108,7 +122,7 @@ class ActionRunner private(
           raw = new URL(parts.latentUrl)
         )
       case Left(e) =>
-        Log error e.getMessage
+        Log error format(e.getCause)("[failed]")
     }
   }
 
