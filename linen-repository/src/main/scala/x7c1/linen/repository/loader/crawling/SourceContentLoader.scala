@@ -49,7 +49,7 @@ private class SourceContentLoaderImpl extends SourceContentLoader {
       }
     } yield LoadedEntry(
       title = Option(entry.getTitle) getOrElse "",
-      content = Option(entry.getDescription.getValue) getOrElse "",
+      content = Option(entry.getDescription) map (_.getValue) getOrElse "",
       author = Option(entry.getAuthor) getOrElse "",
       url = EntryUrl(url),
       createdAt = Date(published)
