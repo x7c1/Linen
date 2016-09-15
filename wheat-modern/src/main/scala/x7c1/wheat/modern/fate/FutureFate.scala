@@ -5,7 +5,7 @@ import java.util.Timer
 import x7c1.wheat.modern.callback.CallbackTask
 import x7c1.wheat.modern.fate.FateProvider.{ErrorLike, HasContext}
 import x7c1.wheat.modern.features.HasInstance
-import x7c1.wheat.modern.kinds.Fate
+import x7c1.wheat.modern.kinds.{Fate, FateRunner}
 import x7c1.wheat.modern.patch.TimerTask
 
 import scala.concurrent.duration.FiniteDuration
@@ -71,6 +71,15 @@ object FutureFate {
 
     def fromPromise[R](promise: Promise[R]): Fate[X, L, R] = {
       FutureFate.fromPromise[X, L, R](promise)
+    }
+
+    def partially[T, R](f: T => R): T => Fate[X, L, R] = t => {
+      try {
+        right(f(t))
+      } catch {
+        case e: Throwable =>
+          create(Left(implicitly[ErrorLike[L]] newInstance e))
+      }
     }
 
     def right[A](f: => A): Fate[X, L, A] = {

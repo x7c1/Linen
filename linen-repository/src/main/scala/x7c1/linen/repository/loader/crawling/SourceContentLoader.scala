@@ -6,7 +6,7 @@ import com.google.code.rome.android.repackaged.com.sun.syndication.feed.synd.Syn
 import com.google.code.rome.android.repackaged.com.sun.syndication.io.SyndFeedInput
 import x7c1.linen.repository.date.Date
 import x7c1.linen.repository.entry.EntryUrl
-import x7c1.wheat.modern.fate.HttpRequester
+import x7c1.wheat.modern.fate.{FutureFate, HttpRequester}
 import x7c1.wheat.modern.kinds.Fate
 
 object SourceContentLoader {
@@ -23,8 +23,8 @@ private class SourceContentLoaderImpl extends SourceContentLoader {
 
   override def loadContent(url: URL) = {
     val requester = HttpRequester[CrawlerContext, SourceContentLoaderError]()
-    requester.readerOf(url) map { reader =>
-      new SyndFeedInput().build(reader)
+    requester readerOf url flatMap {
+      provide partially new SyndFeedInput().build
     } map { feed =>
       SourceContent(
         title = Option(feed.getTitle) getOrElse "",
@@ -35,6 +35,10 @@ private class SourceContentLoaderImpl extends SourceContentLoader {
         description = Option(feed.getDescription) getOrElse ""
       )
     }
+  }
+
+  private val provide = {
+    FutureFate.hold[CrawlerContext, SourceContentLoaderError]
   }
 
   private def convertEntry(url: URL)(entry: SyndEntry): Either[InvalidEntry, LoadedEntry] = {
