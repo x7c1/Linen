@@ -71,7 +71,7 @@ class ActionRunner private(
       updatedAt = Date.current()
     ) match {
       case Left(e) => Log error format(e.getCause)("[failed]")
-      case Right(rows) => //nop
+      case Right(rows) => Log info s"[done] $url"
     }
   }
 
@@ -91,6 +91,7 @@ class ActionRunner private(
           case Right(sourceId) =>
             Log info s"content-entries: ${content.entries.length}"
 
+            updateStatus(url, sourceId)
             content.entries foreach insertEntry(sourceId)
           case Left(e) =>
             Log error format(e.getCause)("[failed]")
@@ -120,7 +121,9 @@ class ActionRunner private(
         getTraverser() startLoading SourceActionUrl(
           actionId = parts.actionId,
           raw = new URL(parts.latentUrl)
-        )
+        ) run CrawlerContext atLeft {
+          Log error _.message
+        }
       case Left(e) =>
         Log error format(e.getCause)("[failed]")
     }
