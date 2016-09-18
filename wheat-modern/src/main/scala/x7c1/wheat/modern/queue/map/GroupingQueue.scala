@@ -3,14 +3,14 @@ package x7c1.wheat.modern.queue.map
 trait GroupingQueue[V] {
 
   /**
-    * return true if the group of enqueued value already exists,
-    * otherwise false
+    * Enqueue 'value' to its group.
+    * Return true if the group already exists, otherwise false.
     */
   def enqueue(value: V): Boolean
 
   /**
-    * return Some if the next value exists in the group of `value`,
-    * otherwise None
+    * Dequeue from the group of 'value'.
+    * Return Some(next value) if exists in its group, otherwise None.
     */
   def dequeue(value: V): Option[V]
 }
