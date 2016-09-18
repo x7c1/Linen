@@ -19,9 +19,10 @@ object FutureFate {
   def fromEither[X: HasContext, L: ErrorLike, R](f: => Either[L, R]): Fate[X, L, R] =
     Fate { x => g =>
       implicit val context = implicitly[HasContext[X]].instance(x)
-      Future(f) recover {
-        case e => Left(implicitly[ErrorLike[L]] newInstance e)
-      } map g
+      Future(f) onComplete {
+        case Success(either) => g(either)
+        case Failure(e) => g(Left(implicitly[ErrorLike[L]] newInstance e))
+      }
     }
 
   def fromCallback[X: HasContext, L: ErrorLike, R](callback: CallbackTask[R]): Fate[X, L, R] = {
