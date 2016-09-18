@@ -1,26 +1,28 @@
 package x7c1.wheat.modern.queue.map
 
-trait ValueQueue[V] {
+trait GroupingQueue[V] {
 
   /**
-    * return true if previous value exists
+    * return true if the group of enqueued value already exists,
+    * otherwise false
     */
   def enqueue(value: V): Boolean
 
-  /*
-   * return Some if next value exists, otherwise None
-   */
+  /**
+    * return Some if the next value exists in the group of `value`,
+    * otherwise None
+    */
   def dequeue(value: V): Option[V]
 }
 
-object ValueQueue {
+object GroupingQueue {
 
-  def toDistribute[K, V](getGroupKey: V => K): ValueQueue[V] = {
-    new GroupingQueue[K, V](getGroupKey)
+  def groupBy[K, V](getGroupKey: V => K): GroupingQueue[V] = {
+    new GroupingQueueImpl[K, V](getGroupKey)
   }
 }
 
-private class GroupingQueue[K, V](getGroupKey: V => K) extends ValueQueue[V] {
+private class GroupingQueueImpl[K, V](getGroupKey: V => K) extends GroupingQueue[V] {
 
   private val queueMap = QueueMap[K, V](getGroupKey)
 

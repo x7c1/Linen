@@ -16,7 +16,7 @@ trait DelayedQueue[CONTEXT, ERROR, X] {
 
 private object DelayedQueue {
   def apply[C: HasContext : HasTimer, E: ErrorLike, X, Y](
-    queue: ValueQueue[X],
+    queue: GroupingQueue[X],
     callee: X => Y,
     onDequeue: (X, Either[E, Y]) => Unit ): DelayedQueue[C, E, X] = {
 
@@ -25,7 +25,7 @@ private object DelayedQueue {
 }
 
 private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
-  queue: ValueQueue[X],
+  queue: GroupingQueue[X],
   callee: X => Y,
   onDequeue: (X, Either[E, Y]) => Unit) extends DelayedQueue[C, E, X] {
 

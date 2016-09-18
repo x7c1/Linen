@@ -30,10 +30,10 @@ object TrackableQueue {
     E: CanThrow : ErrorLike,
     X: CanDump, Y
   ](
-    valueQueue: ValueQueue[X],
+    groupingQueue: GroupingQueue[X],
     callee: X => Y ): TrackableQueue[C, E, X, Y] = {
 
-    new TrackableQueueImpl(valueQueue, callee)
+    new TrackableQueueImpl(groupingQueue, callee)
   }
 }
 
@@ -42,13 +42,13 @@ private class TrackableQueueImpl[
   E: CanThrow : ErrorLike,
   X: CanDump, Y
 ](
-  valueQueue: ValueQueue[X],
+  groupingQueue: GroupingQueue[X],
   callee: X => Y ) extends TrackableQueue[C, E, X, Y] {
 
   private val map = mutable.Map[X, Promise[Y]]()
 
   private val queue: DelayedQueue[C, E, X] = {
-    DelayedQueue(valueQueue, callee, onDequeue)
+    DelayedQueue(groupingQueue, callee, onDequeue)
   }
 
   private val provide = FutureFate.hold[C, E]

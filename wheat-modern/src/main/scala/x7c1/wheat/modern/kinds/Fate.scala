@@ -81,6 +81,7 @@ private class FateImpl[X, L, R](
 private class EitherCollector[L, R](f: Either[Seq[L], Seq[R]] => Unit, threshold: Int) {
 
   import java.util.concurrent.atomic.AtomicInteger
+
   import scala.collection.mutable.ArrayBuffer
 
   private val lefts = ArrayBuffer[L]()

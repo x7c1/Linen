@@ -17,7 +17,7 @@ class TrackableQueueTest extends FlatSpecLike with Matchers {
   it can "enqueue" in {
     val runner = new SampleRunner
     val queue = TrackableQueue[CrawlerContext, UrlTraverserError, SampleUrl, Unit](
-      valueQueue = UrlEnclosureQueue(),
+      groupingQueue = UrlEnclosureQueue(),
       callee = runner.startAction
     )
     val links = Seq(
