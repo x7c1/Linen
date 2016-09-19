@@ -18,7 +18,7 @@ private class UrlTraverserImpl[A <: UrlEnclosure, B](
   callee: A => B) extends UrlTraverser[A, B] {
 
   private val queue = TrackableQueue[CrawlerContext, UrlTraverserError, A, B](
-    groupingQueue = UrlEnclosureQueue(),
+    createQueue = () => UrlEnclosureQueue(),
     callee = callee
   )
 

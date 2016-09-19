@@ -16,20 +16,22 @@ trait DelayedQueue[CONTEXT, ERROR, X] {
 
 private object DelayedQueue {
   def apply[C: HasContext : HasTimer, E: ErrorLike, X, Y](
-    queue: GroupingQueue[X],
+    createQueue: () => GroupingQueue[X],
     callee: X => Y,
     onDequeue: (X, Either[E, Y]) => Unit ): DelayedQueue[C, E, X] = {
 
-    new DelayedQueueImpl(queue, callee, onDequeue)
+    new DelayedQueueImpl(createQueue, callee, onDequeue)
   }
 }
 
 private class DelayedQueueImpl[C: HasContext : HasTimer, E: ErrorLike, X, Y](
-  queue: GroupingQueue[X],
+  createQueue: () => GroupingQueue[X],
   callee: X => Y,
   onDequeue: (X, Either[E, Y]) => Unit) extends DelayedQueue[C, E, X] {
 
   private val provide = FutureFate.hold[C, E]
+
+  private val queue = createQueue()
 
   override def enqueue(value: X): Fate[C, E, Unit] = {
     provide right {

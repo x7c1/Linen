@@ -10,7 +10,7 @@ trait GroupingQueue[V] {
 
   /**
     * Dequeue from the group of 'value'.
-    * Return Some(next value) if exists in its group, otherwise None.
+    * Return Some if next value exists in its group, otherwise None.
     */
   def dequeue(value: V): Option[V]
 }
