@@ -34,14 +34,27 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
       records <- db.selectorOf[InspectorStatusRecord].traverseOn(id).right
     } yield {
       val tmp = sequencer.derive(records) map {
-        case Right(record) =>
-          Log error s"${record.source_title}, ${record.discovered_source_id}"
-
-          DiscoveredSource(
-            sourceTitle = s"${record.source_title}",
-            sourceDescription = s"description of ${record.latent_source_url}",
-            sourceUrl = record.latent_source_url
-          )
+        case Right(record) => record.latent_source_url match {
+          case Some(sourceUrl) => record.discovered_source_id match {
+            case Some(sourceId) =>
+              DiscoveredSource(
+                sourceTitle = record.source_title getOrElse "",
+                sourceDescription = s"description of ${record.latent_source_url}",
+                sourceUrl = sourceUrl
+              )
+            case None =>
+              SourceLoadingError(
+                errorText = s"Loading Error : ${record.origin_title}",
+                pageUrl = sourceUrl
+              )
+          }
+          case None =>
+            NoSourceFound(
+              pageTitle = record.origin_title,
+              pageUrl = record.latent_source_url getOrElse record.origin_url,
+              reportMessage = s"Source Not Found : ${record.origin_title}"
+            )
+        }
         case Left(row) => row
       }
       // todo: enable sequencer.derive to support ClosableSequence

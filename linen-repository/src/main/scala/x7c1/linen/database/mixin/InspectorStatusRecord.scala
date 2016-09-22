@@ -1,18 +1,23 @@
 package x7c1.linen.database.mixin
 
-import x7c1.linen.database.struct.{HasAccountId, InspectorActionRecord, InspectorSourceRecord, SourceRecord}
-import x7c1.wheat.macros.database.{Query, TypedCursor}
-import x7c1.wheat.modern.database.selector.presets.{CanTraverseRecord, TraverseOn}
-import Query.SqlBuilder
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import x7c1.linen.database.struct.{HasAccountId, InspectorActionRecord}
+import x7c1.wheat.macros.database.Query.SqlBuilder
+import x7c1.wheat.macros.database.{Query, TypedCursor}
+import x7c1.wheat.modern.database.selector.presets.{CanTraverseRecord, TraverseOn}
 import x7c1.wheat.modern.database.selector.{RecordReifiable, SelectorProvidable}
 
 trait InspectorStatusRecord
-  extends InspectorActionRecord
-    with InspectorSourceRecord {
+  extends InspectorActionRecord {
 
-  def source_title: String
+  def action_id: Long
+
+  def discovered_source_id: Option[Long]
+
+  def latent_source_url: Option[String]
+
+  def source_title: Option[String]
 }
 
 object InspectorStatusRecord {
