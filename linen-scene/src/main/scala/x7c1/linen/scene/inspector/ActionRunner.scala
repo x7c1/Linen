@@ -107,7 +107,7 @@ class ActionRunner private(
     either match {
       case Right(entry) => helper.writable insert toEntryParts(sourceId)(entry) match {
         case Right(id) => //nop
-        case Left(e) => Log error format(e.getCause)("[failed]")
+        case Left(e) => Log error format(Option(e.getCause) getOrElse e)("[failed]")
       }
       case Left(invalid) => Log error invalid.detail
     }
