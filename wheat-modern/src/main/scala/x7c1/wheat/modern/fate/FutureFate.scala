@@ -74,15 +74,6 @@ object FutureFate {
       FutureFate.fromPromise[X, L, R](promise)
     }
 
-    def partially[T, R](f: T => R): T => Fate[X, L, R] = t => {
-      try {
-        right(f(t))
-      } catch {
-        case e: Throwable =>
-          create(Left(implicitly[ErrorLike[L]] newInstance e))
-      }
-    }
-
     def right[A](f: => A): Fate[X, L, A] = {
       create(Right(f))
     }

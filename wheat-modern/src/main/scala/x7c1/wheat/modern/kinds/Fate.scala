@@ -25,6 +25,10 @@ object Fate {
     g(Right(r))
   }
 
+  def left[X, L, R](l: L): Fate[X, L, R] = Fate { x => g =>
+    g(Left(l))
+  }
+
   implicit class Fates[X, L, R](fates: Seq[Fate[X, L, R]]) {
     def toParallel: Fate[X, Seq[L], Seq[R]] = Fate { x => f =>
       val dispatcher = new EitherCollector(f, fates.length)

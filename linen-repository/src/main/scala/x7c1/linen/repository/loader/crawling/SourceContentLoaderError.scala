@@ -14,6 +14,10 @@ object SourceContentLoaderError {
     override def newInstance = UnexpectedError
   }
 
+  case class LoaderParseError(
+    override val detail: String,
+    override val cause: Option[Throwable]) extends SourceContentLoaderError
+
   case class UnexpectedError(origin: Throwable) extends SourceContentLoaderError {
     override def detail = format(origin) {
       "[unexpected]"
