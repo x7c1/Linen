@@ -3,7 +3,6 @@ package x7c1.linen.repository.inspector
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.InspectorStatusRecord
 import x7c1.linen.database.struct.HasAccountId
-import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
 import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequence, TraverseOn}
 import x7c1.wheat.modern.features.HasShortLength
@@ -19,44 +18,25 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
 
     val sequencer = HeadlineSequencer[InspectorStatusRecord, SourceSearchReportRow](
       equals = _.action_id == _.action_id,
-      toHeadline = records => {
-        val date = records.findAt(0).map(_.created_at.typed.format) getOrElse ""
+      toHeadline = records =>
         DiscoveredSourceLabel(
-          formattedDate = date,
+          formattedDate = {
+            records findAt 0 map (_.created_at.typed.format) getOrElse ""
+          },
           reportMessage = s"${records.length} sources found.",
           pageTitle = "",
           pageUrl = ""
         )
-      }
     )
 
     for {
       records <- db.selectorOf[InspectorStatusRecord].traverseOn(id).right
     } yield {
-      val tmp = sequencer.derive(records) map {
-        case Right(record) => record.latent_source_url match {
-          case Some(sourceUrl) => record.discovered_source_id match {
-            case Some(sourceId) =>
-              DiscoveredSource(
-                sourceTitle = record.source_title getOrElse "",
-                sourceDescription = s"description of ${record.latent_source_url}",
-                sourceUrl = sourceUrl
-              )
-            case None =>
-              SourceLoadingError(
-                errorText = s"Loading Error : ${record.origin_title}",
-                pageUrl = sourceUrl
-              )
-          }
-          case None =>
-            NoSourceFound(
-              pageTitle = record.origin_title,
-              pageUrl = record.latent_source_url getOrElse record.origin_url,
-              reportMessage = s"Source Not Found : ${record.origin_title}"
-            )
-        }
+      val tmp = sequencer derive records map {
         case Left(row) => row
+        case Right(record) => new SourceSearchReportRowFactory(record).create
       }
+
       // todo: enable sequencer.derive to support ClosableSequence
       // workaround
       new ClosableSequence[SourceSearchReportRow] {
@@ -124,5 +104,40 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
     //        override def length = ys.length
     //      }
     //      Right(xs)
+  }
+
+}
+
+private class SourceSearchReportRowFactory(record: InspectorStatusRecord) {
+
+  def create: SourceSearchReportRow = {
+    val either = for {
+      sourceUrl <- record.latent_source_url.toRight(forNoSource).right
+    } yield {
+      forLatentSourceUrl(sourceUrl)(record.discovered_source_id)
+    }
+    either.merge
+  }
+
+  private def forNoSource = {
+    NoSourceFound(
+      pageTitle = record.origin_title,
+      pageUrl = record.latent_source_url getOrElse record.origin_url,
+      reportMessage = s"Source Not Found : ${record.origin_title}"
+    )
+  }
+
+  private def forLatentSourceUrl(sourceUrl: String): Option[Long] => SourceSearchReportRow = {
+    case Some(sourceId) =>
+      DiscoveredSource(
+        sourceTitle = record.source_title getOrElse "",
+        sourceDescription = s"description of ${record.latent_source_url}",
+        sourceUrl = sourceUrl
+      )
+    case None =>
+      SourceLoadingError(
+        errorText = s"Loading Error : ${record.origin_title}",
+        pageUrl = sourceUrl
+      )
   }
 }
