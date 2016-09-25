@@ -1,18 +1,17 @@
 package x7c1.linen.scene.inspector
 
-import java.net.URL
-
 import android.app.Service
 import android.content.Context
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.{ServiceControl, ServiceLabel}
+import x7c1.linen.repository.inspector.ActionPageUrl
 import x7c1.linen.repository.loader.crawling.CrawlerContext
 import x7c1.linen.repository.loader.queueing.{UrlEnclosure, UrlTraverser}
 import x7c1.wheat.macros.intent.ServiceCaller
 import x7c1.wheat.macros.logger.Log
 
 trait InspectorService {
-  def inspect(accountId: Long, pageUrl: String): Unit
+  def inspect(url: ActionPageUrl): Unit
 }
 
 object InspectorService {
@@ -25,7 +24,7 @@ object InspectorService {
   def reify(
     service: Service with ServiceControl,
     helper: DatabaseHelper,
-    traverser: UrlTraverser[UrlEnclosure, Unit] ): InspectorService = {
+    traverser: UrlTraverser[UrlEnclosure, Unit]): InspectorService = {
 
     new InspectorServiceImpl(service, traverser, helper)
   }
@@ -36,12 +35,12 @@ private class InspectorServiceImpl(
   traverser: UrlTraverser[UrlEnclosure, Unit],
   helper: DatabaseHelper) extends InspectorService {
 
-  override def inspect(accountId: Long, pageUrl: String): Unit = {
-    Log info s"[init] account:$accountId, url:$pageUrl"
+  override def inspect(url: ActionPageUrl): Unit = {
+    Log info s"[init] account:${url.accountId}, url:${url.raw}"
 
-    val url = ActionPageUrl(accountId, new URL(pageUrl))
     traverser startLoading url run CrawlerContext atLeft {
       Log error _.message
     }
+
   }
 }

@@ -1,5 +1,7 @@
 package x7c1.linen.modern.init.inspector
 
+import java.net.URL
+
 import android.app.Dialog
 import android.content.DialogInterface.OnClickListener
 import android.content.{Context, DialogInterface}
@@ -10,6 +12,7 @@ import android.widget.Button
 import x7c1.linen.glue.res.layout.SourceSearchStart
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.init.inspector.StartSearchDialog.Arguments
+import x7c1.linen.repository.inspector.ActionPageUrl
 import x7c1.linen.scene.inspector.InspectorService
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -57,10 +60,16 @@ class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
 
   private def onClickPositive(button: Button) = {
     val context = getActivity.asInstanceOf[Context with ServiceControl]
-    InspectorService(context).inspect(
+
+    ActionPageUrl.create(
       accountId = args.clientAccountId,
-      pageUrl = layout.originUrl.text.toString
-    )
+      url = layout.originUrl.text.toString
+    ) match {
+      case Right(pageUrl) =>
+        InspectorService(context) inspect pageUrl
+      case Left(e) =>
+        Log error e.detail
+    }
   }
 
   private def onClickNegative(button: Button) = {

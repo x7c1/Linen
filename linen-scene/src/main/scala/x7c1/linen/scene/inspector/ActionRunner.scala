@@ -143,6 +143,4 @@ class ActionRunner private(
 
 }
 
-case class ActionPageUrl(
-  accountId: Long,
-  override val raw: URL) extends UrlEnclosure
+
