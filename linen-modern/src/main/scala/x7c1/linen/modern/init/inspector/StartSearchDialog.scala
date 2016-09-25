@@ -13,6 +13,7 @@ import x7c1.linen.glue.res.layout.SourceSearchStart
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.modern.init.inspector.StartSearchDialog.Arguments
 import x7c1.linen.repository.inspector.ActionPageUrl
+import x7c1.linen.repository.inspector.ActionPageUrlError.{EmptyUrl, InvalidFormat}
 import x7c1.linen.scene.inspector.InspectorService
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
@@ -67,7 +68,21 @@ class StartSearchDialog extends DialogFragment with TypedFragment[Arguments] {
     ) match {
       case Right(pageUrl) =>
         InspectorService(context) inspect pageUrl
+        keyboard.taskToHide().execute()
+
+      case Left(e: EmptyUrl) =>
+        layout.originUrlLayout setError "(required)"
+
+      case Left(e: InvalidFormat) =>
+        layout.originUrlLayout setError {
+          e.cause.map(_.getMessage) getOrElse "invalid format"
+        }
+        Log info e.detail
+
       case Left(e) =>
+        layout.originUrlLayout setError {
+          e.cause.map(_.getMessage) getOrElse "unknown format"
+        }
         Log error e.detail
     }
   }
