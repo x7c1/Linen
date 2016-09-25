@@ -177,6 +177,7 @@ trait LinenSettings {
       (path startsWith "org/jdom") || (path startsWith "JDOMAbout") ||
       (path startsWith "com/google/code/rome") || (path startsWith "META-INF") ||
       (path startsWith "com/typesafe/config") ||
+      (path startsWith "org/jsoup") ||
       (path startsWith "x7c1/linen/glue") ||
       (path startsWith "x7c1/wheat/ancient")
 
