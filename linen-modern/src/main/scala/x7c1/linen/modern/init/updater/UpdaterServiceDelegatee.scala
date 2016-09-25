@@ -7,10 +7,10 @@ import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.loader.crawling.{RemoteSourceLoader, TraceableQueue}
 import x7c1.linen.repository.loader.queueing.{UrlEnclosure, UrlTraverser}
-import x7c1.linen.scene.inspector.{ActionRunner, InspectorService}
+import x7c1.linen.scene.inspector.{ActionRunner, InspectorService, PageActionStartedEvent}
 import x7c1.linen.scene.loader.crawling.{QueueingService, SchedulerService}
 import x7c1.linen.scene.updater.{ChannelNormalizerService, UpdaterMethods}
-import x7c1.wheat.macros.intent.IntentExpander
+import x7c1.wheat.macros.intent.{IntentExpander, LocalBroadcaster}
 import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.service.CommandStartType
 import x7c1.wheat.modern.decorator.service.CommandStartType.NotSticky
@@ -49,11 +49,19 @@ class UpdaterServiceDelegatee(service: Service with ServiceControl) {
   }
 
   private lazy val traverser: UrlTraverser[UrlEnclosure, Unit] = {
-    val runner = ActionRunner(helper, () => traverser)
+    val runner = ActionRunner(
+      helper = helper,
+      getTraverser = () => traverser,
+      onPageActionStarted = notifyPageActionStarted
+    )
     UrlTraverser(
       runner.startPageAction orElse
         runner.startSourceAction
     )
+  }
+
+  private def notifyPageActionStarted(e: PageActionStartedEvent): Unit = {
+    LocalBroadcaster(e) dispatchFrom service
   }
 
 }

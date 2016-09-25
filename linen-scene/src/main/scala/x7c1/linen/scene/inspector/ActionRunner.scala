@@ -6,8 +6,9 @@ import android.database.SQLException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{HasSourceId, InspectorActionParts, InspectorLoadingStatus, InspectorSourceParts, SourceParts}
 import x7c1.linen.repository.date.Date
-import x7c1.linen.repository.inspector.{ActionPieceLoader, InspectorSourceStatus, LatentUrl}
+import x7c1.linen.repository.inspector.{ActionPageUrl, ActionPieceLoader, InspectorSourceStatus, LatentUrl}
 import x7c1.linen.repository.loader.crawling.LoadedEntry.toEntryParts
+import x7c1.linen.repository.loader.crawling.SourceContentLoaderError.LoaderParseError
 import x7c1.linen.repository.loader.crawling.{CrawlerContext, InvalidEntry, LoadedEntry, SourceContentLoader}
 import x7c1.linen.repository.loader.queueing.{UrlEnclosure, UrlReceiver, UrlTraverser}
 import x7c1.linen.repository.source.inspector.InspectorSource
@@ -17,15 +18,17 @@ import x7c1.wheat.modern.formatter.ThrowableFormatter.format
 object ActionRunner {
   def apply(
     helper: DatabaseHelper,
-    getTraverser: () => UrlTraverser[UrlEnclosure, Unit]): ActionRunner = {
+    getTraverser: () => UrlTraverser[UrlEnclosure, Unit],
+    onPageActionStarted: PageActionStartedEvent => Unit): ActionRunner = {
 
-    new ActionRunner(helper, getTraverser)
+    new ActionRunner(helper, getTraverser, onPageActionStarted)
   }
 }
 
 class ActionRunner private(
   helper: DatabaseHelper,
-  getTraverser: () => UrlTraverser[UrlEnclosure, Unit]) {
+  getTraverser: () => UrlTraverser[UrlEnclosure, Unit],
+  onPageActionStarted: PageActionStartedEvent => Unit) {
 
   val startPageAction: UrlReceiver = UrlReceiver {
     case url: ActionPageUrl =>
@@ -45,6 +48,7 @@ class ActionRunner private(
           Log error format(e.getCause)("[failed]")
         case Right(actionId) =>
           piece.latentUrls map toSourceParts(actionId) foreach insertInspectorSourceParts
+          onPageActionStarted(PageActionStartedEvent(url.accountId))
       }
   }
 
@@ -93,9 +97,17 @@ class ActionRunner private(
 
             updateStatus(url, sourceId)
             content.entries foreach insertEntry(sourceId)
+
+            Log info s"[done] $url"
           case Left(e) =>
             Log error format(e.getCause)("[failed]")
         }
+      case Left(error: LoaderParseError) =>
+        Log error error.detail
+
+      /*
+        todo: update status to InspectorLoadingStatus.ParseError
+       */
       case Left(error) =>
         Log error error.detail
     }
