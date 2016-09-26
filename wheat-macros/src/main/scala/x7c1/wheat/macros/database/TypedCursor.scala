@@ -69,10 +69,14 @@ private object TypedColumnImpl {
     } map (_.asMethod) filter (_.paramLists.isEmpty)
 
     def getValue(tpe: Type, indexKey: TermName): Tree = tpe match {
+
       case x if x =:= typeOf[String] => q"$cursor.getString($indexKey)"
+      case x if x =:= typeOf[Option[String]] => q"Option($cursor.getString($indexKey))"
+
       case x if x =:= typeOf[Long] => q"$cursor.getLong($indexKey)"
       case x if x =:= typeOf[Int] => q"$cursor.getInt($indexKey)"
       case x if x =:= typeOf[Double] => q"$cursor.getDouble($indexKey)"
+
       case x if x =:= typeOf[Option[Long]] =>
         /*
           cannot use cursor.getLong here

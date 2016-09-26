@@ -1,6 +1,7 @@
 package x7c1.wheat.modern.kinds
 
 import org.scalatest.{FlatSpecLike, Matchers}
+import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.kinds.RichFate.ToRichFate
 
 import scala.concurrent.duration.DurationInt

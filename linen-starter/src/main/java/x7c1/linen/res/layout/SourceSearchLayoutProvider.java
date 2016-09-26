@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.FloatingActionButton;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -60,7 +61,8 @@ public class SourceSearchLayoutProvider implements ViewHolderProvider<SourceSear
                 return new SourceSearchLayout(
                     view,
                     (android.support.v7.widget.Toolbar) view.findViewById(R.id.source_search_layout__toolbar),
-                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.source_search_layout__reports)
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.source_search_layout__reports),
+                    (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.source_search_layout__button_to_create)
                 );
             }
         };

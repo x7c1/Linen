@@ -35,6 +35,8 @@ trait IntentDecoder
         q"$intent.getIntExtra($key, -1)"
       case x if x =:= typeOf[Long] =>
         q"$intent.getLongExtra($key, -1)"
+      case x if x =:= typeOf[String] =>
+        q"$intent.getStringExtra($key)"
       case x if x =:= typeOf[Boolean] =>
         q"$intent.getBooleanExtra($key, false)"
       case x if x =:= typeOf[Seq[Long]] =>

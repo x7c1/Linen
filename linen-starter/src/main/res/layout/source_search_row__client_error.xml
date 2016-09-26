@@ -15,6 +15,11 @@
         android:paddingEnd="@dimen/setting_channels_row_padding"
         android:paddingStart="14dp"
         android:drawableStart="@drawable/ic_report_problem"
+
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-condensed"
+
         style="@style/SourceSearch.ItemTitle"
         />
 

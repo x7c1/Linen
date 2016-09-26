@@ -1,6 +1,6 @@
 package x7c1.linen.database.control
 
-import x7c1.linen.database.control.upgrade.{ChannelStatusSchema, LoaderScheduleSchema, NotificationIdSchema}
+import x7c1.linen.database.control.upgrade.{ChannelStatusSchema, InspectorSchema, LoaderScheduleSchema, NotificationIdSchema}
 
 object LinenDatabase {
 
@@ -188,6 +188,7 @@ object LinenDatabase {
     ,Upgrade(20160524)(LoaderScheduleSchema.init:_*)
     ,Upgrade(20160529)(NotificationIdSchema.init:_*)
     ,Upgrade(20160613)(ChannelStatusSchema.rank:_*)
+    ,Upgrade(20160807)(InspectorSchema.init:_*)
   )
 }
 

@@ -6,9 +6,11 @@ import android.database.sqlite.SQLiteConstraintException
 import x7c1.linen.database.control.DatabaseHelper
 import x7c1.linen.database.struct.{EntryParts, RetrievedSourceMarkParts}
 import x7c1.linen.repository.date.Date
+import x7c1.linen.repository.loader.crawling.LoadedEntry.toEntryParts
 import x7c1.wheat.macros.logger.Log
+import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.kinds.{Fate, FutureFate}
+import x7c1.wheat.modern.kinds.Fate
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
@@ -91,15 +93,6 @@ private class SourceUpdaterQueueImpl(
       }
     }
   }
-  private def toEntryParts(sourceId: Long): LoadedEntry => EntryParts =
-    entry => EntryParts(
-      sourceId = sourceId,
-      title = entry.title,
-      content = entry.content,
-      author = entry.author,
-      url = entry.url,
-      createdAt = entry.createdAt
-    )
 
   private def newerThan(latest: LatestEntry) = (parts: LoadedEntry) => {
     (parts.createdAt.timestamp >= latest.createdAt.timestamp) &&
@@ -113,8 +106,6 @@ private class SourceUpdaterQueueImpl(
     }
   }
   private def insertEntries(entries: Seq[EntryParts]): Seq[(Long, EntryParts)] = {
-
-//    val notifier = new UpdaterServiceNotifier(service, loadedEntries.length)
     val marks = entries.zipWithIndex flatMap {
       case (entry, index) =>
         helper.writable insert entry match {
@@ -128,8 +119,6 @@ private class SourceUpdaterQueueImpl(
             Log debug s"$index,${entry.url.host},${entry.title} (by ${entry.author})"
             Some(entryId -> entry)
         }
-
-//        notifier.notifyProgress(index)
     }
     marks.headOption foreach {
       case (entryId, entry) =>
@@ -146,7 +135,6 @@ private class SourceUpdaterQueueImpl(
         }
     }
     marks
-//    notifier.notifyDone()
   }
 
 }

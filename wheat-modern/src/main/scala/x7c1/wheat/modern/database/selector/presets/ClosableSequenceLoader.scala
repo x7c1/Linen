@@ -8,9 +8,10 @@ import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.Selector
 import x7c1.wheat.modern.database.selector.presets.ClosableSequenceLoader.{LoadingDone, LoadingError, SqlError}
 import x7c1.wheat.modern.database.selector.{CanIdentify, CanProvideSelector}
 import x7c1.wheat.modern.decorator.Imports.toRichView
+import x7c1.wheat.modern.fate.FateProvider.HasContext
+import x7c1.wheat.modern.fate.FutureFate
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.kinds.FutureFate.HasContext
-import x7c1.wheat.modern.kinds.{Fate, FutureFate}
+import x7c1.wheat.modern.kinds.Fate
 import x7c1.wheat.modern.sequence.Sequence
 
 import scala.language.higherKinds
@@ -33,7 +34,7 @@ object ClosableSequenceLoader {
   }
   object LoadingError {
     implicit object hasConstructor extends HasConstructor[Throwable => LoadingError]{
-      override def newInstance = new UnexpectedError(_)
+      override def newInstance = UnexpectedError
     }
   }
   case class SqlError(cause:  SQLException) extends LoadingError {

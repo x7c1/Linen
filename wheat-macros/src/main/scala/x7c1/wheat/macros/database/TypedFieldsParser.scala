@@ -27,6 +27,7 @@ trait TypedFieldsParser {
   def getJavaType: Type => Option[Type] = {
     case x if x =:= typeOf[Int] => Some(typeOf[java.lang.Integer])
     case x if x =:= typeOf[Long] => Some(typeOf[java.lang.Long])
+    case x if x =:= typeOf[Option[Long]] => Some(typeOf[java.lang.Long])
     case x if x =:= typeOf[Double] => Some(typeOf[java.lang.Double])
     case x if x =:= typeOf[String] => None
     case x => throw new IllegalArgumentException(s"unsupported type: $x")
