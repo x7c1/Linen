@@ -28,11 +28,11 @@ case class UrlLoadingErrorLabel(
   reportMessage: String,
   pageUrl: String) extends SourceSearchReportRow
 
-case class UrlLoadingError(
+case class OriginLoadingError(
   errorText: String,
   pageUrl: String) extends SourceSearchReportRow
 
-case class SourceLoadingError(
+case class ClientLoadingError(
   errorText: String,
   pageUrl: String) extends SourceSearchReportRow
 

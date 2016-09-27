@@ -135,7 +135,7 @@ private class SourceSearchReportRowFactory(record: InspectorStatusRecord) {
         sourceUrl = sourceUrl
       )
     case None =>
-      SourceLoadingError(
+      ClientLoadingError(
         errorText = s"Loading Error : ${record.origin_title}",
         pageUrl = sourceUrl
       )
