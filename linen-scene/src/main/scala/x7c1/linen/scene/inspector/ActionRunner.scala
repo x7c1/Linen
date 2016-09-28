@@ -32,22 +32,41 @@ class ActionRunner private(
 
   val startPageAction: UrlReceiver = UrlReceiver {
     case url: ActionPageUrl =>
-      val piece = ActionPieceLoader loadFrom url.raw.toString
-      Log info s"[piece] $piece"
-
-      val actionParts = InspectorActionParts(
-        loadingStatus = InspectorLoadingStatus.Loading,
-        accountId = url.accountId,
-        originTitle = piece.originTitle,
-        originUrl = piece.originUrl,
-        createdAt = Date.current(),
-        updatedAt = Date.current()
-      )
-      helper.writable insert actionParts match {
+      val urlAction = ActionPieceLoader loadFrom url.raw.toString match {
+        case Left(error) =>
+          AfterUrlAction(
+            parts = InspectorActionParts(
+              loadingStatus = InspectorLoadingStatus fromException error.cause,
+              accountId = url.accountId,
+              originTitle = "",
+              originUrl = error.targetUrl,
+              createdAt = Date.current(),
+              updatedAt = Date.current()
+            ),
+            next = _ => {}// nop
+          )
+        case Right(piece) =>
+          Log info s"[piece] $piece"
+          AfterUrlAction(
+            parts = InspectorActionParts(
+              loadingStatus = InspectorLoadingStatus.Loading,
+              accountId = url.accountId,
+              originTitle = piece.originTitle,
+              originUrl = piece.originUrl,
+              createdAt = Date.current(),
+              updatedAt = Date.current()
+            ),
+            next = actionId => {
+              piece.latentUrls map
+                toSourceParts(actionId) foreach insertInspectorSourceParts
+            }
+          )
+      }
+      helper.writable insert urlAction.parts match {
         case Left(e) =>
           Log error format(e.getCause)("[failed]")
         case Right(actionId) =>
-          piece.latentUrls map toSourceParts(actionId) foreach insertInspectorSourceParts
+          urlAction.next(actionId)
           onPageActionStarted(PageActionStartedEvent(url.accountId))
       }
   }
@@ -155,4 +174,7 @@ class ActionRunner private(
 
 }
 
-
+case class AfterUrlAction(
+  parts: InspectorActionParts,
+  next: Long => Unit// actionId => Unit
+)

@@ -1,5 +1,7 @@
 package x7c1.linen.repository.inspector
 
+import java.net.UnknownHostException
+
 import org.jsoup.Jsoup
 import x7c1.wheat.macros.logger.Log
 
@@ -7,7 +9,7 @@ object ActionPieceLoader {
 
   import collection.JavaConverters._
 
-  def loadFrom(pageUrl: String): ActionPiece = {
+  def loadFrom(pageUrl: String): Either[ActionPieceLoaderError, ActionPiece] = try {
     val document = Jsoup.connect(pageUrl).
       userAgent("").
       get()
@@ -26,11 +28,17 @@ object ActionPieceLoader {
     eithers.collect {
       case Left(e) => Log error e.message
     }
-    ActionPiece(
+    Right apply ActionPiece(
       originTitle = Option(document.title()) getOrElse "",
       originUrl = pageUrl,
       latentUrls = urls
     )
+  } catch {
+    case e: Exception =>
+      Left apply ActionPieceLoaderError(
+        targetUrl = pageUrl,
+        cause = Some(e)
+      )
   }
 
   private def isSupportedType(linkType: String): Boolean = {
@@ -51,4 +59,9 @@ case class ActionPiece(
   originTitle: String,
   originUrl: String,
   latentUrls: Seq[LatentUrl]
+)
+
+case class ActionPieceLoaderError(
+  targetUrl: String,
+  cause: Option[Exception]
 )
