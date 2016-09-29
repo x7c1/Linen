@@ -23,22 +23,12 @@ case class DiscoveredSource(
   sourceDescription: String,
   sourceUrl: String) extends SourceSearchReportRow
 
-case class UrlLoadingErrorLabel(
-  formattedDate: String,
-  reportMessage: String,
-  pageUrl: String) extends SourceSearchReportRow
-
 case class OriginLoadingError(
   errorText: String,
   pageUrl: String) extends SourceSearchReportRow
 
 case class ClientLoadingError(
   errorText: String,
-  pageUrl: String) extends SourceSearchReportRow
-
-case class NoSourceFoundLabel(
-  formattedDate: String,
-  reportMessage: String,
   pageUrl: String) extends SourceSearchReportRow
 
 case class NoSourceFound(
