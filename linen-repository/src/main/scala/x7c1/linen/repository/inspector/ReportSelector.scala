@@ -136,10 +136,9 @@ private class SourceSearchReportRowFactory(record: InspectorStatusRecord) {
           pageUrl = record.origin_url
         )
       case ConnectionTimeout =>
-        NoSourceFound(
-          pageTitle = "",
+        ClientLoadingError(
           pageUrl = record.origin_url,
-          reportMessage = s"Source Not Found (Connection Timeout)"
+          errorText = s"Source Not Found (Connection Timeout)"
         )
       case UnknownError =>
         NoSourceFound(
