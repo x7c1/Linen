@@ -28,7 +28,9 @@ class EntryAccessorImpl[A <: UnreadEntry](
   positions: EntrySourcePositions,
   cursor: Cursor ) extends ClosableEntryAccessor[A] {
 
-  private lazy val sequence = positions.toHeadlines mergeWith entrySequence
+  private lazy val sequence = {
+    positions.toHeadlines.mergeWith[A, Sequence](entrySequence)
+  }
 
   override def findAt(position: Int) = {
     sequence.findAt(position) map {

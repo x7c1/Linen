@@ -2,10 +2,10 @@ package x7c1.linen.repository.inspector
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.InspectorStatusRecord
-import x7c1.linen.database.struct.InspectorLoadingStatus.{ConnectionTimeout, Loading, LoadingCompleted, ParseError, UnknownError, UnknownHostError, UnknownStatus}
+import x7c1.linen.database.struct.InspectorLoadingStatus.{ConnectionTimeout, ParseError, UnknownError, UnknownHostError}
 import x7c1.linen.database.struct.{HasAccountId, InspectorLoadingStatus}
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
-import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequence, TraverseOn}
+import x7c1.wheat.modern.database.selector.presets.{CanTraverse, TraverseOn}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.HeadlineSequencer
 
@@ -33,19 +33,9 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
     for {
       records <- db.selectorOf[InspectorStatusRecord].traverseOn(id).right
     } yield {
-      val tmp = sequencer derive records map {
+      sequencer derive records map {
         case Left(row) => row
         case Right(record) => new SourceSearchReportRowFactory(record).create
-      }
-
-      // todo: enable sequencer.derive to support ClosableSequence
-      // workaround
-      new ClosableSequence[SourceSearchReportRow] {
-        override def closeCursor(): Unit = records.closeCursor()
-
-        override def length: Int = tmp.length
-
-        override def findAt(position: Int) = tmp.findAt(position)
       }
     }
 

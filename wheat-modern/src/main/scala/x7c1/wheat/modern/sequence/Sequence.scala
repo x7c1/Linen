@@ -36,10 +36,12 @@ object Sequence {
     override protected val underlying: F[A] ) extends SequenceSlice[A, F]
 
   implicit object canSliceFrom extends DefaultCanSliceFrom
+
+  implicit object canDelegate extends DefaultCanDelegate
 }
 
 trait SequenceMerger[A] {
-  def mergeWith[B](sequence: Sequence[B]): Sequence[Either[A, B]]
+  def mergeWith[B, F[T] <: Sequence[T] : CanDelegate](sequence: F[B]): F[Either[A, B]]
 }
 
 class SequenceHeadlines[A] private (
@@ -48,12 +50,12 @@ class SequenceHeadlines[A] private (
 
   require(sequence1.length == interval.length)
 
-  override def mergeWith[B](sequence2: Sequence[B]): Sequence[Either[A, B]] = {
+  override def mergeWith[B, F[T] <: Sequence[T] : CanDelegate](sequence2: F[B]) = {
     require(
       requirement = (sequence1.length + sequence2.length) >= intervals.last,
       message = "sequence.length too short"
     )
-    new Sequence[Either[A, B]] {
+    val target = new Sequence[Either[A, B]] {
       override def findAt(position: Int): Option[Either[A, B]] = {
         @tailrec
         def loop(inf: Int, sup: Int): Option[Either[A, B]] = {
@@ -74,6 +76,7 @@ class SequenceHeadlines[A] private (
       }
       override def length: Int = intervals.last
     }
+    implicitly[CanDelegate[F]].delegate(sequence2)(target)
   }
   private lazy val intervals = interval.scanLeft(0){ _ + _ + 1 }
 }
