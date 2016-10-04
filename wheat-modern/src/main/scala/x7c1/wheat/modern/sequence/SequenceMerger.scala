@@ -18,28 +18,7 @@ class SequenceHeadlines[A] private(
       requirement = (sequence1.length + sequence2.length) >= intervals.last,
       message = "sequence.length too short"
     )
-    val target = new Sequence[Either[A, B]] {
-      override def findAt(position: Int): Option[Either[A, B]] = {
-        @tailrec
-        def loop(inf: Int, sup: Int): Option[Either[A, B]] = {
-          val mid = (inf + sup) / 2
-          //println(s"ys:$ys, inf:$inf, sup:$sup, mid:$mid")
-
-          intervals match {
-            case _ if sup == inf => position - intervals(inf) match {
-              case x if x > 0 => None
-              case 0 => sequence1 findAt inf map Left.apply
-              case _ => sequence2 findAt (position - inf) map Right.apply
-            }
-            case _ if intervals(mid) < position => loop(mid + 1, sup)
-            case _ => loop(inf, mid)
-          }
-        }
-        loop(0, intervals.length - 1)
-      }
-
-      override def length: Int = intervals.last
-    }
+    val target = new MergedSequenceImpl(sequence1, sequence2, intervals)
     implicitly[CanDelegate[F]].delegate(sequence2)(target)
   }
 
@@ -51,6 +30,31 @@ class SequenceHeadlines[A] private(
 object SequenceHeadlines {
   def atInterval[A](sequence: Sequence[A], interval: IndexedSeq[Int]): SequenceHeadlines[A] = {
     new SequenceHeadlines(sequence, interval)
+  }
+}
+
+private class MergedSequenceImpl[A, B, F[T] <: Sequence[T]](
+  sequence1: Sequence[A],
+  sequence2: F[B],
+  intervals: Seq[Int]) extends Sequence[Either[A, B]] {
+
+  override def length: Int = intervals.last
+
+  override def findAt(position: Int) = {
+    @tailrec
+    def loop(inf: Int, sup: Int): Option[Either[A, B]] = {
+      val mid = (inf + sup) / 2
+      intervals match {
+        case _ if sup == inf => position - intervals(inf) match {
+          case x if x > 0 => None
+          case 0 => sequence1 findAt inf map Left.apply
+          case _ => sequence2 findAt (position - inf) map Right.apply
+        }
+        case _ if intervals(mid) < position => loop(mid + 1, sup)
+        case _ => loop(inf, mid)
+      }
+    }
+    loop(0, intervals.length - 1)
   }
 }
 

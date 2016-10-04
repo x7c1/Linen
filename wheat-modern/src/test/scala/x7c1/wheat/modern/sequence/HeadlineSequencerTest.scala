@@ -45,7 +45,7 @@ class HeadlineSequencerTest extends FlatSpecLike with Matchers {
       equals = _ == _,
       toHeadline = xs => s"label(${xs.length})"
     )
-    val sequence = sequencer derive Sequence.from(Seq())
+    val sequence = sequencer.derive[Sequence](Sequence.from(Seq()))
     sequence.toSeq shouldBe Seq()
   }
 }

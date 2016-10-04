@@ -54,4 +54,3 @@ class HeadlineSequencer[X, A] private(
   }
 
 }
-
