@@ -62,16 +62,23 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
         Log info s"[init]"
       }
     }
+
     /*
       In order to control timing of dismiss(),
         temporally set listeners as nop
         then set onClickListener again in onStart method.
      */
-    val builder = args.dialogFactory.newInstance(getActivity).
+    args.dialogFactory.newInstance(getActivity).
       setTitle("Attached channels").
       setPositiveButton("OK", nop).
-      setNegativeButton("CANCEL", nop)
-
+      setNegativeButton("CANCEL", nop).
+      setView(layout.itemView).
+      create()
+  }
+  def showIn(activity: FragmentActivity): Unit = {
+    show(activity.getSupportFragmentManager, "create-source")
+  }
+  override def onCreateDialog(savedInstanceState: Bundle) = {
     channelsAccessor foreach {
       accessor =>
         layout.channels setLayoutManager new LinearLayoutManager(getContext)
@@ -83,13 +90,8 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
           CheckedState(selectedChannelMap)
         )
     }
-    builder setView layout.itemView
-    builder.create()
+    internalDialog
   }
-  def showIn(activity: FragmentActivity): Unit = {
-    show(activity.getSupportFragmentManager, "create-source")
-  }
-  override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
 
   override def onStart(): Unit = {
     super.onStart()
