@@ -27,6 +27,13 @@ trait DelayedDialog extends DialogFragment {
           Log info s"[init]"
         }
       }
+
+      /*
+        In order to control timing of dismiss(),
+          need to set listeners temporally as nop
+          then set onClickListener again in onStart method.
+       */
+
       factory.newInstance(getActivity).
         setTitle(title).
         setPositiveButton(positiveText, nop).
