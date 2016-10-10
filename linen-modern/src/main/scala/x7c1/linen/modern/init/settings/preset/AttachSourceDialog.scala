@@ -14,6 +14,7 @@ import x7c1.linen.modern.init.settings.preset.AttachSourceDialog.Arguments
 import x7c1.linen.repository.channel.my.{ChannelToAttach, MyChannelConnectionUpdater}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
+import x7c1.wheat.lore.dialog.DelayedDialog
 import x7c1.wheat.lore.resource.AdapterDelegatee
 import x7c1.wheat.lore.resource.AdapterDelegatee.BaseAdapter
 import x7c1.wheat.macros.fragment.TypedFragment
@@ -27,6 +28,7 @@ import scala.collection.mutable
 
 
 object AttachSourceDialog {
+
   class Arguments(
     val clientAccountId: Long,
     val originalChannelId: Long,
@@ -35,9 +37,12 @@ object AttachSourceDialog {
     val attachLayoutFactory: ViewHolderProviderFactory[SettingSourceAttach],
     val rowFactory: ViewHolderProviderFactory[SettingSourceAttachRowItem]
   )
+
 }
 
-class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
+class AttachSourceDialog extends DialogFragment
+  with DelayedDialog
+  with TypedFragment[Arguments] {
 
   lazy val args = getTypedArguments
 
@@ -53,31 +58,16 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
   private lazy val channelsAccessor = createAccessor() match {
     case Right(accessor) => Some(accessor)
     case Left(e) =>
-      Log error format(e){"[failed]"}
+      Log error format(e) {
+        "[failed]"
+      }
       None
   }
-  private lazy val internalDialog = {
-    val nop = new OnClickListener {
-      override def onClick(dialog: DialogInterface, which: Int): Unit = {
-        Log info s"[init]"
-      }
-    }
 
-    /*
-      In order to control timing of dismiss(),
-        temporally set listeners as nop
-        then set onClickListener again in onStart method.
-     */
-    args.dialogFactory.newInstance(getActivity).
-      setTitle("Attached channels").
-      setPositiveButton("OK", nop).
-      setNegativeButton("CANCEL", nop).
-      setView(layout.itemView).
-      create()
-  }
   def showIn(activity: FragmentActivity): Unit = {
     show(activity.getSupportFragmentManager, "create-source")
   }
+
   override def onCreateDialog(savedInstanceState: Bundle) = {
     channelsAccessor foreach {
       accessor =>
@@ -90,20 +80,23 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
           CheckedState(selectedChannelMap)
         )
     }
-    internalDialog
+    args.dialogFactory.createAlertDialog(
+      title = "Attached channels",
+      positiveText = "OK",
+      negativeText = "CANCEL",
+      layoutView = layout.itemView
+    )
   }
 
   override def onStart(): Unit = {
     super.onStart()
 
-    getDialog match {
-      case dialog: AlertDialog =>
-        dialog.positiveButton foreach (_ onClick onClickPositive)
-        dialog.negativeButton foreach (_ onClick onClickNegative)
-      case dialog =>
-        Log error s"unknown dialog: $dialog"
-    }
+    initializeButtons(
+      positive = onClickPositive,
+      negative = _ => dismissSoon()
+    )
   }
+
   override def onStop(): Unit = {
     super.onStop()
     helper.close()
@@ -115,6 +108,7 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
       sourceId = args.originalSourceId
     )
   }
+
   private def onClickPositive(button: Button) = {
     Log info s"[init]"
 
@@ -123,20 +117,17 @@ class AttachSourceDialog extends DialogFragment with TypedFragment[Arguments]{
     } foreach {
       _ updateMapping selectedChannelMap
     }
-    UiThread.runDelayed(msec = 200){ dismiss() }
-  }
-  private def onClickNegative(button: Button) = {
-    UiThread.runDelayed(msec = 200){ dismiss() }
+    dismissSoon()
   }
 }
 
 class AttachChannelsAdapter(
   delegatee: AdapterDelegatee[SettingSourceAttachRow, ChannelToAttach],
   state: CheckedState[Long]
-) extends BaseAdapter(delegatee){
+) extends BaseAdapter(delegatee) {
 
   override def onBindViewHolder(holder: SettingSourceAttachRow, position: Int) = {
-    delegatee.bindViewHolder(holder, position){
+    delegatee.bindViewHolder(holder, position) {
       case (row: SettingSourceAttachRowItem, channel) =>
         row.itemView onClick { _ => row.checked.toggle() }
         row.label.text = channel.channelName
