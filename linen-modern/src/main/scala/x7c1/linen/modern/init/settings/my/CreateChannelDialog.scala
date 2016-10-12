@@ -1,7 +1,5 @@
 package x7c1.linen.modern.init.settings.my
 
-import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.{AlertDialog, AppCompatDialogFragment}
@@ -14,6 +12,7 @@ import x7c1.linen.repository.channel.my.ChannelCreator.InputToCreate
 import x7c1.linen.repository.channel.my.{ChannelCreator, ChannelWriterError, EmptyName, UserInputError}
 import x7c1.wheat.ancient.context.ContextualFactory
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory
+import x7c1.wheat.lore.dialog.DelayedDialog
 import x7c1.wheat.macros.fragment.TypedFragment
 import x7c1.wheat.macros.intent.LocalBroadcaster
 import x7c1.wheat.macros.logger.Log
@@ -32,7 +31,10 @@ object CreateChannelDialog {
 
 }
 
-class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arguments] {
+class CreateChannelDialog extends AppCompatDialogFragment
+  with DelayedDialog
+  with TypedFragment[Arguments] {
+
   lazy val args = getTypedArguments
 
   private val provide = EitherTask.hold[ChannelWriterError]
@@ -47,18 +49,22 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     show(activity.getSupportFragmentManager, "channel-dialog")
   }
 
-  override def onCreateDialog(savedInstanceState: Bundle) = internalDialog
+  override def onCreateDialog(savedInstanceState: Bundle) = {
+    args.dialogFactory.createAlertDialog(
+      title = "Create my channel",
+      positiveText = "Create",
+      negativeText = "Cancel",
+      layoutView = layout.itemView
+    )
+  }
 
   override def onStart(): Unit = {
     super.onStart()
 
-    getDialog match {
-      case dialog: AlertDialog =>
-        dialog.positiveButton foreach (_ onClick onClickPositive)
-        dialog.negativeButton foreach (_ onClick onClickNegative)
-      case dialog =>
-        Log error s"unknown dialog $dialog"
-    }
+    initializeButtons(
+      positive = onClickPositive,
+      negative = onClickNegative
+    )
   }
 
   override def onStop(): Unit = {
@@ -137,25 +143,6 @@ class CreateChannelDialog extends AppCompatDialogFragment with TypedFragment[Arg
     factory.inflateOn(null)
   }
 
-  private lazy val internalDialog = {
-    val nop = new OnClickListener {
-      override def onClick(dialog: DialogInterface, which: Int): Unit = {
-        Log info s"[init]"
-      }
-    }
-    /*
-      In order to control timing of dismiss(),
-        temporally set listeners as nop
-        then set onClickListener again in onStart method.
-     */
-    val builder = args.dialogFactory.newInstance(getActivity).
-      setTitle("Create new channel").
-      setPositiveButton("Create", nop).
-      setNegativeButton("Cancel", nop)
-
-    builder setView layout.itemView
-    builder.create()
-  }
 }
 
 class ChannelCreated(

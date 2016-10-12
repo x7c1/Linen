@@ -43,7 +43,7 @@ trait DelayedDialog extends DialogFragment {
     }
   }
 
-  protected def dismissLater(): Unit = {
+  protected def dismissSoon(): Unit = {
     UiThread.runDelayed(msec = 200){ dismiss() }
   }
 
