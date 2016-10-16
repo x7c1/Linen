@@ -1,7 +1,5 @@
 package x7c1.linen.modern.init.settings.preset
 
-import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import android.support.v4.app.{DialogFragment, FragmentActivity}
 import android.support.v7.app.AlertDialog
@@ -22,7 +20,6 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.CheckedState
 import x7c1.wheat.modern.decorator.Imports._
 import x7c1.wheat.modern.formatter.ThrowableFormatter.format
-import x7c1.wheat.modern.tasks.UiThread
 
 import scala.collection.mutable
 

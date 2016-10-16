@@ -8,18 +8,24 @@ import x7c1.wheat.macros.logger.Log
 import x7c1.wheat.modern.decorator.Imports._
 
 class SourceSearchRowAdapter(
-  delegatee: AdapterDelegatee[SourceSearchRow, SourceSearchReportRow]
-) extends BaseAdapter(delegatee){
+  delegatee: AdapterDelegatee[SourceSearchRow, SourceSearchReportRow],
+  onSubscribeClicked: SubscribeClickedEvent => Unit
+
+) extends BaseAdapter(delegatee) {
 
   override def onBindViewHolder(holder: SourceSearchRow, position: Int): Unit = {
-    delegatee.bindViewHolder(holder, position){
+    delegatee.bindViewHolder(holder, position) {
       case (row: SourceSearchRowLabel, source: DiscoveredSourceLabel) =>
         row.date.text = source.formattedDate
 
       case (row: SourceSearchRowSourceItem, source: DiscoveredSource) =>
         row.title.text = source.sourceTitle
         row.url.text = source.sourceUrl
-
+        row.subscribe onClick { _ =>
+          onSubscribeClicked apply SubscribeClickedEvent(
+            sourceId = source.sourceId
+          )
+        }
       case (row: SourceSearchRowOriginError, item: OriginLoadingError) =>
         row.message.text = item.errorText
         row.url.text = item.pageUrl
@@ -32,11 +38,12 @@ class SourceSearchRowAdapter(
         row.message.text = item.errorText
         row.url.text = item.pageUrl
 
-      case (row: SourceSearchRowFooter, item: Footer) =>
-        // nop
+      case (row: SourceSearchRowFooter, item: Footer) => // nop
 
       case (row, item) =>
         Log info s"unknown row: $row, $item"
     }
   }
 }
+
+

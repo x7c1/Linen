@@ -19,6 +19,7 @@ case class DiscoveredSourceLabel(
   pageUrl: String) extends SourceSearchReportRow
 
 case class DiscoveredSource(
+  sourceId: Long,
   sourceTitle: String,
   sourceDescription: String,
   sourceUrl: String) extends SourceSearchReportRow

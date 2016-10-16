@@ -148,6 +148,7 @@ private class SourceSearchReportRowFactory(record: InspectorStatusRecord) {
   private def forLatentSourceUrl(sourceUrl: String): Option[Long] => SourceSearchReportRow = {
     case Some(sourceId) =>
       DiscoveredSource(
+        sourceId = sourceId,
         sourceTitle = record.source_title getOrElse "",
         sourceDescription = s"description of ${record.latent_source_url}",
         sourceUrl = sourceUrl

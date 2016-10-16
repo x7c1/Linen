@@ -4,9 +4,9 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import x7c1.linen.database.control.DatabaseHelper
-import x7c1.linen.database.struct.HasAccountId
+import x7c1.linen.database.struct.{HasAccountId, HasSourceId}
 import x7c1.linen.glue.activity.ActivityControl
-import x7c1.linen.glue.res.layout.{SourceSearchLayout, SourceSearchStart}
+import x7c1.linen.glue.res.layout.{SourceSearchLayout, SourceSearchStart, SubscribeSourceLayout, SubscribeSourceRow, SubscribeSourceRowItem}
 import x7c1.linen.glue.service.ServiceControl
 import x7c1.linen.repository.inspector.SourceSearchReportRow
 import x7c1.linen.repository.loader.crawling.CrawlerContext
@@ -23,9 +23,12 @@ import x7c1.wheat.modern.decorator.Imports._
 class SourceSearchDelegatee(
   activity: FragmentActivity with ActivityControl with ServiceControl,
   layout: SourceSearchLayout,
-  dialogFactory: ContextualFactory[AlertDialog.Builder],
+  startDialogFactory: ContextualFactory[AlertDialog.Builder],
   inputLayoutFactory: ViewHolderProviderFactory[SourceSearchStart],
-  rowProviders: SearchReportRowProviders
+  rowProviders: SearchReportRowProviders,
+  subscribeDialogFactory: ContextualFactory[AlertDialog.Builder],
+  subscribeLayoutFactory: ViewHolderProviderFactory[SubscribeSourceLayout],
+  subscribeRowItemFactory: ViewHolderProviderFactory[SubscribeSourceRowItem]
 ) {
 
   def onCreate(): Unit = {
@@ -50,7 +53,8 @@ class SourceSearchDelegatee(
 
   def createAdapter[A: HasAccountId](account: A) = {
     new SourceSearchRowAdapter(
-      delegatee = AdapterDelegatee.create(rowProviders, loader.sequence)
+      delegatee = AdapterDelegatee.create(rowProviders, loader.sequence),
+      onSubscribeClicked = e => dialogToSubscribe(account, e) showIn activity
     )
   }
 
@@ -72,11 +76,22 @@ class SourceSearchDelegatee(
     reloadReports[PageActionStartedEvent]
   }
 
+  private def dialogToSubscribe[A: HasAccountId, B: HasSourceId](account: A, source: B) = {
+    FragmentFactory.create[SubscribeSourceDialog] by
+      new SubscribeSourceDialog.Arguments(
+        clientAccountId = implicitly[HasAccountId[A]] toId account,
+        sourceId = implicitly[HasSourceId[B]] toId source,
+        dialogFactory = subscribeDialogFactory,
+        layoutFactory = subscribeLayoutFactory,
+        rowItemFactory = subscribeRowItemFactory
+      )
+  }
+
   private def showInputDialog(accountId: Long) = {
     val fragment = FragmentFactory.create[StartSearchDialog] by
       new StartSearchDialog.Arguments(
         clientAccountId = accountId,
-        dialogFactory = dialogFactory,
+        dialogFactory = startDialogFactory,
         inputLayoutFactory = inputLayoutFactory
       )
 

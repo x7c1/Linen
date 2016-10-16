@@ -1,10 +1,7 @@
 package x7c1.linen.modern.init.inspector
 
-import java.net.URL
-
 import android.app.Dialog
-import android.content.DialogInterface.OnClickListener
-import android.content.{Context, DialogInterface}
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.{DialogFragment, FragmentActivity}
 import android.support.v7.app.AlertDialog

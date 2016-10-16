@@ -7,6 +7,7 @@ import x7c1.linen.base.BaseFragmentActivity;
 import x7c1.linen.base.TransitAnimation;
 import x7c1.linen.base.TransitAnimations;
 import x7c1.linen.glue.res.layout.SourceSearchLayout;
+import x7c1.linen.glue.res.layout.SubscribeSourceRow;
 import x7c1.linen.modern.init.inspector.SearchReportRowProviders;
 import x7c1.linen.modern.init.inspector.SourceSearchDelegatee;
 import x7c1.linen.res.layout.SourceSearchLayoutProvider;
@@ -17,6 +18,8 @@ import x7c1.linen.res.layout.SourceSearchRowOriginErrorProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceItemProvider;
 import x7c1.linen.res.layout.SourceSearchRowSourceNotFoundProvider;
 import x7c1.linen.res.layout.SourceSearchStartProvider;
+import x7c1.linen.res.layout.SubscribeSourceLayoutProvider;
+import x7c1.linen.res.layout.SubscribeSourceRowItemProvider;
 import x7c1.linen.settings.DialogFactory;
 
 public class SourceSearchActivity extends BaseFragmentActivity {
@@ -44,7 +47,10 @@ public class SourceSearchActivity extends BaseFragmentActivity {
 						new SourceSearchRowSourceNotFoundProvider(this),
 						new SourceSearchRowClientErrorProvider(this),
 						new SourceSearchRowFooterProvider(this)
-				)
+				),
+				new DialogFactory(),
+				SubscribeSourceLayoutProvider.factory(),
+				SubscribeSourceRowItemProvider.factory()
 		);
 		this.delegatee.onCreate();
 	}
