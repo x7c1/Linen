@@ -36,6 +36,11 @@ public class @(parts.prefix.ofClass)Provider implements ViewHolderProvider<@(par
         return factory().createViewHolder(view);
     }
 
+    @@Override
+    public @(parts.prefix.ofClass) inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<@(parts.prefix.ofClass)> factory(){
         return new ViewHolderProviderFactory<@(parts.prefix.ofClass)>() {
             @@Override
