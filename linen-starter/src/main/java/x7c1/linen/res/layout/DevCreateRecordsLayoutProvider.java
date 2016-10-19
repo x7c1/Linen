@@ -8,15 +8,15 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.View;
+import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.TextView;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
 
 public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCreateRecordsLayout> {
 
@@ -44,6 +44,11 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
     public DevCreateRecordsLayout inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.dev_create_records_layout, parent, attachToRoot);
         return factory().createViewHolder(view);
+    }
+
+    @Override
+    public DevCreateRecordsLayout inflate(){
+        return inflate(null, false);
     }
 
     public static ViewHolderProviderFactory<DevCreateRecordsLayout> factory(){

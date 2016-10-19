@@ -8,6 +8,7 @@ package x7c1.linen.glue.res.layout;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.TextView;
 
