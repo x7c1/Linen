@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.MenuRowLabel;
 
@@ -20,7 +21,11 @@ public class MenuRowLabelProvider implements ViewHolderProvider<MenuRowLabel> {
     private final LayoutInflater inflater;
 
     public MenuRowLabelProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public MenuRowLabelProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -36,9 +41,31 @@ public class MenuRowLabelProvider implements ViewHolderProvider<MenuRowLabel> {
     @Override
     public MenuRowLabel inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.menu_row__label, parent, attachToRoot);
-        return new MenuRowLabel(
-            view,
-            (TextView) view.findViewById(R.id.menu_row__label__text)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public MenuRowLabel inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<MenuRowLabel> factory(){
+        return new ViewHolderProviderFactory<MenuRowLabel>() {
+            @Override
+            public ViewHolderProvider<MenuRowLabel> create(LayoutInflater inflater){
+                return new MenuRowLabelProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<MenuRowLabel> create(Context context){
+                return new MenuRowLabelProvider(context);
+            }
+            @Override
+            public MenuRowLabel createViewHolder(View view){
+                return new MenuRowLabel(
+                    view,
+                    (TextView) view.findViewById(R.id.menu_row__label__text)
+                );
+            }
+        };
     }
 }
