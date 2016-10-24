@@ -44,6 +44,11 @@ public class UnreadDetailRowEntryProvider implements ViewHolderProvider<UnreadDe
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadDetailRowEntry inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadDetailRowEntry> factory(){
         return new ViewHolderProviderFactory<UnreadDetailRowEntry>() {
             @Override
