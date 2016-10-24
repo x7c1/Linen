@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.widget.ProgressBar;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
@@ -43,6 +44,11 @@ public class UnreadOutlineRowFooterProvider implements ViewHolderProvider<Unread
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadOutlineRowFooter inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadOutlineRowFooter> factory(){
         return new ViewHolderProviderFactory<UnreadOutlineRowFooter>() {
             @Override
@@ -56,7 +62,8 @@ public class UnreadOutlineRowFooterProvider implements ViewHolderProvider<Unread
             @Override
             public UnreadOutlineRowFooter createViewHolder(View view){
                 return new UnreadOutlineRowFooter(
-                    view
+                    view,
+                    (ProgressBar) view.findViewById(R.id.tools_progress_indeterminate_h__progress_bar)
                 );
             }
         };
