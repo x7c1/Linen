@@ -49,6 +49,11 @@ public class UnreadItemsLayoutProvider implements ViewHolderProvider<UnreadItems
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadItemsLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadItemsLayout> factory(){
         return new ViewHolderProviderFactory<UnreadItemsLayout>() {
             @Override
