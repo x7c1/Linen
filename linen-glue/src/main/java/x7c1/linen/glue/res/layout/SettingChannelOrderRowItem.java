@@ -13,18 +13,18 @@ import android.widget.TextView;
 public class SettingChannelOrderRowItem extends SettingChannelOrderRow {
 
     public final ImageView startDraggingLeft;
-    public final TextView name;
     public final ImageView startDraggingRight;
+    public final TextView name;
 
     public SettingChannelOrderRowItem(
         View itemView,
         ImageView startDraggingLeft,
-        TextView name,
-        ImageView startDraggingRight
+        ImageView startDraggingRight,
+        TextView name
     ){
         super(itemView);
         this.startDraggingLeft = startDraggingLeft;
-        this.name = name;
         this.startDraggingRight = startDraggingRight;
+        this.name = name;
     }
 }
