@@ -12,18 +12,18 @@ import android.widget.TextView;
 public class SourceSearchRowClientError extends SourceSearchRow {
 
     public final TextView message;
-    public final TextView url;
     public final TextView retry;
+    public final TextView url;
 
     public SourceSearchRowClientError(
         View itemView,
         TextView message,
-        TextView url,
-        TextView retry
+        TextView retry,
+        TextView url
     ){
         super(itemView);
         this.message = message;
-        this.url = url;
         this.retry = retry;
+        this.url = url;
     }
 }
