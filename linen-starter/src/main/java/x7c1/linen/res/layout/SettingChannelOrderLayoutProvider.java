@@ -45,6 +45,11 @@ public class SettingChannelOrderLayoutProvider implements ViewHolderProvider<Set
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingChannelOrderLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingChannelOrderLayout> factory(){
         return new ViewHolderProviderFactory<SettingChannelOrderLayout>() {
             @Override
