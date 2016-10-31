@@ -45,6 +45,11 @@ public class SettingChannelOrderRowItemProvider implements ViewHolderProvider<Se
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingChannelOrderRowItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingChannelOrderRowItem> factory(){
         return new ViewHolderProviderFactory<SettingChannelOrderRowItem>() {
             @Override
@@ -60,8 +65,8 @@ public class SettingChannelOrderRowItemProvider implements ViewHolderProvider<Se
                 return new SettingChannelOrderRowItem(
                     view,
                     (ImageView) view.findViewById(R.id.setting_channel_order_row__item__start_dragging_left),
-                    (TextView) view.findViewById(R.id.setting_channel_order_row__item__name),
-                    (ImageView) view.findViewById(R.id.setting_channel_order_row__item__start_dragging_right)
+                    (ImageView) view.findViewById(R.id.setting_channel_order_row__item__start_dragging_right),
+                    (TextView) view.findViewById(R.id.setting_channel_order_row__item__name)
                 );
             }
         };
