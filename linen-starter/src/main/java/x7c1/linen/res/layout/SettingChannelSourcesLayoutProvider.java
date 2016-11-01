@@ -13,6 +13,7 @@ import android.view.View;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingChannelSourcesLayout;
 
@@ -21,7 +22,11 @@ public class SettingChannelSourcesLayoutProvider implements ViewHolderProvider<S
     private final LayoutInflater inflater;
 
     public SettingChannelSourcesLayoutProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public SettingChannelSourcesLayoutProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -37,10 +42,32 @@ public class SettingChannelSourcesLayoutProvider implements ViewHolderProvider<S
     @Override
     public SettingChannelSourcesLayout inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_channel_sources_layout, parent, attachToRoot);
-        return new SettingChannelSourcesLayout(
-            view,
-            (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_channel_sources_layout__toolbar),
-            (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_channel_sources_layout__source_list)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public SettingChannelSourcesLayout inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<SettingChannelSourcesLayout> factory(){
+        return new ViewHolderProviderFactory<SettingChannelSourcesLayout>() {
+            @Override
+            public ViewHolderProvider<SettingChannelSourcesLayout> create(LayoutInflater inflater){
+                return new SettingChannelSourcesLayoutProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<SettingChannelSourcesLayout> create(Context context){
+                return new SettingChannelSourcesLayoutProvider(context);
+            }
+            @Override
+            public SettingChannelSourcesLayout createViewHolder(View view){
+                return new SettingChannelSourcesLayout(
+                    view,
+                    (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_channel_sources_layout__toolbar),
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_channel_sources_layout__source_list)
+                );
+            }
+        };
     }
 }
