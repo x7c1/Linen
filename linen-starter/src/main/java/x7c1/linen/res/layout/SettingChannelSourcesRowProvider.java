@@ -47,6 +47,11 @@ public class SettingChannelSourcesRowProvider implements ViewHolderProvider<Sett
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingChannelSourcesRow inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingChannelSourcesRow> factory(){
         return new ViewHolderProviderFactory<SettingChannelSourcesRow>() {
             @Override
