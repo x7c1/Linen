@@ -46,6 +46,11 @@ public class SettingMyChannelsLayoutProvider implements ViewHolderProvider<Setti
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingMyChannelsLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingMyChannelsLayout> factory(){
         return new ViewHolderProviderFactory<SettingMyChannelsLayout>() {
             @Override
