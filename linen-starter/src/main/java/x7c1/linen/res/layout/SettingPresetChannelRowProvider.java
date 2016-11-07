@@ -46,6 +46,11 @@ public class SettingPresetChannelRowProvider implements ViewHolderProvider<Setti
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingPresetChannelRow inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingPresetChannelRow> factory(){
         return new ViewHolderProviderFactory<SettingPresetChannelRow>() {
             @Override
