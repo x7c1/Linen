@@ -44,6 +44,11 @@ public class SettingPresetTabAllProvider implements ViewHolderProvider<SettingPr
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingPresetTabAll inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingPresetTabAll> factory(){
         return new ViewHolderProviderFactory<SettingPresetTabAll>() {
             @Override
