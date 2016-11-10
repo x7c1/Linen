@@ -8,13 +8,13 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SettingPresetTabSelected;
+import android.view.View;
+import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingPresetTabSelected;
 
 public class SettingPresetTabSelectedProvider implements ViewHolderProvider<SettingPresetTabSelected> {
 
@@ -44,6 +44,11 @@ public class SettingPresetTabSelectedProvider implements ViewHolderProvider<Sett
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingPresetTabSelected inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingPresetTabSelected> factory(){
         return new ViewHolderProviderFactory<SettingPresetTabSelected>() {
             @Override
@@ -55,10 +60,10 @@ public class SettingPresetTabSelectedProvider implements ViewHolderProvider<Sett
                 return new SettingPresetTabSelectedProvider(context);
             }
             @Override
-            public SettingPresetTabSelected createViewHolder(View view) {
+            public SettingPresetTabSelected createViewHolder(View view){
                 return new SettingPresetTabSelected(
-                        view,
-                        (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__selected__channel_list)
+                    view,
+                    (android.support.v7.widget.RecyclerView) view.findViewById(R.id.setting_preset_tab__selected__channel_list)
                 );
             }
         };
