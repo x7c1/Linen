@@ -8,13 +8,14 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.SettingScheduleLayout;
+import android.view.View;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.SettingScheduleLayout;
 
 public class SettingScheduleLayoutProvider implements ViewHolderProvider<SettingScheduleLayout> {
 
@@ -42,6 +43,11 @@ public class SettingScheduleLayoutProvider implements ViewHolderProvider<Setting
     public SettingScheduleLayout inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_schedule_layout, parent, attachToRoot);
         return factory().createViewHolder(view);
+    }
+
+    @Override
+    public SettingScheduleLayout inflate(){
+        return inflate(null, false);
     }
 
     public static ViewHolderProviderFactory<SettingScheduleLayout> factory(){
