@@ -44,6 +44,11 @@ public class SettingSourceAttachProvider implements ViewHolderProvider<SettingSo
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingSourceAttach inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingSourceAttach> factory(){
         return new ViewHolderProviderFactory<SettingSourceAttach>() {
             @Override
