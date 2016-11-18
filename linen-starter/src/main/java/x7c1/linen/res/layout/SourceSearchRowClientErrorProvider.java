@@ -44,6 +44,11 @@ public class SourceSearchRowClientErrorProvider implements ViewHolderProvider<So
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowClientError inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowClientError> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowClientError>() {
             @Override
@@ -59,8 +64,8 @@ public class SourceSearchRowClientErrorProvider implements ViewHolderProvider<So
                 return new SourceSearchRowClientError(
                     view,
                     (TextView) view.findViewById(R.id.source_search_row__client_error__message),
-                    (TextView) view.findViewById(R.id.source_search_row__client_error__url),
-                    (TextView) view.findViewById(R.id.source_search_row__client_error__retry)
+                    (TextView) view.findViewById(R.id.source_search_row__client_error__retry),
+                    (TextView) view.findViewById(R.id.source_search_row__client_error__url)
                 );
             }
         };
