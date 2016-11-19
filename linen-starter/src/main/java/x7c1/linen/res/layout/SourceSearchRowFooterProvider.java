@@ -43,6 +43,11 @@ public class SourceSearchRowFooterProvider implements ViewHolderProvider<SourceS
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowFooter inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowFooter> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowFooter>() {
             @Override
