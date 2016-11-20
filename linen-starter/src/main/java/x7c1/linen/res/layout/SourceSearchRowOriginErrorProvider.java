@@ -44,6 +44,11 @@ public class SourceSearchRowOriginErrorProvider implements ViewHolderProvider<So
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowOriginError inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowOriginError> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowOriginError>() {
             @Override
