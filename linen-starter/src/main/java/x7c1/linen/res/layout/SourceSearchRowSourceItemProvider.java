@@ -44,6 +44,11 @@ public class SourceSearchRowSourceItemProvider implements ViewHolderProvider<Sou
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowSourceItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowSourceItem> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowSourceItem>() {
             @Override
