@@ -44,6 +44,11 @@ public class SourceSearchRowSourceNotFoundProvider implements ViewHolderProvider
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowSourceNotFound inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowSourceNotFound> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowSourceNotFound>() {
             @Override
