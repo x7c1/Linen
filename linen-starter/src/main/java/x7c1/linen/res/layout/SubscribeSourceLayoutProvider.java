@@ -44,6 +44,11 @@ public class SubscribeSourceLayoutProvider implements ViewHolderProvider<Subscri
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SubscribeSourceLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SubscribeSourceLayout> factory(){
         return new ViewHolderProviderFactory<SubscribeSourceLayout>() {
             @Override
