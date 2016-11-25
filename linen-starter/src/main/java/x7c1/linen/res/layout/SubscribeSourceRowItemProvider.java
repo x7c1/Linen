@@ -45,6 +45,11 @@ public class SubscribeSourceRowItemProvider implements ViewHolderProvider<Subscr
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SubscribeSourceRowItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SubscribeSourceRowItem> factory(){
         return new ViewHolderProviderFactory<SubscribeSourceRowItem>() {
             @Override
