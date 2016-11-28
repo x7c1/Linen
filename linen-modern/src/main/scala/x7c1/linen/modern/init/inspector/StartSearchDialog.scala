@@ -97,7 +97,6 @@ class StartSearchDialog extends DialogFragment
   }
 
   private lazy val layout = {
-    val factory = args.inputLayoutFactory create getActivity
-    factory inflateOn null // todo: eradicate
+    args.inputLayoutFactory.create(getActivity).inflate()
   }
 }
