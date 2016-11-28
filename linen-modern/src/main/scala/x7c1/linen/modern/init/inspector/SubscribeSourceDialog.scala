@@ -75,8 +75,7 @@ class SubscribeSourceDialog extends DialogFragment
   private lazy val helper = new DatabaseHelper(getActivity)
 
   private lazy val layout = {
-    val factory = args.layoutFactory create getActivity
-    factory.inflateOn(null)
+    args.layoutFactory.create(getActivity).inflate()
   }
   private lazy val selectedChannelMap: mutable.Map[Long, Boolean] = {
     mutable.Map()
