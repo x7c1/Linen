@@ -46,8 +46,7 @@ class AttachSourceDialog extends DialogFragment
   private lazy val helper = new DatabaseHelper(getActivity)
 
   private lazy val layout = {
-    val factory = args.attachLayoutFactory create getActivity
-    factory.inflateOn(null)
+    args.attachLayoutFactory.create(getActivity).inflate()
   }
   private lazy val selectedChannelMap: mutable.Map[Long, Boolean] = {
     mutable.Map()
