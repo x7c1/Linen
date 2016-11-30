@@ -139,8 +139,7 @@ class CreateChannelDialog extends AppCompatDialogFragment
   }
 
   private lazy val layout = {
-    val factory = args.inputLayoutFactory create getActivity
-    factory.inflateOn(null)
+    args.inputLayoutFactory.create(getActivity).inflate()
   }
 
 }
