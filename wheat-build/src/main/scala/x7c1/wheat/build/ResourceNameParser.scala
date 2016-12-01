@@ -17,14 +17,14 @@ object ResourceNameParser {
       case (x, xs) => Words(x +: xs)
     }
     any.*.string <~ token(".xml") map { raw =>
-      val p = (wordsParser <~ token("__")).? ~ wordsParser map {
-        case (parent, words) =>
+      val p = "_".? ~ (wordsParser <~ token("__")).? ~ wordsParser map {
+        case ((underscore, parent), words) =>
           val parentName = parent map (_.camelize)
           ResourcePrefix(
             raw = raw,
-            ofClass = (parentName getOrElse "") + words.camelize,
+            ofClass = (underscore getOrElse "") + (parentName getOrElse "") + words.camelize,
             ofKey = raw + "__",
-            parentClassName = parentName
+            parentClassName = for (u <- underscore; p <- parentName) yield u + p
           )
       }
       parse(raw, p).left map WheatParserError
