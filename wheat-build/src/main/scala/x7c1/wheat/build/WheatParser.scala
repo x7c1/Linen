@@ -24,7 +24,7 @@ object WheatParser {
 
   def selectFrom(finder: PathFinder): Def.Initialize[State => Parser[Seq[String]]] =
     Def.setting { state =>
-      val names = finder.get.map(_.getName)
+      val names = finder.get.map(_.getName) filterNot (_ startsWith "_")
       ReductiveParser from names
     }
 
