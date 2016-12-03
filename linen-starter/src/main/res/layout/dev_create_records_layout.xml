@@ -59,7 +59,7 @@
 
     <View style="@style/DevCreateRecordsMenuSeparator" />
 
-    <include layout="@layout/dev_init_records" />
+    <include layout="@layout/_dev_init_records" />
 
     <View style="@style/DevCreateRecordsMenuSeparator" />
 

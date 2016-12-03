@@ -73,8 +73,8 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
                     (Button) view.findViewById(R.id.dev_create_records_layout__create_preset),
                     (Button) view.findViewById(R.id._dev_create_records_preset__create_preset_jp),
                     (Button) view.findViewById(R.id._dev_create_records_preset__create_preset_en),
-                    (Button) view.findViewById(R.id.dev_init_records__mark_all_as_unread),
-                    (Button) view.findViewById(R.id.dev_init_records__delete_database)
+                    (Button) view.findViewById(R.id._dev_init_records__mark_all_as_unread),
+                    (Button) view.findViewById(R.id._dev_init_records__delete_database)
                 );
             }
         };
