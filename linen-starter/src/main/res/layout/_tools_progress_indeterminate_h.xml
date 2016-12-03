@@ -19,7 +19,7 @@
         android:layout_gravity="center_vertical">
 
         <ProgressBar
-            android:id="@+id/tools_progress_indeterminate_h__progress_bar"
+            android:id="@+id/_tools_progress_indeterminate_h__progress_bar"
             style="?android:progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

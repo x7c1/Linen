@@ -63,7 +63,7 @@ public class UnreadOutlineRowFooterProvider implements ViewHolderProvider<Unread
             public UnreadOutlineRowFooter createViewHolder(View view){
                 return new UnreadOutlineRowFooter(
                     view,
-                    (ProgressBar) view.findViewById(R.id.tools_progress_indeterminate_h__progress_bar)
+                    (ProgressBar) view.findViewById(R.id._tools_progress_indeterminate_h__progress_bar)
                 );
             }
         };
