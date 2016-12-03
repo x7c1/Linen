@@ -10,18 +10,18 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   behavior of LayoutGenerator.getClass.getName
 
   it can "inspect resource XML" in {
-    val Right(layout) = loader load "comment_row.xml"
-    layout.prefix.ofClass shouldBe "CommentRow"
+    val Right(layout) = loader load "_comment_row.xml"
+    layout.prefix.ofClass shouldBe "_CommentRow"
 
     val elements = layout.elements
 
-    val Some(name) = elements.find(_.key == "comment_row__name")
-    name.key shouldBe "comment_row__name"
+    val Some(name) = elements.find(_.key == "_comment_row__name")
+    name.key shouldBe "_comment_row__name"
     name.label shouldBe "name"
     name.tag shouldBe "TextView"
 
-    val Some(content) = elements.find(_.key == "comment_row__content")
-    content.key shouldBe "comment_row__content"
+    val Some(content) = elements.find(_.key == "_comment_row__content")
+    content.key shouldBe "_comment_row__content"
     content.label shouldBe "content"
     content.tag shouldBe "TextView"
   }
@@ -29,7 +29,7 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   def locations = SampleLocations.layout
 
   it can "generate java source" in {
-    val Right(layout) = loader load "comment_row.xml"
+    val Right(layout) = loader load "_comment_row.xml"
     val sources = new LayoutSourcesFactory(locations).createFrom(layout)
     val source = sources.head.code
 
