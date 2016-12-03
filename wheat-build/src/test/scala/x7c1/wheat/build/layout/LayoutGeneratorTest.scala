@@ -41,14 +41,14 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   }
 
   it can "expand <include> tag" in {
-    val Right(resource) = loader load "main_layout.xml"
+    val Right(resource) = loader load "unread_items_layout.xml"
     val elements = resource.elements
 
-    val Some(x1) = elements.find(_.key == "main_layout__menu_area")
+    val Some(x1) = elements.find(_.key == "unread_items_layout__menu_area")
     x1.label shouldBe "menuArea"
     x1.tag shouldBe "LinearLayout"
 
-    val Some(x2) = elements.find(_.key == "activity_main__source_toolbar")
+    val Some(x2) = elements.find(_.key == "unread_items_panes__source_toolbar")
     x2.label shouldBe "sourceToolbar"
     x2.tag shouldBe "android.support.v7.widget.Toolbar"
   }
@@ -56,18 +56,18 @@ class LayoutGeneratorTest extends FlatSpecLike with Matchers {
   behavior of classOf[ViewHolderSourcesFactory].getSimpleName
 
   it can "generate files around ViewHolder" in {
-    val Right(layout) = loader load "main_layout.xml"
+    val Right(layout) = loader load "unread_items_layout.xml"
     val sources = new ViewHolderSourcesFactory(locations).createFrom(layout)
 
-    val Some(source1) = sources.find(_.file.getName.endsWith("MainLayoutProvider.java"))
+    val Some(source1) = sources.find(_.file.getName.endsWith("UnreadItemsLayoutProvider.java"))
     source1.code should
-      include("class MainLayoutProvider implements ViewHolderProvider<MainLayout>")
+      include("class UnreadItemsLayoutProvider implements ViewHolderProvider<UnreadItemsLayout>")
     source1.code should
-      include("public MainLayout inflate(ViewGroup parent, boolean attachToRoot)")
+      include("public UnreadItemsLayout inflate(ViewGroup parent, boolean attachToRoot)")
 
-    val Some(source2) = sources.find(_.file.getName.endsWith("MainLayout.java"))
+    val Some(source2) = sources.find(_.file.getName.endsWith("UnreadItemsLayout.java"))
     source2.code should
-      include("class MainLayout extends RecyclerView.ViewHolder")
+      include("class UnreadItemsLayout extends RecyclerView.ViewHolder")
   }
 
   it can "generate parent ViewHolder" in {
