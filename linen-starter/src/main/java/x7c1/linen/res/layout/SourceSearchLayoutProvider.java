@@ -46,6 +46,11 @@ public class SourceSearchLayoutProvider implements ViewHolderProvider<SourceSear
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchLayout> factory(){
         return new ViewHolderProviderFactory<SourceSearchLayout>() {
             @Override

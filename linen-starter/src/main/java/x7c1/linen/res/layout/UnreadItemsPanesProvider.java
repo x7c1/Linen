@@ -48,6 +48,11 @@ public class UnreadItemsPanesProvider implements ViewHolderProvider<UnreadItemsP
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadItemsPanes inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadItemsPanes> factory(){
         return new ViewHolderProviderFactory<UnreadItemsPanes>() {
             @Override

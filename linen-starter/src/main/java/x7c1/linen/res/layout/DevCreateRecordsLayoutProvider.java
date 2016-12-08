@@ -8,15 +8,15 @@ package x7c1.linen.res.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.View;
+import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.TextView;
-
-import x7c1.linen.R;
-import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
 import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
+import x7c1.linen.R;
+import x7c1.linen.glue.res.layout.DevCreateRecordsLayout;
 
 public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCreateRecordsLayout> {
 
@@ -46,6 +46,11 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public DevCreateRecordsLayout inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<DevCreateRecordsLayout> factory(){
         return new ViewHolderProviderFactory<DevCreateRecordsLayout>() {
             @Override
@@ -66,10 +71,10 @@ public class DevCreateRecordsLayoutProvider implements ViewHolderProvider<DevCre
                     (Button) view.findViewById(R.id.dev_create_records_layout__create_dummy_sources),
                     (Button) view.findViewById(R.id.dev_create_records_layout__create_dummies),
                     (Button) view.findViewById(R.id.dev_create_records_layout__create_preset),
-                    (Button) view.findViewById(R.id.dev_create_records_preset__create_preset_jp),
-                    (Button) view.findViewById(R.id.dev_create_records_preset__create_preset_en),
-                    (Button) view.findViewById(R.id.dev_init_records__mark_all_as_unread),
-                    (Button) view.findViewById(R.id.dev_init_records__delete_database)
+                    (Button) view.findViewById(R.id._dev_create_records_preset__create_preset_jp),
+                    (Button) view.findViewById(R.id._dev_create_records_preset__create_preset_en),
+                    (Button) view.findViewById(R.id._dev_init_records__mark_all_as_unread),
+                    (Button) view.findViewById(R.id._dev_init_records__delete_database)
                 );
             }
         };

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.UnreadOutlineRowSource;
 
@@ -20,7 +21,11 @@ public class UnreadOutlineRowSourceProvider implements ViewHolderProvider<Unread
     private final LayoutInflater inflater;
 
     public UnreadOutlineRowSourceProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public UnreadOutlineRowSourceProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -36,9 +41,31 @@ public class UnreadOutlineRowSourceProvider implements ViewHolderProvider<Unread
     @Override
     public UnreadOutlineRowSource inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.unread_outline_row__source, parent, attachToRoot);
-        return new UnreadOutlineRowSource(
-            view,
-            (TextView) view.findViewById(R.id.unread_outline_row__source__title)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public UnreadOutlineRowSource inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<UnreadOutlineRowSource> factory(){
+        return new ViewHolderProviderFactory<UnreadOutlineRowSource>() {
+            @Override
+            public ViewHolderProvider<UnreadOutlineRowSource> create(LayoutInflater inflater){
+                return new UnreadOutlineRowSourceProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<UnreadOutlineRowSource> create(Context context){
+                return new UnreadOutlineRowSourceProvider(context);
+            }
+            @Override
+            public UnreadOutlineRowSource createViewHolder(View view){
+                return new UnreadOutlineRowSource(
+                    view,
+                    (TextView) view.findViewById(R.id.unread_outline_row__source__title)
+                );
+            }
+        };
     }
 }

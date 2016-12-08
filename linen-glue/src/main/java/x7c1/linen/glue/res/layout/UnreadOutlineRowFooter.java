@@ -7,15 +7,17 @@
 package x7c1.linen.glue.res.layout;
 
 import android.view.View;
+import android.widget.ProgressBar;
 
 public class UnreadOutlineRowFooter extends UnreadOutlineRow {
 
-    
+    public final ProgressBar progressBar;
 
     public UnreadOutlineRowFooter(
-        View itemView
+        View itemView,
+        ProgressBar progressBar
     ){
         super(itemView);
-        
+        this.progressBar = progressBar;
     }
 }

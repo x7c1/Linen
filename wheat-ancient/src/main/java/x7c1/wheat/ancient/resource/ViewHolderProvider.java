@@ -8,5 +8,7 @@ public interface ViewHolderProvider<T> {
 
 	T inflate(ViewGroup parent, boolean attachToRoot);
 
+	T inflate();
+
 	T inflateOn(ViewGroup parent);
 }

@@ -44,6 +44,11 @@ public class UnreadSourceRowFooterProvider implements ViewHolderProvider<UnreadS
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadSourceRowFooter inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadSourceRowFooter> factory(){
         return new ViewHolderProviderFactory<UnreadSourceRowFooter>() {
             @Override
@@ -58,7 +63,7 @@ public class UnreadSourceRowFooterProvider implements ViewHolderProvider<UnreadS
             public UnreadSourceRowFooter createViewHolder(View view){
                 return new UnreadSourceRowFooter(
                     view,
-                    (ProgressBar) view.findViewById(R.id.tools_progress_indeterminate_h__progress_bar)
+                    (ProgressBar) view.findViewById(R.id._tools_progress_indeterminate_h__progress_bar)
                 );
             }
         };

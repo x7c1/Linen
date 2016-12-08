@@ -2,9 +2,10 @@ package x7c1.linen.repository.inspector
 
 import android.database.sqlite.SQLiteDatabase
 import x7c1.linen.database.mixin.InspectorStatusRecord
-import x7c1.linen.database.struct.HasAccountId
+import x7c1.linen.database.struct.InspectorLoadingStatus.{ConnectionTimeout, ParseError, UnknownError, UnknownHostError}
+import x7c1.linen.database.struct.{HasAccountId, InspectorLoadingStatus}
 import x7c1.wheat.modern.database.selector.SelectorProvidable.Implicits.SelectorProvidableDatabase
-import x7c1.wheat.modern.database.selector.presets.{CanTraverse, ClosableSequence, TraverseOn}
+import x7c1.wheat.modern.database.selector.presets.{CanTraverse, TraverseOn}
 import x7c1.wheat.modern.features.HasShortLength
 import x7c1.wheat.modern.sequence.HeadlineSequencer
 
@@ -32,19 +33,9 @@ trait TraverseReport extends CanTraverse[HasAccountId, SourceSearchReportRow] {
     for {
       records <- db.selectorOf[InspectorStatusRecord].traverseOn(id).right
     } yield {
-      val tmp = sequencer derive records map {
+      sequencer derive records map {
         case Left(row) => row
         case Right(record) => new SourceSearchReportRowFactory(record).create
-      }
-
-      // todo: enable sequencer.derive to support ClosableSequence
-      // workaround
-      new ClosableSequence[SourceSearchReportRow] {
-        override def closeCursor(): Unit = records.closeCursor()
-
-        override def length: Int = tmp.length
-
-        override def findAt(position: Int) = tmp.findAt(position)
       }
     }
 
@@ -112,30 +103,58 @@ private class SourceSearchReportRowFactory(record: InspectorStatusRecord) {
 
   def create: SourceSearchReportRow = {
     val either = for {
-      sourceUrl <- record.latent_source_url.toRight(forNoSource).right
+      sourceUrl <- {
+        lazy val row = forNoSource(record.action_loading_status.typed)
+        record.latent_source_url.toRight(row).right
+      }
     } yield {
       forLatentSourceUrl(sourceUrl)(record.discovered_source_id)
     }
     either.merge
   }
 
-  private def forNoSource = {
-    NoSourceFound(
-      pageTitle = record.origin_title,
-      pageUrl = record.latent_source_url getOrElse record.origin_url,
-      reportMessage = s"Source Not Found : ${record.origin_title}"
-    )
+  private def forNoSource(status: InspectorLoadingStatus) = {
+    status match {
+      case UnknownHostError =>
+        ClientLoadingError(
+          errorText = s"Unknown Host",
+          pageUrl = record.origin_url
+        )
+      case ParseError =>
+        OriginLoadingError(
+          errorText = s"Parse Error",
+          pageUrl = record.origin_url
+        )
+      case ConnectionTimeout =>
+        ClientLoadingError(
+          pageUrl = record.origin_url,
+          errorText = s"Source Not Found (Connection Timeout)"
+        )
+      case UnknownError =>
+        NoSourceFound(
+          pageTitle = "",
+          pageUrl = record.origin_url,
+          reportMessage = s"Source Not Found (Unknown Error)"
+        )
+      case _ =>
+        NoSourceFound(
+          pageTitle = "",
+          pageUrl = record.origin_url,
+          reportMessage = s"Source Not Found (Unexpected Status)"
+        )
+    }
   }
 
   private def forLatentSourceUrl(sourceUrl: String): Option[Long] => SourceSearchReportRow = {
     case Some(sourceId) =>
       DiscoveredSource(
+        sourceId = sourceId,
         sourceTitle = record.source_title getOrElse "",
         sourceDescription = s"description of ${record.latent_source_url}",
         sourceUrl = sourceUrl
       )
     case None =>
-      SourceLoadingError(
+      ClientLoadingError(
         errorText = s"Loading Error : ${record.origin_title}",
         pageUrl = sourceUrl
       )

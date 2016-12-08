@@ -47,6 +47,11 @@ public class SettingScheduleRowItemProvider implements ViewHolderProvider<Settin
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingScheduleRowItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingScheduleRowItem> factory(){
         return new ViewHolderProviderFactory<SettingScheduleRowItem>() {
             @Override

@@ -43,6 +43,11 @@ public class UnreadDetailRowFooterProvider implements ViewHolderProvider<UnreadD
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadDetailRowFooter inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadDetailRowFooter> factory(){
         return new ViewHolderProviderFactory<UnreadDetailRowFooter>() {
             @Override

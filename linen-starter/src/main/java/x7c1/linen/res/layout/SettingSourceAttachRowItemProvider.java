@@ -45,6 +45,11 @@ public class SettingSourceAttachRowItemProvider implements ViewHolderProvider<Se
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingSourceAttachRowItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingSourceAttachRowItem> factory(){
         return new ViewHolderProviderFactory<SettingSourceAttachRowItem>() {
             @Override

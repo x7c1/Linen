@@ -44,6 +44,11 @@ public class SourceSearchRowLabelProvider implements ViewHolderProvider<SourceSe
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchRowLabel inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchRowLabel> factory(){
         return new ViewHolderProviderFactory<SourceSearchRowLabel>() {
             @Override

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.UnreadDetailRowSource;
 
@@ -20,7 +21,11 @@ public class UnreadDetailRowSourceProvider implements ViewHolderProvider<UnreadD
     private final LayoutInflater inflater;
 
     public UnreadDetailRowSourceProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public UnreadDetailRowSourceProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -36,9 +41,31 @@ public class UnreadDetailRowSourceProvider implements ViewHolderProvider<UnreadD
     @Override
     public UnreadDetailRowSource inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.unread_detail_row__source, parent, attachToRoot);
-        return new UnreadDetailRowSource(
-            view,
-            (TextView) view.findViewById(R.id.unread_detail_row__source__title)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public UnreadDetailRowSource inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<UnreadDetailRowSource> factory(){
+        return new ViewHolderProviderFactory<UnreadDetailRowSource>() {
+            @Override
+            public ViewHolderProvider<UnreadDetailRowSource> create(LayoutInflater inflater){
+                return new UnreadDetailRowSourceProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<UnreadDetailRowSource> create(Context context){
+                return new UnreadDetailRowSourceProvider(context);
+            }
+            @Override
+            public UnreadDetailRowSource createViewHolder(View view){
+                return new UnreadDetailRowSource(
+                    view,
+                    (TextView) view.findViewById(R.id.unread_detail_row__source__title)
+                );
+            }
+        };
     }
 }

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.MenuRowSeparator;
 
@@ -19,7 +20,11 @@ public class MenuRowSeparatorProvider implements ViewHolderProvider<MenuRowSepar
     private final LayoutInflater inflater;
 
     public MenuRowSeparatorProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public MenuRowSeparatorProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -35,8 +40,30 @@ public class MenuRowSeparatorProvider implements ViewHolderProvider<MenuRowSepar
     @Override
     public MenuRowSeparator inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.menu_row__separator, parent, attachToRoot);
-        return new MenuRowSeparator(
-            view
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public MenuRowSeparator inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<MenuRowSeparator> factory(){
+        return new ViewHolderProviderFactory<MenuRowSeparator>() {
+            @Override
+            public ViewHolderProvider<MenuRowSeparator> create(LayoutInflater inflater){
+                return new MenuRowSeparatorProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<MenuRowSeparator> create(Context context){
+                return new MenuRowSeparatorProvider(context);
+            }
+            @Override
+            public MenuRowSeparator createViewHolder(View view){
+                return new MenuRowSeparator(
+                    view
+                );
+            }
+        };
     }
 }

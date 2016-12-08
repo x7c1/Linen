@@ -44,6 +44,11 @@ public class UnreadSourceRowItemProvider implements ViewHolderProvider<UnreadSou
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public UnreadSourceRowItem inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<UnreadSourceRowItem> factory(){
         return new ViewHolderProviderFactory<UnreadSourceRowItem>() {
             @Override

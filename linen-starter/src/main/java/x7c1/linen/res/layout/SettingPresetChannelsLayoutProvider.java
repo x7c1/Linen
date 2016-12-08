@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import x7c1.wheat.ancient.resource.ViewHolderProvider;
+import x7c1.wheat.ancient.resource.ViewHolderProviderFactory;
 import x7c1.linen.R;
 import x7c1.linen.glue.res.layout.SettingPresetChannelsLayout;
 
@@ -22,7 +23,11 @@ public class SettingPresetChannelsLayoutProvider implements ViewHolderProvider<S
     private final LayoutInflater inflater;
 
     public SettingPresetChannelsLayoutProvider(Context context){
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
+    }
+
+    public SettingPresetChannelsLayoutProvider(LayoutInflater inflater){
+        this.inflater = inflater;
     }
 
     @Override
@@ -38,11 +43,33 @@ public class SettingPresetChannelsLayoutProvider implements ViewHolderProvider<S
     @Override
     public SettingPresetChannelsLayout inflate(ViewGroup parent, boolean attachToRoot){
         View view = inflater.inflate(R.layout.setting_preset_channels_layout, parent, attachToRoot);
-        return new SettingPresetChannelsLayout(
-            view,
-            (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_preset_channels_layout__toolbar),
-            (android.support.design.widget.TabLayout) view.findViewById(R.id.setting_preset_channels_layout__tabs),
-            (android.support.v4.view.ViewPager) view.findViewById(R.id.setting_preset_channels_layout__pager)
-        );
+        return factory().createViewHolder(view);
+    }
+
+    @Override
+    public SettingPresetChannelsLayout inflate(){
+        return inflate(null, false);
+    }
+
+    public static ViewHolderProviderFactory<SettingPresetChannelsLayout> factory(){
+        return new ViewHolderProviderFactory<SettingPresetChannelsLayout>() {
+            @Override
+            public ViewHolderProvider<SettingPresetChannelsLayout> create(LayoutInflater inflater){
+                return new SettingPresetChannelsLayoutProvider(inflater);
+            }
+            @Override
+            public ViewHolderProvider<SettingPresetChannelsLayout> create(Context context){
+                return new SettingPresetChannelsLayoutProvider(context);
+            }
+            @Override
+            public SettingPresetChannelsLayout createViewHolder(View view){
+                return new SettingPresetChannelsLayout(
+                    view,
+                    (android.support.v7.widget.Toolbar) view.findViewById(R.id.setting_preset_channels_layout__toolbar),
+                    (android.support.design.widget.TabLayout) view.findViewById(R.id.setting_preset_channels_layout__tabs),
+                    (android.support.v4.view.ViewPager) view.findViewById(R.id.setting_preset_channels_layout__pager)
+                );
+            }
+        };
     }
 }

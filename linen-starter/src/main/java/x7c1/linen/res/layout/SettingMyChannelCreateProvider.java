@@ -45,6 +45,11 @@ public class SettingMyChannelCreateProvider implements ViewHolderProvider<Settin
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingMyChannelCreate inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingMyChannelCreate> factory(){
         return new ViewHolderProviderFactory<SettingMyChannelCreate>() {
             @Override

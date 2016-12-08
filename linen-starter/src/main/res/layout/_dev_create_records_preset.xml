@@ -8,13 +8,13 @@
 
     <RelativeLayout style="@style/DevCreateRecordsMenuBox">
         <Button
-            android:id="@+id/dev_create_records_preset__create_preset_jp"
+            android:id="@+id/_dev_create_records_preset__create_preset_jp"
             android:text="JAPANESE"
             style="@style/DevCreateRecordsMenuButton"
             />
         <Button
-            android:id="@+id/dev_create_records_preset__create_preset_en"
-            android:layout_below="@id/dev_create_records_preset__create_preset_jp"
+            android:id="@+id/_dev_create_records_preset__create_preset_en"
+            android:layout_below="@id/_dev_create_records_preset__create_preset_jp"
             android:text="ENGLISH"
             style="@style/DevCreateRecordsMenuButton"
             />

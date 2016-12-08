@@ -45,6 +45,11 @@ public class SourceSearchStartProvider implements ViewHolderProvider<SourceSearc
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SourceSearchStart inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SourceSearchStart> factory(){
         return new ViewHolderProviderFactory<SourceSearchStart>() {
             @Override

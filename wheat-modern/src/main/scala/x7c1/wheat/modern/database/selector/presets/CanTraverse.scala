@@ -2,7 +2,7 @@ package x7c1.wheat.modern.database.selector.presets
 
 import android.database.{Cursor, SQLException}
 import x7c1.wheat.modern.database.selector.{CanExtract, CanIdentify, CanSelect, CursorReadable, CursorReifiable}
-import x7c1.wheat.modern.sequence.{CanFilterFrom, CanMapFrom, Sequence}
+import x7c1.wheat.modern.sequence.{CanDelegate, CanFilterFrom, CanMapFrom, CanSliceFrom, Sequence}
 
 import scala.language.{higherKinds, reflectiveCalls}
 
@@ -52,6 +52,23 @@ object ClosableSequence {
         override def closeCursor() = fa.closeCursor()
         override def findAt(position: Int) = positions findAt position flatMap fa.findAt
         override def length = positions.length
+      }
+  }
+  implicit object canSliceFrom extends CanSliceFrom[ClosableSequence]{
+    override def sliceFrom[A](fa: ClosableSequence[A])(range: Seq[Int]) =
+      new ClosableSequence[A] {
+        lazy val positionAt = range.lift
+        override def closeCursor() = fa.closeCursor()
+        override def findAt(position: Int) = positionAt(position) flatMap fa.findAt
+        override def length = range.length
+      }
+  }
+  implicit object canDelegate extends CanDelegate[ClosableSequence]{
+    override def delegate[A, B](from: ClosableSequence[A])(to: Sequence[B]) =
+      new ClosableSequence[B] {
+        override def closeCursor() = from.closeCursor()
+        override def findAt(position: Int) = to findAt position
+        override def length = to.length
       }
   }
 }

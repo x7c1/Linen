@@ -43,6 +43,11 @@ public class SettingMyChannelRowFooterProvider implements ViewHolderProvider<Set
         return factory().createViewHolder(view);
     }
 
+    @Override
+    public SettingMyChannelRowFooter inflate(){
+        return inflate(null, false);
+    }
+
     public static ViewHolderProviderFactory<SettingMyChannelRowFooter> factory(){
         return new ViewHolderProviderFactory<SettingMyChannelRowFooter>() {
             @Override
