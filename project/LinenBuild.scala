@@ -1,4 +1,3 @@
-import play.twirl.sbt.SbtTwirl
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
