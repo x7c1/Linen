@@ -2,8 +2,8 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
-import x7c1.wheat.build.WheatSettings.{directories, packages, wheat}
-import x7c1.wheat.build.{WheatDirectories, WheatPackages, WheatSettings}
+import x7c1.wheat.harvest.WheatSettings.{directories, packages, wheat}
+import x7c1.wheat.harvest.{WheatDirectories, WheatPackages, WheatSettings}
 
 import scala.io.Source
 
@@ -109,18 +109,6 @@ object LinenBuild extends Build with LinenSettings {
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
     dependsOn(`linen-scene`)
-
-  lazy val `wheat-build` = project.
-    settings(
-      sbtPlugin := true,
-      libraryDependencies += testLibrary
-    ).
-    settings(
-      organization := "x7c1",
-      name         := "wheat-build",
-      version      := "0.1-SNAPSHOT"
-    ).
-    enablePlugins(SbtTwirl)
 
   lazy val root = Project("linen", file(".")).
     aggregate(`linen-modern`).
