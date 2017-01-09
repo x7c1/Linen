@@ -30,6 +30,7 @@ def create_flow_factory dir_flow
 end
 
 targets = [
+  "android-jars",
   "wheat-build",
   "wheat-modern",
   "wheat-macros",
@@ -45,6 +46,8 @@ targets = [
   "linen-links.rb",
   "project",
   "local.properties",
+  "targets.gradle",
+  "build.gradle",
   "README.md",
 ]
 

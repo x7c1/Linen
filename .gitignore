@@ -14,6 +14,8 @@ gradle.properties
 target
 
 libs-generated
+libs-assembled
+libs-expanded
 linen-pickle/build
 wheat-ancient/build
 

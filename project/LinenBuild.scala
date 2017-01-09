@@ -4,8 +4,7 @@ import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
 import x7c1.wheat.harvest.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.harvest.{WheatDirectories, WheatPackages, WheatSettings}
-
-import scala.io.Source
+import x7c1.wheat.splicer.assembly.AssemblySettings
 
 object LinenBuild extends Build with LinenSettings {
 
@@ -22,13 +21,21 @@ object LinenBuild extends Build with LinenSettings {
   )
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
+  lazy val `android-jars` = project.settings(AssemblySettings.forProvider(
+    assemblyDirectory = _.base / "libs-assembled",
+    splicerDirectory = _.base / "libs-expanded",
+    localProperties = file("local.properties"),
+    buildGradle = file("build.gradle"),
+    dependenciesGradle = file("targets.gradle")
+  ))
+
   lazy val `wheat-ancient` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath)
+    settings(compileOrder := CompileOrder.JavaThenScala).
+    settings(AssemblySettings.forClient(`android-jars`))
 
   lazy val `linen-glue` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-ancient`)
 
   lazy val `linen-pickle` = project.
@@ -43,20 +50,17 @@ object LinenBuild extends Build with LinenSettings {
       "com.google.code.android-rome-feed-reader" % "android-rome-feed-reader" % "1.0.0-r2"
     )).
     settings(
-      unmanagedJars in Compile ++= androidSdkClasspath,
-      assemblyOutputPath in assembly := pickleJarPath.value,
-      assemblyExcludedJars in assembly := androidJars.value
+      assemblyOutputPath in assembly := pickleJarPath.value
     )
 
   lazy val `wheat-macros` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
+    settings(AssemblySettings.forClient(`android-jars`)).
     settings(libraryDependencies +=
       "org.scala-lang" % "scala-reflect" % scalaVersion.value )
 
   lazy val `wheat-macros-sample` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     settings(libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )).
@@ -64,12 +68,10 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `wheat-modern` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-macros`, `wheat-calendar`)
 
   lazy val `wheat-lore` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`wheat-modern`, `wheat-ancient`)
 
   lazy val `wheat-calendar` = project.
@@ -77,7 +79,6 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-repository` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     settings(libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % Test,
       "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
@@ -96,7 +97,6 @@ object LinenBuild extends Build with LinenSettings {
 
   lazy val `linen-scene` = project.
     settings(linenSettings:_*).
-    settings(unmanagedJars in Compile := androidSdkClasspath).
     dependsOn(`linen-repository`, `linen-glue`, `wheat-lore`)
 
   lazy val `linen-modern` = project.
@@ -105,9 +105,9 @@ object LinenBuild extends Build with LinenSettings {
     settings(
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
       assemblyOutputPath in assembly := linenJarPath.value,
-      assemblyExcludedJars in assembly := androidJars.value,
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
+    settings(AssemblySettings.forClient(`android-jars`)).
     dependsOn(`linen-scene`)
 
   lazy val root = Project("linen", file(".")).
@@ -142,21 +142,6 @@ trait LinenSettings {
 
   lazy val pickleJarPath = (assemblyJarName in assembly) map { jar =>
     file("linen-pickle") / "libs-generated" / jar
-  }
-
-  lazy val androidJars = (fullClasspath in assembly) map { path =>
-    path filter {_.data.getAbsolutePath startsWith androidSdk.getAbsolutePath}
-  }
-
-  lazy val androidSdkClasspath = {
-    val dirs = {
-      (androidSdk / "extras/android/support/v7/appcompat/libs") +++
-      (androidSdk / "extras/android/support/v7/recyclerview/libs") +++
-      (androidSdk / "extras/android/support/v7/cardview/libs") +++
-      (androidSdk / "extras/android/support/design/libs") +++
-      (androidSdk / "platforms/android-23")
-    }
-    (dirs * "*.jar").classpath
   }
 
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
@@ -198,11 +183,4 @@ trait LinenSettings {
     list foreach {_ !< streams.value.log}
   }
 
-  private lazy val androidSdk = {
-    val lines = Source.fromFile(file("local.properties")).getLines()
-    val regex = "^sdk.dir=(.*)".r
-    lines collectFirst { case regex(path) => file(path) } getOrElse {
-      throw new IllegalStateException("sdk.dir not found")
-    }
-  }
 }
