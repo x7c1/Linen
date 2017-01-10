@@ -119,7 +119,7 @@ class UnreadChannelsMenu(
       }
     }
   }
-  override def viewHolderProviders = Seq(viewHolderProvider)
+  override def viewHolderProviders[B >: MenuRowLabel] = Seq(viewHolderProvider)
 }
 
 class OnMenuItemClick(
