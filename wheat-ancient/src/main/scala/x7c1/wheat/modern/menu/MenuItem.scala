@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 trait MenuItem[+A] {
   def length: Int
   def findItemAt(position: Int): Option[SingleMenuItem[A]]
-  def viewHolderProviders: Seq[ViewHolderProvider[_ <: A]]
+  def viewHolderProviders[B >: A]: Seq[ViewHolderProvider[_ <: B]]
 }
 
 trait MenuText {
@@ -22,7 +22,7 @@ class SingleMenuItem[+A](
 
   override def findItemAt(position: Int) = Some(this)
 
-  override def viewHolderProviders: Seq[ViewHolderProvider[_ <: A]] = Seq(provider)
+  override def viewHolderProviders[B >: A]: Seq[ViewHolderProvider[_ <: B]] = Seq(provider)
 
   def viewType: Int = provider.layoutId()
 }
@@ -50,7 +50,7 @@ class MenuItems[A] private (items: MenuItem[A]*) extends MenuItem[A] {
       item.findItemAt(position - prev)
     }
   }
-  override def viewHolderProviders = {
+  override def viewHolderProviders[B >: A] = {
     items.flatMap(_.viewHolderProviders)
   }
   def inflate(parent: ViewGroup, viewType: Int): A = {
