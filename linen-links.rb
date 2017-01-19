@@ -29,6 +29,11 @@ def create_flow_factory dir_flow
   }
 end
 
+def escape path
+  require 'shellwords'
+  path.shellescape
+end
+
 targets = [
   "android-jars",
   "wheat-build",
@@ -52,8 +57,8 @@ targets = [
 ]
 
 begin
-  dst_dir = get_dst_path
-  to_flow = create_flow_factory Flow.new(Dir::pwd, dst_dir)
+  dst_dir = escape get_dst_path
+  to_flow = create_flow_factory Flow.new(escape(Dir::pwd), dst_dir)
 
   create_directory dst_dir
   targets.map(&to_flow).each &create_symbolic_link
