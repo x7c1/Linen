@@ -166,8 +166,10 @@ trait LinenSettings {
     Def.taskKey[Unit]("Build android app and install to connected device.")
 
   def linenTasks(project: Project) = Seq(
-    assembleAndInstall := installTask.value,
-    assembleAndInstall <<= (assembleAndInstall dependsOn (assembly in project))
+    assembleAndInstall := Def.sequential(
+      assembly in project,
+      installTask
+    ).value
   )
 
   def installTask = Def task {
