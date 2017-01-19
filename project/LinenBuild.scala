@@ -50,7 +50,9 @@ object LinenBuild extends Build with LinenSettings {
       "com.google.code.android-rome-feed-reader" % "android-rome-feed-reader" % "1.0.0-r2"
     )).
     settings(
-      assemblyOutputPath in assembly := pickleJarPath.value
+      assemblyOutputPath in assembly := {
+        thisProject.value.base / "libs-generated" / (assemblyJarName in assembly).value
+      }
     )
 
   lazy val `wheat-macros` = project.
@@ -104,7 +106,9 @@ object LinenBuild extends Build with LinenSettings {
     settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
     settings(
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
-      assemblyOutputPath in assembly := linenJarPath.value,
+      assemblyOutputPath in assembly := {
+        file("linen-starter") / "libs-generated" / (assemblyJarName in assembly).value
+      },
       assemblyMergeStrategy in assembly := discardTargets.value
     ).
     settings(AssemblySettings.forClient(`android-jars`)).
@@ -136,13 +140,7 @@ trait LinenSettings {
     glue = file("linen-glue")
   )
 
-  lazy val linenJarPath = (assemblyJarName in assembly) map { jar =>
-    file("linen-starter") / "libs-generated" / jar
-  }
 
-  lazy val pickleJarPath = (assemblyJarName in assembly) map { jar =>
-    file("linen-pickle") / "libs-generated" / jar
-  }
 
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
     val ignore = (path: String) =>
