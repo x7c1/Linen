@@ -52,6 +52,7 @@ targets = [
   "project",
   "local.properties",
   "targets.gradle",
+  "build.sbt",
   "build.gradle",
   "README.md",
 ]
