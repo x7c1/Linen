@@ -6,7 +6,7 @@ import x7c1.wheat.harvest.{WheatDirectories, WheatPackages}
 
 object LinenSettings {
 
-  lazy val testLibrary = "org.scalatest" %% "scalatest" % "2.2.4" % Test
+  lazy val testLibrary = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
   lazy val linenSettings = Seq(
     scalaVersion := "2.12.1",
