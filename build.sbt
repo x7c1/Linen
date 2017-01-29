@@ -64,6 +64,9 @@ lazy val `wheat-calendar` = project.
 
 lazy val `linen-repository` = project.
   settings(linenSettings: _*).
+  settings(unmanagedJars in Compile ++= {
+    (assemblyOutputPath in assembly in `linen-pickle`).value.get.classpath
+  }).
   settings(libraryDependencies ++= Seq(
     "com.novocode" % "junit-interface" % "0.11" % Test,
     "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % Test,
@@ -75,7 +78,7 @@ lazy val `linen-repository` = project.
     javaOptions in Test += "-Djava.awt.headless=true",
     fork in Test := true
   ).
-  dependsOn(`wheat-modern`, `linen-pickle`)
+  dependsOn(`wheat-modern`)
 
 lazy val `linen-scene` = project.
   settings(linenSettings: _*).
@@ -83,11 +86,13 @@ lazy val `linen-scene` = project.
 
 lazy val `linen-modern` = project.
   settings(linenSettings: _*).
-  settings(unmanagedJars in Compile := (unmanagedJars in Compile in `linen-pickle`).value).
   settings(
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyOutputPath in assembly := {
       file("linen-starter") / "libs-generated" / (assemblyJarName in assembly).value
+    },
+    assemblyExcludedJars in assembly ++= {
+      (assemblyOutputPath in assembly in `linen-pickle`).value.get.classpath
     },
     assemblyMergeStrategy in assembly := discardTargets.value
   ).

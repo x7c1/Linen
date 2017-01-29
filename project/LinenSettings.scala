@@ -36,10 +36,6 @@ object LinenSettings {
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
     val ignore = {
       val prefixes = Seq(
-        "org/jdom", "JDOMAbout",
-        "com/google/code/rome", "META-INF",
-        "com/typesafe/config",
-        "org/jsoup",
         "x7c1/linen/glue", "x7c1/wheat/ancient"
       )
       prefixes exists (_: String).startsWith
