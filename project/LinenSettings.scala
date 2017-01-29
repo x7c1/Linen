@@ -9,7 +9,7 @@ object LinenSettings {
   lazy val testLibrary = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
   lazy val linenSettings = Seq(
-    scalaVersion := "2.12.1",
+    scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-deprecation",
       "-feature",
