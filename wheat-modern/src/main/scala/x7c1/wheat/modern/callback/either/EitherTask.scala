@@ -15,7 +15,7 @@ class EitherTask [+L, +R] private (f: (Either[L, R] => Unit) => Unit){
       case Right(x) => g(x) run h
     })
 
-  def map[A](g: R => A): L | A =
+  def map[A, L2 >: L](g: R => A): L2 | A =
     EitherTask(h => f {
       case Left(x) => h(Left(x))
       case Right(x) => h(Right(g(x)))
