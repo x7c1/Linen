@@ -72,10 +72,7 @@ lazy val `linen-repository` = project.
     "org.robolectric" % "robolectric" % "3.0" % Test
   )).
   settings(
-
-    // not work?
-    // javaOptions in (Test, run) += "-Djava.awt.headless=true",
-
+    javaOptions in Test += "-Djava.awt.headless=true",
     fork in Test := true
   ).
   dependsOn(`wheat-modern`, `linen-pickle`)
