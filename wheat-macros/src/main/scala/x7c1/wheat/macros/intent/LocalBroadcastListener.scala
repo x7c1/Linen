@@ -96,8 +96,8 @@ private trait LocalBroadcastListenerFactory  extends TreeContext {
     val eventTree = IntentDecoder(this.context)(intent) decodeIntent (instanceType, prefix)
 
     q"""
-      new ${typeOf[BroadcastReceiver]}{
-        override def onReceive($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) = {
+      new ${typeOf[BaseBroadcastReceiver]}(
+        ($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) => {
           try {
             val $event = $eventTree
             val $f = $blockTree
@@ -111,10 +111,14 @@ private trait LocalBroadcastListenerFactory  extends TreeContext {
               ${typeOf[Log].companion}.e(${enclosing.fullName}, $message)
           }
         }
-      }
+      )
     """
   }
   def createFilter = {
     q"""new ${typeOf[IntentFilter]}(${instanceType.typeSymbol.fullName})"""
   }
+}
+
+private class BaseBroadcastReceiver(f: (Context, Intent) => Unit) extends BroadcastReceiver {
+  override def onReceive(context: Context, intent: Intent): Unit = f(context, intent)
 }
