@@ -22,12 +22,12 @@ subprojects{
     afterEvaluate {
         if(it.hasProperty('android')){
             android {
-                compileSdkVersion 23
-                buildToolsVersion "23.0.3"
+                compileSdkVersion 25
+                buildToolsVersion "25.0.2"
 
                 defaultConfig {
                     minSdkVersion 21
-                    targetSdkVersion 23
+                    targetSdkVersion 25
                     multiDexEnabled true
                 }
                 dexOptions {
