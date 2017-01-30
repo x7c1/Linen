@@ -36,7 +36,6 @@ end
 
 targets = [
   "android-jars",
-  "wheat-build",
   "wheat-modern",
   "wheat-macros",
   "wheat-macros-sample",
