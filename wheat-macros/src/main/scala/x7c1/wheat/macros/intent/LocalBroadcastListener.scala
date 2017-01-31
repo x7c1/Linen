@@ -18,8 +18,9 @@ lazy val listener = LocalBroadcastListener[SomeEvent]{
 is expanded like below:
 
 lazy val listener = {
-  val receiver = new BroadcastReceiver {
-    override def onReceive(context: Context, intent: Intent) = try {
+  val receiver =
+   new BaseBroadcastReceiver (
+    (context: Context, intent: Intent) = try {
       val event = {
         val x1 = if (intent.hasExtra(""com.example.SomeEvent:foo"")) {
           intent.getLongExtra("com.example.SomeEvent:foo", -1)
@@ -36,7 +37,7 @@ lazy val listener = {
       case e: ExtraNotFoundException =>
         Log.e("com.example.FooActivity", s"[${e.key}] not found in received Intent")
     }
-  }
+  )
   val filter = new IntentFilter("com.example.SomeEvent")
   new LocalBroadcastListener(receiver, filter)
 }
@@ -96,8 +97,7 @@ private trait LocalBroadcastListenerFactory  extends TreeContext {
     val eventTree = IntentDecoder(this.context)(intent) decodeIntent (instanceType, prefix)
 
     q"""
-      new ${typeOf[BroadcastReceiver]}{
-        override def onReceive($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) = {
+        new ${typeOf[BaseBroadcastReceiver]}(($context: ${typeOf[Context]}, $intent: ${typeOf[Intent]}) => {
           try {
             val $event = $eventTree
             val $f = $blockTree
@@ -110,11 +110,14 @@ private trait LocalBroadcastListenerFactory  extends TreeContext {
 
               ${typeOf[Log].companion}.e(${enclosing.fullName}, $message)
           }
-        }
-      }
+        })
     """
   }
   def createFilter = {
     q"""new ${typeOf[IntentFilter]}(${instanceType.typeSymbol.fullName})"""
   }
+}
+
+class BaseBroadcastReceiver(f: (Context, Intent) => Unit) extends BroadcastReceiver {
+  override def onReceive(context: Context, intent: Intent): Unit = f(context, intent)
 }
