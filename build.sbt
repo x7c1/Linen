@@ -1,5 +1,5 @@
 import LinenSettings.{discardTargets, linenDirectories, linenPackages, linenSettings, linenTasks}
-import sbtassembly.AssemblyKeys.{assemblyJarName, assemblyMergeStrategy, assemblyOption, assemblyOutputPath}
+import sbtassembly.AssemblyKeys.{assemblyJarName, assemblyMergeStrategy, assemblyOutputPath}
 import x7c1.wheat.harvest.WheatSettings
 import x7c1.wheat.harvest.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.splicer.assembly.AssemblySettings
@@ -87,7 +87,6 @@ lazy val `linen-scene` = project.
 lazy val `linen-modern` = project.
   settings(linenSettings: _*).
   settings(
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyOutputPath in assembly := {
       file("linen-starter") / "libs-generated" / (assemblyJarName in assembly).value
     },
