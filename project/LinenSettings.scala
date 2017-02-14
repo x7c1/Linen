@@ -2,7 +2,8 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.MergeStrategy
-import x7c1.wheat.harvest.{WheatDirectories, WheatPackages}
+import x7c1.wheat.harvest.{HarvestSettings, HarvestLocations}
+import x7c1.wheat.harvest.HarvestSettings.harvestLocations
 
 object LinenSettings {
 
@@ -20,17 +21,13 @@ object LinenSettings {
     logLevel in assembly := Level.Error
   )
 
-  lazy val linenPackages = WheatPackages(
-    starter = "x7c1.linen",
-    starterLayout = "x7c1.linen.res.layout",
-    starterValues = "x7c1.linen.res.values",
-    glueLayout = "x7c1.linen.glue.res.layout",
-    glueValues = "x7c1.linen.glue.res.values"
-  )
-
-  lazy val linenDirectories = WheatDirectories(
-    starter = file("linen-starter"),
-    glue = file("linen-glue")
+  lazy val harvestSettings = HarvestSettings.definition ++ Seq(
+    harvestLocations := HarvestLocations(
+      starterPackage = "x7c1.linen",
+      starterDirectory = file("linen-starter"),
+      gluePackage = "x7c1.linen.glue",
+      glueDirectory = file("linen-glue")
+    )
   )
 
   lazy val discardTargets: Def.Initialize[String => MergeStrategy] = {
