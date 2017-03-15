@@ -5,5 +5,5 @@ resolvers += Resolver.url(
 
 addSbtPlugin("x7c1" % "wheat-harvest" % "0.2.0")
 
-addSbtPlugin("x7c1" % "wheat-splicer-assembly" % "0.2.0")
+addSbtPlugin("x7c1" % "wheat-splicer-assembly" % "0.2.1")
 
