@@ -1,7 +1,5 @@
-import LinenSettings.{discardTargets, linenDirectories, linenPackages, linenSettings, linenTasks}
+import LinenSettings.{discardTargets, harvestSettings, linenSettings, linenTasks}
 import sbtassembly.AssemblyKeys.{assemblyJarName, assemblyMergeStrategy, assemblyOutputPath}
-import x7c1.wheat.harvest.WheatSettings
-import x7c1.wheat.harvest.WheatSettings.{directories, packages, wheat}
 import x7c1.wheat.splicer.assembly.AssemblySettings
 
 lazy val `android-jars` = project.settings(AssemblySettings.forProvider(
@@ -101,8 +99,4 @@ lazy val `linen-modern` = project.
 lazy val root = Project("linen", file(".")).
   aggregate(`linen-modern`).
   settings(linenTasks(`linen-modern`): _*).
-  settings(WheatSettings.all: _*).
-  settings(
-    packages in wheat := linenPackages,
-    directories in wheat := linenDirectories
-  )
+  settings(harvestSettings: _*)
